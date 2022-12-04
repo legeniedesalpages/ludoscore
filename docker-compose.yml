@@ -16,6 +16,7 @@ services:
       - APACHE_RUN_GROUP=#1000
     volumes:
       - ./back:/var/www/html
+      - .env:/var/www/html/.env
     networks:
       backend:
         aliases:
@@ -25,13 +26,13 @@ services:
     image: mysql:5.7.40
     container_name: mysql-db
     ports:
-      - 3306:3306
+      - ${DB_PORT}:3306
     volumes:
       - ./data/mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_DATABASE=ludoscore
-      - MYSQL_USER=ludoscore
+      - MYSQL_ROOT_PASSWORD=ludorootpassword
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
     networks:
       backend:
