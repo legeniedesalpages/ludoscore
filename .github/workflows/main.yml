@@ -41,12 +41,6 @@ jobs:
         dangerous-clean-slate: true
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
-        
-    - name: Suppression précédente version
-      uses: fjogeleit/http-request-action@v1
-      with:
-        url: 'https://www.lgda.fr/ludoscore_deploiement/clean.php'
-        method: 'GET'
     
     - name: Lancement du déploiement distant
       uses: fjogeleit/http-request-action@v1
