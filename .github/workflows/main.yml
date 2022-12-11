@@ -43,8 +43,8 @@ jobs:
         password: ${{ secrets.OVH_PASSWORD }}
     
     - name: Lancement du déploiement distant
-      uses: fjogeleit/http-request-action@v1
+      uses: satak/webrequest-action@master
       with:
-        url: 'https://www.lgda.fr/ludoscore_deploiement/install.php'
-        method: 'GET'
+        url: https://www.lgda.fr/ludoscore_deploiement/install.php
+        method: GET
       
