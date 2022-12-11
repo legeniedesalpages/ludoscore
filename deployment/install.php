@@ -13,7 +13,7 @@
     <hr />
     <?php
 
-    $zip_deploiment = '../../ludoscore/deployment/back.zip';
+    $zip_deploiment = './back.zip';
     echo "<hr/>";
     echo "Recherche du fichier $zip_deploiment<br/>";
 
@@ -22,7 +22,7 @@
     if ($res === TRUE) {
         echo "Archive trouvée $zip_deploiment<br/>";
         $time_start2 = microtime(true);
-        $zip->extractTo('../../ludoscore/deployment/back');
+        $zip->extractTo('../../ludoscore/.');
         $zip->close();
         $time_end2 = microtime(true);
         $execution_time2 = ($time_end2 - $time_start2);
