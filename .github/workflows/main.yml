@@ -16,6 +16,11 @@ jobs:
     
     - uses: actions/checkout@v3
     
+    - name: Install dependencies
+      uses: php-actions/composer@v6
+      with:
+        command: install --working-dir=./back/
+    
     - name: Création du fichier .env
       uses: "finnp/create-file-action@master"
       env:
