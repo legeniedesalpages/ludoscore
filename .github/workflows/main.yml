@@ -21,8 +21,8 @@ jobs:
       env:
         FILE_NAME: "./deployment/.env"
         FILE_DATA: |
-            APP_NAME="LudoScore Back"\r\n
-            APP_ENV=local\r\n
+            APP_NAME="LudoScore Back"# 
+            APP_ENV=local#
             APP_KEY=${{ secrets.APP_KEY }}\r\n
             APP_DEBUG=true\r\n
             APP_URL=https://www.lgda.fr/ludoscore\r\n
