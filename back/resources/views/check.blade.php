@@ -22,6 +22,9 @@
     </head>
     <body class="antialiased">
         <h1>Check</h1>
+        <hr/>
+        Migration : {{ $migration  ? 'true' : 'false' }}
+        <hr/>
         <ul>
             @foreach ($users as $user)
                 <li>This is user {{ $user->name }}</li>
