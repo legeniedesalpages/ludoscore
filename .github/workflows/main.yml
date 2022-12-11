@@ -20,21 +20,21 @@ jobs:
       uses: "finnp/create-file-action@master"
       env:
         FILE_NAME: "./deployment/.env"
-        FILE_DATA: |
-            APP_NAME="LudoScore Back"# 
-            APP_ENV=local#
-            APP_KEY=${{ secrets.APP_KEY }}\r\n
-            APP_DEBUG=true\r\n
-            APP_URL=https://www.lgda.fr/ludoscore\r\n
-            LOG_CHANNEL=stack\r\n
-            LOG_DEPRECATIONS_CHANNEL=null\r\n
-            LOG_LEVEL=debug\r\n
-            DB_HOST=lgdafrglegenie.mysql.db\r\n
-            DB_PORT=3306\r\n
-            DB_DATABASE=lgdafrglegenie\r\n
-            DB_USERNAME=${{ secrets.BDD_USERNAME }}\r\n
-            DB_PASSWORD=${{ secrets.BDD_PASSWORD }}\r\n
-            DB_PREFIX=ludo$\r\n
+        FILE_DATA: >-
+          APP_NAME="LudoScore Back"# 
+          APP_ENV=local#
+          APP_KEY=${{ secrets.APP_KEY }} \
+          APP_DEBUG=true\r\n
+          APP_URL=https://www.lgda.fr/ludoscore\r\n
+          LOG_CHANNEL=stack\r\n
+          LOG_DEPRECATIONS_CHANNEL=null\r\n
+          LOG_LEVEL=debug\r\n
+          DB_HOST=lgdafrglegenie.mysql.db\r\n
+          DB_PORT=3306\r\n
+          DB_DATABASE=lgdafrglegenie\r\n
+          DB_USERNAME=${{ secrets.BDD_USERNAME }}\r\n
+          DB_PASSWORD=${{ secrets.BDD_PASSWORD }}\r\n
+          DB_PREFIX=ludo$\r\n
         
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
