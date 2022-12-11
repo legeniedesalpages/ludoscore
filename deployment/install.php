@@ -41,9 +41,37 @@
     echo "<hr/>";
     echo "Copie du repertoire public";
     rename("./public", "../ludoscore");
+
+    echo "<hr/>";
+    echo "Suppression repertoire de déploiement";
+    rrmdir('../ludoscore_deploiement');
     
     echo "<hr/>";
     echo "<h2>Fin</h2>";
+
+
+    function rrmdir($dir)
+    {
+        ob_flush();
+        flush();
+
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+
+            foreach ($objects as $object) {
+                if ($object != '.' && $object != '..') {
+                    if (filetype($dir . '/' . $object) == 'dir') {
+                        rrmdir($dir . '/' . $object);
+                    } else {
+                        unlink($dir . '/' . $object);
+                    }
+                }
+            }
+
+            reset($objects);
+            rmdir($dir);
+        }
+    }
 
     ?></b>
 </body>
