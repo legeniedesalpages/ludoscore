@@ -20,8 +20,11 @@ jobs:
       uses: "finnp/create-file-action@master"
       env:
         FILE_NAME: "./deployment/.env"
-        FILE_DATA: "APP_NAME=\"LudoScore Back\"\nAPP_ENV=local\n,APP_KEY=${{ secrets.APP_KEY }}"
-    
+        FILE_DATA: |
+          "APP_NAME=\"LudoScore Back\" \
+           APP=toto \
+           PLUS=un"
+        
     - name: Copie fichier de déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
