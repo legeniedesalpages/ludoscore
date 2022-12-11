@@ -17,6 +17,12 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Copie fichier de déploiement
+      uses: "finnp/create-file-action@master"
+      env:
+        FILE_NAME: "./deployment/.env"
+        FILE_DATA: "APP_NAME=\"LudoScore Back\"\nAPP_ENV=local\n,APP_KEY=${{ secrets.APP_KEY }}"
+    
+    - name: Copie fichier de déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ${{ secrets.OVH_SERVER }}
