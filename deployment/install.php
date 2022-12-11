@@ -10,7 +10,6 @@
 
 <body>
     <h1>Déploiement Ludoscore / Install</h1>
-    <hr />
     <?php
 
     $zip_deploiment = './back.zip';
@@ -22,7 +21,7 @@
     if ($res === TRUE) {
         echo "Archive trouvée $zip_deploiment<br/>";
         $time_start2 = microtime(true);
-        $zip->extractTo('../../ludoscore/.');
+        $zip->extractTo('../../.');
         $zip->close();
         $time_end2 = microtime(true);
         $execution_time2 = ($time_end2 - $time_start2);
@@ -31,7 +30,18 @@
         echo "Archive introuvable : $zip_deploiment";
     }
     
-
+    echo "<hr/>";
+    echo "Renommage du repertoire";
+    rename('../../back', '../../ludoscore');
+    
+    echo "<hr/>";
+    echo "Copie du .env";
+    copy("./.env", "../../ludoscore/.env");
+    
+    echo "<hr/>";
+    echo "Copie du repertoire public";
+    rename("./public", "../ludoscore");
+    
     echo "<hr/>";
     echo "<h2>Fin</h2>";
 
