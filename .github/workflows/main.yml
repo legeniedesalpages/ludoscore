@@ -16,27 +16,27 @@ jobs:
     
     - uses: actions/checkout@v3
     
-    - name: Copie fichier de déploiement
+    - name: Création du fichier .env
       uses: "finnp/create-file-action@master"
       env:
-        FILE_NAME: "./deployment/.env.txt"
+        FILE_NAME: "./deployment/.env"
         FILE_DATA: |
-            APP_NAME="LudoScore Back"
-            APP_ENV=local
-            APP_KEY=${{ secrets.APP_KEY }}
-            APP_DEBUG=true
-            APP_URL=https://www.lgda.fr/ludoscore
-            LOG_CHANNEL=stack
-            LOG_DEPRECATIONS_CHANNEL=null
-            LOG_LEVEL=debug
-            DB_HOST=lgdafrglegenie.mysql.db
-            DB_PORT=3306
-            DB_DATABASE=lgdafrglegenie
-            DB_USERNAME=${{ secrets.BDD_USERNAME }}
-            DB_PASSWORD=${{ secrets.BDD_PASSWORD }}
-            DB_PREFIX=ludo$
+            APP_NAME="LudoScore Back"\r\n
+            APP_ENV=local\r\n
+            APP_KEY=${{ secrets.APP_KEY }}\r\n
+            APP_DEBUG=true\r\n
+            APP_URL=https://www.lgda.fr/ludoscore\r\n
+            LOG_CHANNEL=stack\r\n
+            LOG_DEPRECATIONS_CHANNEL=null\r\n
+            LOG_LEVEL=debug\r\n
+            DB_HOST=lgdafrglegenie.mysql.db\r\n
+            DB_PORT=3306\r\n
+            DB_DATABASE=lgdafrglegenie\r\n
+            DB_USERNAME=${{ secrets.BDD_USERNAME }}\r\n
+            DB_PASSWORD=${{ secrets.BDD_PASSWORD }}\r\n
+            DB_PREFIX=ludo$\r\n
         
-    - name: Copie fichier de déploiement
+    - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ${{ secrets.OVH_SERVER }}
@@ -45,10 +45,3 @@ jobs:
         dangerous-clean-slate: true
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
-        
-    - name: Création du .env
-      uses: fjogeleit/http-request-action@v1
-      with:
-        url: 'https://www.lgda.fr/ludoscore_deploiement/environnement.php'
-        method: 'POST'
-        data: '{"APP_NAME": "LudoScore Back", "APP_ENV": "local", "APP_KEY": "${{ secrets.APP_KEY }}", "APP_DEBUG": "true", "APP_URL": "https://www.lgda.fr/ludoscore", "LOG_CHANNEL": "stack", "LOG_DEPRECATIONS_CHANNEL": "null", "LOG_LEVEL": "debug", "DB_HOST": "lgdafrglegenie.mysql.db", "DB_PORT": "3306", "DB_DATABASE": "lgdafrglegenie", "DB_USERNAME": "${{ secrets.BDD_USERNAME }}", "DB_PASSWORD": "${{ secrets.BDD_PASSWORD }}", "DB_PREFIX": "ludo$"}'
