@@ -41,6 +41,12 @@ jobs:
         dangerous-clean-slate: true
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
+        
+    - name: Suppression de la version précédente
+      uses: satak/webrequest-action@master
+      with:
+        url: https://www.lgda.fr/ludoscore_deploiement/clean.php
+        method: GET
     
     - name: Lancement du déploiement distant
       uses: satak/webrequest-action@master
