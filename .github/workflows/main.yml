@@ -18,7 +18,7 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ${{ secrets.OVH_SERVER }}
-        local-dir: ./build/
+        local-dir: ./deployment/
         server-dir: /www/ludoscore_deploiement/
         dangerous-clean-slate: true
         username: ${{ secrets.OVH_USERNAME }}
