@@ -16,12 +16,13 @@ jobs:
     
     - uses: actions/checkout@v3
     
-    - name: Install dependencies
+    - name: Installation des dépendances
       uses: php-actions/composer@v6
       with:
         command: install --no-dev --ansi --no-progress --no-interaction --prefer-dist --working-dir=./back/
     
-    - uses: montudor/action-zip@v1
+    - name: Compression du repertoire
+      uses: montudor/action-zip@v1
       with:
         args: zip -qq -r ./deployment/back.zip ./back
     
@@ -40,3 +41,16 @@ jobs:
         dangerous-clean-slate: true
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
+        
+    - name: Suppression précédente version
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: 'https://www.lgda.fr/ludoscore_deploiement/clean.php'
+        method: 'GET'
+    
+    - name: Lancement du déploiement distant
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: 'https://www.lgda.fr/ludoscore_deploiement/install.php'
+        method: 'GET'
+      
