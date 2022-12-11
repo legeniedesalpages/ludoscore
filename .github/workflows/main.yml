@@ -19,7 +19,7 @@ jobs:
       with:
         server: ${{ secrets.OVH_SERVER }}
         local-dir: ./build/
-        server-dir: /www/ludoscore_deploiement
+        server-dir: /www/ludoscore_deploiement/
         dangerous-clean-slate: true
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
