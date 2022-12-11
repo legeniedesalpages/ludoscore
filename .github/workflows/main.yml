@@ -20,7 +20,7 @@ jobs:
       uses: "finnp/create-file-action@master"
       env:
         FILE_NAME: "./deployment/.env"
-        FILE_DATA: "APP_NAME=`\"LudoScore Back\"\r\nAPP_ENV=local\r\nAPP_KEY=${{ secrets.APP_KEY }}\r\nAPP_DEBUG=true\r\nAPP_URL=https://www.lgda.fr/ludoscore\r\nLOG_CHANNEL=stack\r\nLOG_DEPRECATIONS_CHANNEL=null\r\nLOG_LEVEL=debug\r\nDB_HOST=lgdafrglegenie.mysql.db\r\nDB_PORT=3306\r\nDB_DATABASE=lgdafrglegenie\r\nDB_USERNAME=${{ secrets.BDD_USERNAME }}\r\nDB_PASSWORD=${{ secrets.BDD_PASSWORD }}\r\nDB_PREFIX=ludo$\r\n"
+        FILE_DATA: "APP_NAME=\"LudoScore Back\"\nAPP_ENV=local\nAPP_KEY=${{ secrets.APP_KEY }}\nAPP_DEBUG=true\rAPP_URL=https://www.lgda.fr/ludoscore\rLOG_CHANNEL=stack\r\nLOG_DEPRECATIONS_CHANNEL=null\r\nLOG_LEVEL=debug\r\nDB_HOST=lgdafrglegenie.mysql.db\r\nDB_PORT=3306\r\nDB_DATABASE=lgdafrglegenie\r\nDB_USERNAME=${{ secrets.BDD_USERNAME }}\r\nDB_PASSWORD=${{ secrets.BDD_PASSWORD }}\r\nDB_PREFIX=ludo$\r\n"
         
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
