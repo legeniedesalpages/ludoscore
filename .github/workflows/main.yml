@@ -24,7 +24,7 @@ jobs:
     - name: Compression du repertoire
       uses: montudor/action-zip@v1
       with:
-        args: zip -qq -r ./deployment/back.zip ./back/*
+        args: zip -qq -r ./deployment/back.zip ./back
     
     - name: Création du fichier .env
       uses: "finnp/create-file-action@master"
