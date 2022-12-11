@@ -19,7 +19,11 @@ jobs:
     - name: Install dependencies
       uses: php-actions/composer@v6
       with:
-        command: install --working-dir=./back/
+        command: install --no-dev --ansi --no-progress --no-interaction --prefer-dist --working-dir=./back/
+    
+    - uses: montudor/action-zip@v1
+      with:
+        args: zip -qq -r ./deployment/back.zip ./back
     
     - name: Création du fichier .env
       uses: "finnp/create-file-action@master"
