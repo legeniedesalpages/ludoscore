@@ -1,6 +1,26 @@
 version: '3.5'
 
 services:
+  angular-app:
+    image: angular:2.4
+    build:
+      context: ./docker/
+      dockerfile: Dockerfile-Node
+    container_name: angular-app
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+    ports:
+      - 5000:5000
+      - 49153:49153
+    volumes:
+      - ./front:/usr/src/app
+    networks:
+      backend:
+        aliases:
+          - angular-app
+  
   laravel-app:
     image: apache-php:3.0
     build:
@@ -20,7 +40,7 @@ services:
     networks:
       backend:
         aliases:
-          - app
+          - laravel-app
 
   mysql-db:
     image: mysql:5.7.40
