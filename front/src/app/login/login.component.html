@@ -1,0 +1,27 @@
+<div class="login_page">
+    <mat-card class="login_card">
+        <mat-card-header>
+            <mat-card-title>Se connecter</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+
+            <div class="parent">
+                <mat-form-field appearance="fill">
+                    <mat-label>Email</mat-label>
+                    <input matInput [formControl]="emailFormControl">
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Mot de passe</mat-label>
+                    <input matInput [type]="hide ? 'password' : 'text'" [formControl]="passwordFormControl">
+                    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                        [attr.aria-pressed]="hide">
+                        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                </mat-form-field>
+                <button mat-raised-button color="primary">Envoyer</button>
+            </div>
+
+        </mat-card-content>
+    </mat-card>
+</div>
