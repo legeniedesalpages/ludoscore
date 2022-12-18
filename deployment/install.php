@@ -40,7 +40,8 @@
     
     echo "<hr/>";
     echo "Copie du repertoire public";
-    rename("./public", "../ludoscore");
+    rename("./public/.htaccess", "../ludoscore/.htaccess");
+    rename("./public/index.php", "../ludoscore/index.php");
 
     echo "<hr/>";
     echo "Suppression repertoire de déploiement";
