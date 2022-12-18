@@ -11,34 +11,43 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';@Injectable({
-  providedIn: 'root'
-})
-export class AuthService {  // Variables
-  authUrl = 'http://localhost:8000/api/auth/login';
-  apiUrl = 'http://localhost:8000/api';
-  options: any;  /**
-   * Constructor
-   * @param http The http client object
-   */
-  constructor(
-    private http: HttpClient
-  ) {
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { mergeMap } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
+  loginUrl = environment.apiURL + '/api/auth/login';
+  userUrl = environment.apiURL + '/api/users';
+  options: any;
+
+  constructor(private http: HttpClient) {
     this.options = {
       headers: new HttpHeaders({
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data'
-      })
+        Accept: 'application/json'
+      }),
+      withCredentials: true,
+      observe: 'response'
     };
-  }  /**
-   * Get an access token
-   * @param e The email address
-   * @param p The password string
-   */
+  }
+
   login(email: string, password: string) {
-    return this.http.post(this.authUrl, {
-      username: email,
-      password: password
-    }, this.options);
+
+    return new Promise((resolve, reject) => {
+      this.http.get(this.csrfUrl, this.options).pipe(
+        mergeMap(() => this.http.post(this.loginUrl, { email: email, password: password }, this.options)),
+        mergeMap((result: any) => this.http.get(this.userUrl + '/' + result.body.id, this.options))
+      ).subscribe({
+        next(value) {
+          console.info("Login successful")
+          resolve(value);
+        },
+        error(value) {
+          console.warn("Login failed")
+          reject(value);
+        }
+      })
+    });
   }
 }
