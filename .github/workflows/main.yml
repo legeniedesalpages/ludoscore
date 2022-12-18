@@ -38,14 +38,24 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
           
-    - name: Install Dependencies
+    - name: Install Front Dependencies
       if: steps.cache-nodemodules.outputs.cache-hit != 'true'
       run: npm ci
       working-directory: ./front
       
-    - name: Build
+    - name: Build Front
       run: npm run build -- --configuration production
       working-directory: ./front
+      
+    - name: Déploiement Front
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ftp.cluster028.hosting.ovh.net
+        local-dir: ./front/dist/app/
+        server-dir: /www/ludoscore/
+        dangerous-clean-slate: true
+        username: ${{ secrets.OVH_USERNAME }}
+        password: ${{ secrets.OVH_PASSWORD }}
     
     - name: Installation des dépendances
       uses: php-actions/composer@v6
