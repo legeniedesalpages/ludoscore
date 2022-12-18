@@ -58,7 +58,7 @@ jobs:
       uses: "finnp/create-file-action@master"
       env:
         FILE_NAME: "./deployment/.env"
-        FILE_DATA: "SESSION_DRIVER=cookie\rSESSION_DOMAIN=.lgda.fr\rSANCTUM_STATEFUL_DOMAINS=*.lgda.fr:443\rAPP_NAME=\"LudoScore Back\"\rAPP_ENV=local\rAPP_KEY=${{ secrets.APP_KEY }}\rAPP_DEBUG=true\rAPP_URL=https://www.lgda.fr/ludoscore\rLOG_CHANNEL=stack\rLOG_DEPRECATIONS_CHANNEL=null\rLOG_LEVEL=debug\rDB_HOST=lgdafrglegenie.mysql.db\rDB_PORT=3306\rDB_DATABASE=lgdafrglegenie\rDB_USERNAME=${{ secrets.BDD_USERNAME }}\rDB_PASSWORD=${{ secrets.BDD_PASSWORD }}\rDB_PREFIX=ludo$\r"
+        FILE_DATA: "SESSION_DRIVER=cookie\rSESSION_DOMAIN=.lgda.fr\rSANCTUM_STATEFUL_DOMAINS=*.lgda.fr:443\rAPP_NAME=\"LudoScore Back\"\rAPP_ENV=local\rAPP_KEY=${{ secrets.APP_KEY }}\rAPP_DEBUG=true\rAPP_URL=https://www.lgda.fr/ludoscoreback\rLOG_CHANNEL=stack\rLOG_DEPRECATIONS_CHANNEL=null\rLOG_LEVEL=debug\rDB_HOST=lgdafrglegenie.mysql.db\rDB_PORT=3306\rDB_DATABASE=lgdafrglegenie\rDB_USERNAME=${{ secrets.BDD_USERNAME }}\rDB_PASSWORD=${{ secrets.BDD_PASSWORD }}\rDB_PREFIX=ludo$\r"
       
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
