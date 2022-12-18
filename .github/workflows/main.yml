@@ -20,6 +20,13 @@ jobs:
     
     - uses: actions/checkout@v3
     
+    - name: Definition variables environnement Front
+      uses: jacobtomlinson/gha-find-replace@v2
+      with:
+        find: "${API_URL}"
+        replace: "https://www.lgda.fr/ludoscore"
+        include: "front/src/environments/environment.prod.ts"
+    
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
