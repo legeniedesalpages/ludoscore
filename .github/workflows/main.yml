@@ -44,7 +44,7 @@ jobs:
       working-directory: ./front
       
     - name: Build
-      run: npm run build -- --prod --configuration production
+      run: npm run build -- --configuration production
       working-directory: ./front
     
     - name: Installation des dépendances
