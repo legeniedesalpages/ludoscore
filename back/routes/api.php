@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameSearchController;
+use App\Http\Controllers\Api\UserController;
 
 
 /*
@@ -17,11 +18,20 @@ Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
 /*
 |--------------------------------------------------------------------------
+| User
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->resource('users', UserController::class);
+
+/*
+|--------------------------------------------------------------------------
 | Search
 |--------------------------------------------------------------------------
 */
 
-Route::get('/game_search', [ 'as' => 'game_search', function()
+Route::middleware('auth:sanctum')->get('/game_search', [ 'as' => 'game_search', function()
 {
     return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = [ 'searchText' => request()->q]);
 }]);
+
