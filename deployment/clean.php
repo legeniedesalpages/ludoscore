@@ -19,7 +19,6 @@
     $time_start = microtime(true);
     rrmdir($install_dir);
     rrmdir('../../back');
-    rrmdir('../ludoscore');
     $time_end = microtime(true);
     $execution_time = ($time_end - $time_start);
     echo '<b>Suppression en :</b> ' . $execution_time . ' Secondes<br/>';
