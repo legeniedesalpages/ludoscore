@@ -85,6 +85,6 @@ jobs:
     - name: Lancement de la migration si besoin
       uses: satak/webrequest-action@master
       with:
-        url: https://www.lgda.fr/ludoscore/finir_installation
+        url: https://www.lgda.fr/ludoscoreback/finir_installation
         method: GET
       
