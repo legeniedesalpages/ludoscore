@@ -19,8 +19,6 @@ import { User } from '../model/user';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  user?: User;
-
   csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
   loginUrl = environment.apiURL + '/api/auth/login';
   logoutUrl = environment.apiURL + '/api/auth/logout';
@@ -28,7 +26,7 @@ export class AuthService {
   options: any;
 
   constructor(private http: HttpClient) {
-    
+
     this.options = {
       headers: new HttpHeaders({
         Accept: 'application/json'
@@ -62,7 +60,6 @@ export class AuthService {
   logout() {
     return new Promise((resolve, reject) => {
       this.http.get(this.logoutUrl, this.options).subscribe(res => {
-        this.user = undefined;
         localStorage.removeItem('access_token');
         resolve(res);
       })
@@ -71,8 +68,7 @@ export class AuthService {
 
   setAuthenticated(user: User) {
     console.debug('Authenticated, username: ' + user.name);
-    this.user = user;
-    localStorage.setItem('access_token', user.id);
+    localStorage.setItem('access_token', JSON.stringify(user));
   }
 
   isAuthenticated(): boolean {
@@ -80,5 +76,12 @@ export class AuthService {
       return false;
     }
     return true;
+  }
+
+  getAuthenticatedUser(): User | undefined {
+    if (!this.isAuthenticated()) {
+      return undefined;
+    }
+    return JSON.parse(localStorage.getItem('access_token') || '{}')
   }
 }

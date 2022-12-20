@@ -23,11 +23,11 @@ export class AuthGuardService {
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
     if (this.authService.isAuthenticated()) {
-      console.debug('Authenticated, can show this page')
+      console.debug(`Authenticated, can show this page: /${next.url}`)
       return true;
     }
 
-    console.debug('Not authenticated, return to login page')
+    console.debug(`Not authenticated for page /${next.url}, return to login page`)
     this.router.navigateByUrl('/login');
     return false;
   }

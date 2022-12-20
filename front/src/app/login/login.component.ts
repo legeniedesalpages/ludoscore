@@ -34,7 +34,6 @@ export class LoginComponent {
 
     this.hidePassword = true;
     
-
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.email, Validators.required]),
       password: new FormControl('', Validators.required),

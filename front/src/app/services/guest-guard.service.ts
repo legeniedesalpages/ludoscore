@@ -23,11 +23,11 @@ export class GuestGuardService {
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
     if (!this.authService.isAuthenticated()) {
-      console.debug('Not authenticated, can show this page')
+      console.debug(`Not authenticated, can show this page : /${next.url}`)
       return true;
     }
 
-    console.debug('Authenticated, return to root page')
+    console.debug(`Authenticated, return to root page`)
     this.router.navigateByUrl('/');
     return false;
   }

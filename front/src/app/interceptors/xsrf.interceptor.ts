@@ -11,14 +11,15 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
+import { catchError, Observable, of, tap, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class HttpXSRFInterceptor implements HttpInterceptor {
 
-    constructor(private tokenExtractor: HttpXsrfTokenExtractor) {
-
+    constructor(private tokenExtractor: HttpXsrfTokenExtractor, private router: Router, private authService: AuthService) {
     }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -26,10 +27,20 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
         const respHeaderName = 'X-XSRF-TOKEN';
         let token = this.tokenExtractor.getToken() as string;
         if (token !== null && !req.headers.has(headerName)) {
-            req = req.clone({ headers: req.headers.set(respHeaderName, token) });
-
+            req = req.clone({ 
+                headers: req.headers.set(respHeaderName, token)
+            });
         }
-        return next.handle(req);
+
+        return next.handle(req).pipe(catchError(err => {
+            if (err.status == 401 && !req.url.includes('api/auth')) {
+                console.warn("No more authenticated, redirect to login page")
+                this.authService.logout();
+                this.router.navigate(['/login']);
+            }
+            return throwError(() => new Error(err));
+        }));
+
 
     }
 
