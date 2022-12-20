@@ -12,31 +12,22 @@
 **/
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuardService {  /**
-   * Constructor
-   * @param router The router object
-   */
-  constructor(private router: Router) {
+@Injectable({ providedIn: 'root' })
+export class AuthGuardService {
+
+  constructor(private router: Router, private authService: AuthService) {
   }
 
-  /**
-   * Can activate function
-   * @param next The activated route snapshot object
-   * @param state The router state snapshot object
-   */
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ) {
-    if (localStorage.getItem('access_token')) {
-      console.log('Token, donc ok')
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+
+    if (this.authService.isAuthenticated()) {
+      console.debug('Authenticated, can show this page')
       return true;
     }
-    localStorage.removeItem('Pas de token, donc login');
+
+    console.debug('Not authenticated, return to login page')
     this.router.navigateByUrl('/login');
     return false;
   }

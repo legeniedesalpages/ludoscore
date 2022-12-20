@@ -11,9 +11,10 @@
     * - Modification    : 
 **/
 import { Component } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
+import { User } from '../model/user';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -29,13 +30,14 @@ export class LoginComponent {
   errorMessage: any;
   loading: boolean;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private appComponent: AppComponent) {
 
     this.hidePassword = true;
+    
 
     this.loginForm = new FormGroup({
-      email: new FormControl('', [Validators.email, Validators.required]),
-      password: new FormControl('', Validators.required),
+      email: new FormControl('renaud_balu@hotmail.com', [Validators.email, Validators.required]),
+      password: new FormControl('Renaud21', Validators.required),
     });
 
     this.errors = false;
@@ -52,12 +54,13 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value['email'], this.loginForm.value['password'])
       .then((res: any) => {
 
-        console.log(res);
-        //localStorage.setItem('access_token', res.token);
+        this.authService.setAuthenticated(new User(res.body.id, res.body.name))
+        this.appComponent.setUserName(res.body.name)
         this.loading = false;
         this.router.navigate(['/']);
 
       }, (err: any) => {
+        
         if (err.status != 401) {
           this.errorMessage = err.message;
         } else {
