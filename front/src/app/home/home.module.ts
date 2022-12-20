@@ -23,7 +23,7 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    canActivate: [ AuthGuardService ]
+    canActivate: [AuthGuardService]
   }
 ];
 
