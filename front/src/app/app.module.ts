@@ -22,6 +22,7 @@ import { HttpXSRFInterceptor } from './interceptors/xsrf.interceptor'
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import {MatMenuModule} from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { MatButtonModule } from '@angular/material/button';
     BrowserAnimationsModule,
     MatToolbarModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatMenuModule
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true }],
   bootstrap: [AppComponent]

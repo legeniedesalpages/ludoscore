@@ -16,6 +16,8 @@ import { HomeComponent } from './home.component';
 
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from '../services/auth-guard.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 const routes: Routes = [
   {
@@ -29,7 +31,9 @@ const routes: Routes = [
   declarations: [HomeComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    MatButtonModule,
+    MatCardModule
   ]
 })
 

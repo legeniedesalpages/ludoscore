@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : renau
+    * @group            : 
+    * @created          : 19/12/2022 - 11:27:36
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 19/12/2022
+    * - Author          : renau
+    * - Modification    : 
+**/
 import { Component } from '@angular/core';
 
 @Component({
@@ -7,4 +19,9 @@ import { Component } from '@angular/core';
 })
 export class HomeComponent {
 
+  gameInProgress: boolean;
+
+  constructor() {
+    this.gameInProgress = false;
+  }
 }

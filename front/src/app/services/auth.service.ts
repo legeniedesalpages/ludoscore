@@ -14,15 +14,21 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { mergeMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { User } from '../model/user';
+import { AppComponent } from '../app.component';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
+  user?: User;
+
   csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
   loginUrl = environment.apiURL + '/api/auth/login';
   userUrl = environment.apiURL + '/api/users';
   options: any;
 
   constructor(private http: HttpClient) {
+    
     this.options = {
       headers: new HttpHeaders({
         Accept: 'application/json'
@@ -39,15 +45,35 @@ export class AuthService {
         mergeMap(() => this.http.post(this.loginUrl, { email: email, password: password }, this.options)),
         mergeMap((result: any) => this.http.get(this.userUrl + '/' + result.body.id, this.options))
       ).subscribe({
+
         next(value) {
           console.info("Login successful")
           resolve(value);
         },
+
         error(value) {
           console.warn("Login failed")
           reject(value);
         }
       })
     });
+  }
+
+  logout() {
+    this.user = undefined;
+    localStorage.removeItem('access_token');
+  }
+
+  setAuthenticated(user: User) {
+    console.debug('Authenticated, username: ' + user.name);
+    this.user = user;
+    localStorage.setItem('access_token', user.id);
+  }
+
+  isAuthenticated(): boolean {
+    if (!localStorage.getItem('access_token')) {
+      return false;
+    }
+    return true;
   }
 }
