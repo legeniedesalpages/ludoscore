@@ -10,7 +10,10 @@
     * - Author          : renau
     * - Modification    : 
 **/
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ThisReceiver } from '@angular/compiler';
 import { Component } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -19,9 +22,27 @@ import { Component } from '@angular/core';
 })
 export class HomeComponent {
 
-  gameInProgress: boolean;
+  options: any;
+  getCurrentMatchUrl = environment.apiURL + '/api/matches/current';
 
-  constructor() {
-    this.gameInProgress = false;
+  dataReceived: boolean;
+  matchInProgress: boolean;
+
+  constructor(private http: HttpClient) {
+    this.matchInProgress = false;
+    this.dataReceived = false;
+
+    this.options = {
+      headers: new HttpHeaders({
+        Accept: 'application/json'
+      }),
+      withCredentials: true
+    };
+    
+    this.http.get(this.getCurrentMatchUrl, this.options).subscribe(response => {
+      this.dataReceived = true;
+      console.debug(response);
+      this.matchInProgress = JSON.parse(JSON.stringify(response)).hasCurrent;
+    });
   }
 }

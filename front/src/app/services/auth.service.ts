@@ -15,7 +15,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { mergeMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { User } from '../model/user';
-import { AppComponent } from '../app.component';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -24,6 +23,7 @@ export class AuthService {
 
   csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
   loginUrl = environment.apiURL + '/api/auth/login';
+  logoutUrl = environment.apiURL + '/api/auth/logout';
   userUrl = environment.apiURL + '/api/users';
   options: any;
 
@@ -60,8 +60,13 @@ export class AuthService {
   }
 
   logout() {
-    this.user = undefined;
-    localStorage.removeItem('access_token');
+    return new Promise((resolve, reject) => {
+      this.http.get(this.logoutUrl, this.options).subscribe(res => {
+        this.user = undefined;
+        localStorage.removeItem('access_token');
+        resolve(res);
+      })
+    });
   }
 
   setAuthenticated(user: User) {
