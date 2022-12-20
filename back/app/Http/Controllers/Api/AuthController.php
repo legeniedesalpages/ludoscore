@@ -78,7 +78,6 @@ class AuthController extends Controller
                     'message' => 'User Logged In Successfully',
                     'id' => Auth::user()->id
                 ], 200);
-
             } else {
 
                 return response()->json([
@@ -86,12 +85,22 @@ class AuthController extends Controller
                     'message' => 'Invalid credentials'
                 ], 401);
             }
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
+    }
+
+    public function logoutUser(Request $request)
+    {
+        Auth::guard()->logout();
+        $request->session()->invalidate();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User Logged Out Successfully'
+        ]);
     }
 }
