@@ -24,9 +24,13 @@ import { AuthService } from './services/auth.service';
 export class AppComponent {
 
   title = environment.title;
-  username = '...';
+  username = '';
 
   constructor(private authService: AuthService, private router: Router) {
+    let user = this.authService.getAuthenticatedUser();
+    if (user) {
+      this.username = user.name;
+    }
   }
 
   setUserName(name: string) {
@@ -35,9 +39,9 @@ export class AppComponent {
 
   onClickLogout() {
     this.username = '';
-    this.authService.logout().then(res => {
+    this.authService.logout().then(() => {
       this.router.navigate(['/login']);
     });
   }
-  
+
 }
