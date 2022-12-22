@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core';
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -27,8 +27,18 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
         const respHeaderName = 'X-XSRF-TOKEN';
         let token = this.tokenExtractor.getToken() as string;
         if (token !== null && !req.headers.has(headerName)) {
-            req = req.clone({ 
-                headers: req.headers.set(respHeaderName, token)
+            req = req.clone({
+                withCredentials: true,
+                headers: new HttpHeaders({
+                    Accept: 'application/json'
+                }).append(respHeaderName, token)
+            });
+        } else {
+            req = req.clone({
+                withCredentials: true,
+                headers: new HttpHeaders({
+                    Accept: 'application/json'
+                })
             });
         }
 

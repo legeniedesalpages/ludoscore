@@ -53,8 +53,8 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value['email'], this.loginForm.value['password'])
       .then((res: any) => {
 
-        this.authService.setAuthenticated(new User(res.body.id, res.body.name))
-        this.appComponent.setUserName(res.body.name)
+        this.authService.setAuthenticated(new User(res.id, res.name))
+        this.appComponent.setUserName(res.name)
         this.loading = false;
         this.router.navigate(['/']);
 

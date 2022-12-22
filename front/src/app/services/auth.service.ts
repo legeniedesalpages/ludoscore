@@ -23,25 +23,16 @@ export class AuthService {
   loginUrl = environment.apiURL + '/api/auth/login';
   logoutUrl = environment.apiURL + '/api/auth/logout';
   userUrl = environment.apiURL + '/api/users';
-  options: any;
 
   constructor(private http: HttpClient) {
-
-    this.options = {
-      headers: new HttpHeaders({
-        Accept: 'application/json'
-      }),
-      withCredentials: true,
-      observe: 'response'
-    };
   }
 
   login(email: string, password: string) {
 
     return new Promise((resolve, reject) => {
-      this.http.get(this.csrfUrl, this.options).pipe(
-        mergeMap(() => this.http.post(this.loginUrl, { email: email, password: password }, this.options)),
-        mergeMap((result: any) => this.http.get(this.userUrl + '/' + result.body.id, this.options))
+      this.http.get(this.csrfUrl).pipe(
+        mergeMap(() => this.http.post(this.loginUrl, { email: email, password: password })),
+        mergeMap((result: any) => this.http.get(this.userUrl + '/' + result.id))
       ).subscribe({
 
         next(value) {
@@ -59,7 +50,7 @@ export class AuthService {
 
   logout() {
     return new Promise((resolve, reject) => {
-      this.http.get(this.logoutUrl, this.options).subscribe(res => {
+      this.http.get(this.logoutUrl).subscribe(res => {
         localStorage.removeItem('access_token');
         resolve(res);
       })

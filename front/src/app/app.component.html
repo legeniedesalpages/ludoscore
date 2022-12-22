@@ -1,21 +1,31 @@
+<div class="container">
+  <div class="header">
+    <mat-toolbar color="primary">
+      <span>{{title}}</span>
+      <span class="menu-spacer"></span>
 
-<mat-toolbar color="primary">
-  <span>{{title}}</span>
-  <span class="menu-spacer"></span>
-  
-  <div>
-    {{username}}
+      <div>
+        {{username}}
+      </div>
+      <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon"
+        [matMenuTriggerFor]="login" [hidden]="username == ''">
+        <mat-icon>person</mat-icon>
+      </button>
+      <mat-menu #login="matMenu" xPosition="before">
+        <button mat-menu-item (click)="onClickLogout()">
+          <mat-icon>power_settings_new</mat-icon>
+          <span>Se déconnecter</span>
+        </button>
+      </mat-menu>
+
+    </mat-toolbar>
   </div>
-  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon" [matMenuTriggerFor]="login" [hidden]="username == ''">
-    <mat-icon>person</mat-icon>
-  </button>
-  <mat-menu #login="matMenu" xPosition="before">
-    <button mat-menu-item (click)="onClickLogout()">
-      <mat-icon>power_settings_new</mat-icon>
-      <span>Se déconnecter</span>
-    </button>
-  </mat-menu>
 
-</mat-toolbar>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
 
-<router-outlet></router-outlet>
+  <div class="footer" #footer>
+      <span>LGDA - 2022</span>
+  </div>
+</div>
