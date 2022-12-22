@@ -1,3 +1,9 @@
+:host {
+  display: flex;
+  flex-flow: column;
+  height: 100px;
+  flex: 1 1 auto;
+}
 
 .material-cust-large-button {
   width: 300px;
@@ -6,3 +12,15 @@
   padding-bottom: 20px;
   font-size: x-large;
 }
+
+.match {
+  flex: 1 1 auto;
+  background: linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6)), url('https://cf.geekdo-images.com/SoU8p28Sk1s8MSvoM4N8pQ__original/img/g4S18szTdrXCdIwVKzMKrZrYAcM=/0x0/filters:format(jpeg)/pic6293412.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.other_actions {
+  flex: 0 1 40px;
+}
+
