@@ -1,0 +1,20 @@
+<div class="start_match" [hidden]="creatingMatch">
+    <button mat-raised-button color="primary" class="material-cust-large-button" (click)="createMatch()">
+        Démarrer une partie
+    </button>
+</div>
+
+<div class="create_match" [hidden]="!creatingMatch">
+    <form [formGroup]="createMatchForm" (ngSubmit)="onSubmit()" class="parent">
+
+        <mat-form-field appearance="fill">
+            <mat-label>Jeu</mat-label>
+            <input matInput formControlName="email">
+        </mat-form-field>
+        <p>
+            <button mat-raised-button color="primary" (click)="cancelCreation()">
+                Annuler la création
+            </button>
+        </p>
+    </form>
+</div>

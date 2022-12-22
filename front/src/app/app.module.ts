@@ -24,6 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import {MatMenuModule} from '@angular/material/menu';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     }),
     BrowserAnimationsModule,
     MatToolbarModule,
+    MatSidenavModule,
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
