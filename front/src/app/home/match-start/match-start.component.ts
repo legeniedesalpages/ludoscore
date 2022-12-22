@@ -15,7 +15,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'game-start',
+  selector: 'match-start',
   templateUrl: './match-start.component.html',
   styleUrls: ['./match-start.component.css'],
 })
