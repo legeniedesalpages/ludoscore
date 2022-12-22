@@ -55,11 +55,11 @@
       "type": "image/png",
       "purpose": "any"
     },
-	{
+    {
       "src": "assets/icons/icon-180x180-maskable.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "maskable"
-    },
+    }
   ]
 }
