@@ -1,5 +1,18 @@
-.container {
-  min-height: 100vh;
+#container {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+#header {
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+}
+
+.mat-toolbar-single-row {
+  height: 40px;
+  padding: 0;
 }
 
 .menu-spacer {
@@ -7,13 +20,10 @@
 }
 
 .content {
-  margin-top: 10px;
-  width: 100vw;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-flow: column;
+  height: 100px;
+  flex: 1 1 auto;
 }
 
-.mat-toolbar-single-row {
-  height: 40px;
-}
+

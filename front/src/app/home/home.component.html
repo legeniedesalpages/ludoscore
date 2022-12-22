@@ -1,25 +1,31 @@
-<div class="home_page">
-    <div [hidden]="matchInProgress">
-        <div [hidden]="!dataReceived">
-            <button mat-raised-button color="primary" class="material-cust-large-button" (click)="createMatch()">
-                Démarrer une partie
+<div class="match">
+    <div class="tout">
+        <div [hidden]="matchInProgress">
+            <div [hidden]="!dataReceived">
+                <button mat-raised-button color="primary" class="material-cust-large-button" (click)="createMatch()">
+                    Démarrer une partie
+                </button>
+            </div>
+    
+            <div [hidden]="dataReceived">
+                Recherche si une partie est en cours...
+            </div>
+        </div>
+    
+        <div [hidden]="!matchInProgress">
+            <button mat-raised-button color="primary" class="material-cust-large-button">Mettre fin à la partie</button>
+        </div>
+    
+        <hr/>
+    
+        <div>
+            <button mat-raised-button color="primary" (click)="findGame()">
+                Rechercher un jeu
             </button>
         </div>
-
-        <div [hidden]="dataReceived">
-            Recherche si une partie est en cours...
-        </div>
     </div>
+</div>
 
-    <div [hidden]="!matchInProgress">
-        <button mat-raised-button color="primary" class="material-cust-large-button">Mettre fin à la partie</button>
-    </div>
-
-    <hr/>
-
-    <div>
-        <button mat-raised-button color="primary" (click)="findGame()">
-            Rechercher un jeu
-        </button>
-    </div>
+<div class="other_actions">
+    qsd
 </div>
