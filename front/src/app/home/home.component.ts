@@ -12,6 +12,7 @@
 **/
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -27,7 +28,7 @@ export class HomeComponent {
   dataReceived: boolean;
   matchInProgress: boolean;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.matchInProgress = false;
     this.dataReceived = false;
 
@@ -43,5 +44,13 @@ export class HomeComponent {
       console.debug(response);
       this.matchInProgress = JSON.parse(JSON.stringify(response)).hasCurrent;
     });
+  }
+
+  createMatch() {
+    this.router.navigate(['match-start']);
+  }
+
+  findGame() {
+    this.router.navigate(['find-game']);
   }
 }

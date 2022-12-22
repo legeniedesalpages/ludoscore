@@ -1,14 +1,15 @@
 <div class="container">
   <div class="header">
     <mat-toolbar color="primary">
-      <span>{{title}}</span>
+      <button mat-flat-button color="primary" (click)="onClickHome()">
+        <mat-icon>home</mat-icon>
+        <span>{{title}}</span>
+      </button>
+
       <span class="menu-spacer"></span>
 
-      <div>
-        {{username}}
-      </div>
-      <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon"
-        [matMenuTriggerFor]="login" [hidden]="username == ''">
+      <button mat-flat-button color="primary" [matMenuTriggerFor]="login" [hidden]="username == ''">
+        <span>{{username}}</span>
         <mat-icon>person</mat-icon>
       </button>
       <mat-menu #login="matMenu" xPosition="before">

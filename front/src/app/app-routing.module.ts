@@ -22,6 +22,14 @@ const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./login/login.module').then(m => m.LoginModule)
+  },
+  {
+    path: 'match-start',
+    loadChildren: () => import('./match-start/match-start.module').then(m => m.MatchStartModule)
+  },
+  {
+    path: 'find-game',
+    loadChildren: () => import('./find-game/find-game.module').then(m => m.FindGameModule)
   }
 ];
 
