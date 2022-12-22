@@ -44,4 +44,8 @@ export class AppComponent {
     });
   }
 
+  onClickHome() {
+    this.router.navigate(['/']);
+  }
+
 }

@@ -12,7 +12,7 @@
 **/
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'match-start',
@@ -21,26 +21,18 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class MatchStartComponent {
 
-  creatingMatch: boolean;
   createMatchForm: FormGroup;
 
   constructor(private http: HttpClient) {
-    this.creatingMatch = false;
 
     this.createMatchForm = new FormGroup({
-      email: new FormControl('', [Validators.email, Validators.required]),
-      password: new FormControl('', Validators.required),
     });
   }
 
-  createMatch() {
-    console.debug('Start ceating match');
-    this.creatingMatch = true;
-  }
 
   cancelCreation() {
     console.debug('Cancel match creation');
-    this.creatingMatch = false;
+    
   }
 
   onSubmit() {

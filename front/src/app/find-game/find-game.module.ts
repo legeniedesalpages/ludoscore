@@ -12,7 +12,6 @@
 **/
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HomeComponent } from './home.component';
 
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from '../services/auth-guard.service';
@@ -22,18 +21,19 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { FindGameComponent } from './find-game.component';
 
 
 const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    component: FindGameComponent,
     canActivate: [AuthGuardService]
   }
 ];
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [FindGameComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -47,4 +47,4 @@ const routes: Routes = [
   ]
 })
 
-export class HomeModule { }
+export class FindGameModule { }

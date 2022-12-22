@@ -23,7 +23,7 @@ export class AuthGuardService {
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
     if (this.authService.isAuthenticated()) {
-      console.debug(`Authenticated, can show this page: /${next.url}`)
+      console.debug(`Authenticated, can show this page: ${state.url}`)
       return true;
     }
 

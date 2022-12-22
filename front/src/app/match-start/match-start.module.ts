@@ -12,12 +12,12 @@
 **/
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HomeComponent } from './home.component';
 
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from '../services/auth-guard.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatchStartComponent } from '../match-start/match-start.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,13 +27,13 @@ import { MatInputModule } from '@angular/material/input';
 const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    component: MatchStartComponent,
     canActivate: [AuthGuardService]
   }
 ];
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [MatchStartComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -47,4 +47,4 @@ const routes: Routes = [
   ]
 })
 
-export class HomeModule { }
+export class MatchStartModule { }
