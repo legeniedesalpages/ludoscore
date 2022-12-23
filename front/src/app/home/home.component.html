@@ -1,31 +1,52 @@
 <div class="match">
-    <div class="tout">
-        <div [hidden]="matchInProgress">
-            <div [hidden]="!dataReceived">
-                <button mat-raised-button color="primary" class="material-cust-large-button" (click)="createMatch()">
-                    Démarrer une partie
-                </button>
-            </div>
-    
-            <div [hidden]="dataReceived">
-                Recherche si une partie est en cours...
-            </div>
-        </div>
-    
-        <div [hidden]="!matchInProgress">
-            <button mat-raised-button color="primary" class="material-cust-large-button">Mettre fin à la partie</button>
-        </div>
-    
-        <hr/>
-    
-        <div>
-            <button mat-raised-button color="primary" (click)="findGame()">
-                Rechercher un jeu
+    <div [hidden]="matchInProgress" class="cont">
+        <div [hidden]="!dataReceived" class="start">
+            <button mat-flat-button (click)="createMatch()">
+                <span class="material-symbols-outlined">Swords</span>
+                <br/>
+                Démarrer une partie
             </button>
         </div>
+
+        <div [hidden]="dataReceived" class="cont">
+            Recherche si une partie est en cours...
+        </div>
+    </div>
+
+    <div [hidden]="!matchInProgress">
+        <button mat-flat-button class="material-cust-large-button">Mettre fin à la partie</button>
     </div>
 </div>
 
 <div class="other_actions">
-    qsd
+    <div class="actions">
+        <div class="row haut-gauche">
+            <button mat-flat-button (click)="findGame()">
+                <span class="material-symbols-outlined">Swords</span>
+                <br/>
+                Chercher un jeu
+            </button>
+        </div>
+        <div class="row haut-droite">
+            <button mat-flat-button>
+                <span class="material-symbols-outlined">Swords</span>
+                <br/>
+                Voir les stats
+            </button>
+        </div>
+        <div class="row bas-gauche">
+            <button mat-flat-button>
+                <span class="material-symbols-outlined">Swords</span>
+                <br/>
+                Gérer la ludotech
+            </button>
+        </div>
+        <div class="row bas-droite">
+            <button mat-flat-button>
+                <span class="material-symbols-outlined">Swords</span>
+                <br/>
+                Gérer les joueurs
+            </button>
+        </div>
+    </div>
 </div>
