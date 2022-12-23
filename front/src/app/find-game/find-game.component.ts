@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChildren } from '@angular/core';
 
 @Component({
   selector: 'find-game',
@@ -21,6 +21,14 @@ import { Component } from '@angular/core';
 export class FindGameComponent {
 
   constructor(private http: HttpClient) {
+  }
+
+  @ViewChildren('input') 
+  vc: any;
+
+  ngAfterViewInit() {
+    console.log("pppppppppppppppppp")
+    this.vc.first.nativeElement.focus();
   }
 
   onSubmit() {
