@@ -1,6 +1,6 @@
 <div class="match">
     <div [hidden]="matchInProgress" class="cont">
-        <div [hidden]="!dataReceived" class="start">
+       <div [hidden]="!dataReceived" class="start">
             <button mat-flat-button (click)="createMatch()">
                 <span class="material-symbols-outlined">Swords</span>
                 <br/>
@@ -8,7 +8,7 @@
             </button>
         </div>
 
-        <div [hidden]="dataReceived" class="cont">
+        <div class="recherche_partie" [hidden]="dataReceived">
             Recherche si une partie est en cours...
         </div>
     </div>
@@ -46,7 +46,7 @@
             <button mat-flat-button>
                 <span class="material-symbols-outlined">Groups</span>
                 <br/>
-                Gérer les joueurs
+                Voir les joueurs
             </button>
         </div>
     </div>

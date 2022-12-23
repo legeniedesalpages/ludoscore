@@ -5,10 +5,6 @@
   flex: 1 1 auto;
 }
 
-.material-cust-large-button {
-  font-size: x-large;
-}
-
 .match {
   flex: 1 1 auto;
 }
@@ -29,12 +25,20 @@
   background-color: #60a917;
   border:solid #41207a;
   border-width: 6px 6px 0px 6px;
-  
   color:white;
 }
 
 .material-symbols-outlined {
   font-size: 80px;
+}
+
+
+.recherche_partie {
+  background-color:#41207a;
+  height: 100%;
+  color: white;
+  text-align: center;
+  padding-top: 50px;
 }
 
 .other_actions {
