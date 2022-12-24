@@ -20,18 +20,22 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./find-game.component.css'],
 })
 export class FindGameComponent {
-
+  
   private gameSearchUrl = environment.apiURL + '/api/game_search?q=';
-  items : any = null;
+
+  items: any = null;
+  searching: boolean = false;
 
   constructor(private http: HttpClient) {
   }
 
   search(event: any) {
+    this.searching = true;
     console.debug("Search: ", event.target.value);
-    this.http.get(this.gameSearchUrl + encodeURIComponent(event.target.value)).subscribe(res => {
-      console.log(res);
+    this.http.get(this.gameSearchUrl + encodeURIComponent(event.target.value)).subscribe((res: any) => {
+      console.log("Result count: " + res.length);
       this.items = res;
+      this.searching = false;
     })
   }
 }
