@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\UserController;
 */
 
 Route::post('/auth/register', [AuthController::class, 'createUser']);
-
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 Route::get('/auth/logout', [AuthController::class, 'logoutUser']);
 
@@ -42,8 +41,6 @@ Route::middleware('auth:sanctum')->controller(MatchController::class)->group(fun
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->get('/game_search', [ 'as' => 'game_search', function()
-{
-    return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = [ 'searchText' => request()->q]);
+Route::middleware('auth:sanctum')->get('/game_search', ['as' => 'game_search', function () {
+    return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = ['searchText' => request()->q]);
 }]);
-

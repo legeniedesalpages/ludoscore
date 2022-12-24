@@ -1,11 +1,14 @@
 <div class="find_game">
     <form class="example-form">
         <mat-form-field class="example-full-width">
-          <mat-label>Rechercher un jeu</mat-label>
-          <input matInput autofocus  #myInput>
-          {{ myInput.focus() }}
-          <mat-icon matSuffix>search</mat-icon>
+            <mat-label>Rechercher un jeu</mat-label>
+            <input matInput autofocus #myInput (keydown.enter)="search($event)">
+            <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
-      </form>
-      
+    </form>
+    <div class="result">
+        <div class="row" *ngFor="let item of items">
+            {{ item.name }}
+        </div>
+    </div>
 </div>
