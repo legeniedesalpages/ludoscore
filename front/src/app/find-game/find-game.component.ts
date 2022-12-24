@@ -11,7 +11,8 @@
     * - Modification    : 
 **/
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChildren } from '@angular/core';
+import { Component } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'find-game',
@@ -20,17 +21,17 @@ import { Component, ViewChildren } from '@angular/core';
 })
 export class FindGameComponent {
 
+  private gameSearchUrl = environment.apiURL + '/api/game_search?q=';
+  items : any = null;
+
   constructor(private http: HttpClient) {
   }
 
-  @ViewChildren('input') 
-  vc: any;
-
-  ngAfterViewInit() {
-    console.log("pppppppppppppppppp")
-    this.vc.first.nativeElement.focus();
-  }
-
-  onSubmit() {
+  search(event: any) {
+    console.debug("Search: ", event.target.value);
+    this.http.get(this.gameSearchUrl + encodeURIComponent(event.target.value)).subscribe(res => {
+      console.log(res);
+      this.items = res;
+    })
   }
 }
