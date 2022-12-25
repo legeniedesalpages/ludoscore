@@ -18,7 +18,7 @@
     </div>
 
     <div class="result">
-        <div class="row" *ngFor="let item of items">
+        <div class="row" *ngFor="let item of items" matRipple (click)="gameDetail(item.id)">
             <mat-grid-list cols="7" rowHeight="60px">
                 <mat-grid-tile [colspan]="2" [rowspan]="2">
                     <img src={{item.thumbnail}} />

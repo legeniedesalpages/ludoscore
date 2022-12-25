@@ -36,7 +36,7 @@ export class FindGameComponent {
     if (!searchString) {
       return;
     }
-    
+
     this.searching = true;
     this.errors = '';
     console.debug("Search: ", searchString);
@@ -54,5 +54,9 @@ export class FindGameComponent {
         this.searching = false;
       }
     });
+  }
+
+  gameDetail(id: number) {
+    console.debug("Id :" + id);
   }
 }

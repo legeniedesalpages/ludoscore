@@ -24,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FindGameComponent } from './find-game.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
+import {MatRippleModule} from '@angular/material/core';
 
 
 const routes: Routes = [
@@ -47,7 +48,8 @@ const routes: Routes = [
     MatIconModule,
     MatProgressSpinnerModule,
     MatGridListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatRippleModule
   ]
 })
 
