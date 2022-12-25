@@ -1,11 +1,15 @@
-<div class="find_game">
-    <form class="example-form">
-        <mat-form-field class="example-full-width">
+<div class="find-game">
+    <form class="find-game-form">
+        <mat-form-field class="find-game-search-field" style="margin-bottom: -1.25em">
             <mat-label>Rechercher un jeu</mat-label>
             <input matInput autofocus #myInput (keydown.enter)="search($event)" (blur)="search($event)">
             <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
     </form>
+
+    <div [hidden]="!errors">
+        <div class="error">Erreur lors de la récupération des résultats</div>
+    </div>
 
     <div [hidden]="!searching">
         <div class="spinner searching">
@@ -15,22 +19,23 @@
 
     <div class="result">
         <div class="row" *ngFor="let item of items">
-            <mat-grid-list cols="4" rowHeight="60px">
-                <mat-grid-tile [colspan]="3" [rowspan]="1">
-                    <span class="name">{{item.name}}</span>
+            <mat-grid-list cols="7" rowHeight="60px">
+                <mat-grid-tile [colspan]="2" [rowspan]="2">
+                    <img src={{item.thumbnail}} />
                 </mat-grid-tile>
-                <mat-grid-tile [colspan]="1" [rowspan]="2">
-                    <img src={{item.thumbnail}} />                    
+                <mat-grid-tile [colspan]="5" [rowspan]="1">
+                    <div class="text-inside-grid"><span class="name">{{item.name}}</span></div>
                 </mat-grid-tile>
-                <mat-grid-tile [colspan]="1" [rowspan]="1">
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <span class="title">Année: </span>{{item.year}}
                 </mat-grid-tile>
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="3" [rowspan]="1">
                     <span class="title">Popularité: </span>{{item.popularity}}
                 </mat-grid-tile>
             </mat-grid-list>
             <mat-divider></mat-divider>
         </div>
-        
+
     </div>
 </div>

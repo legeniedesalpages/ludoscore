@@ -8,4 +8,11 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+.error {
+  width: 100%;
+  padding: 10px;
+  color:red;
+  background-color: whitesmoke;
+}
+
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";

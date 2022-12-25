@@ -1,12 +1,4 @@
-.find_game {
-  width: 100%;
-}
-
-.example-full-width {
-  width: 100%;
-}
-
-.example-form {
+.find-game, .find-game-form, .find-game-search-field {
   width: 100%;
 }
 
@@ -27,4 +19,9 @@
 
 .title {
   color:darkgray
+}
+
+.text-inside-grid {
+  position: absolute;
+  left: 5px;
 }
