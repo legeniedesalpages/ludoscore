@@ -28,7 +28,7 @@ class GameSearchController extends Controller
             $id = $item['@attributes']['id'];
             array_push($idList, $id);
         }
-        $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&id=' . implode(',', array_slice($idList,0,50));
+        $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&id=' . implode(',', array_slice($idList, 0, 50));
         $jsonDetailData = $this->requester($detailRequest);
 
         $returnList = array();
@@ -61,11 +61,42 @@ class GameSearchController extends Controller
     {
         return array(
             'id' => $item['@attributes']['id'],
-            'thumbnail' => $item['thumbnail'],
+            'thumbnail' => $this->extractThumbnail($item),
             'name' => $this->extractName($item),
-            'year' => $item['yearpublished']['@attributes']['value'],
-            'popularity' => $item['poll'][0]['@attributes']['totalvotes']
+            'year' => $this->extractYear($item),
+            'popularity' => $this->extractPopularity($item)
         );
+    }
+
+    private function extractThumbnail($item)
+    {
+        try {
+            return $item['thumbnail'];
+        } catch (Exception $e) {
+            return "";
+        }
+    }
+
+    private function extractYear($item)
+    {
+        try {
+            return $item['yearpublished']['@attributes']['value'];
+        } catch (Exception $e) {
+            return "";
+        }
+    }
+
+    private function extractPopularity($item)
+    {
+        try {
+            return $item['poll'][0]['@attributes']['totalvotes'];
+        } catch (Exception $e1) {
+            try {
+                return $item['poll']['@attributes']['totalvotes'];
+            } catch (Exception $e2) {
+                return "";
+            }
+        }
     }
 
     private function extractName($item)
