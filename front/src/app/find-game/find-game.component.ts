@@ -12,6 +12,7 @@
 **/
 import { HttpClient } from '@angular/common/http';
 import { Component, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -27,20 +28,28 @@ export class FindGameComponent {
   items: any = null;
   searching: boolean = false;
   errors: string = '';
+  searchString: string = '';
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
   }
 
   search(event: any) {
-    let searchString = event.target.value;
-    if (!searchString) {
+    if (!event.target.value) {
+      console.debug('No search string');
       return;
     }
 
+    if  (event.target.value === this.searchString) {
+      console.debug('No new search, old search : ' + this.searchString);
+      return;
+    }
+
+    this.searchString = event.target.value;
     this.searching = true;
     this.errors = '';
-    console.debug("Search: ", searchString);
-    this.http.get(this.gameSearchUrl + encodeURIComponent(searchString)).subscribe({
+    console.debug("Search: ", this.searchString);
+
+    this.http.get(this.gameSearchUrl + encodeURIComponent(this.searchString)).subscribe({
       complete: () => {
         this.searching = false;
       },
@@ -57,6 +66,7 @@ export class FindGameComponent {
   }
 
   gameDetail(id: number) {
-    console.debug("Id :" + id);
+    console.debug("Go to detail page for id :" + id);
+    this.router.navigate(['/find-game-detail', id]);
   }
 }

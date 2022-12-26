@@ -10,6 +10,20 @@ use Illuminate\Support\Facades\Log;
 class GameSearchController extends Controller
 {
 
+    public function searchById($id)
+    {
+        $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&stats=1&id=' . $id;
+        $jsonDetailData = $this->requester($detailRequest);
+
+        if (array_key_exists('item', $jsonDetailData)) {
+            return json_encode($this->extractDetail($jsonDetailData['item']));
+        }
+        else {
+            Log::info("No detail results");
+            return json_encode("");
+        }
+    }
+
     public function searchByName($searchText)
     {
         $searchRequest = 'https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=' . $searchText;
@@ -57,6 +71,20 @@ class GameSearchController extends Controller
         return json_encode($returnList);
     }
 
+    private function extractDetail($item)
+    {
+        return array(
+            'id' => $item['@attributes']['id'],
+            'thumbnail' => $this->extractThumbnail($item),
+            'image' => $this->extractImage($item),
+            'name' => $this->extractName($item),
+            'year' => $this->extractYear($item),
+            'popularity' => $this->extractPopularity($item),
+            'minplayers' => $this->extractMinPlayer($item),
+            'maxplayers' => $this->extractMaxPlayer($item)
+        );
+    }
+
     private function extractData($item)
     {
         return array(
@@ -68,10 +96,37 @@ class GameSearchController extends Controller
         );
     }
 
+    private function extractMinPlayer($item)
+    {
+        try {
+            return $item['minplayers']['@attributes']['value'];
+        } catch (Exception $e) {
+            return "";
+        }
+    }
+
+    private function extractMaxPlayer($item)
+    {
+        try {
+            return $item['maxplayers']['@attributes']['value'];
+        } catch (Exception $e) {
+            return "";
+        }
+    }
+
     private function extractThumbnail($item)
     {
         try {
             return $item['thumbnail'];
+        } catch (Exception $e) {
+            return "";
+        }
+    }
+
+    private function extractImage($item)
+    {
+        try {
+            return $item['image'];
         } catch (Exception $e) {
             return "";
         }
