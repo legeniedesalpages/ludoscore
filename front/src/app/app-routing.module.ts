@@ -30,11 +30,15 @@ const routes: Routes = [
   {
     path: 'find-game',
     loadChildren: () => import('./find-game/find-game.module').then(m => m.FindGameModule)
+  },
+  {
+    path: 'find-game-detail/:id',
+    loadChildren: () => import('./find-game-detail/find-game-detail.module').then(m => m.FindGameDetailModule)
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule]
 })
 

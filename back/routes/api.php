@@ -44,3 +44,7 @@ Route::middleware('auth:sanctum')->controller(MatchController::class)->group(fun
 Route::middleware('auth:sanctum')->get('/game_search', ['as' => 'game_search', function () {
     return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = ['searchText' => request()->q]);
 }]);
+
+Route::middleware('auth:sanctum')->get('/game_search_detail', ['as' => 'game_search_detail', function () {
+    return app()->make(GameSearchController::class)->callAction('searchById', $parameters = ['id' => request()->id]);
+}]);

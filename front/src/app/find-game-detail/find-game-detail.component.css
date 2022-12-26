@@ -1,0 +1,15 @@
+.find-game-detail {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form {
+    padding: 10px;
+}
+
+.detail {
+    width:400px;
+    min-width: 300px;
+}
