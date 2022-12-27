@@ -21,7 +21,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { FindGameDetailComponent } from './find-game-detail.component';
+import { GameEditorComponent } from './game-editor.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
@@ -30,13 +30,13 @@ import { MatRippleModule } from '@angular/material/core';
 const routes: Routes = [
   {
     path: '',
-    component: FindGameDetailComponent,
+    component: GameEditorComponent,
     canActivate: [AuthGuardService]
   }
 ];
 
 @NgModule({
-  declarations: [FindGameDetailComponent],
+  declarations: [GameEditorComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -53,4 +53,4 @@ const routes: Routes = [
   ]
 })
 
-export class FindGameDetailModule { }
+export class GameEditorModule { }

@@ -21,10 +21,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { FindGameComponent } from './find-game.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
 import {MatRippleModule} from '@angular/material/core';
+import { FindGameComponent } from './find-game.component';
 
 
 const routes: Routes = [
