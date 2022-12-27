@@ -1,0 +1,14 @@
+<div class="game-editor">
+    <div [hidden]="!loading">
+        <div class="spinner searching">
+            <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+        </div>
+    </div>
+
+    <form [formGroup]="gameEditorForm" [hidden]="loading">
+        <mat-form-field appearance="fill" class="detail">
+            <mat-label>Nom</mat-label>
+            <input matInput formControlName="name">
+        </mat-form-field>
+    </form>
+</div>

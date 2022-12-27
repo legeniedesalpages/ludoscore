@@ -17,16 +17,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'find-game-detail',
-  templateUrl: './find-game-detail.component.html',
-  styleUrls: ['./find-game-detail.component.css'],
+  selector: 'game-editor',
+  templateUrl: './game-editor.component.html',
+  styleUrls: ['./game-editor.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class FindGameDetailComponent {
+export class GameEditorComponent {
 
   id: any;
   loading: boolean;
-  gameDetailForm: FormGroup;
+  gameEditorForm: FormGroup;
 
 
   private gameSearcDetailhUrl = environment.apiURL + '/api/game_search_detail?id=';
@@ -34,7 +34,7 @@ export class FindGameDetailComponent {
   constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {
     this.loading = true;
 
-    this.gameDetailForm = new FormGroup({
+    this.gameEditorForm = new FormGroup({
       name: new FormControl('', Validators.required),
     });
   }
@@ -50,7 +50,7 @@ export class FindGameDetailComponent {
         },
         next: (res: any) => {
           console.log("Detail: " + res.image);
-          this.gameDetailForm.setValue({
+          this.gameEditorForm.setValue({
             name: res.name
           });
         },
