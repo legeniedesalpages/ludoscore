@@ -2,14 +2,16 @@
   width: 100vw;
   display: flex;
   justify-content: center;
-  align-items: center;
+  flex: 1 1 auto;
 }
 
 form {
-    padding: 10px;
+  width: 100%;
+  padding: 20px;
 }
 
-.detail {
-    width:400px;
-    min-width: 300px;
+.mat-mdc-form-field {
+  width: 100%;
+  padding: 5px;
+  opacity: 0.9;
 }
