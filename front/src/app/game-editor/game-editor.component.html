@@ -1,5 +1,6 @@
 <div class="game-editor">
     <div [hidden]="!loading">
+        <br/>
         <div class="spinner searching">
             <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
         </div>
@@ -8,7 +9,7 @@
 
 
     <form [formGroup]="gameEditorForm" [hidden]="loading"
-        [ngStyle]="{'background': 'url(' + imageUrl + ') no-repeat 0 0 / cover'}" *ngIf="imageUrl != null">
+        [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat 0 0 / cover'}" *ngIf="imageUrl != null">
 
         <mat-grid-list cols="2" rowHeight="80px">
             <mat-grid-tile [colspan]="2" [rowspan]="1">
@@ -22,8 +23,8 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Uniquement coopérarif</mat-label>
                     <mat-select formControlName="cooperative">
-                        <mat-option value=true>Oui</mat-option>
-                        <mat-option value=false>Non</mat-option>
+                        <mat-option value="true">Oui</mat-option>
+                        <mat-option value="false">Non</mat-option>
                     </mat-select>
                 </mat-form-field>
             </mat-grid-tile>
@@ -55,25 +56,43 @@
             <mat-grid-tile [colspan]="2" [rowspan]="1">
                 <mat-form-field appearance="fill">
                     <mat-label>Tags de partie</mat-label>
-                    <mat-chip-grid #chipGrid aria-label="Ajouter des tags de partie">
-                      <mat-chip-row *ngFor="let fruit of fruits" (removed)="remove(fruit)" [editable]="true" (edited)="edit(fruit, $event)">
-                        {{fruit.name}}
-                        <button matChipRemove [attr.aria-label]="'remove ' + fruit">
+                    <mat-chip-grid #chipGridTagGame aria-label="Ajouter des tags de partie">
+                      <mat-chip-row *ngFor="let tag of tagsGame" (removed)="removeTagGame(tag)" [editable]="true" (edited)="editTagGame(tag, $event)">
+                        {{tag.name}}
+                        <button matChipRemove [attr.aria-label]="'remove ' + tag">
                           <mat-icon>cancel</mat-icon>
                         </button>
                       </mat-chip-row>
                       <input placeholder="Ajouter un tag"
-                             [matChipInputFor]="chipGrid"
+                             [matChipInputFor]="chipGridTagGame"
                              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                              [matChipInputAddOnBlur]="addOnBlur"
-                             (matChipInputTokenEnd)="add($event)"/>
+                             (matChipInputTokenEnd)="addTagGame($event)"/>
+                    </mat-chip-grid>
+                  </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-form-field appearance="fill">
+                    <mat-label>Tags de joueur</mat-label>
+                    <mat-chip-grid #chipGridTagPlayer aria-label="Ajouter des tags de joueur">
+                      <mat-chip-row *ngFor="let tag of tagsPlayer" (removed)="removeTagPlayer(tag)" [editable]="true" (edited)="editTagPlayer(tag, $event)">
+                        {{tag.name}}
+                        <button matChipRemove [attr.aria-label]="'remove ' + tag">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </mat-chip-row>
+                      <input placeholder="Ajouter un tag"
+                             [matChipInputFor]="chipGridTagPlayer"
+                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                             [matChipInputAddOnBlur]="addOnBlur"
+                             (matChipInputTokenEnd)="addTagPlayer($event)"/>
                     </mat-chip-grid>
                   </mat-form-field>
             </mat-grid-tile>
 
             <mat-grid-tile [colspan]="1" [rowspan]="1">
                 <button mat-raised-button>Annuler</button>
-    
             </mat-grid-tile>
 
             <mat-grid-tile [colspan]="1" [rowspan]="1">

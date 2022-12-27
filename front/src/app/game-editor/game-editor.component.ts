@@ -18,7 +18,7 @@ import { environment } from 'src/environments/environment';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
 
-export interface Fruit {
+export interface Tag {
   name: string;
 }
 
@@ -37,7 +37,8 @@ export class GameEditorComponent {
 
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
-  fruits: Fruit[] = [];
+  tagsGame: Tag[] = [];
+  tagsPlayer: Tag[] = [];
 
   private gameSearcDetailhUrl = environment.apiURL + '/api/game_search_detail?id=';
 
@@ -48,7 +49,7 @@ export class GameEditorComponent {
       name: new FormControl('', Validators.required),
       minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
-      cooperative: new FormControl(false)
+      cooperative: new FormControl('', Validators.required)
     });
   }
 
@@ -62,13 +63,13 @@ export class GameEditorComponent {
           this.loading = false;
         },
         next: (res: any) => {
-          console.log("Detail: [" + res.image + "]");
+          console.log("Detail: [" + res.name + "]");
           this.imageUrl = `'${res.image}'`;
           this.gameEditorForm.setValue({
             name: res.name,
             minPlayer: res.minplayers,
             maxPlayer: res.maxplayers,
-            cooperative: false
+            cooperative: "false"
           });
         },
         error: (err) => {
@@ -80,39 +81,52 @@ export class GameEditorComponent {
     });
   }
 
-  add(event: MatChipInputEvent): void {
+  addTagPlayer(event: MatChipInputEvent): void {
+    this.addTag(event, this.tagsPlayer);
+  }
+  addTagGame(event: MatChipInputEvent): void {
+    this.addTag(event, this.tagsGame);
+  }
+  addTag(event: MatChipInputEvent, tags: Tag[]): void {
     const value = (event.value || '').trim();
-
-    // Add our fruit
     if (value) {
-      this.fruits.push({ name: value });
+      tags.push({ name: value });
     }
 
     // Clear the input value
     event.chipInput!.clear();
   }
 
-  remove(fruit: Fruit): void {
-    const index = this.fruits.indexOf(fruit);
 
+  removeTagPlayer(tag: Tag): void {
+    this.removeTag(tag, this.tagsPlayer);
+  }
+  removeTagGame(tag: Tag): void {
+    this.removeTag(tag, this.tagsGame);
+  }
+  removeTag(tag: Tag, tags: Tag[]): void {
+    const index = tags.indexOf(tag);
     if (index >= 0) {
-      this.fruits.splice(index, 1);
+      tags.splice(index, 1);
     }
   }
 
-  edit(fruit: Fruit, event: MatChipEditedEvent) {
-    const value = event.value.trim();
 
-    // Remove fruit if it no longer has a name
+  editTagPlayer(tag: Tag, event: MatChipEditedEvent): void {
+    this.editTag(tag, this.tagsPlayer, event);
+  }
+  editTagGame(tag: Tag, event: MatChipEditedEvent): void {
+    this.editTag(tag, this.tagsGame, event);
+  }
+  editTag(tag: Tag, tags: Tag[], event: MatChipEditedEvent) {
+    const value = event.value.trim();
     if (!value) {
-      this.remove(fruit);
+      this.removeTag(tag, tags);
       return;
     }
-
-    // Edit existing fruit
-    const index = this.fruits.indexOf(fruit);
+    const index = tags.indexOf(tag);
     if (index > 0) {
-      this.fruits[index].name = value;
+      tags[index].name = value;
     }
   }
 
