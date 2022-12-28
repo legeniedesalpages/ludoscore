@@ -1,6 +1,6 @@
 <div class="game-editor">
     <div [hidden]="!loading">
-        <br/>
+        <br />
         <div class="spinner searching">
             <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
         </div>
@@ -9,17 +9,20 @@
 
 
     <form [formGroup]="gameEditorForm" [hidden]="loading"
-        [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat 0 0 / cover'}" *ngIf="imageUrl != null">
+        [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat 0 0 / cover'}"
+        *ngIf="imageUrl != null">
 
-        <mat-grid-list cols="2" rowHeight="80px">
-            <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <div class="row">
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Nom</mat-label>
                     <input matInput formControlName="name">
                 </mat-form-field>
-            </mat-grid-tile>
+            </div>
+        </div>
 
-            <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <div class="row">
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Uniquement coopérarif</mat-label>
                     <mat-select formControlName="cooperative">
@@ -27,79 +30,88 @@
                         <mat-option value="false">Non</mat-option>
                     </mat-select>
                 </mat-form-field>
-            </mat-grid-tile>
+            </div>
+        </div>
 
-            <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <div class="row">
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Joueurs minimum</mat-label>
                     <input matInput formControlName="minPlayer">
                 </mat-form-field>
-            </mat-grid-tile>
-
-            <mat-grid-tile [colspan]="1" [rowspan]="1">
+            </div>
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Joueurs maximum</mat-label>
                     <input matInput formControlName="maxPlayer">
                 </mat-form-field>
-            </mat-grid-tile>
+            </div>
+        </div>
 
-
-            <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <div class="row">
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Date d'obtention</mat-label>
                     <input matInput [matDatepicker]="picker">
                     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
-            </mat-grid-tile>
+            </div>
+        </div>
 
-            <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <div class="row">
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Tags de partie</mat-label>
                     <mat-chip-grid #chipGridTagGame aria-label="Ajouter des tags de partie">
-                      <mat-chip-row *ngFor="let tag of tagsGame" (removed)="removeTagGame(tag)" [editable]="true" (edited)="editTagGame(tag, $event)">
-                        {{tag.name}}
-                        <button matChipRemove [attr.aria-label]="'remove ' + tag">
-                          <mat-icon>cancel</mat-icon>
-                        </button>
-                      </mat-chip-row>
-                      <input placeholder="Ajouter un tag"
-                             [matChipInputFor]="chipGridTagGame"
-                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                             [matChipInputAddOnBlur]="addOnBlur"
-                             (matChipInputTokenEnd)="addTagGame($event)"/>
+                        <mat-chip-row *ngFor="let tag of tagsGame" (removed)="removeTagGame(tag)" [editable]="true"
+                            (edited)="editTagGame(tag, $event)">
+                            {{tag.name}}
+                            <button matChipRemove [attr.aria-label]="'remove ' + tag">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip-row>
+                        <input placeholder="Ajouter un tag" [matChipInputFor]="chipGridTagGame"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                            (matChipInputTokenEnd)="addTagGame($event)" />
                     </mat-chip-grid>
-                  </mat-form-field>
-            </mat-grid-tile>
-
-            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                </mat-form-field>
+            </div>
+            <div class="column">
                 <mat-form-field appearance="fill">
                     <mat-label>Tags de joueur</mat-label>
                     <mat-chip-grid #chipGridTagPlayer aria-label="Ajouter des tags de joueur">
-                      <mat-chip-row *ngFor="let tag of tagsPlayer" (removed)="removeTagPlayer(tag)" [editable]="true" (edited)="editTagPlayer(tag, $event)">
-                        {{tag.name}}
-                        <button matChipRemove [attr.aria-label]="'remove ' + tag">
-                          <mat-icon>cancel</mat-icon>
-                        </button>
-                      </mat-chip-row>
-                      <input placeholder="Ajouter un tag"
-                             [matChipInputFor]="chipGridTagPlayer"
-                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                             [matChipInputAddOnBlur]="addOnBlur"
-                             (matChipInputTokenEnd)="addTagPlayer($event)"/>
+                        <mat-chip-row *ngFor="let tag of tagsPlayer" (removed)="removeTagPlayer(tag)" [editable]="true"
+                            (edited)="editTagPlayer(tag, $event)">
+                            {{tag.name}}
+                            <button matChipRemove [attr.aria-label]="'remove ' + tag">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip-row>
+                        <input placeholder="Ajouter un tag" [matChipInputFor]="chipGridTagPlayer"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                            (matChipInputTokenEnd)="addTagPlayer($event)" />
                     </mat-chip-grid>
-                  </mat-form-field>
-            </mat-grid-tile>
+                </mat-form-field>
+            </div>
+        </div>
 
-            <mat-grid-tile [colspan]="1" [rowspan]="1">
-                <button mat-raised-button>Annuler</button>
-            </mat-grid-tile>
-
-            <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <div class="row button_row">
+            <div class="column">
                 <button mat-raised-button color="primary">Enregistrer le jeu</button>
-            </mat-grid-tile>
+            </div>
+        </div>
 
-        </mat-grid-list>
+        <div class="row button_row">
+            <div class="column">
+                <button mat-raised-button>Annuler</button>
+            </div>
+        </div>
+        <div class="row button_row">
+            <div class="column">
+                <button mat-raised-button color="warn">Supprimer</button>
+            </div>
+        </div>
     </form>
 
 

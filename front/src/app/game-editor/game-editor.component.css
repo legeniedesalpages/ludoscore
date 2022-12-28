@@ -5,18 +5,32 @@
   flex: 1 1 auto;
 }
 
-form {
+.game-editor form {
   width: 100%;
   padding-top: 10px;
 }
 
-.mat-mdc-form-field {
+.game-editor .row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   width: 100%;
-  opacity: 0.9;
+}
+
+.game-editor .column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
   padding-left: 5px;
   padding-right: 5px;
 }
 
-.mat-standard-chip {    
-  height: auto !important;
+.game-editor .mat-mdc-form-field {
+  width: 100%;
+  opacity: 0.9;  
+}
+
+.game-editor .button_row {
+  height: 50px;
 }
