@@ -10,18 +10,16 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, ViewEncapsulation, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
 import { DateValidator } from '../services/date.validator';
-import moment from 'moment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, EMPTY, throwError, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import moment from 'moment';
 
 export interface Tag {
   name: string;
@@ -109,7 +107,7 @@ export class GameEditorComponent {
     console.log("saving " + formName + ", owning [" + this.gameEditorForm.get('ownership')?.value + "]");
 
     let formOwnershipDate = this.gameEditorForm.get('ownership')?.value ? moment(this.gameEditorForm.get('ownership')?.value).format('YYYY-MM-DD') : null;
-    
+
     this.http.post(this.gameSaveUrl, {
       name: formName,
       image: this.imageResource,

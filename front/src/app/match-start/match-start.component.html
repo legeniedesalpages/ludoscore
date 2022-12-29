@@ -1,5 +1,13 @@
 <div class="create-match">
-    <form [formGroup]="createMatchForm" (ngSubmit)="onSubmit()">
+
+    <div [hidden]="!loading">
+        <br />
+        <div class="spinner searching">
+            <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+        </div>
+    </div>
+
+    <form [formGroup]="createMatchForm" (ngSubmit)="onSubmit()" [hidden]="loading">
         <fieldset [disabled]="saving">
 
             <div class="row">
