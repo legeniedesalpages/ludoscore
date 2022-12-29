@@ -10,8 +10,8 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { HttpClient } from '@angular/common/http';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -19,6 +19,9 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
 import { DateValidator } from '../services/date.validator';
 import moment from 'moment';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable, EMPTY, throwError, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface Tag {
   name: string;
@@ -50,7 +53,7 @@ export class GameEditorComponent {
   private gameSearchDetailhUrl = environment.apiURL + '/api/game_search_detail?id=';
   private gameSaveUrl = environment.apiURL + '/api/games';
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router, private snackBar: MatSnackBar) {
     this.loading = true;
     this.saving = false;
 
@@ -101,13 +104,13 @@ export class GameEditorComponent {
     });
   }
 
-  saveGame() : void {    
+  saveGame(): void {
     let formName = this.gameEditorForm.get('name')?.value;
-    let formOwnershipDate = moment(this.gameEditorForm.get('ownership')?.value).format('YYYY-MM-DD');
-    console.log("saving " + formName + ", owning " + formOwnershipDate);
-    this.saving = true;
+    console.log("saving " + formName + ", owning [" + this.gameEditorForm.get('ownership')?.value + "]");
+
+    let formOwnershipDate = this.gameEditorForm.get('ownership')?.value ? moment(this.gameEditorForm.get('ownership')?.value).format('YYYY-MM-DD') : null;
     
-    this.http.post(this.gameSaveUrl, { 
+    this.http.post(this.gameSaveUrl, {
       name: formName,
       image: this.imageResource,
       thumbnail: this.thumbnailResource,
@@ -115,14 +118,16 @@ export class GameEditorComponent {
       minPlayers: this.gameEditorForm.get('minPlayer')?.value,
       maxPlayers: this.gameEditorForm.get('maxPlayer')?.value,
       ownershipDate: formOwnershipDate,
-      bggId: this.bggId
+      bggId: this.bggId,
+      tagsGame: JSON.stringify(this.tagsGame),
+      tagsPlayer: JSON.stringify(this.tagsPlayer)
     }).subscribe({
       complete: () => {
-        console.log("saved");
+        this.snackBar.open("enregistré");
         this.saving = false;
       },
-      error: (err) => {
-        console.error(err);
+      error: (err: any) => {
+        this.snackBar.open(err);
         this.saving = false;
       }
     });

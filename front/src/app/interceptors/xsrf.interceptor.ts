@@ -48,7 +48,7 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
                 this.authService.logout();
                 this.router.navigate(['/login']);
             }
-            return throwError(() => new Error(err));
+            return throwError(() => new Error(err.error.message));
         }));
 
 
