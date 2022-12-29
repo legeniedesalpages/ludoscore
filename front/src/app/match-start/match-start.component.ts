@@ -11,13 +11,14 @@
     * - Modification    : 
 **/
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 export class Game {
-  constructor(public id: number, public title: string) {}
+  constructor(public id: number, public title: string) { }
 }
 
 @Component({
@@ -27,10 +28,13 @@ export class Game {
 })
 export class MatchStartComponent {
 
+  private gameUrl = environment.apiURL + '/api/games';
+
+  loading: boolean = true;
   saving: boolean = false;
   createMatchForm: FormGroup;
   games: Game[] = [];
-  filteredOptions: Observable<Game[]>;
+  filteredOptions: Observable<Game[]> | null = null;
 
   constructor(private http: HttpClient) {
 
@@ -38,24 +42,41 @@ export class MatchStartComponent {
       game: new FormControl('', Validators.required)
     });
 
-    this.filteredOptions = this.createMatchForm.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
-    );
+  }
+
+  ngOnInit(): void {
+    this.http.get(this.gameUrl).subscribe({
+      next: (res: any) => {
+        this.games = res.map((r: any) => new Game(r.id, r.title));    
+        
+        this.filteredOptions = this.createMatchForm.valueChanges.pipe(
+          startWith(''),
+          map(value => this._filter(value || '')),
+        );
+
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
   }
 
 
   cancelCreation() {
     console.debug('Cancel match creation');
-
   }
 
   onSubmit() {
-
   }
 
-  private _filter(value: string): Game[] {
-    const filterValue = value.toLowerCase();
+  private _filter(value: any): Game[] {
+    if (!value || !value.game) {
+      console.log("show all");
+      return this.games;
+    }
+    console.log(value.game);
+    const filterValue = value.game.toLowerCase();    
     return this.games.filter(jeu => jeu.title.toLowerCase().includes(filterValue));
   }
 }
