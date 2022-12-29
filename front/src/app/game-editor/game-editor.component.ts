@@ -144,8 +144,6 @@ export class GameEditorComponent {
     if (value) {
       tags.push({ name: value });
     }
-
-    // Clear the input value
     event.chipInput!.clear();
   }
 

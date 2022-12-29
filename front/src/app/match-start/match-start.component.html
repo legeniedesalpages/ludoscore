@@ -1,5 +1,26 @@
-<div class="create_match">
-    <form [formGroup]="createMatchForm" (ngSubmit)="onSubmit()" class="parent">
-        <h1>Créer une partie</h1>
+<div class="create-match">
+    <form [formGroup]="createMatchForm" (ngSubmit)="onSubmit()">
+        <fieldset [disabled]="saving">
+
+            <div class="row">
+                <div class="column">
+                    <div class="field_button">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Jeu</mat-label>
+                            <input type="text" placeholder="" aria-label="Choisir un jeu" matInput
+                                formControlName="game" [matAutocomplete]="auto">
+                            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.title">
+                                    {{option.title}}
+                                </mat-option>
+                            </mat-autocomplete>                            
+                        </mat-form-field>
+                        <button mat-icon-button color="primary">
+                            <mat-icon>add_circle_outline</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
     </form>
 </div>
