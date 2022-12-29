@@ -32,7 +32,7 @@ const routes: Routes = [
     loadChildren: () => import('./find-game/find-game.module').then(m => m.FindGameModule)
   },
   {
-    path: 'game-editor/:id',
+    path: 'game-editor/:type/:id',
     loadChildren: () => import('./game-editor/game-editor.module').then(m => m.GameEditorModule)
   }
 ];
