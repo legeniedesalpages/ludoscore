@@ -66,7 +66,7 @@ export class FindGameComponent {
   }
 
   gameDetail(id: number) {
-    console.debug("Go to detail page for id :" + id);
-    this.router.navigate(['/game-editor', id]);
+    console.debug("Go to creation page for id :" + id);
+    this.router.navigate(['/game-editor', 'bgg', id]);
   }
 }
