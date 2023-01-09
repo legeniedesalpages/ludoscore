@@ -2,6 +2,9 @@
   width: 100%;
 }
 
+#find-game-result {
+  margin-top: -22px;
+}
 
 .row {
   cursor: pointer;  
@@ -25,28 +28,26 @@
 .text {
   vertical-align:middle;
   width: 100%;
-  background-color: #badffb;
 }
 
 .title {
-  width: 100%;
-  background-color: #61b7f7;
-  color: white;
+  width: 100%;  
   font-size: larger;
   padding: 10px;
-  margin-bottom: 15px;
+}
+
+.details {
+  padding: 10px;
+  height: 150px;
 }
 
 .detail {
-  width: 100%;
-  padding: 10px;
   font-size: smaller;
+  padding-bottom: 5px;
 }
 
-.category {
-  color: gray;
-}
-
-.mat-mdc-form-field-bottom-align::before {
-  height: 14px !important;
+.mat-mdc-progress-spinner {
+  float: right; 
+  padding:0; 
+  margin-top: -32px;
 }
