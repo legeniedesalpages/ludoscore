@@ -17,28 +17,20 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./home/home.module').then(m => m.HomeModule)
+    loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule)
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then(m => m.LoginModule)
-  },
-  {
-    path: 'match-start',
-    loadChildren: () => import('./match-start/match-start.module').then(m => m.MatchStartModule)
+    loadChildren: () => import('./components/auth/login.module').then(m => m.LoginModule)
   },
   {
     path: 'find-game',
-    loadChildren: () => import('./find-game/find-game.module').then(m => m.FindGameModule)
-  },
-  {
-    path: 'game-editor/:type/:id',
-    loadChildren: () => import('./game-editor/game-editor.module').then(m => m.GameEditorModule)
+    loadChildren: () => import('./components/find-game/find-game.module').then(m => m.FindGameModule)
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  imports: [RouterModule.forRoot(routes, { useHash: false })],
   exports: [RouterModule]
 })
 

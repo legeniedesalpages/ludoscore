@@ -1,0 +1,17 @@
+@use '@angular/material'as mat;
+@import '../../../styles.scss';
+
+#recherche_partie {
+  background-color: mat.get-color-from-palette($ludoscore-accent, 900);
+  color: white;
+}
+
+.row button {
+  border: solid mat.get-color-from-palette($ludoscore-accent, 900);
+  color: white;
+}
+
+#match button {
+  border: solid mat.get-color-from-palette($ludoscore-accent, 900);
+  color: white;
+}

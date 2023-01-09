@@ -1,0 +1,66 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$bright-navy-blue-palette: (
+  50: #e3f2fd,
+  100: #badffb,
+  200: #8fcbfa,
+  300: #61b7f7,
+  400: #3ca7f6,
+  500: #0c98f5,
+  600: #078ae7,
+  700: #0078d4,
+  800: #0067c2,
+  900: #042c5c,
+  A100: #c2e4ff,
+  A200: #addcff,
+  A400: #1f9eff,
+  A700: #00518f,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: white,
+    A700: white,    
+  )
+);
+
+$ludoscore-primary: mat.define-palette(mat.$blue-palette);
+$ludoscore-accent: mat.define-palette($bright-navy-blue-palette);
+$ludoscore-warn: mat.define-palette(mat.$red-palette);
+
+$ludoscore-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $ludoscore-primary,
+      accent: $ludoscore-accent,
+      warn: $ludoscore-warn,
+      is-dark: false,
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+  )
+);
+
+@include mat.all-component-themes($ludoscore-theme);
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: mat.get-color-from-palette($ludoscore-accent, 50);
+}

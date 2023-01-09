@@ -1,0 +1,39 @@
+<div id="find-game">
+    <form id="find-game-form">
+        <mat-form-field id="find-game-search-field" style="margin-bottom: -1.25em">
+            <mat-label>Rechercher un jeu</mat-label>
+            <input matInput autofocus #myInput (keydown.enter)="search($event)" (blur)="search($event)">
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+    </form>
+
+    <div *ngIf="errors">
+        <div class="error">Erreur lors de la récupération des résultats</div>
+    </div>
+
+    <div *ngIf="searching">
+        <div class="spinner searching">
+            <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+        </div>
+    </div>
+
+    <div class="find-game-result" *ngIf="findGameService.items.length > 0">
+        <div class="row" *ngFor="let item of findGameService.items"  matRipple>
+            <!--(click)="gameDetail(item.id)"-->
+            <span class="thumbnail">
+                <img src={{item.thumbnail}} />
+            </span>
+
+            <span class="text">
+                <div class="title">{{item.name}}</div>
+                <div class="detail">
+                    <span class="category">Année: </span>{{item.year}}
+                </div>
+                <div class="detail">
+                    <span class="category">Popularité: </span>{{item.popularity}}
+                </div>
+            </span>            
+        </div>
+        
+    </div>
+</div>
