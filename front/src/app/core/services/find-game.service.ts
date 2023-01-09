@@ -23,16 +23,24 @@ export class FindGameService {
     private readonly gameSearchUrl = environment.apiURL + '/api/game_search';
 
     public items: GameSearchResult[];
+    public searchString: string;
 
     constructor(private http: HttpClient) {
         this.items = [];
+        this.searchString = '';
     }
 
     public search(searchString: string): Observable<GameSearchResult[]> {
+        this.searchString = searchString;
         return this.http.get<GameSearchResult[]>(this.gameSearchUrl, { params: { q: searchString } }).pipe(
             tap(gameResult =>  this.items = gameResult),
             catchError(_ => this.items = [])
         );
+    }
+
+    public resetPreviousSearch() {
+        this.searchString = '';
+        this.items = [];
     }
 
 }
