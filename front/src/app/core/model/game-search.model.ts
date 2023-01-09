@@ -15,5 +15,6 @@ export interface GameSearchResult {
     thumbnail: string,
     name: string,
     year: number,
-    popularity: number
+    popularity: number,
+    owned: boolean
 }

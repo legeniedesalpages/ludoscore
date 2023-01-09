@@ -11,6 +11,7 @@
   height: 150px;
   display: grid;
   grid-template-columns: 150px 1fr;
+  user-select: none;
 }
 
 .thumbnail {
@@ -23,6 +24,10 @@
   object-fit: cover;
   padding: 0;
   margin: 0;
+}
+
+.owned {
+  opacity: 0.5;
 }
 
 .text {

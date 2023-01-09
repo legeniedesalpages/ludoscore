@@ -14,3 +14,7 @@
 .category {
   color: mat.get-color-from-palette($ludoscore-accent, A700);
 }
+
+.thumbnail {
+  background-color: mat.get-color-from-palette($ludoscore-accent, 900);
+}

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class GameSearchController extends Controller
 {
@@ -77,7 +79,31 @@ class GameSearchController extends Controller
             Log::info("No detail results");
         }
 
-        return json_encode($returnList);
+        $newRetunrList = $this->addDetails($returnList);
+        Log::debug($newRetunrList);
+        return json_encode($newRetunrList);
+    }
+
+    private function addDetails($list) {
+        $idList = collect($list)->map(function($game) {
+            return $game['id'];
+        });
+        Log::debug("Board game list :");
+        Log::debug($idList);
+
+        $games = DB::table('games')
+                    ->whereIn('bgg_id', $idList)
+                    ->get();
+
+        $newList = array();
+        foreach($list as $returnedGame) {
+            if (array_search($returnedGame['id'], array_column($games->toArray(), 'bgg_id')) !== false) {
+                array_push($newList, array_merge($returnedGame, array('owned' => true)));
+            } else {
+                array_push($newList, array_merge($returnedGame, array('owned' => false)));
+            }
+        }
+        return $newList;
     }
 
     private function extractDetail($item)

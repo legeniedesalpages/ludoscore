@@ -9,23 +9,27 @@
     </form>
 
     <div id="find-game-result" *ngIf="findGameService.items.length > 0">
-        <div class="row" *ngFor="let item of findGameService.items" matRipple>
-            <!--(click)="gameDetail(item.id)"-->
-            <span class="thumbnail">
-                <img src={{item.thumbnail}} />
-            </span>
+        <div *ngFor="let item of findGameService.items" matRipple (click)="gameDetail(item.id)">
+            <div [class]="item.owned ? 'row owned' : 'row'">
+                <div class="thumbnail">
+                    <img src={{item.thumbnail}} />
+                </div>
 
-            <span class="text">
-                <div class="title">{{item.name}}</div>
-                <div class="details">
-                    <div class="detail">
-                        <span class="category">Année: </span>{{item.year}}
-                    </div>
-                    <div class="detail">
-                        <span class="category">Popularité: </span>{{item.popularity}}
+                <div class="text">
+                    <div class="title">{{item.name}}</div>
+                    <div class="details">
+                        <div class="detail">
+                            <span class="category">Année: </span>{{item.year}}
+                        </div>
+                        <div class="detail">
+                            <span class="category">Popularité: </span>{{item.popularity}}
+                        </div>
+                        <div class="detail" *ngIf="item.owned">
+                            <span class="category">Jeu déjà dans la liste</span>
+                        </div>
                     </div>
                 </div>
-            </span>
+            </div>
         </div>
 
     </div>

@@ -62,7 +62,7 @@ export class FindGameComponent implements OnInit {
   }
 
   public gameDetail(id: number) {
-    console.debug("Go to creation page for id :" + id);
+    console.debug("Go to edition page for id :" + id);
     this.router.navigate(['/game-editor', 'bgg', id]);
   }
 }
