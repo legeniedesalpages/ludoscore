@@ -26,15 +26,18 @@ export class FindGameService {
     public searchString: string;
 
     constructor(private http: HttpClient) {
-        this.items = [];
         this.searchString = '';
+        this.items = [];
     }
 
     public search(searchString: string): Observable<GameSearchResult[]> {
         this.searchString = searchString;
         return this.http.get<GameSearchResult[]>(this.gameSearchUrl, { params: { q: searchString } }).pipe(
-            tap(gameResult =>  this.items = gameResult),
-            catchError(_ => this.items = [])
+            tap(gameResult => this.items = gameResult),
+            catchError(error => {
+                this.items = []
+                throw new Error(error)
+            })
         );
     }
 
