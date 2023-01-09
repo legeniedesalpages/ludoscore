@@ -15,11 +15,12 @@ import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, Http
 import { catchError, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class HttpXSRFInterceptor implements HttpInterceptor {
 
-    constructor(private tokenExtractor: HttpXsrfTokenExtractor, private router: Router, private authService: AuthService) {
+    constructor(private tokenExtractor: HttpXsrfTokenExtractor, private router: Router, private authService: AuthService, private snackBar: MatSnackBar) {
     }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -53,6 +54,11 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
                     this.router.navigate(['/login']);
                 })
             }
+
+            this.snackBar.open("Erreur: " + err.error.message, 'Fermer', {
+                duration: 5000
+            })
+
             return throwError(() => new Error(err.error.message));
         }));
 

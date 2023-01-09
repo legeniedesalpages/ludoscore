@@ -26,6 +26,10 @@ const routes: Routes = [
   {
     path: 'find-game',
     loadChildren: () => import('./components/find-game/find-game.module').then(m => m.FindGameModule)
+  },
+  {
+    path: 'game-editor/:type/:id',
+    loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule)
   }
 ];
 
