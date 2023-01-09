@@ -1,0 +1,52 @@
+<div id="home">
+    <div id="match">
+        <div *ngIf="dataReceived" id="big-button">
+            <button mat-flat-button (click)="createMatch()" *ngIf="!matchInProgress">
+                <span class="material-symbols-outlined">Swords</span>
+                <br />
+                Démarrer une partie
+            </button>
+
+            <button mat-flat-button class="material-cust-large-button" *ngIf="matchInProgress">
+                Mettre fin à la partie
+            </button>
+        </div>
+
+        <div *ngIf="!dataReceived" id="recherche_partie">
+            Recherche si une partie est en cours...
+        </div>
+    </div>
+
+    <div id="actions">
+        <div class="row haut-gauche">
+            <button mat-flat-button (click)="findGame()">
+                <span class="material-symbols-outlined">Search</span>
+                <br />
+                Chercher un jeu
+            </button>
+        </div>
+        <div class="row haut-droite">
+            <button mat-flat-button>
+                <span class="material-symbols-outlined">Data_exploration</span>
+                <!--<span class="material-symbols-outlined">Scoreboard</span>-->
+                <br />
+                Voir les stats
+            </button>
+        </div>
+        <div class="row bas-gauche">
+            <button mat-flat-button>
+                <span class="material-symbols-outlined">Folder_open</span>
+                <br />
+                Gérer la ludotech
+            </button>
+        </div>
+        <div class="row bas-droite">
+            <button mat-flat-button>
+                <span class="material-symbols-outlined">Groups</span>
+                <br />
+                Voir les joueurs
+            </button>
+        </div>
+    </div>
+
+</div>

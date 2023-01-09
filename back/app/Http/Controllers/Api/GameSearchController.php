@@ -29,19 +29,28 @@ class GameSearchController extends Controller
         $searchRequest = 'https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=' . $searchText;
         $jsonSearchData = $this->requester($searchRequest);
 
+        Log::info($jsonSearchData);
+
+        $idList = array();
         $totalFound = $jsonSearchData['@attributes']['total'];
         if ($totalFound == '0') {
             Log::info("No result for query " . $searchText);
             return json_encode([]);
+        } else if ($totalFound == '1') {
+            Log::info("Found 1 result for query " . $searchText);
+            $id = $jsonSearchData['item']['@attributes']['id'];
+            array_push($idList, $id);
         } else {
+
             Log::info("Found " . $totalFound . " results for query " . $searchText);
+            foreach ($jsonSearchData['item'] as $item) {
+                $id = $item['@attributes']['id'];
+                array_push($idList, $id);
+            }
         }
 
-        $idList = array();
-        foreach ($jsonSearchData['item'] as $item) {
-            $id = $item['@attributes']['id'];
-            array_push($idList, $id);
-        }
+        
+        
         $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&id=' . implode(',', array_slice($idList, 0, 50));
         $jsonDetailData = $this->requester($detailRequest);
 

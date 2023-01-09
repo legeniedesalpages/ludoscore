@@ -1,0 +1,21 @@
+<mat-toolbar color="primary">
+  <button mat-flat-button color="primary" (click)="onClickHome()">
+    <mat-icon>home</mat-icon>
+    <span>{{title}}</span>
+  </button>
+
+  <span class="menu-spacer"></span>
+
+  <button mat-flat-button color="primary" [matMenuTriggerFor]="login" *ngIf="username">
+    <span>{{username}}</span>
+    <mat-icon>person</mat-icon>
+  </button>
+
+  <mat-menu #login="matMenu" xPosition="before">
+    <button mat-menu-item (click)="onClickLogout()">
+      <mat-icon>power_settings_new</mat-icon>
+      <span>Se déconnecter</span>
+    </button>
+  </mat-menu>
+
+</mat-toolbar>

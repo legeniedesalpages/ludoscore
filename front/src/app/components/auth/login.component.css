@@ -1,0 +1,37 @@
+
+#login-page {
+  height: 75vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#login-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.mat-mdc-card-header {
+  padding: 5px !important;
+  display: flex !important;
+}
+
+.mat-card {
+  padding: 0 !important;
+}
+
+.mat-mdc-card-content {
+  padding: 15px !important;
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,52 @@
+#find-game, #find-game-form, #find-game-search-field {
+  width: 100%;
+}
+
+
+.row {
+  cursor: pointer;  
+  height: 150px;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+}
+
+.thumbnail {
+  width: 150px;
+}
+
+.thumbnail img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  padding: 0;
+  margin: 0;
+}
+
+.text {
+  vertical-align:middle;
+  width: 100%;
+  background-color: #badffb;
+}
+
+.title {
+  width: 100%;
+  background-color: #61b7f7;
+  color: white;
+  font-size: larger;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.detail {
+  width: 100%;
+  padding: 10px;
+  font-size: smaller;
+}
+
+.category {
+  color: gray;
+}
+
+.mat-mdc-form-field-bottom-align::before {
+  height: 14px !important;
+}
