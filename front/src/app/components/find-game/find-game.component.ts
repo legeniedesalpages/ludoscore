@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FindGameService } from 'src/app/core/services/find-game.service';
 
 @Component({
@@ -24,12 +24,20 @@ export class FindGameComponent implements OnInit {
   public searching: boolean;
   public searchString: string;
 
-  constructor(public findGameService: FindGameService, private router: Router) {
+  constructor(public findGameService: FindGameService, private router: Router, private route: ActivatedRoute) {
     this.searching = false;
     this.searchString = '';
   }
   ngOnInit(): void {
-    this.findGameService.resetPreviousSearch();
+
+    this.route.queryParamMap.subscribe((params) => {  
+      let reset = params.get('no-reset');
+      if (reset === 'true') {
+        console.debug("No reset")
+      } else {
+        this.findGameService.resetPreviousSearch();
+      }
+    });
   }
 
   public search(event: any) {

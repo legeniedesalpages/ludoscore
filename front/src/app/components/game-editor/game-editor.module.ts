@@ -31,17 +31,20 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { FindGameService } from 'src/app/core/services/find-game.service';
+import { TagEditorComponent } from './tag-editor.component';
+import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 
 const routes: Routes = [
   {
-    path: '',
+    path: '**',
     component: GameEditorComponent,
     canActivate: [AuthGuardService]
   }
 ];
 
 @NgModule({
-  declarations: [GameEditorComponent],
+  declarations: [GameEditorComponent, TagEditorComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -60,10 +63,13 @@ const routes: Routes = [
     MatDatepickerModule,
     MatChipsModule,
     MatSnackBarModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    NgxMatColorPickerModule
   ],
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' }
+    FindGameService,
+    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
+    { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS }
   ]
 })
 
