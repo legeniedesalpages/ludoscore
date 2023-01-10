@@ -3,15 +3,15 @@
 
 #recherche_partie {
   background-color: mat.get-color-from-palette($ludoscore-accent, 900);
-  color: white;
+  color: mat.get-color-from-palette($ludoscore-accent, 900-contrast);
 }
 
 .row button {
   border: solid mat.get-color-from-palette($ludoscore-accent, 900);
-  color: white;
+  color: mat.get-color-from-palette($ludoscore-accent, 900-contrast);
 }
 
 #match button {
   border: solid mat.get-color-from-palette($ludoscore-accent, 900);
-  color: white;
+  color: mat.get-color-from-palette($ludoscore-accent, 900-contrast);
 }
