@@ -12,7 +12,7 @@
 **/
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,10 +20,8 @@ import moment from 'moment';
 import { DateValidator } from 'src/app/core/services/date.validator';
 import { FindGameService } from 'src/app/core/services/find-game.service';
 import { GameSearchDetail } from 'src/app/core/model/game-search-detail.model';
-
-export interface Tag {
-  name: string;
-}
+import { Tag } from 'src/app/core/model/tag.model';
+import { ColorTag } from 'src/app/core/model/color-tag.model';
 
 @Component({
   selector: 'game-editor',
@@ -32,19 +30,18 @@ export interface Tag {
 })
 export class GameEditorComponent implements OnInit {
 
-  bggId: number | null;
-  internalId: number | null;
+  public loading: boolean;
+  public saving: boolean;
+  public gameEditorForm: FormGroup;
 
-  loading: boolean;
-  saving: boolean;
-  gameEditorForm: FormGroup;
-
-  imageResource: string | null = null;
-  thumbnailResource: string | null = null;
-  imageUrl: string | null = null;
-  tagsGame: Tag[] = [];
-  tagsPlayer: Tag[] = [];
-
+  public bggId: number | null;
+  private internalId: number | null;
+  public imageResource: string | null = null;
+  public thumbnailResource: string | null = null;
+  public imageUrl: string | null = null;
+  public tagsGame: Tag[] = [];
+  public tagsPlayer: Tag[] = [];
+  public tagsColor: ColorTag[] = [];
   
   private gameSaveUrl = environment.apiURL + '/api/games';
 
@@ -55,13 +52,14 @@ export class GameEditorComponent implements OnInit {
     this.bggId = null;
     this.internalId = null;
 
+    
+
     this.gameEditorForm = new FormGroup({
       name: new FormControl('', Validators.required),
+      cooperative: new FormControl('', Validators.required),
       minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
-      cooperative: new FormControl('', Validators.required),
       ownership: new FormControl('', DateValidator.dateValidator),
-      colorCtr: new FormControl(null)
     });
   }
 
@@ -83,22 +81,22 @@ export class GameEditorComponent implements OnInit {
 
     this.findGameService.detail(this.bggId).subscribe({
 
-      next: (gameDetail: GameSearchDetail) => {
-        this.loading = false;
+      next: (gameSearchDetail: GameSearchDetail) => {
+        console.info("Game details: [" + gameSearchDetail.name + "]");
+        this.imageUrl = `'${gameSearchDetail.image}'`;
 
-        console.info("Game details: [" + gameDetail.name + "]");
-        this.imageUrl = `'${gameDetail.image}'`;
-
-        this.imageResource = gameDetail.image;
-        this.thumbnailResource = gameDetail.thumbnail;
+        this.imageResource = gameSearchDetail.image;
+        this.thumbnailResource = gameSearchDetail.thumbnail;
 
         this.gameEditorForm.setValue({
-          name: gameDetail.name,
-          minPlayer: gameDetail.minplayers,
-          maxPlayer: gameDetail.maxplayers,
+          name: gameSearchDetail.name,
+          minPlayer: gameSearchDetail.minplayers,
+          maxPlayer: gameSearchDetail.maxplayers,
           cooperative: "false",
           ownership: null
         });
+
+        this.loading = false;
       },
       error: () => {
         this.loading = false;
@@ -106,8 +104,8 @@ export class GameEditorComponent implements OnInit {
     });
   }
 
-  saveGame(): void {
-    let formName = this.gameEditorForm.get('name')?.value;
+  public saveGame(): void {
+    /*let formName = this.gameEditorForm.get('name')?.value;
     console.log("saving " + formName + ", owning [" + this.gameEditorForm.get('ownership')?.value + "]");
 
     let formOwnershipDate = this.gameEditorForm.get('ownership')?.value ? moment(this.gameEditorForm.get('ownership')?.value).format('YYYY-MM-DD') : null;
@@ -137,7 +135,7 @@ export class GameEditorComponent implements OnInit {
         this.snackBar.open(err);
         this.saving = false;
       }
-    });
+    });*/
   }
 
   public cancel() {

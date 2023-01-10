@@ -13,20 +13,20 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Tag } from 'src/app/core/model/tag.model';
+import { ColorTag } from 'src/app/core/model/color-tag.model';
 
 
 @Component({
-    selector: 'tag-editor',
-    templateUrl: './tag-editor.component.html',
-    styleUrls: ['./tag-editor.component.css']
+    selector: 'color-tag-editor',
+    templateUrl: './color-tag-editor.component.html',
+    styleUrls: ['./color-tag-editor.component.css']
 })
-export class TagEditorComponent implements OnInit {
+export class ColorTagEditorComponent implements OnInit {
 
     readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
     @Input()
-    public tags: Tag[] = [];
+    public tags: ColorTag[] = [];
 
     @Input()
     public title: string = '';
@@ -35,21 +35,21 @@ export class TagEditorComponent implements OnInit {
     }
 
     public addTag(event: MatChipInputEvent): void {
-        const value = (event.value || '').trim();
+        /*const value = (event.value || null).trim();
         if (value) {
-            this.tags.push({ name: value });
-        }
+            this.tags.push(value);
+        }*/
         event.chipInput!.clear();
     }
 
-    public removeTag(tag: Tag): void {
+    public removeTag(tag: ColorTag): void {
         const index = this.tags.indexOf(tag);
         if (index >= 0) {
             this.tags.splice(index, 1);
         }
     }
 
-    public editTag(tag: Tag, event: MatChipEditedEvent) {
+    public editTag(tag: ColorTag, event: MatChipEditedEvent) {
         const value = event.value.trim();
         if (!value) {
             this.removeTag(tag);
@@ -59,5 +59,10 @@ export class TagEditorComponent implements OnInit {
         if (index > 0) {
             this.tags[index].name = value;
         }
+    }
+
+    public ajout() {
+        let a: ColorTag = {name:"fsdf", code:"blue"}
+        this.tags.push(a);
     }
 }

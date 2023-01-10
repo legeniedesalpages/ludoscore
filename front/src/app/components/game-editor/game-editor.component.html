@@ -59,22 +59,15 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="column">
-                    <mat-form-field>
-                        <input matInput [ngxMatColorPicker]="picker" formControlName="colorCtr">
-                        <ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
-                        <ngx-mat-color-picker #picker></ngx-mat-color-picker>
-                    </mat-form-field>
-                </div>
-            </div>
-
-            <div class="row">
+            <div class="row">                
                 <div class="column">
                     <tag-editor [tags]="tagsGame" [title]="'Tags du jeu'"></tag-editor>
                 </div>
                 <div class="column">
                     <tag-editor [tags]="tagsPlayer" [title]="'Tags des joueurs'"></tag-editor>
+                </div>
+                <div class="column">
+                    <color-tag-editor [tags]="tagsColor" [title]="'Couleurs'"></color-tag-editor>
                 </div>
             </div>
 
