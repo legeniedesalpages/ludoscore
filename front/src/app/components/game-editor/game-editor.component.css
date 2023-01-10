@@ -5,19 +5,19 @@
   flex: 1 1 auto;
 }
 
-.game-editor form {
+form {
   width: 100%;
   padding-top: 10px;
 }
 
-.game-editor .row {
+.row {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   width: 100%;
 }
 
-.game-editor .column {
+.column {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
@@ -26,11 +26,11 @@
   padding-right: 5px;
 }
 
-.game-editor .mat-mdc-form-field {
+.mat-mdc-form-field {
   opacity: 0.9;
 }
 
-.game-editor .button_row {
+.button_row {
   height: 50px;
 }
 

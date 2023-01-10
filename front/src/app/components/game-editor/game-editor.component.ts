@@ -11,15 +11,15 @@
     * - Modification    : 
 **/
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import moment from 'moment';
 import { DateValidator } from 'src/app/core/services/date.validator';
+import { FindGameService } from 'src/app/core/services/find-game.service';
+import { GameSearchDetail } from 'src/app/core/model/game-search-detail.model';
 
 export interface Tag {
   name: string;
@@ -28,12 +28,9 @@ export interface Tag {
 @Component({
   selector: 'game-editor',
   templateUrl: './game-editor.component.html',
-  styleUrls: ['./game-editor.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  styleUrls: ['./game-editor.component.css']
 })
-export class GameEditorComponent {
-
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+export class GameEditorComponent implements OnInit {
 
   bggId: number | null;
   internalId: number | null;
@@ -48,10 +45,10 @@ export class GameEditorComponent {
   tagsGame: Tag[] = [];
   tagsPlayer: Tag[] = [];
 
-  private gameSearchDetailhUrl = environment.apiURL + '/api/game_search_detail?id=';
+  
   private gameSaveUrl = environment.apiURL + '/api/games';
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router, private snackBar: MatSnackBar) {
+  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient, private findGameService: FindGameService, private snackBar: MatSnackBar) {
     this.loading = true;
     this.saving = false;
 
@@ -64,40 +61,47 @@ export class GameEditorComponent {
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       cooperative: new FormControl('', Validators.required),
       ownership: new FormControl('', DateValidator.dateValidator),
+      colorCtr: new FormControl(null)
     });
   }
 
   ngOnInit(): void {
+
     this.route.paramMap.subscribe((params) => {
 
+      console.log(params)
       let type = params.get('type');
       if (type === 'bgg') {
-        console.log('From bgg id: ' + params.get('id'))
-        this.bggId = Number(params.get('id'));
+        this.initFromSearch(params)
+      }
+    });
+  }
 
-        this.http.get(this.gameSearchDetailhUrl + encodeURIComponent(this.bggId)).subscribe({
-          complete: () => {
-            this.loading = false;
-          },
-          next: (res: any) => {
-            console.log("Detail: [" + res.name + "]");
-            this.imageUrl = `'${res.image}'`;
-            this.imageResource = res.image;
-            this.thumbnailResource = res.thumbnail;
+  private initFromSearch(params: ParamMap) {
+    console.info('Fill form from bgg id: ' + params.get('id'))
+    this.bggId = Number(params.get('id'));
 
-            this.gameEditorForm.setValue({
-              name: res.name,
-              minPlayer: res.minplayers,
-              maxPlayer: res.maxplayers,
-              cooperative: "false",
-              ownership: null
-            });
-          },
-          error: (err) => {
-            console.error(err);
-            this.loading = false;
-          }
+    this.findGameService.detail(this.bggId).subscribe({
+
+      next: (gameDetail: GameSearchDetail) => {
+        this.loading = false;
+
+        console.info("Game details: [" + gameDetail.name + "]");
+        this.imageUrl = `'${gameDetail.image}'`;
+
+        this.imageResource = gameDetail.image;
+        this.thumbnailResource = gameDetail.thumbnail;
+
+        this.gameEditorForm.setValue({
+          name: gameDetail.name,
+          minPlayer: gameDetail.minplayers,
+          maxPlayer: gameDetail.maxplayers,
+          cooperative: "false",
+          ownership: null
         });
+      },
+      error: () => {
+        this.loading = false;
       }
     });
   }
@@ -136,51 +140,7 @@ export class GameEditorComponent {
     });
   }
 
-  addTagPlayer(event: MatChipInputEvent): void {
-    this.addTag(event, this.tagsPlayer);
+  public cancel() {
+    this.router.navigate(['/find-game'], {queryParams: {'no-reset': 'true'}});
   }
-  addTagGame(event: MatChipInputEvent): void {
-    this.addTag(event, this.tagsGame);
-  }
-  addTag(event: MatChipInputEvent, tags: Tag[]): void {
-    const value = (event.value || '').trim();
-    if (value) {
-      tags.push({ name: value });
-    }
-    event.chipInput!.clear();
-  }
-
-
-  removeTagPlayer(tag: Tag): void {
-    this.removeTag(tag, this.tagsPlayer);
-  }
-  removeTagGame(tag: Tag): void {
-    this.removeTag(tag, this.tagsGame);
-  }
-  removeTag(tag: Tag, tags: Tag[]): void {
-    const index = tags.indexOf(tag);
-    if (index >= 0) {
-      tags.splice(index, 1);
-    }
-  }
-
-
-  editTagPlayer(tag: Tag, event: MatChipEditedEvent): void {
-    this.editTag(tag, this.tagsPlayer, event);
-  }
-  editTagGame(tag: Tag, event: MatChipEditedEvent): void {
-    this.editTag(tag, this.tagsGame, event);
-  }
-  editTag(tag: Tag, tags: Tag[], event: MatChipEditedEvent) {
-    const value = event.value.trim();
-    if (!value) {
-      this.removeTag(tag, tags);
-      return;
-    }
-    const index = tags.indexOf(tag);
-    if (index > 0) {
-      tags[index].name = value;
-    }
-  }
-
 }
