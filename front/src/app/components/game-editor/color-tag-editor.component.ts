@@ -10,11 +10,9 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, Input } from '@angular/core';
-import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Component, Inject, Input, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ColorTag } from 'src/app/core/model/color-tag.model';
-
 
 @Component({
     selector: 'color-tag-editor',
@@ -23,23 +21,15 @@ import { ColorTag } from 'src/app/core/model/color-tag.model';
 })
 export class ColorTagEditorComponent implements OnInit {
 
-    readonly separatorKeysCodes = [ENTER, COMMA] as const;
-
     @Input()
     public tags: ColorTag[] = [];
 
     @Input()
     public title: string = '';
 
-    ngOnInit(): void {
-    }
+    constructor(public dialog: MatDialog) { }
 
-    public addTag(event: MatChipInputEvent): void {
-        /*const value = (event.value || null).trim();
-        if (value) {
-            this.tags.push(value);
-        }*/
-        event.chipInput!.clear();
+    ngOnInit(): void {
     }
 
     public removeTag(tag: ColorTag): void {
@@ -49,20 +39,57 @@ export class ColorTagEditorComponent implements OnInit {
         }
     }
 
-    public editTag(tag: ColorTag, event: MatChipEditedEvent) {
-        const value = event.value.trim();
-        if (!value) {
-            this.removeTag(tag);
-            return;
-        }
-        const index = this.tags.indexOf(tag);
-        if (index > 0) {
-            this.tags[index].name = value;
-        }
+    public addColorTag() {
+        this.dialog.open(DialogColorTagEditorComponent, {
+            data: {
+                colorTags: this.tags
+            }
+        })
+    }
+}
+
+@Component({
+    selector: 'dialog-animations-example-dialog',
+    templateUrl: './color-tag-editor-dialog.component.html',
+    styleUrls: ['./color-tag-editor-dialog.component.css']
+})
+export class DialogColorTagEditorComponent {
+
+    public tags: ColorTag[];
+
+    public readonly colors: ColorTag[] = [
+
+        { name: "Blanc", code: "#EEE", invert: "black" },
+        { name: "Jaune", code: "yellow", invert: "black" },
+        { name: "Vert clair", code: "lightgreen", invert: "Black" },
+        { name: "Rose", code: "pink", invert: "black" },
+        { name: "Bleu clair", code: "lightblue", invert: "black" },
+        
+        { name: "Gris", code: "grey", invert: "white" },
+        { name: "Orange", code: "orange", invert: "black" },
+        { name: "Vert", code: "limegreen", invert: "white" },
+        { name: "Rouge", code: "red", invert: "white" },
+        { name: "Bleu", code: "blue", invert: "white" },
+
+        { name: "Noir", code: "black", invert: "white" },
+        { name: "Marron", code: "brown", invert: "white" },
+        { name: "Vert foncé", code: "darkgreen", invert: "white" },
+        { name: "Pourpre", code: "purple", invert: "white" },
+        { name: "Bleu foncé", code: "darkblue", invert: "white" },
+    ]
+
+    constructor(public dialogRef: MatDialogRef<DialogColorTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+        this.tags = this.data.colorTags;
+        console.log(this.tags)
     }
 
-    public ajout() {
-        let a: ColorTag = {name:"fsdf", code:"blue"}
-        this.tags.push(a);
+    public chooseColor(colorTag: ColorTag) {
+        this.tags.push(colorTag);
+    }
+
+    public filteredColors(): ColorTag[] {
+        return this.colors.filter(x => {
+            return !this.tags.map(c => c.code).includes(x.code)
+        });
     }
 }

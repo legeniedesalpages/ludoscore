@@ -1,0 +1,25 @@
+.dialog {
+  width: 350px;
+}
+
+.dot {
+  height: 45px;
+  width: 45px;
+  border-radius: 100%;
+  display: inline-block;
+  vertical-align: middle;
+  margin:5px;
+  padding:10px;
+  cursor: pointer;
+}
+
+.color-name {
+  vertical-align: middle;
+  padding-left: 5px;
+  font-size: smaller;
+}
+
+.row {
+  column-count: 3;
+  
+}

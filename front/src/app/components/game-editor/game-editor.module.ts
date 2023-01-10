@@ -33,7 +33,8 @@ import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { FindGameService } from 'src/app/core/services/find-game.service';
 import { TagEditorComponent } from './tag-editor.component';
-import { ColorTagEditorComponent } from './color-tag-editor.component';
+import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-tag-editor.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 const routes: Routes = [
   {
@@ -44,7 +45,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [GameEditorComponent, TagEditorComponent, ColorTagEditorComponent],
+  declarations: [GameEditorComponent, TagEditorComponent, ColorTagEditorComponent, DialogColorTagEditorComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -63,7 +64,8 @@ const routes: Routes = [
     MatDatepickerModule,
     MatChipsModule,
     MatSnackBarModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatDialogModule
   ],
   providers: [
     FindGameService,

@@ -13,4 +13,5 @@
 export interface ColorTag {
     name: string;
     code: string;
+    invert: string;
 }
