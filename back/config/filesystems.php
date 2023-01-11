@@ -46,8 +46,8 @@ return [
 
         'images' => [
             'driver' => 'local',
-            'root' => base_path('public/images'),
-            'url' => env('IMAGES_URL', env('APP_URL').'/images'),
+            'root' => env('IMAGES_PATH', base_path('public/images')),
+            'url' => env('APP_URL').'/images',
             'visibility' => 'public',
             'throw' => false,
         ],

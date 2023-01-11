@@ -54,7 +54,6 @@ class GameController extends Controller
         $clean_name = Str::limit($this->clean($request->name), 20, '');
         $uuidImage = $clean_name."_".Str::uuid().".jpg";
         Storage::disk('images')->writeStream($uuidImage, fopen($request->image_id, 'r'));
-
         $uuidThumbnail = $clean_name."_thumb_".Str::uuid().".jpg";
         Storage::disk('images')->writeStream($uuidThumbnail, fopen($request->thumbnail_id, 'r'));
 
