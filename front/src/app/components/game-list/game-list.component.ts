@@ -12,7 +12,6 @@
 **/
 import { Component, OnInit } from '@angular/core';
 import { GameService } from 'src/app/core/services/game.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'game-list',
