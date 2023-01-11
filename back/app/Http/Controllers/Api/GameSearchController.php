@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class GameSearchController extends Controller
@@ -91,9 +90,7 @@ class GameSearchController extends Controller
         Log::debug("Board game list :");
         Log::debug($idList);
 
-        $games = DB::table('games')
-                    ->whereIn('bgg_id', $idList)
-                    ->get();
+        $games = DB::table('games')->whereIn('bgg_id', $idList)->get();
 
         $newList = array();
         foreach($list as $returnedGame) {

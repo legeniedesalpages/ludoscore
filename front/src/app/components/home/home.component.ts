@@ -50,7 +50,11 @@ export class HomeComponent {
     this.router.navigate(['match-start']);
   }
 
-  findGame() {
+  public findGame() {
     this.router.navigate(['find-game']);
+  }
+
+  public gameList() {
+    this.router.navigate(['game-list']);
   }
 }
