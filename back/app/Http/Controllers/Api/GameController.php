@@ -47,10 +47,10 @@ class GameController extends Controller
         }
 
         $uuidImage = "images/".Str::uuid().".jpg";
-        Storage::writeStream($uuidImage, fopen($request->image, 'r'));
+        Storage::writeStream($uuidImage, fopen($request->image_id, 'r'));
 
         $uuidThumbnail = "images/thumb_".Str::uuid().".jpg";
-        Storage::writeStream($uuidThumbnail, fopen($request->thumbnail, 'r'));
+        Storage::writeStream($uuidThumbnail, fopen($request->thumbnail_id, 'r'));
 
         $game = new Game;
 
