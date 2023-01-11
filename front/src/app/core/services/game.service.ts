@@ -34,8 +34,8 @@ export class GameService {
 
         return this.http.post<Game>(this.gameUrl, {
             name: game.name,
-            image: game.image_id,
-            thumbnail: game.thumbnail_id,
+            image_id: game.image_id,
+            thumbnail_id: game.thumbnail_id,
             isOnlyCooperative: game.isOnlyCooperative,
             minPlayers: game.minPlayers,
             maxPlayers: game.maxPlayers,
@@ -56,7 +56,7 @@ export class GameService {
         return this.http.get<Game[]>(this.gameUrl).pipe(
             tap(games => {
                 let modifiedGames = games.map(x => {
-                    x.thumbnail_id = environment.apiURL + '/' + x.thumbnail_id
+                    x.thumbnail_id = environment.imagesURL + '/' + x.thumbnail_id
                     return x;
                 })
                 console.log(modifiedGames)

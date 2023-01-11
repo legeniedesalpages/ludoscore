@@ -13,5 +13,6 @@
 export const environment = {
     production: true,
     title: 'Ludoscore',
-    apiURL: 'https://www.lgda.fr/ludoscoreback'
+    apiURL: 'https://www.lgda.fr/ludoscoreback',
+    imagesURL: 'https://www.lgda.fr/ludoscoreimages'
 };
