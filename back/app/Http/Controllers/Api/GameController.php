@@ -41,7 +41,10 @@ class GameController extends Controller
     {
         Log::debug("Saving game : ".$request->name);
 
-        //Storage::writeStream("lml.fsd", fopen("http://qsdfqsdf.sdf", 'r'));
+        $existingGame = Game::where('bgg_id', $request->bggId)->first();
+        if ($existingGame) {
+            return response(['message'=>'Game with this bggid already exist'], 409);
+        }
 
         $uuidImage = "images/".Str::uuid().".jpg";
         Storage::writeStream($uuidImage, fopen($request->image, 'r'));
@@ -59,12 +62,14 @@ class GameController extends Controller
         $game->ownership_date = $request->ownershipDate;
         $game->thumbnail_id = $uuidThumbnail;
         $game->image_id = $uuidImage;
-        $game->match_tags = $request->tagsGame;
-        $game->player_tags = $request->tagsPlayer;
+        $game->match_tags = $request->matchTags;
+        $game->player_tags = $request->playerTags;
+        $game->player_colors = $request->playerColors;
         $game->bgg_id = $request->bggId;
         $game->save();
 
-        Log::debug("Game crated : ".$game);
+        Log::debug("Game created : ".$game);
+        return response(['id'=> $game->id], 201);
     }
 
     /**

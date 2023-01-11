@@ -14,14 +14,14 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import moment from 'moment';
 import { DateValidator } from 'src/app/core/services/date.validator';
 import { FindGameService } from 'src/app/core/services/find-game.service';
 import { GameSearchDetail } from 'src/app/core/model/game-search-detail.model';
 import { Tag } from 'src/app/core/model/tag.model';
 import { ColorTag } from 'src/app/core/model/color-tag.model';
+import { GameService } from 'src/app/core/services/game.service';
+import { Game } from 'src/app/core/model/game.model';
 
 @Component({
   selector: 'game-editor',
@@ -35,24 +35,21 @@ export class GameEditorComponent implements OnInit {
   public gameEditorForm: FormGroup;
 
   public bggId: number | null;
-  private internalId: number | null;
   public imageResource: string | null = null;
   public thumbnailResource: string | null = null;
   public imageUrl: string | null = null;
   public tagsGame: Tag[] = [];
   public tagsPlayer: Tag[] = [];
   public tagsColor: ColorTag[] = [];
-  
-  private gameSaveUrl = environment.apiURL + '/api/games';
 
-  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient, private findGameService: FindGameService, private snackBar: MatSnackBar) {
+  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient,
+    private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService
+  ) {
+
     this.loading = true;
     this.saving = false;
 
     this.bggId = null;
-    this.internalId = null;
-
-    
 
     this.gameEditorForm = new FormGroup({
       name: new FormControl('', Validators.required),
@@ -105,40 +102,44 @@ export class GameEditorComponent implements OnInit {
   }
 
   public saveGame(): void {
-    /*let formName = this.gameEditorForm.get('name')?.value;
-    console.log("saving " + formName + ", owning [" + this.gameEditorForm.get('ownership')?.value + "]");
+    let formName = this.gameEditorForm.get('name')?.value;
+    console.log("saving " + formName + ", owning date [" + this.gameEditorForm.get('ownership')?.value + "]");
 
-    let formOwnershipDate = this.gameEditorForm.get('ownership')?.value ? moment(this.gameEditorForm.get('ownership')?.value).format('YYYY-MM-DD') : null;
-
-    this.http.post(this.gameSaveUrl, {
+    let game: Game = {
+      id: null,
       name: formName,
-      image: this.imageResource,
-      thumbnail: this.thumbnailResource,
+      image_id: this.imageResource!,
+      thumbnail_id: this.thumbnailResource!,
       isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value == "false" ? false : true,
       minPlayers: this.gameEditorForm.get('minPlayer')?.value,
       maxPlayers: this.gameEditorForm.get('maxPlayer')?.value,
-      ownershipDate: formOwnershipDate,
-      bggId: this.bggId,
-      tagsGame: JSON.stringify(this.tagsGame),
-      tagsPlayer: JSON.stringify(this.tagsPlayer)
-    }).subscribe({
-      complete: () => {
+      ownershipDate: this.gameEditorForm.get('ownership')?.value!,
+      matchTags: this.tagsGame,
+      playerTags: this.tagsPlayer,
+      playerColors: this.tagsColor,
+      bggId: this.bggId!,
+    };
 
-      // TODO : redirect vers mes jeux : ce jeu ajouté en premier dans la liste
+    this.saving = true;
+    this.gameService.save(game).subscribe({
+      next: (game) => {
+
+        console.log("Game id :" + game.id)
 
         this.snackBar.open("Jeu enregistré", 'Fermer', {
           duration: 5000
         });
         this.saving = false;
+
+        this.router.navigate(['/find-game'], { queryParams: { 'no-reset': 'false' } });
       },
-      error: (err: any) => {
-        this.snackBar.open(err);
+      error: () => {
         this.saving = false;
       }
-    });*/
+    });
   }
 
   public cancel() {
-    this.router.navigate(['/find-game'], {queryParams: {'no-reset': 'true'}});
+    this.router.navigate(['/find-game'], { queryParams: { 'no-reset': 'true' } });
   }
 }

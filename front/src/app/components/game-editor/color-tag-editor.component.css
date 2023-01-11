@@ -16,3 +16,15 @@
   margin-top: 8px; 
   margin-right: 10px;
 }
+
+.mat-mdc-standard-chip {
+  height: 20px;
+}
+
+.mdc-evolution-chip-set .mdc-evolution-chip, .mdc-evolution-chip-set, .mdc-evolution-chip {
+  margin-top: 0px !important;
+}
+
+input {
+  display: none;
+}
