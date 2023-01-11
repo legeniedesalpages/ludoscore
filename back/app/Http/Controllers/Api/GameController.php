@@ -31,6 +31,11 @@ class GameController extends Controller
         //
     }
 
+    function clean($string) {
+        $string = str_replace(' ', '_', $string); // Replaces all spaces with hyphens.
+        return preg_replace('/[^A-Za-z0-9\_]/', '', $string); // Removes special chars.
+     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -46,14 +51,14 @@ class GameController extends Controller
             return response(['message'=>'Game with this bggid already exist'], 409);
         }
 
-        $uuidImage = "images/".Str::uuid().".jpg";
-        Storage::writeStream($uuidImage, fopen($request->image_id, 'r'));
+        $clean_name = Str::limit($this->clean($request->name), 20, '');
+        $uuidImage = $clean_name."_".Str::uuid().".jpg";
+        Storage::disk('images')->writeStream($uuidImage, fopen($request->image_id, 'r'));
 
-        $uuidThumbnail = "images/thumb_".Str::uuid().".jpg";
-        Storage::writeStream($uuidThumbnail, fopen($request->thumbnail_id, 'r'));
+        $uuidThumbnail = $clean_name."_thumb_".Str::uuid().".jpg";
+        Storage::disk('images')->writeStream($uuidThumbnail, fopen($request->thumbnail_id, 'r'));
 
         $game = new Game;
-
         $game->title = $request->name;
         $game->is_expansion = false;
         $game->is_only_cooperative = $request->isOnlyCooperative;

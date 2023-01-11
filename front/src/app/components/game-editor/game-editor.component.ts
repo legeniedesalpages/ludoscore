@@ -131,7 +131,7 @@ export class GameEditorComponent implements OnInit {
         });
         this.saving = false;
 
-        this.router.navigate(['/find-game'], { queryParams: { 'no-reset': 'false' } });
+        this.router.navigate(['/game-list']);
       },
       error: () => {
         this.saving = false;

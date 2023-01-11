@@ -13,5 +13,6 @@
 export const environment = {
     production: false,
     title: 'Ludoscore Dev',
-    apiURL: 'http://localhost:8000'
+    apiURL: 'http://localhost:8000',
+    imagesURL: 'http://localhost:8000/images'
 };

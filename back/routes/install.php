@@ -11,7 +11,6 @@ Route::get('/finir_installation', function () {
     if ($contenu != 'done') {
         $storage->put('migration.txt', 'done');
         Artisan::call("migrate");
-        Artisan::call("storage:link");        
         $migration = true;
     } else {
         $migration = false;
