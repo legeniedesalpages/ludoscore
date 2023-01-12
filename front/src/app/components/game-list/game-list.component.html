@@ -16,13 +16,13 @@
                 </div>
 
                 <div class="text">
-                    <div class="title">{{item.name}}</div>
+                    <div class="title">{{item.title}}</div>
                     <div class="details">
                         <div class="detail">
-                            <span class="category">Année: </span>
+                            <span class="category">Dernière partie il y a </span>{{ prettyTime(item.created_at) }}<span class="category">, avec une victoire de </span>Anne-Cécile <span class="category">en </span>1h34m
                         </div>
                         <div class="detail">
-                            <span class="category">Popularité: </span>
+                            <span class="category">Nombre de parties jouées: </span>12
                         </div>
                     </div>
                 </div>

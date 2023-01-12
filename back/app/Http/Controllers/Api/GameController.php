@@ -8,6 +8,7 @@ use App\Models\Game;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
 {
@@ -18,7 +19,9 @@ class GameController extends Controller
      */
     public function index()
     {
-        return Game::get();
+        return DB::table('games')
+        ->orderBy('created_at', 'desc')
+        ->get();
     }
 
     /**

@@ -39,4 +39,25 @@ export class GameListComponent implements OnInit {
 
   public filter(event: any) {
   }
+
+  public prettyTime(dateToFormat: string | null): string {
+    if (dateToFormat === null) {
+      return "";
+    
+    }
+    /*console.log(dateToFormat);
+    let a: Date = new Date(Date.parse(dateToFormat));
+    console.log(a);
+    console.log(a.getMilliseconds());
+    let u = a.getMilliseconds() * 1000;
+    console.log(u)*/
+
+    var pretty = require('pretty-time');
+    require('browser-hrtime');
+    let a = Date.parse(dateToFormat)
+    console.log(process.hrtime())
+    console.log([a/1000, 0])
+    //console.log(process.hrtime([a*1000, 0]));
+    return pretty(process.hrtime([a/1000, 0]))
+  }
 }

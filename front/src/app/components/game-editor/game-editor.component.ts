@@ -107,7 +107,7 @@ export class GameEditorComponent implements OnInit {
 
     let game: Game = {
       id: null,
-      name: formName,
+      title: formName,
       image_id: this.imageResource!,
       thumbnail_id: this.thumbnailResource!,
       isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value == "false" ? false : true,
@@ -118,6 +118,7 @@ export class GameEditorComponent implements OnInit {
       playerTags: this.tagsPlayer,
       playerColors: this.tagsColor,
       bggId: this.bggId!,
+      created_at: null
     };
 
     this.saving = true;
