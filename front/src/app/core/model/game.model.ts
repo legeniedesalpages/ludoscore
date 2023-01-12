@@ -15,7 +15,7 @@ import { Tag } from "./tag.model";
 **/
 export interface Game {
     id: number | null,
-    name: string,
+    title: string,
     image_id: string,
     thumbnail_id: string,
     isOnlyCooperative: boolean,
@@ -25,5 +25,6 @@ export interface Game {
     matchTags: Tag[],
     playerTags: Tag[],
     playerColors: ColorTag[],
-    bggId: number
+    bggId: number,
+    created_at: string | null
 }

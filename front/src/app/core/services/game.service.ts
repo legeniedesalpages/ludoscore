@@ -33,7 +33,7 @@ export class GameService {
         let formOwnershipDate = game.ownershipDate ? moment(game.ownershipDate).format('YYYY-MM-DD') : null;
 
         return this.http.post<Game>(this.gameUrl, {
-            name: game.name,
+            name: game.title,
             image_id: game.image_id,
             thumbnail_id: game.thumbnail_id,
             isOnlyCooperative: game.isOnlyCooperative,
