@@ -1,6 +1,6 @@
 <div class="find-game">
     <form class="find-game-form">
-        <mat-form-field id="find-game-search-field">
+        <mat-form-field class="find-game-search-field">
             <mat-label>Rechercher un jeu</mat-label>
             <input matInput autofocus (keydown.enter)="search($event)" (blur)="search($event)">
             <mat-icon matSuffix *ngIf="!searching">search</mat-icon>
@@ -19,13 +19,13 @@
                     <div class="title">{{item.name}}</div>
                     <div class="details">
                         <div class="detail">
-                            <span class="category">Année: </span>{{item.year}}
+                            Année: <span class="emphasis">{{item.year}}</span>
                         </div>
                         <div class="detail">
-                            <span class="category">Popularité: </span>{{item.popularity}}
+                            Popularité: <span class="emphasis">{{item.popularity}}</span>
                         </div>
                         <div class="detail" *ngIf="item.owned">
-                            <span class="category">Jeu déjà dans la liste</span>
+                            <span class="emphasis">Jeu déjà dans la liste</span>
                         </div>
                     </div>
                 </div>
