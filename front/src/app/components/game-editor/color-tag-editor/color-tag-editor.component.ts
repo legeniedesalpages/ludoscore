@@ -50,8 +50,8 @@ export class ColorTagEditorComponent implements OnInit {
 
 @Component({
     selector: 'dialog-animations-example-dialog',
-    templateUrl: './color-tag-editor-dialog.component.html',
-    styleUrls: ['./color-tag-editor-dialog.component.css']
+    templateUrl: '../color-tag-editor-dialog/color-tag-editor-dialog.component.html',
+    styleUrls: ['../color-tag-editor-dialog/color-tag-editor-dialog.component.css']
 })
 export class DialogColorTagEditorComponent {
 

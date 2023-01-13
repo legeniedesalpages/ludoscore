@@ -1,4 +1,4 @@
-#app {
+.app {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -7,21 +7,15 @@
     align-content: stretch;
 }
 
-#header {
+.header {
     width: 100%;
 }
 
-#content {
+.content {
     flex: 1;
     width: 100%;
 }
 
-#footer {
+.footer {
     width: 100%;
-}
-
-#footer-content {
-    color:white;
-    text-align: right;
-    padding: 5px;
 }
