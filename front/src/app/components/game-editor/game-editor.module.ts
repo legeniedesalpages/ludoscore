@@ -32,10 +32,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { FindGameService } from 'src/app/core/services/find-game.service';
-import { TagEditorComponent } from './tag-editor.component';
-import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-tag-editor.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { GameService } from 'src/app/core/services/game.service';
+import { TagEditorComponent } from './tag-editor/tag-editor.component';
+import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-tag-editor/color-tag-editor.component';
 
 const routes: Routes = [
   {

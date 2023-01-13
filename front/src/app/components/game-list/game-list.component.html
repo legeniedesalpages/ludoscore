@@ -1,6 +1,6 @@
-<div id="find-game">
-    <form id="find-game-form">
-        <mat-form-field id="find-game-search-field">
+<div class="game-list">
+    <form class="game-list-form">
+        <mat-form-field class="game-list-search-field">
             <mat-label>Rechercher dans la ludothèque</mat-label>
             <input matInput autofocus (keydown.enter)="filter($event)" (blur)="filter($event)">
             <mat-icon matSuffix *ngIf="!searching">search</mat-icon>
@@ -8,7 +8,7 @@
         </mat-form-field>
     </form>
 
-    <div id="find-game-result" *ngIf="gameService.searchedGames.length > 0">
+    <div class="game-list-result" *ngIf="gameService.searchedGames.length > 0">
         <div *ngFor="let item of gameService.searchedGames" matRipple>
             <div class="row">
                 <div class="thumbnail">

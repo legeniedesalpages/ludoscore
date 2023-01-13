@@ -14,13 +14,14 @@
 import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule, HttpClientXsrfModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { HttpXSRFInterceptor } from './core/interceptors/xsrf.interceptor';
-import { HeaderModule } from './components/layout/header.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AppComponent } from './components/layout/app/app.component';
+import { FooterModule } from './components/layout/footer/footer.module';
+import { HeaderModule } from './components/layout/header/header.module';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatSnackBarModule,
 
     HeaderModule,
+    FooterModule,
     
     HttpClientModule,
     HttpClientXsrfModule.withOptions({

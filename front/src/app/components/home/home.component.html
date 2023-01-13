@@ -1,6 +1,6 @@
-<div id="home">
-    <div id="match">
-        <div *ngIf="dataReceived" id="big-button">
+<div class="home">
+    <div class="match">
+        <div *ngIf="dataReceived" class="big-button">
             <button mat-flat-button (click)="createMatch()" *ngIf="!matchInProgress">
                 <span class="material-symbols-outlined">Swords</span>
                 <br />
@@ -12,12 +12,12 @@
             </button>
         </div>
 
-        <div *ngIf="!dataReceived" id="recherche_partie">
+        <div *ngIf="!dataReceived" class="recherche_partie">
             Recherche si une partie est en cours...
         </div>
     </div>
 
-    <div id="actions">
+    <div class="actions">
         <div class="row haut-gauche">
             <button mat-flat-button (click)="findGame()">
                 <span class="material-symbols-outlined">Search</span>

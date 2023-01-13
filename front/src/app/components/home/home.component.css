@@ -1,14 +1,14 @@
-#home {
+.home {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-#match {
+.match {
   flex: 1 1 auto;
 }
 
-#big-button {
+.big-button {
   height: 100%;
 }
 
@@ -16,13 +16,13 @@
   font-size: 80px;
 }
 
-#recherche_partie {
+.recherche_partie {
   height: 100%;
   text-align: center;
   padding-top: 50px;
 }
 
-#actions {
+.actions {
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
@@ -45,7 +45,7 @@
   font-size: 40px;
 }
 
-#match button {
+.match button {
   width: 100%;
   height: 100%;
   border-radius: 0%;

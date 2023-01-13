@@ -12,34 +12,31 @@
 **/
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
+import { HomeModule } from './components/home/home.module';
+import { HomeComponent } from './components/home/home.component';
+import { FindGameComponent } from './components/find-game/find-game.component';
+import { FindGameModule } from './components/find-game/find-game.module';
+import { LoginComponent } from './components/login/login.component';
+import { LoginModule } from './components/login/login.module';
+import { GameListModule } from './components/game-list/game-list.module';
+import { GameListComponent } from './components/game-list/game-list.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule)
-  },
-  {
-    path: 'login',
-    loadChildren: () => import('./components/auth/login.module').then(m => m.LoginModule)
-  },
-  {
-    path: 'find-game',
-    loadChildren: () => import('./components/find-game/find-game.module').then(m => m.FindGameModule)
-  },
-  {
-    path: 'game-list',
-    loadChildren: () => import('./components/game-list/game-list.module').then(m => m.GameListModule)
-  },
-  {
-    path: 'game-editor/:type/:id',
-    loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule)
-  }
+  { path: '', component: HomeComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'find-game', component: FindGameComponent },
+  { path: 'game-list', component: GameListComponent },
+  { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  imports: [
+    RouterModule.forRoot(routes, { useHash: true }),
+    HomeModule,
+    FindGameModule,
+    LoginModule,
+    GameListModule
+  ],
   exports: [RouterModule]
 })
-
 export class AppRoutingModule { }
