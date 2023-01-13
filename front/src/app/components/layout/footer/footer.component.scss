@@ -2,5 +2,6 @@
 @import '../../../../styles.scss';
 
 .footer-content {
-  background-color: mat.get-color-from-palette($ludoscore-primary);
+  background-color: $title-background-color;
+  color: $title-text-color;
 }
