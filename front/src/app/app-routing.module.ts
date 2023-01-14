@@ -20,10 +20,13 @@ import { LoginComponent } from './components/login/login.component';
 import { LoginModule } from './components/login/login.module';
 import { GameListModule } from './components/game-list/game-list.module';
 import { GameListComponent } from './components/game-list/game-list.component';
+import { RegisterComponent } from './components/register/register.component';
+import { RegisterModule } from './components/register/register.module';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   { path: 'find-game', component: FindGameComponent },
   { path: 'game-list', component: GameListComponent },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
@@ -35,6 +38,7 @@ const routes: Routes = [
     HomeModule,
     FindGameModule,
     LoginModule,
+    RegisterModule,
     GameListModule
   ],
   exports: [RouterModule]
