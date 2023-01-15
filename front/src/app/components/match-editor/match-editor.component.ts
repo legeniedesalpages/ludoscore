@@ -17,7 +17,7 @@ import { MatchService } from 'src/app/core/services/match.service';
 import { GameService } from 'src/app/core/services/game.service';
 import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
 import { MatDialog } from '@angular/material/dialog';
-import { MatchPlayerEditorComponent } from './player-editor/match-player-editor.component';
+import { MatchPlayerEditorComponent } from './match-player-editor/match-player-editor.component';
 
 @Component({
   selector: 'match-editor',

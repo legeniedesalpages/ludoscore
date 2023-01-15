@@ -13,12 +13,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Observable, tap } from 'rxjs';
+import { Player } from '../model/player.model';
 
 @Injectable()
 export class PlayerService {
 
-    private readonly gameUrl = environment.apiURL + '/api/players';
+    private readonly playerUrl = environment.apiURL + '/api/player';
 
     constructor(private http: HttpClient) {
+    }
+
+    public list(): Observable<Player[]> {
+        return this.http.get<Player[]>(this.playerUrl).pipe(
+            tap(players => {
+                console.log("Players", players)
+            })
+        );
     }
 }
