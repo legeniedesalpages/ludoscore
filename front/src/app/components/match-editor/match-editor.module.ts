@@ -29,6 +29,7 @@ import { MatInputModule } from '@angular/material/input';
 import { GameEditorModule } from '../game-editor/game-editor.module';
 import { MatChipsModule } from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete'; 
+import { MatchPlayerTagEditorComponent } from './match-player-tag-editor/match-player-tag-editor.component';
 
 
 const routes: Routes = [
@@ -40,7 +41,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [MatchEditorComponent, MatchPlayerEditorComponent],
+  declarations: [MatchEditorComponent, MatchPlayerEditorComponent, MatchPlayerTagEditorComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
