@@ -16,12 +16,10 @@ import { HomeComponent } from './home.component';
 
 import { Routes, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
+import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 
 
 const routes: Routes = [
@@ -38,13 +36,9 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     MatButtonModule,
-    MatCardModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatInputModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    LoadingSpinnerModule
   ]
 })
-
 export class HomeModule { }

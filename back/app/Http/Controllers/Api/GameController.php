@@ -24,17 +24,7 @@ class GameController extends Controller
         ->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    function clean($string) {
+    private function clean($string) {
         $string = str_replace(' ', '_', $string); // Replaces all spaces with hyphens.
         return preg_replace('/[^A-Za-z0-9\_]/', '', $string); // Removes special chars.
      }
@@ -87,18 +77,8 @@ class GameController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $game = DB::table('games')->where('id', $id)->first();
+        return $game;
     }
 
     /**
@@ -120,6 +100,28 @@ class GameController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
+    {
+        //
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
     {
         //
     }

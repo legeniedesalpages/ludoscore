@@ -39,7 +39,7 @@ import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-
 
 const routes: Routes = [
   {
-    path: '**',
+    path: '',
     component: GameEditorComponent,
     canActivate: [AuthGuardService]
   }

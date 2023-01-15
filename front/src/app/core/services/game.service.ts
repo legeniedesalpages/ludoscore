@@ -68,4 +68,18 @@ export class GameService {
             })
         );
     }
+
+    public get(gameId: number): Observable<Game> {
+        return this.http.get<Game>(this.gameUrl + "/" + gameId).pipe(
+            tap(game => {
+                console.log(game)
+                game.thumbnail_id = environment.imagesURL + '/' + game.thumbnail_id
+                game.image_id = environment.imagesURL + '/' + game.image_id
+                return game;
+            }),
+            catchError(error => {
+                throw new Error(error)
+            })
+        );
+    }
 }

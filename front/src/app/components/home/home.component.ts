@@ -41,13 +41,9 @@ export class HomeComponent {
     
     this.http.get(this.getCurrentMatchUrl, this.options).subscribe(response => {
       this.dataReceived = true;
-      console.debug(response);
+      console.debug("Match en cours:", response);
       this.matchInProgress = JSON.parse(JSON.stringify(response)).hasCurrent;
     });
-  }
-
-  createMatch() {
-    this.router.navigate(['match-start']);
   }
 
   public findGame() {

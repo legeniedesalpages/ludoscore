@@ -32,6 +32,8 @@
                     <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword">
                 </mat-form-field>
 
+                <re-captcha id="recaptcha" name="captcha" formControlName="recaptchaField"></re-captcha>
+
                 <div *ngIf="errorMessage">
                     <button mat-button color="warn" type="button">{{errorMessage}}</button>
                 </div>                

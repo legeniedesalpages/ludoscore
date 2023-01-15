@@ -1,7 +1,7 @@
 <div class="home">
     <div class="match">
-        <div *ngIf="dataReceived" class="big-button">
-            <button mat-flat-button (click)="createMatch()" *ngIf="!matchInProgress">
+        <div *ngIf="dataReceived" class="big-button" >
+            <button mat-flat-button [routerLink]="['/match-editor']" *ngIf="!matchInProgress">
                 <span class="material-symbols-outlined">Swords</span>
                 <br />
                 Démarrer une partie
@@ -13,7 +13,7 @@
         </div>
 
         <div *ngIf="!dataReceived" class="recherche_partie">
-            Recherche si une partie est en cours...
+            <loading-spinner [loading]="true" [caption]="'Recherche si une partie est en cours'"></loading-spinner>
         </div>
     </div>
 
