@@ -1,0 +1,10 @@
+.spinner {
+  display: flex;
+  justify-content: center;
+}
+
+.caption {
+  align-self: center;
+  opacity: 0.6;
+  margin-left: 10px;
+}
