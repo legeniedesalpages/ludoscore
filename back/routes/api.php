@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\GameSearchController;
 use App\Http\Controllers\Api\MatchController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\PlayerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,14 @@ Route::get('/auth/logout', [AuthController::class, 'logoutUser']);
 */
 
 Route::middleware('auth:sanctum')->resource('users', UserController::class);
+
+/*
+|--------------------------------------------------------------------------
+| Player
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->resource('player', PlayerController::class);
 
 /*
 |--------------------------------------------------------------------------

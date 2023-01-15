@@ -1,0 +1,12 @@
+form {
+  width: 100%;
+  padding-top: 10px;
+}
+
+.mat-mdc-form-field {
+    width:100%;
+}
+
+.demo-chip-list {
+  width: 100%;
+}

@@ -68,11 +68,11 @@ const routes: Routes = [
     MatNativeDateModule,
     MatDialogModule
   ],
+  exports: [TagEditorComponent],
   providers: [
     FindGameService,
     GameService,
     { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' }
   ]
 })
-
 export class GameEditorModule { }

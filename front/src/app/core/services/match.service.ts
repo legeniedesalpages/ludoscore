@@ -97,13 +97,11 @@ export class MatchService implements OnInit {
     }
 
     public deletePlayer(matchPlayer: MatchPlayer) {
-        console.warn(this.currentMatch.matchPlayers.length)
         const index = this.currentMatch.matchPlayers.indexOf(matchPlayer);
         console.log("Delete player: ", matchPlayer)
         this.currentMatch.matchPlayers.splice(index, 1);
-        console.warn(this.currentMatch.matchPlayers.length)
-        console.warn(this.currentMatch.game!.min_players)
         if (this.currentMatch.matchPlayers.length < this.currentMatch.game!.min_players) {
+            console.log("Minimum number of player reached, creating an empty one: ", matchPlayer)
             this.addPlayer()
         }
     }
