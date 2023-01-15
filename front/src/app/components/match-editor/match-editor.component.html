@@ -1,15 +1,27 @@
 <div class="match-editor">
 
-    <div *ngIf="searchGame">
+    <div *ngIf="haveToSearchGame()">
         <div class="search-criteria">
             <button mat-mini-fab color="primary"><mat-icon>add</mat-icon></button>
         </div>
         <game-list (gameSelectedEvent)="gameSelected($event)"></game-list>
     </div>
 
-    <div *ngIf="!searchGame" class="form"
+    <div *ngIf="!haveToSearchGame()" class="form"
         [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl() + ') no-repeat top / cover'}">
         <div class="title">{{ matchService.getGame()?.title }}</div>
+
+        <div class="players">
+            <div class="player" *ngFor="let player of getPlayers()">
+                <div *ngIf="player.player == null">
+                    <button mat-raised-button color="primary" (click)="editPlayer()">Choisir le joueur</button>
+                    <button mat-raised-button color="warn" (click)="deletePlayer(player)">Supprimer le joueur</button>
+                </div>
+            </div>
+            <button mat-raised-button color="primary" (click)="addPlayer()" *ngIf="canAddPlayer()">Ajouter un joueur</button>
+        </div>
+
+        <button mat-raised-button color="warn" (click)="cancel()">cancel</button>
     </div>
 
 </div>

@@ -27,7 +27,7 @@ export class ColorTagEditorComponent implements OnInit {
     @Input()
     public title: string = '';
 
-    constructor(public dialog: MatDialog) { }
+    constructor(private dialog: MatDialog) { }
 
     ngOnInit(): void {
     }
@@ -49,7 +49,7 @@ export class ColorTagEditorComponent implements OnInit {
 }
 
 @Component({
-    selector: 'dialog-animations-example-dialog',
+    selector: 'dialog-color-tag-editor',
     templateUrl: '../color-tag-editor-dialog/color-tag-editor-dialog.component.html',
     styleUrls: ['../color-tag-editor-dialog/color-tag-editor-dialog.component.css']
 })
