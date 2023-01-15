@@ -24,6 +24,7 @@ import { FooterModule } from './components/layout/footer/footer.module';
 import { HeaderModule } from './components/layout/header/header.module';
 import { LoadingSpinnerModule } from './components/layout/spinner/loading-spinner.module';
 import { GameService } from './core/services/game.service';
+import { MatchService } from './core/services/match.service';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { GameService } from './core/services/game.service';
   ],
 
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
+    MatchService
   ],
 
   bootstrap: [AppComponent]

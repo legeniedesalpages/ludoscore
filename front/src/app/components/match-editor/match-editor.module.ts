@@ -15,12 +15,12 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { MatchEditorComponent } from './match-editor.component';
-import { MatchService } from 'src/app/core/services/match.service';
 import { GameListModule } from '../game-list/game-list.module';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { GameService } from 'src/app/core/services/game.service';
+import { MatDialogModule } from '@angular/material/dialog';
 
 const routes: Routes = [
   {
@@ -34,14 +34,14 @@ const routes: Routes = [
   declarations: [MatchEditorComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes),    
+    RouterModule.forChild(routes),
     GameListModule,
     LoadingSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    MatDialogModule
   ],
   providers: [
-    MatchService,
     GameService
   ]
 })

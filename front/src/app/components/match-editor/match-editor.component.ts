@@ -11,11 +11,13 @@
     * - Modification    : 
 **/
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatchService } from 'src/app/core/services/match.service';
 import { GameService } from 'src/app/core/services/game.service';
+import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
+import { MatDialog } from '@angular/material/dialog';
+import { MatchPlayerEditorComponent } from './player-editor/match-player-editor.component';
 
 @Component({
   selector: 'match-editor',
@@ -25,19 +27,11 @@ import { GameService } from 'src/app/core/services/game.service';
 export class MatchEditorComponent implements OnInit {
 
   public loading: boolean;
-  public saving: boolean;
-  public matchEditorForm: FormGroup;
-  public searchGame: boolean;
 
-  constructor(private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar,
+  constructor(private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar, private dialog: MatDialog,
     public matchService: MatchService, private gameService: GameService) {
 
     this.loading = false;
-    this.saving = false;
-    this.searchGame = true;
-
-    this.matchEditorForm = new FormGroup({
-    });
   }
 
   ngOnInit(): void {
@@ -46,15 +40,11 @@ export class MatchEditorComponent implements OnInit {
   public saveGame(): void {
   }
 
-  public cancel() {
-  }
-
   public gameSelected(gameId: number) {
     this.loading = true;
     console.log("Action:" + gameId)
     this.gameService.get(gameId).subscribe((game) => {
       this.matchService.setGame(game)
-      this.searchGame = false
       this.loading = false;
       console.log(this.imageUrl())
     })
@@ -62,5 +52,40 @@ export class MatchEditorComponent implements OnInit {
 
   public imageUrl(): string | undefined {
     return this.matchService.getGame()?.image_id
+  }
+
+  public getPlayers(): MatchPlayer[] {
+    return this.matchService.getMatchPlayers()
+  }
+
+  public addPlayer() {
+    this.matchService.addPlayer()
+    this.dialog.open(MatchPlayerEditorComponent, {
+      data: {
+      }
+    })
+  }
+
+  public canAddPlayer(): boolean {
+    return this.matchService.canAddPlayer()
+  }
+
+  public editPlayer() {
+    this.dialog.open(MatchPlayerEditorComponent, {
+      data: {
+      }
+    })
+  }
+
+  public deletePlayer(matchPlayer: MatchPlayer) {
+    return this.matchService.deletePlayer(matchPlayer)
+  }
+
+  public haveToSearchGame(): boolean {
+    return this.matchService.getGame() == null ? true : false
+  }
+
+  public cancel() {
+    this.matchService.cancel()
   }
 }
