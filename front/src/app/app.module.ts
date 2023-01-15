@@ -22,6 +22,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './components/layout/app/app.component';
 import { FooterModule } from './components/layout/footer/footer.module';
 import { HeaderModule } from './components/layout/header/header.module';
+import { LoadingSpinnerModule } from './components/layout/spinner/loading-spinner.module';
+import { GameService } from './core/services/game.service';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,7 @@ import { HeaderModule } from './components/layout/header/header.module';
 
     HeaderModule,
     FooterModule,
+    LoadingSpinnerModule,
     
     HttpClientModule,
     HttpClientXsrfModule.withOptions({

@@ -13,17 +13,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { GameListComponent } from './game-list.component';
+import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 import { GameService } from 'src/app/core/services/game.service';
 
 const routes: Routes = [
@@ -39,15 +32,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    MatButtonModule,
-    MatCardModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatInputModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatGridListModule,
-    MatDividerModule,
+    LoadingSpinnerModule,
     MatRippleModule
   ],
   exports: [GameListComponent],

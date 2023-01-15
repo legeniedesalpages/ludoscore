@@ -13,8 +13,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { mergeMap } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from '../model/user.model';
+import { UserRegistration } from '../model/userRegistration.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -23,6 +26,7 @@ export class AuthService {
   private readonly loginUrl = environment.apiURL + '/api/auth/login';
   private readonly logoutUrl = environment.apiURL + '/api/auth/logout';
   private readonly userUrl = environment.apiURL + '/api/users';
+  private readonly registerUrl = environment.apiURL + '/api/auth/registers';  
 
   constructor(private http: HttpClient) {
   }
@@ -42,13 +46,13 @@ export class AuthService {
 
         next(user) {
           console.info("Login successful")
-          localStorage.setItem('access_token', JSON.stringify(user));
-          resolve(user);
+          localStorage.setItem('access_token', JSON.stringify(user))
+          resolve(user)
         },
 
         error() {
           console.warn("Login failed")
-          reject("Login failed");
+          reject("Login failed")
         }
       })
     });
@@ -56,11 +60,11 @@ export class AuthService {
 
   public logout(): Promise<string> {
 
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('access_token')
 
     return new Promise(resolve => {
       this.http.get(this.logoutUrl).subscribe(() => {
-        resolve("logged out");
+        resolve("logged out")
       })
     });
   }
@@ -78,4 +82,14 @@ export class AuthService {
     }
     return JSON.parse(localStorage.getItem('access_token') || '{}')
   }
+
+  public register(userRegistration: UserRegistration): Observable<UserRegistration> {
+
+    return this.http.post<UserRegistration>(this.registerUrl, userRegistration).pipe(
+        map(res => {
+            console.info("User registered")
+            return res
+        })
+    );
+}
 }

@@ -23,7 +23,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from 'src/environments/environment';
-import { RecaptchaV3Module, RECAPTCHA_V3_SITE_KEY } from 'ng-recaptcha';
+import { RECAPTCHA_SETTINGS, RecaptchaFormsModule, RecaptchaModule, RecaptchaSettings } from 'ng-recaptcha';
+
 
 const routes: Routes = [
   {
@@ -44,13 +45,16 @@ const routes: Routes = [
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    RecaptchaV3Module,
+    RecaptchaFormsModule,
+    RecaptchaModule
   ],
   providers: [
     {
-      provide: RECAPTCHA_V3_SITE_KEY,
-      useValue: environment.recaptchaSiteKey,
-    }
+      provide: RECAPTCHA_SETTINGS,
+      useValue: {
+        siteKey: environment.recaptchaV2SiteKey,
+      } as RecaptchaSettings,
+    },
   ],
 })
 export class RegisterModule { }

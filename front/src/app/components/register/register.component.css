@@ -1,6 +1,6 @@
 
 .register-page {
-  height: 75vh;
+  height: 86vh;
   width: 100vw;
   display: flex;
   justify-content: center;
@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width:350px;
+  width:330px;
 }
 
 .register-form {
