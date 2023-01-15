@@ -1,0 +1,15 @@
+<div class="match-editor">
+
+    <div *ngIf="searchGame">
+        <div class="search-criteria">
+            <button mat-mini-fab color="primary"><mat-icon>add</mat-icon></button>
+        </div>
+        <game-list (gameSelectedEvent)="gameSelected($event)"></game-list>
+    </div>
+
+    <div *ngIf="!searchGame" class="form"
+        [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl() + ') no-repeat top / cover'}">
+        <div class="title">{{ matchService.getGame()?.title }}</div>
+    </div>
+
+</div>
