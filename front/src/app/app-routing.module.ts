@@ -24,6 +24,8 @@ import { RegisterComponent } from './components/register/register.component';
 import { RegisterModule } from './components/register/register.module';
 import { MatchEditorComponent } from './components/match-editor/match-editor.component';
 import { MatchEditorModule } from './components/match-editor/match-editor.module';
+import { PlayerListComponent } from './components/player-list/player-list.component';
+import { PlayerListModule } from './components/player-list/player-list.module';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -31,6 +33,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'find-game', component: FindGameComponent },
   { path: 'game-list', component: GameListComponent },
+  { path: 'player-list', component: PlayerListComponent },
   { path: 'match-editor', component: MatchEditorComponent },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
 ];
@@ -43,8 +46,10 @@ const routes: Routes = [
     LoginModule,
     RegisterModule,
     GameListModule,
-    MatchEditorModule
+    MatchEditorModule,
+    PlayerListModule
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}
