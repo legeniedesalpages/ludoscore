@@ -53,4 +53,8 @@ export class HomeComponent {
   public gameList() {
     this.router.navigate(['game-list']);
   }
+
+  public playerList() {
+    this.router.navigate(['player-list']);
+  }
 }

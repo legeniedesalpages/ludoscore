@@ -16,6 +16,11 @@
   font-size: 80px;
 }
 
+svg {
+  height: 80px; 
+  width: 80px;
+}
+
 .recherche_partie {
   height: 100%;
   text-align: center;
