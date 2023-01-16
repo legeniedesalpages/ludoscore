@@ -46,12 +46,22 @@ export class PlayerListComponent {
   ];
 
   drop(event: CdkDragDrop<string[]>) {
-    console.log(event.distance.x > 0 ? 'effacer' : 'favoris')
-    moveItemInArray(this.movies, event.previousIndex, event.currentIndex);
+    if (Math.abs(event.distance.x) > 100) {
+      console.log(event.distance.x > 0 ? 'effacer' : 'favoris')
+    }
   }
 
   computeDragRenderPos(pos:any, dragRef:any) {
-    console.log(dragRef)
-    return {x: pos.x > 300 ? 300 : pos.x, y: pos.y}; // will render the element every 30 pixels horizontally
+    let x = pos.x - dragRef._pickupPositionInElement.x;
+    if (Math.abs(x) < 30) {
+      x= dragRef._pickupPositionOnPage.x - dragRef._pickupPositionInElement.x
+    }
+    if (x < -200) {
+      x = -200
+    }
+    if (x > 200) {
+      x = 200
+    }
+    return {x: x, y: dragRef._pickupPositionOnPage.y - dragRef._pickupPositionInElement.y};
   }
 }
