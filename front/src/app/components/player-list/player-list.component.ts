@@ -46,6 +46,10 @@ export class PlayerListComponent {
   public startX: number = 0
   public draggableX: number = 0
 
+  rand = Math.random()
+
+
+
   public action() {
     if (!this.dragging) {
       console.warn("Action!")

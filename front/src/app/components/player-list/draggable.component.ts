@@ -15,25 +15,62 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'drag-element',
   template: `
-    <div matRipple [ngStyle]="{'left.px': draggableX + 150}" class="test" draggable="false" 
-    (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)"
-    (mouseleave)="releaseMouse($event)" (touchmove)="moveFinger($event)" (touchstart)="touch($event)" (touchend)="end($event)"
-    (click)="action()">{{rand}}</div>
+    <div class="hiding-parent">
+
+      <div matRipple [ngStyle]="{'left.px': draggableX}" class="test" draggable="false" (click)="action()"
+      (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)" (mouseleave)="leave($event)" 
+      (touchmove)="moveFinger($event)" (touchstart)="touch($event)" (touchend)="end($event)">
+        <ng-content></ng-content>
+      </div>
+
+      <div class="back" [ngStyle]="{'background-color': backgroundColor, 'flex-direction':direction}"><mat-icon>{{icon}}</mat-icon>{{text}}</div>
+
+    </div>
     `,
   styles: [`
+  .hiding-parent {
+    overflow:hidden;
+    width:100%;
+  }
   .test {
-    width:100px;
-    height: 100px;
-    background-color: lightblue;
+    width:100%;
+    height: 60px;
     user-select: none;
+    position: relative;
+    transition-property: left;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    z-index:1;
+    overflow:hidden;
+    background-color:white;
+  }
+  .back {
+    width:100%;
+    height: 60px;
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    margin-top: -60px;
+  }
+  .mat-icon {
+    width:40px;
+    height:40px;
+    opacity:.6;
+    font-size: 40px;
   }
   `]
 })
 export class DraggableComponent {
 
+  //
   private clicked: boolean = false;
-  private dragging: boolean = false;
 
+  public wipe: string = ""
+  public dragging: boolean = false;
+  public backgroundColor: string = ''
+  public text: string = '';
+  public direction: string = ''
+  public icon: string = "";
   public startX: number = 0
   public draggableX: number = 0
 
@@ -45,7 +82,13 @@ export class DraggableComponent {
     }
   }
 
-  rand = Math.random()
+  leave(_: MouseEvent) {
+    this.clicked = false
+    this.startX = 0
+    this.draggableX = 0
+    this.wipe = "none"
+    this.dragging = false
+  }
 
 
   touch(event: TouchEvent) {
@@ -53,24 +96,29 @@ export class DraggableComponent {
   }
   clicMouse(event: MouseEvent) {
     this.clic(event.clientX)
-    
+
   }
   clic(x: number) {
-    this.startX = x;
-    this.clicked = true;
+    this.startX = x
+    this.clicked = true
+    this.wipe = "none"
   }
 
 
-  end(event: TouchEvent) {
+  end(_: TouchEvent) {
     this.release()
   }
-  releaseMouse(event: MouseEvent) {
+  releaseMouse(_: MouseEvent) {
     this.release()
   }
   release() {
     this.clicked = false;
     this.startX = 0;
     this.draggableX = 0;
+    if (this.wipe !== "none" && this.dragging) {
+      console.warn("Wipe: " + this.wipe)
+    }
+    this.wipe = "none"
   }
 
 
@@ -81,9 +129,29 @@ export class DraggableComponent {
     this.move(event.clientX)
   }
   move(x: number) {
-    if (this.clicked) {
+    if (this.clicked && (Math.abs(x - this.startX) > 30 || this.dragging == true)) {
       this.dragging = true;
       this.draggableX = x - this.startX;
+    }
+
+    if (this.dragging) {
+      if (x - this.startX > 0) {
+        this.wipe = "left"
+        this.backgroundColor = 'lightcoral'
+        this.icon = "delete"
+        this.direction = "row"
+        this.text = "Supprimer"
+      } else {
+        this.wipe = "right"
+        this.icon = "stars"
+        this.text = "Favoris"
+        this.direction = "row-reverse"
+        this.backgroundColor = 'lightblue'
+      }
+
+      if (Math.abs(x - this.startX) < 60) {
+        this.wipe = "none"
+      }
     }
   }
 }
