@@ -10,20 +10,28 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+export interface WipeActionStyle {
+  backgroundColor: string,
+  icon: string,
+  text: string
+}
 
 @Component({
   selector: 'drag-element',
   template: `
     <div class="hiding-parent">
 
-      <div matRipple [ngStyle]="{'left.px': draggableX}" class="test" draggable="false" (click)="action()"
+      <div matRipple [ngStyle]="{'left.px': draggableX, 'cursor': dragging ? 'move' : 'pointer'}" [ngClass]="['draggable', dragClass]" draggable="false" (click)="action()"
       (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)" (mouseleave)="leave($event)" 
       (touchmove)="moveFinger($event)" (touchstart)="touch($event)" (touchend)="end($event)">
         <ng-content></ng-content>
       </div>
 
-      <div class="back" [ngStyle]="{'background-color': backgroundColor, 'flex-direction':direction}"><mat-icon>{{icon}}</mat-icon>{{text}}</div>
+      <div class="back" [ngStyle]="{'background-color': backgroundColor}">
+        <div class="txt" [ngStyle]="{'opacity': wipe === 'none' ? '0.2':'0.9', 'flex-direction':direction}"><mat-icon>{{icon}}</mat-icon>{{text}}</div>
+      </div>
 
     </div>
     `,
@@ -32,37 +40,54 @@ import { Component } from '@angular/core';
     overflow:hidden;
     width:100%;
   }
-  .test {
+  .drop {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .draggable {
     width:100%;
     height: 60px;
     user-select: none;
     position: relative;
-    transition-property: left;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    transition-property: all;
     z-index:1;
     overflow:hidden;
     background-color:white;
+    cursor:pointer;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.12),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
   }
   .back {
     width:100%;
     height: 60px;
-    display: flex;
-    position: relative;
-    flex-direction: row;
-    align-items: center;
+    position: relative;   
+    display: flex; 
     margin-top: -60px;
   }
+  .txt {
+    width:100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
   .mat-icon {
+    margin-left:5px;
+    margin-right:5px;
     width:40px;
     height:40px;
-    opacity:.6;
     font-size: 40px;
   }
   `]
 })
 export class DraggableComponent {
 
-  //
+  @Input() leftWipeStyle: WipeActionStyle | null = null
+  @Input() rightWipeStyle: WipeActionStyle | null = null
+
+  @Output() rightSwipeEvent = new EventEmitter<void>();
+  @Output() leftSwipeEvent = new EventEmitter<void>();
+  @Output() actionEvent = new EventEmitter<void>();
+
   private clicked: boolean = false;
 
   public wipe: string = ""
@@ -73,10 +98,11 @@ export class DraggableComponent {
   public icon: string = "";
   public startX: number = 0
   public draggableX: number = 0
+  public dragClass: string = ""
 
   public action() {
     if (!this.dragging) {
-      console.warn("Action!")
+      this.actionEvent.emit()
     } else {
       this.dragging = false;
     }
@@ -99,6 +125,7 @@ export class DraggableComponent {
 
   }
   clic(x: number) {
+    this.dragClass = ""
     this.startX = x
     this.clicked = true
     this.wipe = "none"
@@ -116,9 +143,15 @@ export class DraggableComponent {
     this.startX = 0;
     this.draggableX = 0;
     if (this.wipe !== "none" && this.dragging) {
-      console.warn("Wipe: " + this.wipe)
+      if (this.wipe === 'right') {
+        this.rightSwipeEvent.emit()
+      }
+      if (this.wipe === 'left') {
+        this.leftSwipeEvent.emit()
+      }
     }
     this.wipe = "none"
+    this.dragClass = "drop"
   }
 
 
@@ -129,7 +162,15 @@ export class DraggableComponent {
     this.move(event.clientX)
   }
   move(x: number) {
-    if (this.clicked && (Math.abs(x - this.startX) > 30 || this.dragging == true)) {
+    if (this.clicked && (Math.abs(x - this.startX) > 60 || this.dragging == true)) {
+
+      if (this.rightWipeStyle == null && x - this.startX < 0) {
+        return
+      }
+      if (this.leftWipeStyle == null && x - this.startX > 0) {
+        return
+      }
+
       this.dragging = true;
       this.draggableX = x - this.startX;
     }
@@ -137,19 +178,19 @@ export class DraggableComponent {
     if (this.dragging) {
       if (x - this.startX > 0) {
         this.wipe = "left"
-        this.backgroundColor = 'lightcoral'
-        this.icon = "delete"
         this.direction = "row"
-        this.text = "Supprimer"
+        this.backgroundColor = this.leftWipeStyle?.backgroundColor!
+        this.icon = this.leftWipeStyle?.icon!
+        this.text = this.leftWipeStyle?.text!
       } else {
         this.wipe = "right"
-        this.icon = "stars"
-        this.text = "Favoris"
         this.direction = "row-reverse"
-        this.backgroundColor = 'lightblue'
+        this.backgroundColor = this.rightWipeStyle?.backgroundColor!
+        this.icon = this.rightWipeStyle?.icon!
+        this.text = this.rightWipeStyle?.text!
       }
 
-      if (Math.abs(x - this.startX) < 60) {
+      if (Math.abs(x - this.startX) < 120) {
         this.wipe = "none"
       }
     }

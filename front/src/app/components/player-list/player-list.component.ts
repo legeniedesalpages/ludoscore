@@ -40,42 +40,7 @@ export class PlayerListComponent {
     'Episode IX - The Rise of Skywalker',
   ];
 
-  private clicked: boolean = false;
-  private dragging: boolean = false;
-
-  public startX: number = 0
-  public draggableX: number = 0
-
-  rand = Math.random()
-
-
-
-  public action() {
-    if (!this.dragging) {
-      console.warn("Action!")
-    } else {
-      this.dragging = false;
-    }
-  }
-
-  clicMouse(event: MouseEvent) {
-    console.debug("Clic:", event)
-    this.startX = event.clientX;
-    this.clicked = true;
-  }
-
-  releaseMouse(event: MouseEvent) {
-    console.debug("UnClick:", event)
-    this.clicked = false;
-    this.startX = 0;
-  }
-
-  moveMouse(event: MouseEvent) {
-    if (this.clicked) {
-      if (Math.abs(this.startX - event.clientX) > 30) {
-        this.dragging = true;
-        this.draggableX = event.clientX;
-      }
-    }
+  public action(event: string) {
+    console.warn(event)
   }
 }
