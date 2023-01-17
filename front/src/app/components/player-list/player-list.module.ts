@@ -18,6 +18,7 @@ import { PlayerListComponent } from './player-list.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
+import { DraggableComponent } from './draggable.component';
 
 const routes: Routes = [
   {
@@ -28,7 +29,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [PlayerListComponent],
+  declarations: [PlayerListComponent, DraggableComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
