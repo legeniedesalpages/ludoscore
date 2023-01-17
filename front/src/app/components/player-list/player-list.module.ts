@@ -17,6 +17,7 @@ import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { PlayerListComponent } from './player-list.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
+import { MatRippleModule } from '@angular/material/core';
 
 const routes: Routes = [
   {
@@ -32,7 +33,8 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     DragDropModule,
-    MatIconModule
+    MatIconModule,
+    MatRippleModule
   ],
   exports: [PlayerListComponent]
 })

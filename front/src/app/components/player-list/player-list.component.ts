@@ -56,12 +56,16 @@ export class PlayerListComponent {
     if (Math.abs(x) < 30) {
       x= dragRef._pickupPositionOnPage.x - dragRef._pickupPositionInElement.x
     }
-    if (x < -200) {
-      x = -200
+    if (x < -180) {
+      x = -180
     }
-    if (x > 200) {
-      x = 200
+    if (x > 180) {
+      x = 180
     }
     return {x: x, y: dragRef._pickupPositionOnPage.y - dragRef._pickupPositionInElement.y};
+  }
+
+  clic() {
+    console.info("sdfqsdfsdf")
   }
 }
