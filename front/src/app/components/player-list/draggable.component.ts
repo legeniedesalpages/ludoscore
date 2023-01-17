@@ -15,14 +15,17 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'drag-element',
   template: `
-    <div matRipple [ngStyle]="{'left.px': draggableX}" class="test" draggable="false" 
-    (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)" (click)="action()"></div>
+    <div matRipple [ngStyle]="{'left.px': draggableX + 150}" class="test" draggable="false" 
+    (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)"
+    (mouseleave)="releaseMouse($event)" (touchmove)="moveFinger($event)" (touchstart)="touch($event)" (touchend)="end($event)"
+    (click)="action()">{{rand}}</div>
     `,
   styles: [`
   .test {
     width:100px;
     height: 100px;
     background-color: lightblue;
+    user-select: none;
   }
   `]
 })
@@ -42,24 +45,45 @@ export class DraggableComponent {
     }
   }
 
+  rand = Math.random()
+
+
+  touch(event: TouchEvent) {
+    this.clic(event.touches[0].clientX)
+  }
   clicMouse(event: MouseEvent) {
-    console.debug("Clic:", event)
-    this.startX = event.clientX;
+    this.clic(event.clientX)
+    
+  }
+  clic(x: number) {
+    this.startX = x;
     this.clicked = true;
   }
 
+
+  end(event: TouchEvent) {
+    this.release()
+  }
   releaseMouse(event: MouseEvent) {
-    console.debug("UnClick:", event)
+    this.release()
+  }
+  release() {
     this.clicked = false;
     this.startX = 0;
+    this.draggableX = 0;
   }
 
+
+  moveFinger(event: TouchEvent) {
+    this.move(event.touches[0].clientX)
+  }
   moveMouse(event: MouseEvent) {
+    this.move(event.clientX)
+  }
+  move(x: number) {
     if (this.clicked) {
-      if (Math.abs(this.startX - event.clientX) > 30) {
-        this.dragging = true;
-        this.draggableX = event.clientX;
-      }
+      this.dragging = true;
+      this.draggableX = x - this.startX;
     }
   }
 }
