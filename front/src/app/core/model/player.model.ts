@@ -15,6 +15,6 @@ export interface Player {
     lastName: string, // nom
     firstName: string, // prénom
     pseudo: string,
-    email: string,
-    initials: string
+    initials: string,
+    gravatar: string
 }

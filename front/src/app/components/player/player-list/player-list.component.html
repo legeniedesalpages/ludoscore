@@ -1,0 +1,13 @@
+<div *ngFor="let player of players">
+<!--     <div style=" width:100%">
+        <drag-element [leftWipeStyle]='{backgroundColor: "lightyellow", icon: "stars", text: "Favoris"}' [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
+        (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="addToFavoriteAction(player)" (actionEvent)="detail(player)">
+            <div style="width:50px; height:60px; background-color: lightskyblue; float:left;"></div>
+            <span style="vertical-align:middle">{{ player.lastName }}</span>
+        </drag-element>
+        <mat-divider></mat-divider>
+    </div> -->
+    <div style=" width:100%">
+        <drag2-element></drag2-element>
+    </div>
+</div>

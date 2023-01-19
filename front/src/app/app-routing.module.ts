@@ -24,17 +24,17 @@ import { RegisterComponent } from './components/register/register.component';
 import { RegisterModule } from './components/register/register.module';
 import { MatchEditorComponent } from './components/match-editor/match-editor.component';
 import { MatchEditorModule } from './components/match-editor/match-editor.module';
-import { PlayerListComponent } from './components/player-list/player-list.component';
-import { PlayerListModule } from './components/player-list/player-list.module';
+import { PlayerManagerComponent } from './components/player/player-manager/player-manager.component';
+import { PlayerManagerModule } from './components/player/player-manager/player-manager.module';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'find-game', component: FindGameComponent },
-  { path: 'game-list', component: GameListComponent },
-  { path: 'player-list', component: PlayerListComponent },
+  { path: 'game-list', component: GameListComponent },  
   { path: 'match-editor', component: MatchEditorComponent },
+  { path: 'player-manager', component: PlayerManagerComponent },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
 ];
 
@@ -47,7 +47,7 @@ const routes: Routes = [
     RegisterModule,
     GameListModule,
     MatchEditorModule,
-    PlayerListModule
+    PlayerManagerModule
   ],
   exports: [RouterModule]
 })

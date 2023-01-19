@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+   
+    <mat-slide-toggle color="primary">Favoris</mat-slide-toggle>
+
+    <span class="menu-spacer"></span>
+
+    <button mat-flat-button color="primary" [matMenuTriggerFor]="filter">
+        <mat-icon>filter_list</mat-icon>
+        <span>Filtrer</span>
+    </button>
+
+    <mat-menu #filter="matMenu" xPosition="before">
+        <button mat-menu-item><span>Tous les joueurs</span></button>
+        <button mat-menu-item><span>Avec qui j'ai fait au moins une partie</span></button>
+    </mat-menu>
+
+</mat-toolbar>
+
+<player-list [players]="players"></player-list>
+
+<button mat-fab class="fixedButton" color="primary" aria-label="Ajouter un joueur">
+    <mat-icon>add</mat-icon>
+</button>
