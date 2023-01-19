@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter } from '@angular/core';
-import { map, fromEvent, switchMap, takeUntil, tap, merge, withLatestFrom, scan } from 'rxjs';
+import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
 
 interface MoveEvent {
   positionX: number,
@@ -31,7 +31,7 @@ export interface WipeActionStyle {
         <div #back class="back">
           <div #action class="txt"><mat-icon>{{ icon }}</mat-icon>{{ text}}</div>
         </div>
-        <div #draggable ripple class="front" draggable="false" (click)="applyAction()">
+        <div #draggable matRipple class="front" draggable="false">
           <ng-content></ng-content>
         </div>
       </div>  
@@ -51,7 +51,7 @@ export class DraggableComponent implements OnInit {
 
   public icon: string = "";
   public text: string = "";
-  public action: string = 'not-swipping';
+  public action: string = 'clicked';
 
   @Input() tresholdStartDrag: number = 20;
   @Input() tresholdAction: number = 120;
@@ -97,11 +97,9 @@ export class DraggableComponent implements OnInit {
           map(moveEvent => {
             this.applyFading(moveEvent.positionX, startPositionX)
             const diff = moveEvent.positionX - startPositionX
-
             this.action = this.findAction(moveEvent.positionX, startPositionX)
 
             if (Math.abs(diff) > this.tresholdStartDrag && !this.scroll) {
-              
               moveEvent.actionWhenDragStart()
               return {
                 position: diff,
@@ -113,6 +111,7 @@ export class DraggableComponent implements OnInit {
           }),
           takeUntil(mouseUp.pipe(
             tap(_ => {
+              this.applyAction()
               this.draggableDiv.nativeElement.classList.add('drop')
               this.draggableDiv.nativeElement.style.left = '0px'
             })
@@ -140,14 +139,14 @@ export class DraggableComponent implements OnInit {
       }
     }
     if (Math.abs(positionX - startPositionX) > this.tresholdStartDrag) {
-      return 'undefined'
+      return 'swipe-started-but-imcomplete'
     }
-    return 'not-swipping'
+    return 'scrolling'
   }
 
   public applyAction() {
     switch (this.action) {
-      case 'not-swipping':
+      case 'clicking':
         this.actionEvent.emit()
         break;
       case 'swipping-left':
@@ -157,7 +156,7 @@ export class DraggableComponent implements OnInit {
         this.rightSwipeEvent.emit()
         break;
     }
-    this.action = 'not-swipping'
+    this.action = 'clicking'
   }
 
   private applyLeftAction() {

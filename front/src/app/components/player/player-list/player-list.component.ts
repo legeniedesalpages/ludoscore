@@ -21,6 +21,12 @@ import { PlayerService } from 'src/app/core/services/player.service';
 })
 export class PlayerListComponent implements OnInit {
 
+  onScroll() {
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => { this.action = ""; }, 1000);
+  }
+  private timeout: NodeJS.Timeout = setTimeout(() => { this.action = ""; }, 1);
+
   @Input() players: Player[] = []
   public action:string = ""
 
@@ -33,15 +39,18 @@ export class PlayerListComponent implements OnInit {
   public deleteAction(player: Player) {
     console.info("delete")
     this.action = "delete"
+    this.onScroll()
   }
 
   public addToFavoriteAction(player: Player) {
     console.info("favorite")
     this.action = "favorite"
+    this.onScroll()
   }
 
   public detail(player: Player) {
     console.warn("action:" + player)
     this.action = "action"
+    this.onScroll()
   }
 }
