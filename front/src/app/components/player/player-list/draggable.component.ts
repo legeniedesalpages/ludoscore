@@ -10,195 +10,117 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, HostListener } from '@angular/core';
+import { Observable, map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
 
-export interface WipeActionStyle {
-  backgroundColor: string,
-  icon: string,
-  text: string
+interface MoveEvent {
+  positionX: number,
+  actionWhenDragStart: Function
 }
 
 @Component({
   selector: 'drag-element',
   template: `
-    <div class="hiding-parent">
-
-      <div matRipple 
-      [ngStyle]="{'left.px': draggableX, 'cursor': dragging ? 'move' : 'pointer'}" 
-      [ngClass]="['draggable', dragClass]" 
-      draggable="false" (click)="action()"
-      (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)" (mouseleave)="leave($event)" 
-      (touchmove)="moveFinger($event)" (touchstart)="touch($event)" (touchend)="end($event)">
-        Clicked:{{clicked}}<br/>
-        Wipe:{{wipe}}<br/>
-        Dragging:{{dragging}}<br/>
-      </div>
-
-      <div class="back" [ngStyle]="{'background-color': backgroundColor}">
-        <div class="txt" [ngStyle]="{'opacity': wipe === 'none' ? '0.2':'0.9', 'flex-direction':direction}"><mat-icon>{{icon}}</mat-icon>{{text}}</div>
-      </div>
-
-    </div>
+      <div class="hiding-parent">
+        <div #back class="back back-style">
+          <div class="txt"><mat-icon>delete</mat-icon>Supprimer</div>
+        </div>
+        <div #draggable class="front front-style" draggable="false">
+          <ng-content></ng-content>
+        </div>
+      </div>  
     `,
-  styles: [`
-  .hiding-parent {
-    overflow:hidden;
-    width:100%;
-  }
-  .drop {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-  }
-  .draggable {
-    width:100%;
-    height: 60px;
-    user-select: none;
-    position: relative;
-    transition-property: all;
-    z-index:1;
-    overflow:hidden;
-    background-color:white;
-    cursor:pointer;
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.12), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  }
-  .back {
-    width:100%;
-    height: 60px;
-    position: relative;   
-    display: flex; 
-    margin-top: -60px;
-  }
-  .txt {
-    width:100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-  .mat-icon {
-    margin-left:5px;
-    margin-right:5px;
-    width:40px;
-    height:40px;
-    font-size: 40px;
-  }
-  `]
+  styleUrls: ['./draggable.component.css']
 })
-export class DraggableComponent {
+export class DraggableComponent implements OnInit {
 
-  @Input() leftWipeStyle: WipeActionStyle | null = null
-  @Input() rightWipeStyle: WipeActionStyle | null = null
+  @HostListener('window:scroll')
+  onScroll() {
+    this.scroll = true;
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => { this.scroll = false; }, 300);
+  }
+  public scroll: boolean = false;
+  private timeout: NodeJS.Timeout = setTimeout(() => { this.scroll = false; }, 1);
 
-  @Output() rightSwipeEvent = new EventEmitter<void>();
-  @Output() leftSwipeEvent = new EventEmitter<void>();
-  @Output() actionEvent = new EventEmitter<void>();
+  @Input() tresholdStartDrag: number = 20;
+  @Input() tresholdAction: number = 150;
 
-  public clicked: boolean = false;
-  public wipe: string = ""
-  public dragging: boolean = false;
-  public backgroundColor: string = ''
-  public text: string = '';
-  public direction: string = ''
-  public icon: string = "";
-  public startX: number = 0
-  public draggableX: number = 0
-  public dragClass: string = ""
+  @ViewChild('draggable', { static: true }) private draggableDiv!: ElementRef<HTMLDivElement>
+  @ViewChild('back', { static: true }) private backDiv!: ElementRef<HTMLDivElement>
 
-  public action() {
-    if (!this.dragging) {
-      this.actionEvent.emit()
-    } else {
-      this.dragging = false;
+  public fade: string = "0";
+
+  ngOnInit() {
+
+    // overlap divs : back behind front
+    let height = this.draggableDiv.nativeElement.offsetHeight
+    this.draggableDiv.nativeElement.style.marginTop = `-${height}px`
+    this.backDiv.nativeElement.style.height = `${height}px`
+
+    // prepare actions
+    const mouseDown = merge(
+      fromEvent<MouseEvent>(this.draggableDiv.nativeElement, 'mousedown').pipe(map(event => event.clientX)),
+      fromEvent<TouchEvent>(this.draggableDiv.nativeElement, 'touchstart').pipe(map(event => event.touches[0].clientX))
+    )
+    const mouseMove = merge(
+      fromEvent<MouseEvent>(document, 'mousemove').pipe(map(event => this.mouseMoveEvent(event))),
+      fromEvent<TouchEvent>(document, 'touchmove', { passive: false }).pipe(map(event => this.touchMoveEvent(event)))
+    )
+    const mouseUp = merge(
+      fromEvent<MouseEvent>(document, 'mouseup'),
+      fromEvent<TouchEvent>(document, 'touchend')
+    )
+
+    // drag pipeline
+    mouseDown.pipe(
+      tap(_ => {
+        this.draggableDiv.nativeElement.classList.remove('drop')
+      }),
+      switchMap(startPositionX => {
+        return mouseMove.pipe(
+          map(moveEvent => {
+            this.fade = this.calcFade(moveEvent.positionX, startPositionX).toPrecision(2);
+            this.backDiv.nativeElement.style.opacity = this.fade
+            if (Math.abs(moveEvent.positionX - startPositionX) > this.tresholdStartDrag && !this.scroll) {
+              moveEvent.actionWhenDragStart()
+              return { left: moveEvent.positionX - startPositionX }
+            }
+            return { left: 0 }
+          }),
+          takeUntil(mouseUp.pipe(
+            tap(_ => {
+              this.draggableDiv.nativeElement.classList.add('drop')
+              this.draggableDiv.nativeElement.style.left = '0px'
+            })
+          ))
+        );
+      })).subscribe(pos => {
+        this.draggableDiv.nativeElement.style.left = `${pos.left}px`
+      });
+  }
+
+  private calcFade(positionX: number, startPositionX: number): number {
+    const calc = Math.abs(positionX - startPositionX) / this.tresholdAction
+    if (calc > 1) {
+      return 1;
+    }
+    return calc;
+  }
+
+  private mouseMoveEvent(event: MouseEvent): MoveEvent {
+    return {
+      positionX: event.clientX,
+      actionWhenDragStart: () => { }
     }
   }
 
-  leave(_: MouseEvent) {
-    this.clicked = false
-    this.startX = 0
-    this.draggableX = 0
-    this.wipe = "none"
-    this.dragging = false
-  }
-
-
-  touch(event: TouchEvent) {
-    this.clic(event.touches[0].clientX)
-  }
-  clicMouse(event: MouseEvent) {
-    this.clic(event.clientX)
-
-  }
-  clic(x: number) {
-    this.dragClass = ""
-    this.startX = x
-    this.clicked = true
-    this.wipe = "none"
-  }
-
-
-  end(_: TouchEvent) {
-    this.release()
-  }
-  releaseMouse(_: MouseEvent) {
-    this.release()
-  }
-  release() {
-    this.clicked = false;
-    this.startX = 0;
-    this.draggableX = 0;
-    if (this.wipe !== "none" && this.dragging) {
-      if (this.wipe === 'right') {
-        this.rightSwipeEvent.emit()
-      }
-      if (this.wipe === 'left') {
-        this.leftSwipeEvent.emit()
-      }
-    }
-    this.wipe = "none"
-    this.dragClass = "drop"
-    this.dragging = false
-  }
-
-
-  moveFinger(event: TouchEvent) {
-    if (this.dragging) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    this.move(event.touches[0].clientX)
-  }
-  moveMouse(event: MouseEvent) {
-    this.move(event.clientX)
-  }
-  move(x: number) {
-    if (this.clicked && (Math.abs(x - this.startX) > 60 || this.dragging == true)) {
-
-      if (this.rightWipeStyle == null && x - this.startX < 0) {
-        return
-      }
-      if (this.leftWipeStyle == null && x - this.startX > 0) {
-        return
-      }
-
-      this.dragging = true;
-      this.draggableX = x - this.startX;
-    }
-
-    if (this.dragging) {
-      if (x - this.startX > 0) {
-        this.wipe = "left"
-        this.direction = "row"
-        this.backgroundColor = this.leftWipeStyle?.backgroundColor!
-        this.icon = this.leftWipeStyle?.icon!
-        this.text = this.leftWipeStyle?.text!
-      } else {
-        this.wipe = "right"
-        this.direction = "row-reverse"
-        this.backgroundColor = this.rightWipeStyle?.backgroundColor!
-        this.icon = this.rightWipeStyle?.icon!
-        this.text = this.rightWipeStyle?.text!
-      }
-
-      if (Math.abs(x - this.startX) < 120) {
-        this.wipe = "none"
+  private touchMoveEvent(event: TouchEvent): MoveEvent {
+    return {
+      positionX: event.touches[0].clientX,
+      actionWhenDragStart: () => {
+        event.preventDefault();
+        event.stopPropagation();
       }
     }
   }
