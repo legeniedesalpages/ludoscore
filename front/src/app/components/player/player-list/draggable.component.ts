@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter } from '@angular/core';
-import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
+import { map, fromEvent, switchMap, takeUntil, tap, merge, withLatestFrom, scan } from 'rxjs';
 
 interface MoveEvent {
   positionX: number,
@@ -31,7 +31,7 @@ export interface WipeActionStyle {
         <div #back class="back">
           <div #action class="txt"><mat-icon>{{ icon }}</mat-icon>{{ text}}</div>
         </div>
-        <div #draggable class="front" draggable="false">
+        <div #draggable ripple class="front" draggable="false" (click)="applyAction()">
           <ng-content></ng-content>
         </div>
       </div>  
@@ -51,9 +51,10 @@ export class DraggableComponent implements OnInit {
 
   public icon: string = "";
   public text: string = "";
+  public action: string = 'not-swipping';
 
   @Input() tresholdStartDrag: number = 20;
-  @Input() tresholdAction: number = 150;
+  @Input() tresholdAction: number = 120;
   @Input() leftWipeStyle: WipeActionStyle | null = null
   @Input() rightWipeStyle: WipeActionStyle | null = null
 
@@ -96,21 +97,27 @@ export class DraggableComponent implements OnInit {
           map(moveEvent => {
             this.applyFading(moveEvent.positionX, startPositionX)
             const diff = moveEvent.positionX - startPositionX
+
+            this.action = this.findAction(moveEvent.positionX, startPositionX)
+
             if (Math.abs(diff) > this.tresholdStartDrag && !this.scroll) {
+              
               moveEvent.actionWhenDragStart()
               return {
                 position: diff,
                 direction: diff > 0 ? 'left' : 'right'
               }
+            } else {
+              return { position: 0 }
             }
-            return { position: 0 }
           }),
           takeUntil(mouseUp.pipe(
             tap(_ => {
               this.draggableDiv.nativeElement.classList.add('drop')
               this.draggableDiv.nativeElement.style.left = '0px'
             })
-          ))
+          )),
+
         );
       })).subscribe(event => {
         if (event.direction === 'left' && this.leftWipeStyle != null) {
@@ -121,7 +128,36 @@ export class DraggableComponent implements OnInit {
           this.applyRightAction()
           this.draggableDiv.nativeElement.style.left = `${event.position}px`
         }
-      });
+      })
+  }
+
+  private findAction(positionX: number, startPositionX: number): string {
+    if (Math.abs(positionX - startPositionX) > this.tresholdAction) {
+      if (positionX - startPositionX > 0) {
+        return 'swipping-left'
+      } else {
+        return 'swipping-right'
+      }
+    }
+    if (Math.abs(positionX - startPositionX) > this.tresholdStartDrag) {
+      return 'undefined'
+    }
+    return 'not-swipping'
+  }
+
+  public applyAction() {
+    switch (this.action) {
+      case 'not-swipping':
+        this.actionEvent.emit()
+        break;
+      case 'swipping-left':
+        this.leftSwipeEvent.emit()
+        break;
+      case 'swipping-right':
+        this.rightSwipeEvent.emit()
+        break;
+    }
+    this.action = 'not-swipping'
   }
 
   private applyLeftAction() {

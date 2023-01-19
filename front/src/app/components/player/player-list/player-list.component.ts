@@ -22,6 +22,7 @@ import { PlayerService } from 'src/app/core/services/player.service';
 export class PlayerListComponent implements OnInit {
 
   @Input() players: Player[] = []
+  public action:string = ""
 
   constructor(public playerService: PlayerService) {}
 
@@ -30,14 +31,17 @@ export class PlayerListComponent implements OnInit {
   }
 
   public deleteAction(player: Player) {
-    console.warn("delete")
+    console.info("delete")
+    this.action = "delete"
   }
 
   public addToFavoriteAction(player: Player) {
     console.info("favorite")
+    this.action = "favorite"
   }
 
   public detail(player: Player) {
     console.warn("action:" + player)
+    this.action = "action"
   }
 }

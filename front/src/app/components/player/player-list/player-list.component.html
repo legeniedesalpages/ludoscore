@@ -4,7 +4,7 @@
         (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="addToFavoriteAction(player)" (actionEvent)="detail(player)">
             <div style="height:60px; background-color:white;">
                 <div style="width:50px; height:60px; background-color: lightskyblue; float:left;"></div>
-                <span style="vertical-align:middle">{{ player.pseudo }}</span>
+                <span style="vertical-align:middle">{{ player.pseudo }}<br/>({{ action }})</span>
             </div>
         </drag-element>
     </div>
