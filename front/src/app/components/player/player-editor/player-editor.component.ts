@@ -17,6 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateValidator } from 'src/app/core/services/date.validator';
 import { FindGameService } from 'src/app/core/services/find-game.service';
 import { GameService } from 'src/app/core/services/game.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'player-editor',
@@ -30,7 +31,7 @@ export class PlayerEditorComponent implements OnInit {
   public gameEditorForm: FormGroup;
 
   constructor(private router: Router, private route: ActivatedRoute,
-    private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService
+    private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService, private location: Location
   ) {
 
     this.loading = true;
@@ -57,5 +58,6 @@ export class PlayerEditorComponent implements OnInit {
   }
 
   public cancel() {
+    this.location.back()
   }
 }

@@ -90,13 +90,14 @@ export class DraggableComponent implements OnInit {
     // drag pipeline
     mouseDown.pipe(
       tap(_ => {
+        this.action = 'clicking' // default action, will change if a move occurs
         this.draggableDiv.nativeElement.classList.remove('drop')
       }),
       switchMap(startPositionX => {
         return mouseMove.pipe(
           map(moveEvent => {
-            this.applyFading(moveEvent.positionX, startPositionX)
             const diff = moveEvent.positionX - startPositionX
+            this.applyFading(moveEvent.positionX, startPositionX)
             this.action = this.findAction(moveEvent.positionX, startPositionX)
 
             if (Math.abs(diff) > this.tresholdStartDrag && !this.scroll) {
@@ -120,11 +121,11 @@ export class DraggableComponent implements OnInit {
         );
       })).subscribe(event => {
         if (event.direction === 'left' && this.leftWipeStyle != null) {
-          this.applyLeftAction()
+          this.applyLeftSwipe()
           this.draggableDiv.nativeElement.style.left = `${event.position}px`
         }
         if (event.direction === 'right' && this.rightWipeStyle != null) {
-          this.applyRightAction()
+          this.applyRightSwipe()
           this.draggableDiv.nativeElement.style.left = `${event.position}px`
         }
       })
@@ -156,17 +157,16 @@ export class DraggableComponent implements OnInit {
         this.rightSwipeEvent.emit()
         break;
     }
-    this.action = 'clicking'
   }
 
-  private applyLeftAction() {
+  private applyLeftSwipe() {
     this.backDiv.nativeElement.style.backgroundColor = this.leftWipeStyle?.backgroundColor!
     this.icon = this.leftWipeStyle?.icon!
     this.text = this.leftWipeStyle?.text!
     this.actionDiv.nativeElement.style.flexDirection = 'row'
   }
 
-  private applyRightAction() {
+  private applyRightSwipe() {
     this.backDiv.nativeElement.style.backgroundColor = this.rightWipeStyle?.backgroundColor!
     this.icon = this.rightWipeStyle?.icon!
     this.text = this.rightWipeStyle?.text!

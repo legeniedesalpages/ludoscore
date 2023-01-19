@@ -1,11 +1,9 @@
 <div *ngFor="let player of players">
-    <div style=" width:100%">
         <drag-element [leftWipeStyle]='{backgroundColor: "lightgreen", icon: "stars", text: "Favoris"}' [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
         (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="addToFavoriteAction(player)" (actionEvent)="detail(player)">
             <div style="height:60px; background-color:white;">
                 <div style="width:50px; height:60px; background-color: lightskyblue; float:left;"></div>
-                <span style="vertical-align:middle">{{ player.pseudo }}<br/>({{ action }})</span>
+                <span style="vertical-align:middle">{{ player.pseudo }}</span>
             </div>
         </drag-element>
-    </div>
 </div>
