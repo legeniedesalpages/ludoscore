@@ -73,6 +73,7 @@ export class GameEditorComponent implements OnInit {
   }
 
   private initFromSearch(params: ParamMap) {
+    this.loading = true;
     console.info('Fill form from bgg id: ' + params.get('id'))
     this.bggId = Number(params.get('id'));
 

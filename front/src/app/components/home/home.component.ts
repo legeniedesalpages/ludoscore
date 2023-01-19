@@ -55,6 +55,6 @@ export class HomeComponent {
   }
 
   public playerList() {
-    this.router.navigate(['player-list']);
+    this.router.navigate(['player-manager']);
   }
 }

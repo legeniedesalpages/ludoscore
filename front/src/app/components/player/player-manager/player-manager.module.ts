@@ -14,30 +14,35 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
-import { PlayerListComponent } from './player-list.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { PlayerService } from 'src/app/core/services/player.service';
+import { PlayerManagerComponent } from './player-manager.component';
+import { PlayerListModule } from '../player-list/player-list.module';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatRippleModule } from '@angular/material/core';
-import { DraggableComponent } from './draggable.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 const routes: Routes = [
   {
     path: '',
-    component: PlayerListComponent,
+    component: PlayerManagerComponent,
     canActivate: [AuthGuardService]
   }
 ];
 
 @NgModule({
-  declarations: [PlayerListComponent, DraggableComponent],
+  declarations: [PlayerManagerComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    DragDropModule,
+    PlayerListModule,
+    MatToolbarModule,
     MatIconModule,
-    MatRippleModule
+    MatButtonModule,
+    MatMenuModule,
+    MatSlideToggleModule
   ],
-  exports: [PlayerListComponent]
+  providers: [PlayerService]
 })
-
-export class PlayerListModule { }
+export class PlayerManagerModule { }

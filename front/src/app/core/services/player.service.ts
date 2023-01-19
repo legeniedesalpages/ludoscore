@@ -13,8 +13,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Observable, tap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Player } from '../model/player.model';
+
+interface PlayerFromApi {
+    id: number,
+    pseudo: string,
+    last_name: string,
+    first_name: string,
+    initials: string,
+    prefered_color: string,
+    gravatar: string
+}
 
 @Injectable()
 export class PlayerService {
@@ -25,10 +35,20 @@ export class PlayerService {
     }
 
     public list(): Observable<Player[]> {
-        return this.http.get<Player[]>(this.playerUrl).pipe(
-            tap(players => {
-                console.log("Players", players)
-            })
-        );
+        return this.http.get<PlayerFromApi[]>(this.playerUrl).pipe(
+            map(players => players.map(player => this.playerFromApiToPlayer(player)))
+        )
+    }
+
+    private playerFromApiToPlayer(playerFromApi: PlayerFromApi): Player {
+        console.log(playerFromApi)
+        return {
+            id: playerFromApi.id,
+            pseudo: playerFromApi.pseudo,
+            lastName: playerFromApi.last_name,
+            firstName: playerFromApi.first_name,            
+            initials: playerFromApi.prefered_color,
+            gravatar: playerFromApi.gravatar
+        }
     }
 }

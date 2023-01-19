@@ -23,10 +23,15 @@ export interface WipeActionStyle {
   template: `
     <div class="hiding-parent">
 
-      <div matRipple [ngStyle]="{'left.px': draggableX, 'cursor': dragging ? 'move' : 'pointer'}" [ngClass]="['draggable', dragClass]" draggable="false" (click)="action()"
+      <div matRipple 
+      [ngStyle]="{'left.px': draggableX, 'cursor': dragging ? 'move' : 'pointer'}" 
+      [ngClass]="['draggable', dragClass]" 
+      draggable="false" (click)="action()"
       (mousedown)="clicMouse($event)" (mouseup)="releaseMouse($event)" (mousemove)="moveMouse($event)" (mouseleave)="leave($event)" 
       (touchmove)="moveFinger($event)" (touchstart)="touch($event)" (touchend)="end($event)">
-        <ng-content></ng-content>
+        Clicked:{{clicked}}<br/>
+        Wipe:{{wipe}}<br/>
+        Dragging:{{dragging}}<br/>
       </div>
 
       <div class="back" [ngStyle]="{'background-color': backgroundColor}">
@@ -53,9 +58,7 @@ export interface WipeActionStyle {
     overflow:hidden;
     background-color:white;
     cursor:pointer;
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.12),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.12), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
   }
   .back {
     width:100%;
@@ -88,8 +91,7 @@ export class DraggableComponent {
   @Output() leftSwipeEvent = new EventEmitter<void>();
   @Output() actionEvent = new EventEmitter<void>();
 
-  private clicked: boolean = false;
-
+  public clicked: boolean = false;
   public wipe: string = ""
   public dragging: boolean = false;
   public backgroundColor: string = ''
@@ -152,10 +154,15 @@ export class DraggableComponent {
     }
     this.wipe = "none"
     this.dragClass = "drop"
+    this.dragging = false
   }
 
 
   moveFinger(event: TouchEvent) {
+    if (this.dragging) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.move(event.touches[0].clientX)
   }
   moveMouse(event: MouseEvent) {
