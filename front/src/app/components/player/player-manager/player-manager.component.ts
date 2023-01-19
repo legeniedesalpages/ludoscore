@@ -11,6 +11,7 @@
     * - Modification    : 
 **/
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Player } from 'src/app/core/model/player.model';
 import { PlayerService } from 'src/app/core/services/player.service';
 
@@ -21,233 +22,22 @@ import { PlayerService } from 'src/app/core/services/player.service';
 export class PlayerManagerComponent implements OnInit {
 
   public players: Player[] = []
+  public loading: boolean = true
 
-  constructor(public playerService: PlayerService) {
+  constructor(public playerService: PlayerService, private router: Router) {
     console.debug("Player Manager starting!")
-    this.players = [
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-      {
-        id: 0,
-        pseudo: "reno",
-        lastName: "",
-        firstName: "",
-        initials: "",
-        gravatar: ""
-      },
-    ]
   }
 
   ngOnInit(): void {
-    //this.playerService.list().subscribe((players) => {
-    //  console.debug("player manager", players)
-    //  this.players = players
-    //})
+    this.loading = true
+    this.playerService.list().subscribe((players) => {
+      console.debug("player manager", players)
+      this.players = players
+      this.loading = false
+    })
+  }
+
+  public addPlayer() {
+    this.router.navigate(['player-editor']);
   }
 }

@@ -21,6 +21,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { PlayerService } from 'src/app/core/services/player.service';
 import { DraggableComponent } from './draggable.component';
+import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 
 const routes: Routes = [
   {
@@ -38,7 +39,8 @@ const routes: Routes = [
     DragDropModule,
     MatIconModule,
     MatRippleModule,
-    MatDividerModule
+    MatDividerModule,
+    LoadingSpinnerModule
   ],
   exports: [PlayerListComponent],
   providers: [PlayerService]

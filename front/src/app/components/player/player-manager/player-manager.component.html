@@ -14,8 +14,9 @@
 
 </mat-toolbar>
 
+<loading-spinner [loading]="loading" [caption]="'Récupère la liste des joueurs'"></loading-spinner>
 <player-list [players]="players"></player-list>
 
-<button mat-fab class="fixedButton" color="primary" aria-label="Ajouter un joueur">
+<button mat-fab class="fixedButton" color="primary" aria-label="Ajouter un joueur" (click)="addPlayer()">
     <mat-icon>add</mat-icon>
 </button>

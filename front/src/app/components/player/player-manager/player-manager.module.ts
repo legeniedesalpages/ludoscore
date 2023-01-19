@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 
 const routes: Routes = [
   {
@@ -41,7 +42,8 @@ const routes: Routes = [
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    LoadingSpinnerModule
   ],
   providers: [PlayerService]
 })

@@ -23,7 +23,7 @@ export class PlayerListComponent implements OnInit {
 
   onScroll() {
     clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => { this.action = ""; }, 1000);
+    this.timeout = setTimeout(() => { this.action = ""; }, 300);
   }
   private timeout: NodeJS.Timeout = setTimeout(() => { this.action = ""; }, 1);
 
