@@ -18,10 +18,9 @@ import { PlayerListComponent } from './player-list.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
-import { DraggableComponent } from './draggable.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { PlayerService } from 'src/app/core/services/player.service';
-import { DraggableComponent2 } from './draggable2.component';
+import { DraggableComponent } from './draggable.component';
 
 const routes: Routes = [
   {
@@ -32,7 +31,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [PlayerListComponent, DraggableComponent, DraggableComponent2],
+  declarations: [PlayerListComponent, DraggableComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
