@@ -10,22 +10,28 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ViewChild, ElementRef, Input, HostListener } from '@angular/core';
-import { Observable, map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter } from '@angular/core';
+import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
 
 interface MoveEvent {
   positionX: number,
   actionWhenDragStart: Function
 }
 
+export interface WipeActionStyle {
+  backgroundColor: string,
+  icon: string,
+  text: string
+}
+
 @Component({
   selector: 'drag-element',
   template: `
       <div class="hiding-parent">
-        <div #back class="back back-style">
-          <div class="txt"><mat-icon>delete</mat-icon>Supprimer</div>
+        <div #back class="back">
+          <div #action class="txt"><mat-icon>{{ icon }}</mat-icon>{{ text}}</div>
         </div>
-        <div #draggable class="front front-style" draggable="false">
+        <div #draggable class="front" draggable="false">
           <ng-content></ng-content>
         </div>
       </div>  
@@ -40,16 +46,24 @@ export class DraggableComponent implements OnInit {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => { this.scroll = false; }, 300);
   }
-  public scroll: boolean = false;
+  private scroll: boolean = false;
   private timeout: NodeJS.Timeout = setTimeout(() => { this.scroll = false; }, 1);
+
+  public icon: string = "";
+  public text: string = "";
 
   @Input() tresholdStartDrag: number = 20;
   @Input() tresholdAction: number = 150;
+  @Input() leftWipeStyle: WipeActionStyle | null = null
+  @Input() rightWipeStyle: WipeActionStyle | null = null
+
+  @Output() rightSwipeEvent = new EventEmitter<void>();
+  @Output() leftSwipeEvent = new EventEmitter<void>();
+  @Output() actionEvent = new EventEmitter<void>();
 
   @ViewChild('draggable', { static: true }) private draggableDiv!: ElementRef<HTMLDivElement>
   @ViewChild('back', { static: true }) private backDiv!: ElementRef<HTMLDivElement>
-
-  public fade: string = "0";
+  @ViewChild('action', { static: true }) private actionDiv!: ElementRef<HTMLDivElement>
 
   ngOnInit() {
 
@@ -80,13 +94,16 @@ export class DraggableComponent implements OnInit {
       switchMap(startPositionX => {
         return mouseMove.pipe(
           map(moveEvent => {
-            this.fade = this.calcFade(moveEvent.positionX, startPositionX).toPrecision(2);
-            this.backDiv.nativeElement.style.opacity = this.fade
-            if (Math.abs(moveEvent.positionX - startPositionX) > this.tresholdStartDrag && !this.scroll) {
+            this.applyFading(moveEvent.positionX, startPositionX)
+            const diff = moveEvent.positionX - startPositionX
+            if (Math.abs(diff) > this.tresholdStartDrag && !this.scroll) {
               moveEvent.actionWhenDragStart()
-              return { left: moveEvent.positionX - startPositionX }
+              return {
+                position: diff,
+                direction: diff > 0 ? 'left' : 'right'
+              }
             }
-            return { left: 0 }
+            return { position: 0 }
           }),
           takeUntil(mouseUp.pipe(
             tap(_ => {
@@ -95,17 +112,41 @@ export class DraggableComponent implements OnInit {
             })
           ))
         );
-      })).subscribe(pos => {
-        this.draggableDiv.nativeElement.style.left = `${pos.left}px`
+      })).subscribe(event => {
+        if (event.direction === 'left' && this.leftWipeStyle != null) {
+          this.applyLeftAction()
+          this.draggableDiv.nativeElement.style.left = `${event.position}px`
+        }
+        if (event.direction === 'right' && this.rightWipeStyle != null) {
+          this.applyRightAction()
+          this.draggableDiv.nativeElement.style.left = `${event.position}px`
+        }
       });
   }
 
-  private calcFade(positionX: number, startPositionX: number): number {
+  private applyLeftAction() {
+    this.backDiv.nativeElement.style.backgroundColor = this.leftWipeStyle?.backgroundColor!
+    this.icon = this.leftWipeStyle?.icon!
+    this.text = this.leftWipeStyle?.text!
+    this.actionDiv.nativeElement.style.flexDirection = 'row'
+  }
+
+  private applyRightAction() {
+    this.backDiv.nativeElement.style.backgroundColor = this.rightWipeStyle?.backgroundColor!
+    this.icon = this.rightWipeStyle?.icon!
+    this.text = this.rightWipeStyle?.text!
+    this.actionDiv.nativeElement.style.flexDirection = 'row-reverse'
+  }
+
+  private applyFading(positionX: number, startPositionX: number) {
     const calc = Math.abs(positionX - startPositionX) / this.tresholdAction
     if (calc > 1) {
-      return 1;
+      this.backDiv.nativeElement.style.opacity = '1'
+      this.actionDiv.nativeElement.style.opacity = '0.8'
+    } else {
+      this.backDiv.nativeElement.style.opacity = calc.toPrecision(2)
+      this.actionDiv.nativeElement.style.opacity = '0.2'
     }
-    return calc;
   }
 
   private mouseMoveEvent(event: MouseEvent): MoveEvent {
