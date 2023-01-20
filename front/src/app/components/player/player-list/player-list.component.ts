@@ -56,4 +56,8 @@ export class PlayerListComponent implements OnInit {
     this.onScroll()
     this.clickOnPlayer.emit(player)
   }
+
+  public gravatarUrl(hash: string | null): string {
+    return "https://www.gravatar.com/avatar/" + hash + "?d=identicon"
+  }
 }

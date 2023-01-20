@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\Player;
+use App\Models\User;
 
 class PlayerController extends Controller
 {
@@ -28,7 +31,19 @@ class PlayerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Log::debug("Saving player : ".$request->name);
+
+        if ($request->user_id != null) {
+            $gravatar = calcGravatar();
+        }
+
+        $player = new Player();
+        $player->pseudo = $request->pseudo;
+        $player->last_name = $request->last_name;
+        $player->first_name = $request->first_name;
+        $player->initials = $request->initials;
+        $player->prefered_color = $request->prefered_color;
+        $player->save();
     }
 
     /**
@@ -52,7 +67,22 @@ class PlayerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        Log::debug("Updating player : ".$request->name);
+
+        $player = Player::whereId($id);
+        $player->update($request->except(['user_id']));
+
+        if ($request->user_id != null) {
+            $gravatar = $this->calcGravatar($request->user_id);
+            $player->update(['gravatar' => $gravatar]);
+        }
+    }
+
+    private function calcGravatar($user_id) {
+        $user = User::where(['id' => $user_id])->first();
+        $gravatar = md5(strtolower(trim($user->email)));
+        Log::debug("Gravatar : ".$gravatar);
+        return $gravatar;
     }
 
     /**

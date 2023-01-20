@@ -27,6 +27,16 @@ interface PlayerFromApi {
     gravatar: string
 }
 
+interface PlayerToSave {
+    pseudo: string,
+    last_name: string,
+    first_name: string,
+    initials: string,
+    prefered_color: string,
+    gravatar: string,
+    user_id: number | null
+}
+
 @Injectable()
 export class PlayerService {
 
@@ -47,8 +57,16 @@ export class PlayerService {
         )
     }
 
-    public save(player: Player, user?: User) {
-        //return this.http.post
+    public save(player: Player, user: User | null): Observable<number> {
+        if (player.id == null) {
+            return this.http.post<PlayerFromApi>(this.playerUrl, this.playerToPlayerFromApi(player, user)).pipe(
+                map(player => player == null ? 0 : player.id)
+            )
+        } else {
+            return this.http.patch<PlayerFromApi>(this.playerUrl + '/' + player.id, this.playerToPlayerFromApi(player, user)).pipe(
+                map(player => player == null ? 0 : player.id)
+            )
+        }
     }
 
     private playerFromApiToPlayer(playerFromApi: PlayerFromApi): Player {
@@ -57,9 +75,22 @@ export class PlayerService {
             id: playerFromApi.id,
             pseudo: playerFromApi.pseudo,
             lastName: playerFromApi.last_name,
-            firstName: playerFromApi.first_name,            
-            initials: playerFromApi.prefered_color,
+            firstName: playerFromApi.first_name,
+            initials: playerFromApi.initials,
+            preferedColor: playerFromApi.prefered_color,
             gravatar: playerFromApi.gravatar
+        }
+    }
+
+    private playerToPlayerFromApi(player: Player, user: User | null): PlayerToSave {
+        return {
+            pseudo: player.pseudo,
+            last_name: player.lastName,
+            first_name: player.firstName,
+            initials: player.initials,
+            gravatar: player.gravatar == null ? "" : player.gravatar,
+            prefered_color: player.preferedColor,
+            user_id: user == null ? null : user.id
         }
     }
 }

@@ -27,7 +27,7 @@ Route::get('/auth/logout', [AuthController::class, 'logoutUser']);
 Route::middleware('auth:sanctum')->controller(UserController::class)->group(function () {
     Route::get('/users/player/{id}', 'player');
 });
-Route::middleware('auth:sanctum')->resource('users', UserController::class);
+Route::middleware('auth:sanctum')->resource('users', UserController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->resource('users', UserController::class);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->resource('player', PlayerController::class);
+Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->resource('player', PlayerController::class);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->resource('games', GameController::class);
+Route::middleware('auth:sanctum')->resource('games', GameController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------
