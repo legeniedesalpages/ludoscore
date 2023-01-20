@@ -39,7 +39,8 @@ class PlayerController extends Controller
      */
     public function show($id)
     {
-        //
+        $player = DB::table('players')->where('id', $id)->first();
+        return $player;
     }
 
     /**

@@ -17,12 +17,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
+import { MatRippleModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
@@ -31,6 +29,8 @@ import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PlayerEditorComponent } from './player-editor.component';
 import { PlayerService } from 'src/app/core/services/player.service';
+import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
+import { UserService } from 'src/app/core/services/user.service';
 
 const routes: Routes = [
   {
@@ -51,19 +51,18 @@ const routes: Routes = [
     ReactiveFormsModule,
     MatInputModule,
     MatIconModule,
-    MatProgressSpinnerModule,
     MatGridListModule,
-    MatDividerModule,
     MatRippleModule,
     MatCheckboxModule,
     MatSelectModule,
     MatChipsModule,
     MatSnackBarModule,
-    MatNativeDateModule,
-    MatDialogModule
+    MatDialogModule,
+    LoadingSpinnerModule
   ],
   providers: [
-    PlayerService
+    PlayerService,
+    UserService
   ]
 })
 

@@ -26,7 +26,6 @@ import { MatchEditorComponent } from './components/match-editor/match-editor.com
 import { MatchEditorModule } from './components/match-editor/match-editor.module';
 import { PlayerManagerComponent } from './components/player/player-manager/player-manager.component';
 import { PlayerManagerModule } from './components/player/player-manager/player-manager.module';
-import { PlayerEditorComponent } from './components/player/player-editor/player-editor.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -34,9 +33,10 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'find-game', component: FindGameComponent },
   { path: 'game-list', component: GameListComponent },  
-  { path: 'match-editor', component: MatchEditorComponent, data: { animation: 'isRight' } },
-  { path: 'player-manager', component: PlayerManagerComponent, data: { animation: 'isRight' } },
-  { path: 'player-editor', component: PlayerEditorComponent },
+  { path: 'match-editor', component: MatchEditorComponent },
+  { path: 'player-manager', component: PlayerManagerComponent },
+  { path: 'player-editor', loadChildren: () => import('./components/player/player-editor/player-editor.module').then(m => m.PlayerEditorModule) },
+  { path: 'player-editor/:id', loadChildren: () => import('./components/player/player-editor/player-editor.module').then(m => m.PlayerEditorModule) },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
 ];
 

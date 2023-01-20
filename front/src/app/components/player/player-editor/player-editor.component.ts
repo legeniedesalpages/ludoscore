@@ -10,14 +10,16 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DateValidator } from 'src/app/core/services/date.validator';
-import { FindGameService } from 'src/app/core/services/find-game.service';
-import { GameService } from 'src/app/core/services/game.service';
 import { Location } from '@angular/common';
+import { PlayerService } from 'src/app/core/services/player.service';
+import { UserService } from 'src/app/core/services/user.service';
+import { switchMap, map } from 'rxjs';
+import { Player } from 'src/app/core/model/player.model';
+import { User } from 'src/app/core/model/user.model';
 
 @Component({
   selector: 'player-editor',
@@ -26,38 +28,82 @@ import { Location } from '@angular/common';
 })
 export class PlayerEditorComponent implements OnInit {
 
-  public loading: boolean;
-  public saving: boolean;
-  public gameEditorForm: FormGroup;
+  @ViewChild('userInput', {static: false}) private userInput!: ElementRef
 
-  constructor(private router: Router, private route: ActivatedRoute,
-    private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService, private location: Location
+  public loading: boolean
+  public saving: boolean
+  public creating: boolean
+  public playerEditorForm: FormGroup
+
+  private player!: Player
+  public user!: User
+
+  constructor(
+    private route: ActivatedRoute, private location: Location,
+    private playerService: PlayerService, private userService: UserService,
+    private snackBar: MatSnackBar
   ) {
+
+    console.debug("Init player editor")
 
     this.loading = true;
     this.saving = false;
+    this.creating = true;
 
-    this.gameEditorForm = new FormGroup({
-      name: new FormControl('', Validators.required),
-      cooperative: new FormControl('', Validators.required),
-      minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
-      maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
-      ownership: new FormControl('', DateValidator.dateValidator),
+    this.playerEditorForm = new FormGroup({
+      pseudo: new FormControl('', Validators.required),
+      lastName: new FormControl(''),
+      firstName: new FormControl(''),
+      initials: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]),
+      preferedColor: new FormControl(''),
     });
   }
 
   ngOnInit(): void {
-
     this.route.paramMap.subscribe((params) => {
+      if (params.get("id") === null) {
+        console.debug("Create new user")
+        this.loading = false;
+        this.creating = true;
+      } else {
+        const id = params.get("id")
+        console.debug("Edit existing user id:", id)
+        this.creating = false;
 
-      console.log(params)
+        this.playerService.get(Number(id)).pipe(
+          map(player => {
+            this.player = player
+            this.playerEditorForm.get('pseudo')?.setValue(player.pseudo)
+            this.playerEditorForm.get('lastName')?.setValue(player.lastName)
+            this.playerEditorForm.get('firstName')?.setValue(player.firstName)
+            this.playerEditorForm.get('initials')?.setValue(player.initials)
+            return player.id
+          }),
+          switchMap(idPlayer => this.userService.getFromPlayerId(idPlayer))
+         ).subscribe(user => {
+          this.user = user
+          this.loading = false;
+        })
+      }
     });
   }
 
-  public saveGame(): void {
+  public savePlayer(): void {
+    //this.playerService.s
+    this.snackBar.open("Joueur enregistré", 'Fermer', {
+      duration: 5000
+    })
   }
 
   public cancel() {
     this.location.back()
+  }
+
+  public searchUser() {
+    console.log("Search user")
+  }
+
+  public deletePalyer() {
+    console.log("Delete Player")
   }
 }
