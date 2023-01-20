@@ -10,14 +10,14 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '@angular/common';
 import { PlayerService } from 'src/app/core/services/player.service';
 import { UserService } from 'src/app/core/services/user.service';
-import { switchMap, map } from 'rxjs';
+import { switchMap, map, of } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
 import { User } from 'src/app/core/model/user.model';
 
@@ -28,18 +28,16 @@ import { User } from 'src/app/core/model/user.model';
 })
 export class PlayerEditorComponent implements OnInit {
 
-  @ViewChild('userInput', {static: false}) private userInput!: ElementRef
-
   public loading: boolean
   public saving: boolean
   public creating: boolean
   public playerEditorForm: FormGroup
 
   private player!: Player
-  public user!: User
+  public user: User | null = null
 
   constructor(
-    private route: ActivatedRoute, private location: Location,
+    private route: ActivatedRoute, private location: Location, private router: Router,
     private playerService: PlayerService, private userService: UserService,
     private snackBar: MatSnackBar
   ) {
@@ -79,19 +77,44 @@ export class PlayerEditorComponent implements OnInit {
             this.playerEditorForm.get('initials')?.setValue(player.initials)
             return player.id
           }),
-          switchMap(idPlayer => this.userService.getFromPlayerId(idPlayer))
-         ).subscribe(user => {
-          this.user = user
-          this.loading = false;
+          switchMap(idPlayer => idPlayer != null ? this.userService.getFromPlayerId(idPlayer) : of(null))
+        ).subscribe({
+          next: (user) => {
+            this.user = user
+            this.loading = false;
+          },
+          error: _ => {
+            this.loading = false
+          }
         })
       }
-    });
+    })
   }
 
   public savePlayer(): void {
-    //this.playerService.s
-    this.snackBar.open("Joueur enregistré", 'Fermer', {
-      duration: 5000
+
+    this.saving = true;
+    const player: Player = {
+      id: this.player == null ? null : this.player.id,
+      lastName: this.playerEditorForm.get('lastName')?.value, // nom
+      firstName: this.playerEditorForm.get('firstName')?.value, // prénom
+      pseudo: this.playerEditorForm.get('pseudo')?.value,
+      initials: this.playerEditorForm.get('initials')?.value,
+      preferedColor: "",
+      gravatar: ""
+    }
+
+    this.playerService.save(player, this.user).subscribe({
+      next: _ => {
+        this.saving = false;
+        this.snackBar.open("Joueur enregistré", 'Fermer', {
+          duration: 5000
+        })
+        this.router.navigate(['player-manager']);
+      },
+      error: _ => {
+        this.saving = false
+      }
     })
   }
 

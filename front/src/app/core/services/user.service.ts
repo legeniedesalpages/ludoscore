@@ -50,7 +50,6 @@ export class UserService {
     }
 
     private userFromApiToUser(userFromApi: UserFromApi): User {
-        console.log(userFromApi)
         return {
             id: userFromApi.id,
             name: userFromApi.name,

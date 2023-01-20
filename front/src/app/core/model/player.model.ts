@@ -11,10 +11,11 @@
     * - Modification    : 
 **/
 export interface Player {
-    id: number,
+    id: number | null,
     lastName: string, // nom
     firstName: string, // prénom
     pseudo: string,
     initials: string,
-    gravatar: string
+    preferedColor: string,
+    gravatar: string | null
 }
