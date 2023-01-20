@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Player } from 'src/app/core/model/player.model';
 import { PlayerService } from 'src/app/core/services/player.service';
 
@@ -20,6 +20,8 @@ import { PlayerService } from 'src/app/core/services/player.service';
   styleUrls: ['./player-list.component.css']
 })
 export class PlayerListComponent implements OnInit {
+
+  @Output() clickOnPlayer = new EventEmitter<Player>();
 
   onScroll() {
     clearTimeout(this.timeout);
@@ -52,5 +54,6 @@ export class PlayerListComponent implements OnInit {
     console.warn("action:" + player)
     this.action = "action"
     this.onScroll()
+    this.clickOnPlayer.emit(player)
   }
 }

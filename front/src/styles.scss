@@ -30,12 +30,12 @@ $item-text-accent-color: mat.get-color-from-palette($ludoscore-primary, 500);
 html,
 body {
   margin: 0;
+  padding: 0;
   height: 100%;
 }
 
 body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  overflow: visible;
 }
 
 .title {

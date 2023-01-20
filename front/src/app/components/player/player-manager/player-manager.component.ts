@@ -37,6 +37,10 @@ export class PlayerManagerComponent implements OnInit {
     })
   }
 
+  public editPlayer(player: Player) {
+    this.router.navigate(['player-editor', player.id]);
+  }
+
   public addPlayer() {
     this.router.navigate(['player-editor']);
   }

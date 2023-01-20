@@ -13,8 +13,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Observable, map } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { Player } from '../model/player.model';
+import { User } from '../model/user.model';
 
 interface PlayerFromApi {
     id: number,
@@ -38,6 +39,16 @@ export class PlayerService {
         return this.http.get<PlayerFromApi[]>(this.playerUrl).pipe(
             map(players => players.map(player => this.playerFromApiToPlayer(player)))
         )
+    }
+
+    public get(id: number): Observable<Player> {
+        return this.http.get<PlayerFromApi>(this.playerUrl + "/" + id).pipe(
+            map(player => this.playerFromApiToPlayer(player))
+        )
+    }
+
+    public save(player: Player, user?: User) {
+        //return this.http.post
     }
 
     private playerFromApiToPlayer(playerFromApi: PlayerFromApi): Player {
