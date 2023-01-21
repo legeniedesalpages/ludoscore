@@ -17,6 +17,7 @@ import { Match } from '../model/match.model';
 import { GameService } from './game.service';
 import { Game } from '../model/game.model';
 import { MatchPlayer } from '../model/matchPlayer.model';
+import { Player } from '../model/player.model';
 
 @Injectable()
 export class MatchService implements OnInit {
@@ -57,12 +58,20 @@ export class MatchService implements OnInit {
         this.currentMatch.game = game;
         for (let i = 0; i < game.min_players; i++) {
             console.debug("Add minimum players: " + game.min_players)
-            this.currentMatch.matchPlayers.push({
-                player: null,
-                color: null,
-                tags: []
-            })
+            this.addPlayer()
         }
+    }
+
+    public setPlayer(matchPlayer: MatchPlayer, player: Player) {
+        const matchPlayerFound = this.currentMatch.matchPlayers.find(element => element.uuid == matchPlayer.uuid);
+        if (matchPlayerFound) {
+            matchPlayerFound.player = [player]
+        }
+    }
+
+    public canLaunchGame() {
+        console.log("houla", this.currentMatch.matchPlayers)
+        return this.currentMatch.matchPlayers.every(matchPlayer => matchPlayer.player.length > 0)
     }
 
     public minPlayer(): number {
@@ -87,9 +96,10 @@ export class MatchService implements OnInit {
     public addPlayer() {
         if (this.canAddPlayer()) {
             this.currentMatch.matchPlayers.push({
-                player: null,
+                player: [],
                 color: null,
-                tags: []
+                tags: [],
+                uuid: "" + Math.random()
             })
         } else {
             throw Error("Max Players excedeed for this game")

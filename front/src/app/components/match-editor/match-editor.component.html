@@ -9,25 +9,24 @@
         <div class="title">{{ matchService.getGame()?.title }}</div>
 
         <fieldset>
-            <div *ngFor="let player of getPlayers()" class="editor">
+            <div *ngFor="let matchPlayer of getPlayers()" class="editor">
                 <div class="row">
                     <div class="column">
                         <mat-form-field appearance="fill">
                             <mat-label>Joueur</mat-label>
-                            <mat-select>
-                                <mat-option style="background-color: green"><mat-icon>search</mat-icon>Chercher un
+                            <mat-select (selectionChange)="playerSelected($event.value, matchPlayer)">
+                                <mat-option style="background-color: green" value="search"><mat-icon>search</mat-icon>Chercher un
                                     joueur...</mat-option>
-                                <mat-option style="background-color: lightcoral"><mat-icon>groups</mat-icon>Créer un
+                                <mat-option style="background-color: lightcoral" value="team"><mat-icon>groups</mat-icon>Créer un
                                     groupe...</mat-option>
-                                <mat-option *ngFor="let choosingPlayer of filteredPlayerList()" [value]="choosingPlayer.id"
-                                    [ngStyle]="{'background': choosingPlayer.color}">
+                                <mat-option *ngFor="let choosingPlayer of filteredPlayerList()" [value]="choosingPlayer">
                                     {{choosingPlayer.pseudo}}
                                 </mat-option>
                             </mat-select>
                             <div style="opacity: 1; padding-right:5px;" matSuffix>
-                                <button mat-mini-fab color="primary" (click)="deletePlayer(player)"><mat-icon>color_lens</mat-icon></button>
-                                <span style="padding:5px"><button mat-mini-fab color="primary" (click)="deletePlayer(player)"><mat-icon>code</mat-icon></button></span>
-                                <button mat-mini-fab color="warn" (click)="deletePlayer(player)"><mat-icon>delete</mat-icon></button>
+                                <button mat-mini-fab color="primary" (click)="deletePlayer(matchPlayer)"><mat-icon>color_lens</mat-icon></button>
+                                <span style="padding:5px"><button mat-mini-fab color="primary" (click)="deletePlayer(matchPlayer)"><mat-icon>code</mat-icon></button></span>
+                                <button mat-mini-fab color="warn" (click)="deletePlayer(matchPlayer)"><mat-icon>delete</mat-icon></button>
                             </div>
                         </mat-form-field>
                     </div>
@@ -43,7 +42,7 @@
 
             <div class="row button_row">
                 <div class="column">
-                    <button mat-raised-button color="warn" (click)="play()">Jouer !</button>
+                    <button mat-raised-button color="warn" (click)="play()" [disabled]="canLaunchGame">Jouer !</button>
                 </div>
             </div>
 
