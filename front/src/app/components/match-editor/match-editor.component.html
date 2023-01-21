@@ -11,22 +11,43 @@
         [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl() + ') no-repeat top / cover'}">
         <div class="title">{{ matchService.getGame()?.title }}</div>
 
-        <button mat-raised-button color="primary" (click)="addPlayer()" *ngIf="canAddPlayer()">Reprendre les memes joueurs que la dernière fois</button>
-
-        <div class="players">
-            <div class="player" *ngFor="let player of getPlayers()">
-                <div *ngIf="player.player == null">
-                    <button mat-raised-button color="primary" (click)="editPlayer()">Choisir le joueur</button>
-                    <button mat-raised-button color="warn" (click)="deletePlayer(player)">Supprimer le joueur</button>
+        <fieldset>
+            <div *ngFor="let player of getPlayers()" class="editor">
+                <div class="row">
+                    <div class="column">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Joueur</mat-label>
+                            <mat-select>
+                                <mat-option *ngFor="let food of foods" [value]="food.value" [ngStyle]="{'background': food.value}">
+                                        {{food.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
                 </div>
             </div>
-            <button mat-raised-button color="primary" (click)="addPlayer()" *ngIf="canAddPlayer()">Ajouter un joueur</button>
-            <button mat-raised-button color="primary" (click)="addPlayer()" *ngIf="canAddPlayer()"><mat-icon>shuffle</mat-icon>Choisir l'ordre des joueurs au hasard</button>
-            <button mat-raised-button color="primary" (click)="addPlayer()" *ngIf="canAddPlayer()"><mat-icon>dice</mat-icon>Attribuer des couleurs au hasard</button>
-            <button mat-raised-button color="primary" (click)="addPlayer()" *ngIf="canAddPlayer()">Lancer la partie</button>
-        </div>
 
-        <button mat-raised-button color="warn" (click)="cancel()">cancel</button>
+            <div class="row button_row" *ngIf="canAddPlayer()">
+                <div class="column">
+                    <button mat-raised-button color="primary" (click)="addPlayer()">Ajouter un
+                        joueur</button>
+                </div>
+            </div>
+
+            <div class="row button_row">
+                <div class="column">
+                    <button mat-raised-button color="warn" (click)="play()">Jouer !</button>
+                </div>
+            </div>
+
+            <div class="row button_row">
+                <div class="column">
+                    <button mat-raised-button (click)="cancel()">Annuler</button>
+                </div>
+            </div>
+
+        </fieldset>
+
     </div>
 
 </div>
