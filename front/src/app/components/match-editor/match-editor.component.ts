@@ -17,13 +17,14 @@ import { MatchService } from 'src/app/core/services/match.service';
 import { GameService } from 'src/app/core/services/game.service';
 import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
 import { MatDialog } from '@angular/material/dialog';
-import { MatchPlayerEditorComponent } from './match-player-editor/match-player-editor.component';
+import { PlayerService } from 'src/app/core/services/player.service';
+import { Observable, map, tap } from 'rxjs';
 
-interface Food {
-  value: string;
-  viewValue: string;
+interface ChoosingPlayer {
+  color: string
+  id: number
+  pseudo: string
 }
-
 
 @Component({
   selector: 'match-editor',
@@ -33,17 +34,11 @@ interface Food {
 export class MatchEditorComponent implements OnInit {
 
   public loading: boolean;
+  public choosingPlayers: ChoosingPlayer[] = []
 
-  foods: Food[] = [
-    {value: 'green', viewValue: 'Chercher un joueur...'},
-    {value: 'pink', viewValue: 'Créer une equipe...'},
-    {value: 'white', viewValue: 'Renaud'},
-    {value: 'white', viewValue: 'Anne-Cécile'},
-    {value: 'white', viewValue: 'Dimitri'},
-  ];
-
-  constructor(private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar, private dialog: MatDialog,
-    public matchService: MatchService, private gameService: GameService) {
+  constructor(private router: Router, private route: ActivatedRoute,
+    private snackBar: MatSnackBar, private dialog: MatDialog,
+    public matchService: MatchService, private gameService: GameService, private playerService: PlayerService) {
 
     this.loading = false;
   }
@@ -59,8 +54,19 @@ export class MatchEditorComponent implements OnInit {
     console.log("Action:" + gameId)
     this.gameService.get(gameId).subscribe((game) => {
       this.matchService.setGame(game)
-      this.loading = false;
-      console.log(this.imageUrl())
+      this.playerService.list().pipe(
+        map(players => players.map(player => {
+          return { color: 'white', id: player.id == null ? 0 : player.id, pseudo: player.pseudo }
+        })
+        )).subscribe({
+          next: (players) => {
+            this.choosingPlayers = players
+            this.loading = false;
+          },
+          error: _ => {
+            this.loading = false;
+          }
+        })
     })
   }
 
@@ -74,21 +80,10 @@ export class MatchEditorComponent implements OnInit {
 
   public addPlayer() {
     this.matchService.addPlayer()
-/*     this.dialog.open(MatchPlayerEditorComponent, {
-      data: {
-      }
-    }) */
   }
 
   public canAddPlayer(): boolean {
     return this.matchService.canAddPlayer()
-  }
-
-  public editPlayer() {
-    this.dialog.open(MatchPlayerEditorComponent, {
-      data: {
-      }
-    })
   }
 
   public deletePlayer(matchPlayer: MatchPlayer) {

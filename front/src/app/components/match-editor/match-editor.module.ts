@@ -30,6 +30,8 @@ import { GameEditorModule } from '../game-editor/game-editor.module';
 import { MatChipsModule } from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete'; 
 import { MatchPlayerTagEditorComponent } from './match-player-tag-editor/match-player-tag-editor.component';
+import { MatchService } from 'src/app/core/services/match.service';
+import { PlayerService } from 'src/app/core/services/player.service';
 
 
 const routes: Routes = [
@@ -62,7 +64,9 @@ const routes: Routes = [
     MatAutocompleteModule
   ],
   providers: [
-    GameService
+    GameService,
+    PlayerService,
+    MatchService
   ]
 })
 export class MatchEditorModule { }
