@@ -19,6 +19,12 @@ import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatchPlayerEditorComponent } from './match-player-editor/match-player-editor.component';
 
+interface Food {
+  value: string;
+  viewValue: string;
+}
+
+
 @Component({
   selector: 'match-editor',
   templateUrl: './match-editor.component.html',
@@ -27,6 +33,14 @@ import { MatchPlayerEditorComponent } from './match-player-editor/match-player-e
 export class MatchEditorComponent implements OnInit {
 
   public loading: boolean;
+
+  foods: Food[] = [
+    {value: 'green', viewValue: 'Chercher un joueur...'},
+    {value: 'pink', viewValue: 'Créer une equipe...'},
+    {value: 'white', viewValue: 'Renaud'},
+    {value: 'white', viewValue: 'Anne-Cécile'},
+    {value: 'white', viewValue: 'Dimitri'},
+  ];
 
   constructor(private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar, private dialog: MatDialog,
     public matchService: MatchService, private gameService: GameService) {
@@ -60,10 +74,10 @@ export class MatchEditorComponent implements OnInit {
 
   public addPlayer() {
     this.matchService.addPlayer()
-    this.dialog.open(MatchPlayerEditorComponent, {
+/*     this.dialog.open(MatchPlayerEditorComponent, {
       data: {
       }
-    })
+    }) */
   }
 
   public canAddPlayer(): boolean {
@@ -87,5 +101,8 @@ export class MatchEditorComponent implements OnInit {
 
   public cancel() {
     this.matchService.cancel()
+  }
+
+  public play() {
   }
 }
