@@ -19,14 +19,15 @@
                                     joueur...</mat-option>
                                 <mat-option style="background-color: lightcoral"><mat-icon>groups</mat-icon>Créer un
                                     groupe...</mat-option>
-                                <mat-option *ngFor="let choosingPlayer of choosingPlayers" [value]="choosingPlayer.id"
+                                <mat-option *ngFor="let choosingPlayer of filteredPlayerList()" [value]="choosingPlayer.id"
                                     [ngStyle]="{'background': choosingPlayer.color}">
                                     {{choosingPlayer.pseudo}}
                                 </mat-option>
                             </mat-select>
-                            <div style="opacity: 1; padding-right:10px;" matSuffix>
-                                <button mat-mini-fab color="primary"
-                                    (click)="deletePlayer(player)"><mat-icon>delete</mat-icon></button>
+                            <div style="opacity: 1; padding-right:5px;" matSuffix>
+                                <button mat-mini-fab color="primary" (click)="deletePlayer(player)"><mat-icon>color_lens</mat-icon></button>
+                                <span style="padding:5px"><button mat-mini-fab color="primary" (click)="deletePlayer(player)"><mat-icon>code</mat-icon></button></span>
+                                <button mat-mini-fab color="warn" (click)="deletePlayer(player)"><mat-icon>delete</mat-icon></button>
                             </div>
                         </mat-form-field>
                     </div>
