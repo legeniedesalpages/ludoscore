@@ -15,12 +15,19 @@
                         <mat-form-field appearance="fill">
                             <mat-label>Joueur</mat-label>
                             <mat-select>
-                                <mat-option style="background-color: green"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
-                                <mat-option style="background-color: lightcoral"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
-                                <mat-option *ngFor="let choosingPlayer of choosingPlayers" [value]="choosingPlayer.id" [ngStyle]="{'background': choosingPlayer.color}">
-                                        {{choosingPlayer.pseudo}}
+                                <mat-option style="background-color: green"><mat-icon>search</mat-icon>Chercher un
+                                    joueur...</mat-option>
+                                <mat-option style="background-color: lightcoral"><mat-icon>groups</mat-icon>Créer un
+                                    groupe...</mat-option>
+                                <mat-option *ngFor="let choosingPlayer of choosingPlayers" [value]="choosingPlayer.id"
+                                    [ngStyle]="{'background': choosingPlayer.color}">
+                                    {{choosingPlayer.pseudo}}
                                 </mat-option>
                             </mat-select>
+                            <div style="opacity: 1; padding-right:10px;" matSuffix>
+                                <button mat-mini-fab color="primary"
+                                    (click)="deletePlayer(player)"><mat-icon>delete</mat-icon></button>
+                            </div>
                         </mat-form-field>
                     </div>
                 </div>
