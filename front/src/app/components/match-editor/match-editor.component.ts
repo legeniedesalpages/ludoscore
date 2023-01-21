@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatchService } from 'src/app/core/services/match.service';
@@ -18,7 +18,6 @@ import { GameService } from 'src/app/core/services/game.service';
 import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerService } from 'src/app/core/services/player.service';
-import { map } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
 
 @Component({
@@ -95,6 +94,7 @@ export class MatchEditorComponent implements OnInit {
 
   public addPlayer() {
     this.matchService.addPlayer()
+    this.canLaunchGame = this.matchService.canLaunchGame()
   }
 
   public canAddPlayer(): boolean {
@@ -102,7 +102,8 @@ export class MatchEditorComponent implements OnInit {
   }
 
   public deletePlayer(matchPlayer: MatchPlayer) {
-    return this.matchService.deletePlayer(matchPlayer)
+    this.matchService.deletePlayer(matchPlayer)
+    this.canLaunchGame = this.matchService.canLaunchGame()
   }
 
   public haveToSearchGame(): boolean {
@@ -114,5 +115,12 @@ export class MatchEditorComponent implements OnInit {
   }
 
   public play() {
+    this.loading = true;
+    this.matchService.createMatch().subscribe({
+      next: _ => {
+        this.router.navigate([''])
+      },
+      error: _ => this.loading = false
+    })
   }
 }

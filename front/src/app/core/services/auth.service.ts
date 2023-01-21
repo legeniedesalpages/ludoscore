@@ -13,7 +13,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { mergeMap } from 'rxjs/operators';
-import { tap, catchError, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from '../model/user.model';
