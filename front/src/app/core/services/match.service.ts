@@ -10,27 +10,29 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Match } from '../model/match.model';
-import { GameService } from './game.service';
 import { Game } from '../model/game.model';
 import { MatchPlayer } from '../model/matchPlayer.model';
 import { Player } from '../model/player.model';
+import { tap } from 'rxjs/operators';
+
+interface MatchForApi {
+    id_game: number,
+    teams: MatchPlayer[]
+}
 
 @Injectable()
-export class MatchService implements OnInit {
+export class MatchService {
 
     private readonly matchUrl = environment.apiURL + '/api/match';
 
     private currentMatch!: Match;
 
-    constructor(private http: HttpClient, private gameService: GameService) {
-        this.reset()
-    }
-
-    ngOnInit(): void {
+    constructor(private http: HttpClient) {
+        this.init()
     }
 
     public hasGameSelected(): boolean {
@@ -65,13 +67,13 @@ export class MatchService implements OnInit {
     public setPlayer(matchPlayer: MatchPlayer, player: Player) {
         const matchPlayerFound = this.currentMatch.matchPlayers.find(element => element.uuid == matchPlayer.uuid);
         if (matchPlayerFound) {
-            matchPlayerFound.player = [player]
+            matchPlayerFound.players = [player]
         }
     }
 
     public canLaunchGame() {
         console.log("houla", this.currentMatch.matchPlayers)
-        return this.currentMatch.matchPlayers.every(matchPlayer => matchPlayer.player.length > 0)
+        return this.currentMatch.matchPlayers.every(matchPlayer => matchPlayer.players.length > 0)
     }
 
     public minPlayer(): number {
@@ -96,7 +98,7 @@ export class MatchService implements OnInit {
     public addPlayer() {
         if (this.canAddPlayer()) {
             this.currentMatch.matchPlayers.push({
-                player: [],
+                players: [],
                 color: null,
                 tags: [],
                 uuid: "" + Math.random()
@@ -117,15 +119,28 @@ export class MatchService implements OnInit {
     }
 
     public cancel() {
-        this.reset()
+        this.init()
     }
 
-    private reset() {
+    private init() {
         this.currentMatch = {
             game: null,
             matchStarted: false,
             tags: [],
             matchPlayers: []
         }
+    }
+
+    public createMatch() {
+        if (this.currentMatch == null) {
+            throw Error("No current match")
+        }
+        const macth: MatchForApi = {
+            id_game: this.currentMatch.game!.id!,
+            teams: this.currentMatch.matchPlayers
+        }
+        return this.http.post(this.matchUrl, macth).pipe(
+            tap(_ => this.currentMatch.matchStarted = true)
+        )
     }
 }

@@ -42,7 +42,7 @@
 
             <div class="row button_row">
                 <div class="column">
-                    <button mat-raised-button color="warn" (click)="play()" [disabled]="canLaunchGame">Jouer !</button>
+                    <button mat-raised-button color="warn" (click)="play()" [disabled]="!canLaunchGame">Jouer !</button>
                 </div>
             </div>
 
