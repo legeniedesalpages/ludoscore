@@ -19,6 +19,7 @@ import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerService } from 'src/app/core/services/player.service';
 import { Observable, map, tap } from 'rxjs';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 interface ChoosingPlayer {
   color: string
@@ -33,11 +34,13 @@ interface ChoosingPlayer {
 })
 export class MatchEditorComponent implements OnInit {
 
+  private choosingPlayers: ChoosingPlayer[] = []
+
   public loading: boolean;
-  public choosingPlayers: ChoosingPlayer[] = []
 
   constructor(private router: Router, private route: ActivatedRoute,
     private snackBar: MatSnackBar, private dialog: MatDialog,
+    private formBuilder: FormBuilder,
     public matchService: MatchService, private gameService: GameService, private playerService: PlayerService) {
 
     this.loading = false;
@@ -56,7 +59,11 @@ export class MatchEditorComponent implements OnInit {
       this.matchService.setGame(game)
       this.playerService.list().pipe(
         map(players => players.map(player => {
-          return { color: 'white', id: player.id == null ? 0 : player.id, pseudo: player.pseudo }
+          return {
+            color: 'white',
+            id: player.id == null ? 0 : player.id,
+            pseudo: player.pseudo
+          }
         })
         )).subscribe({
           next: (players) => {
@@ -68,6 +75,10 @@ export class MatchEditorComponent implements OnInit {
           }
         })
     })
+  }
+
+  public filteredPlayerList(): ChoosingPlayer[] {
+    return this.choosingPlayers
   }
 
   public imageUrl(): string | undefined {
@@ -92,6 +103,10 @@ export class MatchEditorComponent implements OnInit {
 
   public haveToSearchGame(): boolean {
     return this.matchService.getGame() == null ? true : false
+  }
+
+  public canLaunchGame() {
+    
   }
 
   public cancel() {
