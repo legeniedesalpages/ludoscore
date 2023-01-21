@@ -13,7 +13,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Player } from '../model/player.model';
 import { User } from '../model/user.model';
 
@@ -70,7 +70,6 @@ export class PlayerService {
     }
 
     private playerFromApiToPlayer(playerFromApi: PlayerFromApi): Player {
-        console.log(playerFromApi)
         return {
             id: playerFromApi.id,
             pseudo: playerFromApi.pseudo,

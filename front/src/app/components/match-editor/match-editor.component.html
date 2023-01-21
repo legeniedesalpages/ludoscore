@@ -1,9 +1,6 @@
 <div class="match-editor">
 
     <div *ngIf="haveToSearchGame()">
-        <div class="search-criteria">
-            <button mat-mini-fab color="primary"><mat-icon>add</mat-icon></button>
-        </div>
         <game-list (gameSelectedEvent)="gameSelected($event)"></game-list>
     </div>
 
@@ -18,8 +15,10 @@
                         <mat-form-field appearance="fill">
                             <mat-label>Joueur</mat-label>
                             <mat-select>
-                                <mat-option *ngFor="let food of foods" [value]="food.value" [ngStyle]="{'background': food.value}">
-                                        {{food.viewValue}}
+                                <mat-option style="background-color: green"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
+                                <mat-option style="background-color: lightcoral"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
+                                <mat-option *ngFor="let choosingPlayer of choosingPlayers" [value]="choosingPlayer.id" [ngStyle]="{'background': choosingPlayer.color}">
+                                        {{choosingPlayer.pseudo}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
