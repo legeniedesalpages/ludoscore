@@ -14,7 +14,8 @@ import { Player } from "./player.model";
 import { Tag } from "./tag.model";
 
 export interface MatchPlayer {
-    player: Player | null,
+    player: Player[],
     color: String | null,
     tags: Tag[],
+    uuid: string
 }

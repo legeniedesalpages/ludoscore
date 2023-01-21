@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatchService } from 'src/app/core/services/match.service';
@@ -18,14 +18,8 @@ import { GameService } from 'src/app/core/services/game.service';
 import { MatchPlayer } from 'src/app/core/model/matchPlayer.model';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerService } from 'src/app/core/services/player.service';
-import { Observable, map, tap } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
-
-interface ChoosingPlayer {
-  color: string
-  id: number
-  pseudo: string
-}
+import { map } from 'rxjs';
+import { Player } from 'src/app/core/model/player.model';
 
 @Component({
   selector: 'match-editor',
@@ -34,19 +28,22 @@ interface ChoosingPlayer {
 })
 export class MatchEditorComponent implements OnInit {
 
-  private choosingPlayers: ChoosingPlayer[] = []
+  private choosingPlayers: Player[] = []
 
   public loading: boolean;
+  public canLaunchGame: boolean = false
 
   constructor(private router: Router, private route: ActivatedRoute,
     private snackBar: MatSnackBar, private dialog: MatDialog,
-    private formBuilder: FormBuilder,
     public matchService: MatchService, private gameService: GameService, private playerService: PlayerService) {
 
     this.loading = false;
   }
 
   ngOnInit(): void {
+    console.log("init")
+    this.loading = true
+    this.loadingPlayers()
   }
 
   public saveGame(): void {
@@ -57,27 +54,34 @@ export class MatchEditorComponent implements OnInit {
     console.log("Action:" + gameId)
     this.gameService.get(gameId).subscribe((game) => {
       this.matchService.setGame(game)
-      this.playerService.list().pipe(
-        map(players => players.map(player => {
-          return {
-            color: 'white',
-            id: player.id == null ? 0 : player.id,
-            pseudo: player.pseudo
-          }
-        })
-        )).subscribe({
-          next: (players) => {
-            this.choosingPlayers = players
-            this.loading = false;
-          },
-          error: _ => {
-            this.loading = false;
-          }
-        })
+      this.loadingPlayers()
     })
   }
 
-  public filteredPlayerList(): ChoosingPlayer[] {
+  private loadingPlayers() {
+    this.playerService.list().subscribe({
+      next: (players) => {
+        this.choosingPlayers = players
+        this.loading = false;
+      },
+      error: _ => {
+        this.loading = false;
+      }
+    })
+  }
+
+  public playerSelected(event: Player | string, matchPlayer: MatchPlayer) {
+    if (event === 'search') {
+      console.log("Lancement de la recherche")
+    } else if (event === 'team') {
+      console.log("Création d'une équipe")
+    } else {
+      this.matchService.setPlayer(matchPlayer, event as Player)
+    }
+    this.canLaunchGame = this.matchService.canLaunchGame()
+  }
+
+  public filteredPlayerList(): Player[] {
     return this.choosingPlayers
   }
 
@@ -103,10 +107,6 @@ export class MatchEditorComponent implements OnInit {
 
   public haveToSearchGame(): boolean {
     return this.matchService.getGame() == null ? true : false
-  }
-
-  public canLaunchGame() {
-    
   }
 
   public cancel() {
