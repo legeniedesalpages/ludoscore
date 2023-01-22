@@ -20,6 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { AuthGuardService } from 'src/app/core/services/auth-guard.service';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
+import { FindGameService } from 'src/app/core/services/find-game.service';
 
 
 const routes: Routes = [
@@ -39,6 +40,9 @@ const routes: Routes = [
     MatInputModule,
     MatIconModule,
     LoadingSpinnerModule
+  ],
+  providers: [
+    FindGameService
   ]
 })
 export class HomeModule { }

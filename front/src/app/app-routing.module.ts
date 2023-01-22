@@ -26,6 +26,8 @@ import { MatchEditorComponent } from './components/match-editor/match-editor.com
 import { MatchEditorModule } from './components/match-editor/match-editor.module';
 import { PlayerManagerComponent } from './components/player/player-manager/player-manager.component';
 import { PlayerManagerModule } from './components/player/player-manager/player-manager.module';
+import { MatchFinisherComponent } from './components/match-finisher/match-finisher.component';
+import { MatchFinisherModule } from './components/match-finisher/match-finisher.module';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -35,6 +37,7 @@ const routes: Routes = [
   { path: 'game-list', component: GameListComponent },  
   { path: 'match-editor', component: MatchEditorComponent },
   { path: 'player-manager', component: PlayerManagerComponent },
+  { path: 'match-finisher/:id', component: MatchFinisherComponent },
   { path: 'player-editor', loadChildren: () => import('./components/player/player-editor/player-editor.module').then(m => m.PlayerEditorModule) },
   { path: 'player-editor/:id', loadChildren: () => import('./components/player/player-editor/player-editor.module').then(m => m.PlayerEditorModule) },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
@@ -49,7 +52,8 @@ const routes: Routes = [
     RegisterModule,
     GameListModule,
     MatchEditorModule,
-    PlayerManagerModule
+    PlayerManagerModule,
+    MatchFinisherModule
   ],
   exports: [RouterModule]
 })

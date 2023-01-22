@@ -117,8 +117,8 @@ export class MatchEditorComponent implements OnInit {
   public play() {
     this.loading = true;
     this.matchService.createMatch().subscribe({
-      next: _ => {
-        this.router.navigate([''])
+      next: matchId => {
+        this.router.navigate(['match-finisher', matchId]);
       },
       error: _ => this.loading = false
     })

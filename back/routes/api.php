@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->resource('games', GameController::class, ['ex
 Route::middleware('auth:sanctum')->controller(MatchController::class)->group(function () {
     Route::get('/matches/current', 'currentMatch');
     Route::post('/match', 'store');
+    Route::get('/match/{id}', 'show');
 });
 
 /*
