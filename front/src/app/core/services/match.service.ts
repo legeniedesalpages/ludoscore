@@ -18,6 +18,7 @@ import { Game } from '../model/game.model';
 import { MatchPlayer } from '../model/matchPlayer.model';
 import { Player } from '../model/player.model';
 import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 interface MatchForApi {
     id_game: number,
@@ -139,8 +140,12 @@ export class MatchService {
             id_game: this.currentMatch.game!.id!,
             teams: this.currentMatch.matchPlayers
         }
-        return this.http.post(this.matchUrl, macth).pipe(
+        return this.http.post<number>(this.matchUrl, macth).pipe(
             tap(_ => this.currentMatch.matchStarted = true)
         )
+    }
+
+    public finishMatch() {
+
     }
 }

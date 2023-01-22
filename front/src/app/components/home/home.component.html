@@ -13,8 +13,9 @@
                 Démarrer une partie
             </button>
 
-            <button mat-flat-button class="material-cust-large-button" *ngIf="matchInProgress">
-                Mettre fin à la partie
+            <button mat-flat-button class="material-cust-large-button" *ngIf="matchInProgress" (click)="finishMatch()"
+                [ngStyle]="{'background': 'linear-gradient(rgba(0,0,0,.5), rgba(255,255,255,.5)), url(' + imageUrl + ') no-repeat top / cover'}">
+                <span class="text-end">Mettre fin à la partie</span>
             </button>
         </div>
 

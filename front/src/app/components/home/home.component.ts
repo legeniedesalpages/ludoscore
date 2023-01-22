@@ -13,6 +13,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameSearchDetail } from 'src/app/core/model/game-search-detail.model';
+import { Game } from 'src/app/core/model/game.model';
+import { FindGameService } from 'src/app/core/services/find-game.service';
+import { GameService } from 'src/app/core/services/game.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -22,13 +26,15 @@ import { environment } from 'src/environments/environment';
 })
 export class HomeComponent {
 
-  options: any;
-  getCurrentMatchUrl = environment.apiURL + '/api/matches/current';
+  options: any
+  getCurrentMatchUrl = environment.apiURL + '/api/matches/current'
 
-  dataReceived: boolean;
-  matchInProgress: boolean;
+  dataReceived: boolean
+  matchInProgress: boolean
+  imageUrl: string = ""
+  matchId: number = 0
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private gameService: GameService) {
     this.matchInProgress = false;
     this.dataReceived = false;
 
@@ -38,11 +44,22 @@ export class HomeComponent {
       }),
       withCredentials: true
     };
-    
+
     this.http.get(this.getCurrentMatchUrl, this.options).subscribe(response => {
-      this.dataReceived = true;
+
       console.debug("Match en cours:", response);
-      this.matchInProgress = JSON.parse(JSON.stringify(response)).hasCurrent;
+      const res = JSON.parse(JSON.stringify(response))
+      this.matchInProgress = res.hasCurrent;
+      this.matchId = res.match.id
+
+      this.gameService.get(res.match.game_id).subscribe({
+
+        next: (game: Game) => {
+          this.imageUrl = `'${game.image_id}'`;
+          this.dataReceived = true;
+        }
+      }
+      )
     });
   }
 
@@ -56,5 +73,10 @@ export class HomeComponent {
 
   public playerList() {
     this.router.navigate(['player-manager']);
+  }
+
+  public finishMatch() {
+    console.log("finish")
+    this.router.navigate(['match-finisher', this.matchId]);
   }
 }

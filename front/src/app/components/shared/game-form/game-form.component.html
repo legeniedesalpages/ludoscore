@@ -1,0 +1,8 @@
+<form class="game-form"
+    [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat top / cover'}"
+    *ngIf="!loading">
+
+    <fieldset [disabled]="saving">
+        <ng-content></ng-content>
+    </fieldset>
+</form>

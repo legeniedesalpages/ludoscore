@@ -7,11 +7,14 @@ use App\Models\GameMatch;
 use App\Models\Team;
 use App\Models\TeamPlayer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class MatchController extends Controller
 {
+
+    public function show($id)
+    {
+        return GameMatch::findOrFail($id);
+    }
 
     public function currentMatch()
     {
@@ -31,6 +34,14 @@ class MatchController extends Controller
 
     public function store(Request $request)
     {
+        $hasCurrentMatch = GameMatch::where('running', true)->get();
+        if (count($hasCurrentMatch) == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => "Another match has already started"
+            ], 500);
+        }
+
         $match = new GameMatch;
         $match->game_id = $request->id_game;
         $match->canceled = false;
@@ -41,8 +52,8 @@ class MatchController extends Controller
 
         $i = 0;
         foreach ($request->teams as $requestTeam) {
-
             $i++;
+
             $team = new Team;
             $team->color = "";
             $team->tags = "{}";
@@ -53,12 +64,7 @@ class MatchController extends Controller
 
             $j = 0;
             foreach ($requestTeam['players'] as $requestPlayer) {
-
                 $j++;
-                Log::debug("Request player");
-                Log::debug($requestPlayer);
-                Log::debug("************");
-
 
                 $teamPlayer = new TeamPlayer;
                 $teamPlayer->team_id = $team->id;
@@ -67,5 +73,7 @@ class MatchController extends Controller
                 $teamPlayer->save();
             }
         }
+
+        return $match->id;
     }
 }
