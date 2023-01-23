@@ -73,23 +73,13 @@ class AuthController extends Controller
 
                 $request->session()->regenerate();
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'User Logged In Successfully',
-                    'id' => Auth::user()->id
-                ], 200);
+                return response()->json(Auth::user()->id);
             } else {
 
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Invalid credentials'
-                ], 401);
+                return response()->json('Invalid credentials', 401);
             }
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
+            return response()->json($th->getMessage(), 500);
         }
     }
 
@@ -98,9 +88,6 @@ class AuthController extends Controller
         Auth::guard()->logout();
         $request->session()->invalidate();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'User Logged Out Successfully'
-        ]);
+        return response()->json('User Logged Out Successfully');
     }
 }

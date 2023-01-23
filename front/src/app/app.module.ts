@@ -19,11 +19,12 @@ import { HttpClientModule, HttpClientXsrfModule, HTTP_INTERCEPTORS } from "@angu
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { HttpXSRFInterceptor } from './core/interceptors/xsrf.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { AppComponent } from './components/layout/app/app.component';
-import { FooterModule } from './components/layout/footer/footer.module';
-import { HeaderModule } from './components/layout/header/header.module';
-import { LoadingSpinnerModule } from './components/layout/spinner/loading-spinner.module';
-import { MatchService } from './core/services/match.service';
+import { AppComponent } from './app.component';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { environment } from 'src/environments/environment';
+import { AuthState } from './core/state/auth/auth.state';
 
 @NgModule({
   declarations: [
@@ -33,30 +34,24 @@ import { MatchService } from './core/services/match.service';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-
+    MatSnackBarModule,
     AppRoutingModule,
 
-    MatSnackBarModule,
-
-    HeaderModule,
-    FooterModule,
-    LoadingSpinnerModule,
-    
+    // HTTP
     HttpClientModule,
-    HttpClientXsrfModule.withOptions({
-      cookieName: 'XSRF-TOKEN',
-      headerName: 'X-CSRF-TOKEN'
-    }),
+    HttpClientXsrfModule.withOptions({ cookieName: 'XSRF-TOKEN', headerName: 'X-CSRF-TOKEN' }),
 
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000'
-    })
+    // PWA
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: !isDevMode(), registrationStrategy: 'registerWhenStable:30000' }),
+
+    // NgXs
+    NgxsModule.forRoot([AuthState], { developmentMode: !environment.production }),
+    NgxsStoragePluginModule.forRoot({ key: AuthState }),
+    NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production })
   ],
 
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
-    MatchService
+    { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true }
   ],
 
   bootstrap: [AppComponent]
