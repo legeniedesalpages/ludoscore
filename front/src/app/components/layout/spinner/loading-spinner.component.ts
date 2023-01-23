@@ -14,21 +14,30 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'loading-spinner',
-  templateUrl: './loading-spinner.component.html',
-  styleUrls: ['./loading-spinner.component.css']
+  template: `
+    <div class="spinner" *ngIf="loading">
+      <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+      <div class="caption">{{ caption }}...</div>
+    </div>
+  `,
+  styles: [`
+   .spinner {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .caption {
+      align-self: center;
+      opacity: 0.6;
+      margin-left: 10px;
+    }
+  `]
 })
-export class LoadingSpinnerComponent implements OnInit {
+export class LoadingSpinnerComponent {
 
-  @Input() loading: boolean
+  @Input() loading: boolean = false
+  @Input() caption: string = ""
 
-  @Input() caption: string
-
-  constructor() {
-    this.loading = false
-    this.caption = ""
-  }
-
-  ngOnInit() {
-    console.debug("Loading spinner");
-  }
 }

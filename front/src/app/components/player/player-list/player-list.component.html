@@ -1,9 +1,0 @@
-<div *ngFor="let player of players">
-        <drag-element [leftWipeStyle]='{backgroundColor: "lightgreen", icon: "stars", text: "Favoris"}' [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
-        (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="addToFavoriteAction(player)" (actionEvent)="detail(player)">
-            <div style="height:80px; background-color:white; border-bottom: 1px solid gainsboro;">
-                <img style="vertical-align:middle" src="{{ gravatarUrl(player.gravatar) }}" />
-                <span style="padding: 10px;">{{ player.pseudo }}</span>
-            </div>
-        </drag-element>
-</div>

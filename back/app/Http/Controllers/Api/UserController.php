@@ -16,19 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-       
-    }
 
     /**
      * Display the specified resource.
@@ -44,14 +33,6 @@ class UserController extends Controller
         } else {
             return ['name' => $user->name];
         }
-        
-    }
-
-    /**
-     * Return the user that match the player with the $id
-     */
-    public function player($id) {
-        return User::where(['player_id' => $id])->first();
     }
 
     /**
