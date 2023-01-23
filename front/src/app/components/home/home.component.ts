@@ -10,73 +10,28 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { GameSearchDetail } from 'src/app/core/model/game-search-detail.model';
-import { Game } from 'src/app/core/model/game.model';
-import { FindGameService } from 'src/app/core/services/find-game.service';
-import { GameService } from 'src/app/core/services/game.service';
-import { environment } from 'src/environments/environment';
+import { Select, Store } from '@ngxs/store';
+import { DoLogout } from 'src/app/core/state/auth/auth.actions';
+import { AuthState } from 'src/app/core/state/auth/auth.state';
+import { Observable } from 'rxjs';
+import { User } from 'src/app/core/model/user.model';
 
 @Component({
-  selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss', './home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
 
-  options: any
-  getCurrentMatchUrl = environment.apiURL + '/api/matches/current'
+  @Select(AuthState) loggedUser!: Observable<User>;
 
-  dataReceived: boolean
-  matchInProgress: boolean
-  imageUrl: string = ""
-  matchId: number = 0
+  public loggingOut: boolean = false
 
-  constructor(private http: HttpClient, private router: Router, private gameService: GameService) {
-    this.matchInProgress = false;
-    this.dataReceived = false;
-
-    this.options = {
-      headers: new HttpHeaders({
-        Accept: 'application/json'
-      }),
-      withCredentials: true
-    };
-
-    this.http.get(this.getCurrentMatchUrl, this.options).subscribe(response => {
-
-      console.debug("Match en cours:", response);
-      const res = JSON.parse(JSON.stringify(response))
-      this.matchInProgress = res.hasCurrent;
-      this.matchId = res.match.id
-
-      this.gameService.get(res.match.game_id).subscribe({
-
-        next: (game: Game) => {
-          this.imageUrl = `'${game.image_id}'`;
-          this.dataReceived = true;
-        }
-      }
-      )
-    });
+  constructor(private store: Store) {
   }
 
-  public findGame() {
-    this.router.navigate(['find-game']);
-  }
-
-  public gameList() {
-    this.router.navigate(['game-list']);
-  }
-
-  public playerList() {
-    this.router.navigate(['player-manager']);
-  }
-
-  public finishMatch() {
-    console.log("finish")
-    this.router.navigate(['match-finisher', this.matchId]);
+  public logout() {
+    this.loggingOut = true
+    this.store.dispatch(new DoLogout())
   }
 }

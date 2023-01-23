@@ -2,11 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\GameSearchController;
-use App\Http\Controllers\Api\MatchController;
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GameController;
-use App\Http\Controllers\Api\PlayerController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,50 +20,11 @@ Route::get('/auth/logout', [AuthController::class, 'logoutUser']);
 | User
 |--------------------------------------------------------------------------
 */
-
-Route::middleware('auth:sanctum')->controller(UserController::class)->group(function () {
-    Route::get('/users/player/{id}', 'player');
-});
-Route::middleware('auth:sanctum')->resource('users', UserController::class, ['except' => ['edit', 'create']]);
-
-/*
-|--------------------------------------------------------------------------
-| Player
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create']]);
+Route::middleware('auth:sanctum')->resource('user', UserController::class, ['except' => ['edit', 'create', 'store']]);
 
 /*
 |--------------------------------------------------------------------------
 | Game
 |--------------------------------------------------------------------------
 */
-
-Route::middleware('auth:sanctum')->resource('games', GameController::class, ['except' => ['edit', 'create']]);
-
-/*
-|--------------------------------------------------------------------------
-| Match
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth:sanctum')->controller(MatchController::class)->group(function () {
-    Route::get('/matches/current', 'currentMatch');
-    Route::post('/match', 'store');
-    Route::get('/match/{id}', 'show');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Search
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth:sanctum')->get('/game_search', ['as' => 'game_search', function () {
-    return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = ['searchText' => request()->q]);
-}]);
-
-Route::middleware('auth:sanctum')->get('/game_search_detail', ['as' => 'game_search_detail', function () {
-    return app()->make(GameSearchController::class)->callAction('searchById', $parameters = ['id' => request()->id]);
-}]);
+Route::middleware('auth:sanctum')->resource('game', GameController::class, ['except' => ['edit', 'create', 'store']]);
