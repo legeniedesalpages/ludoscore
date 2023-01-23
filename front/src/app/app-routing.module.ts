@@ -12,48 +12,19 @@
 **/
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeModule } from './components/home/home.module';
-import { HomeComponent } from './components/home/home.component';
-import { FindGameComponent } from './components/find-game/find-game.component';
-import { FindGameModule } from './components/find-game/find-game.module';
-import { LoginComponent } from './components/login/login.component';
-import { LoginModule } from './components/login/login.module';
-import { GameListModule } from './components/game-list/game-list.module';
-import { GameListComponent } from './components/game-list/game-list.component';
-import { RegisterComponent } from './components/register/register.component';
-import { RegisterModule } from './components/register/register.module';
-import { MatchEditorComponent } from './components/match-editor/match-editor.component';
-import { MatchEditorModule } from './components/match-editor/match-editor.module';
-import { PlayerManagerComponent } from './components/player/player-manager/player-manager.component';
-import { PlayerManagerModule } from './components/player/player-manager/player-manager.module';
-import { MatchFinisherComponent } from './components/match-finisher/match-finisher.component';
-import { MatchFinisherModule } from './components/match-finisher/match-finisher.module';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'find-game', component: FindGameComponent },
-  { path: 'game-list', component: GameListComponent },  
-  { path: 'match-editor', component: MatchEditorComponent },
-  { path: 'player-manager', component: PlayerManagerComponent },
-  { path: 'match-finisher/:id', component: MatchFinisherComponent },
-  { path: 'player-editor', loadChildren: () => import('./components/player/player-editor/player-editor.module').then(m => m.PlayerEditorModule) },
-  { path: 'player-editor/:id', loadChildren: () => import('./components/player/player-editor/player-editor.module').then(m => m.PlayerEditorModule) },
-  { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game-editor/game-editor.module').then(m => m.GameEditorModule) }
+  { path: '', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: {animation: 'isRight'} },
+  { path: 'login', loadChildren: () => import('./components/login/login.module').then(m => m.LoginModule), data: {animation: 'isLeft'} },
+  { path: 'match-editor', loadChildren: () => import('./components/match/match-editor/match-editor.module').then(m => m.MatchEditorModule), data: {animation: 'isLeft'} },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { useHash: true }),
-    HomeModule,
-    FindGameModule,
-    LoginModule,
-    RegisterModule,
-    GameListModule,
-    MatchEditorModule,
-    PlayerManagerModule,
-    MatchFinisherModule
+    RouterModule.forRoot(routes, { 
+      useHash: false,
+      scrollPositionRestoration: 'top'
+    })
   ],
   exports: [RouterModule]
 })

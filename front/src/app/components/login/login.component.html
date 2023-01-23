@@ -1,50 +1,34 @@
 <div class="login-page">
-    <mat-card class="login-card">
-        <mat-card-header>
-            <mat-card-title>Se connecter</mat-card-title>
-        </mat-card-header>
 
-        <mat-card-content>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
 
-            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <mat-form-field appearance="fill">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email">
+        </mat-form-field>
 
-                <mat-form-field appearance="fill">
-                    <mat-label>Email</mat-label>
-                    <input matInput formControlName="email">
-                </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Mot de passe</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'"
+                type="button" [attr.aria-pressed]="hidePassword">
+                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+        </mat-form-field>
 
-                <mat-form-field appearance="fill">
-                    <mat-label>Mot de passe</mat-label>
-                    <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-                    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword"
-                        [attr.aria-label]="'Hide password'" type="button" [attr.aria-pressed]="hidePassword">
-                        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                    </button>
-                </mat-form-field>
+        <div *ngIf="errorMessage">
+            <button mat-button color="warn" type="button">{{errorMessage}}</button>
+        </div>
 
-                <div class="link">
-                    <a routerLink="/register">Créer un compte</a>
-                </div>
-                <div class="link">
-                    <a routerLink="/">Mot de passe oublié</a>
-                </div>
+        <button mat-raised-button color="primary" [disabled]="!loginForm.valid" [hidden]="loading">
+            C'est parti !
+        </button>
 
-                <div *ngIf="errorMessage">
-                    <button mat-button color="warn" type="button">{{errorMessage}}</button>
-                </div>                
+        <div *ngIf="loading">
+            <div class="spinner">
+                <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+            </div>
+        </div>
 
-                <button mat-raised-button color="primary" [disabled]="!loginForm.valid" [hidden]="loading">
-                    C'est parti !
-                </button>
-
-                <div *ngIf="loading">
-                    <div class="spinner">
-                        <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
-                    </div>
-                </div>
-
-            </form>
-
-        </mat-card-content>
-    </mat-card>
+    </form>
 </div>

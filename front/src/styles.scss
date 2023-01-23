@@ -1,15 +1,18 @@
 @use '@angular/material' as mat;
+@use './app/components/layout/layout-theme.scss' as header;
+@use './app/components/home/home-theme.scss' as home;
+
 @include mat.core();
 
 $ludoscore-primary: mat.define-palette(mat.$blue-palette);
-$ludoscore-accent: mat.define-palette(mat.$blue-palette);
-$ludoscore-warn: mat.define-palette(mat.$red-palette);
+$ludoscore-accent: mat.define-palette(mat.$teal-palette);
+$ludoscore-warn: mat.define-palette(mat.$deep-orange-palette);
 
 $ludoscore-theme: mat.define-light-theme(
   (
     color: (
       primary: $ludoscore-primary,
-      accent: $ludoscore-primary,
+      accent: $ludoscore-accent,
       warn: $ludoscore-warn,
       is-dark: false,
     ),
@@ -18,14 +21,9 @@ $ludoscore-theme: mat.define-light-theme(
   )
 );
 
-$title-background-color: mat.get-color-from-palette($ludoscore-primary, 500);
-$title-text-color: mat.get-color-from-palette($ludoscore-primary, 500-contrast);
-
-$item-background-color: mat.get-color-from-palette($ludoscore-primary, 100);
-$item-text-color: mat.get-color-from-palette($ludoscore-primary, 100-contrast);
-$item-text-accent-color: mat.get-color-from-palette($ludoscore-primary, 500);
-
 @include mat.all-component-themes($ludoscore-theme);
+@include home.theme($ludoscore-theme);
+@include header.theme($ludoscore-theme);
 
 html,
 body {
@@ -38,20 +36,6 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-.title {
-  background-color: $title-background-color;
-  color: $title-text-color;
-}
-
-.text {
-  background-color: $item-background-color;
-  color: $item-text-color;
-}
-
-.emphasis {
-  color: $item-text-accent-color;
-}
-
-.thumbnail {
-  background-color: $title-background-color;
+.menu-spacer {
+  flex: 1 1 auto;
 }

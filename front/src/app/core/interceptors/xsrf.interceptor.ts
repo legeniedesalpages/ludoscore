@@ -14,7 +14,7 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
@@ -25,16 +25,13 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-        const headerName = 'X-CSRFTOKEN';
-        const respHeaderName = 'X-XSRF-TOKEN';
-
         let token = this.tokenExtractor.getToken() as string;
-        if (token !== null && !req.headers.has(headerName)) {
+        if (token !== null && !req.headers.has('X-CSRFTOKEN')) {
             req = req.clone({
                 withCredentials: true,
                 headers: new HttpHeaders({
                     Accept: 'application/json'
-                }).append(respHeaderName, token)
+                }).append('X-XSRF-TOKEN', token)
             });
         } else {
             req = req.clone({
@@ -50,14 +47,17 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
             // redirect to login page if not authenticated (401) and if is not a authentication page
             if (err.status == 401 && !req.url.includes('api/auth')) {
                 console.warn("No more authenticated, redirect to login page")
-                this.authService.logout().finally(() => {
+                this.authService.logout().subscribe(_ => {
                     this.router.navigate(['/login']);
                 })
             }
 
-            this.snackBar.open("Erreur: " + err.error.message, 'Fermer', {
-                duration: 5000
-            })
+            // show error if internal server error
+            if (err.status == 500) {
+                this.snackBar.open("Erreur: " + err.error.message, 'Fermer', {
+                    duration: 5000
+                })
+            }
 
             return throwError(() => new Error(err.error.message));
         }));
