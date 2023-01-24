@@ -33,8 +33,8 @@ export class LoginComponent implements OnInit {
     this.hidePassword = true
 
     this.loginForm = new FormGroup({
-      email: new FormControl('renaud_balu@hotmail.com', [Validators.email, Validators.required]),
-      password: new FormControl('Renaud21', Validators.required),
+      email: new FormControl('', [Validators.email, Validators.required]),
+      password: new FormControl('', Validators.required),
     });
 
     this.errors = false
