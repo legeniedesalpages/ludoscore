@@ -16,6 +16,7 @@ import { DoLogout } from 'src/app/core/state/auth/auth.actions';
 import { AuthState } from 'src/app/core/state/auth/auth.state';
 import { Observable } from 'rxjs';
 import { User } from 'src/app/core/model/user.model';
+import { PusherService } from 'src/app/core/services/pusher/pusher.service';
 
 @Component({
   templateUrl: './home.component.html',
@@ -27,7 +28,8 @@ export class HomeComponent {
 
   public loggingOut: boolean = false
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private pusherService: PusherService) {
+    pusherService.init()
   }
 
   public logout() {

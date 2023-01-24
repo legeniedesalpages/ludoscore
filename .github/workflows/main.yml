@@ -54,11 +54,13 @@ jobs:
       with:
         args: zip -qq -r ./deployment/back.zip ./back
     
-    - name: Création du fichier .env
-      uses: "finnp/create-file-action@master"
-      env:
-        FILE_NAME: "./deployment/.env"
-        FILE_DATA: "IMAGES_PATH=/home/lgdafrg/www/ludoscoreimages\rSESSION_DRIVER=cookie\rSESSION_DOMAIN=.lgda.fr\rSANCTUM_STATEFUL_DOMAINS=*.lgda.fr:443,lgda.fr,www.lgda.fr\rAPP_NAME=\"LudoScore Back\"\rAPP_ENV=local\rAPP_KEY=${{ secrets.APP_KEY }}\rAPP_DEBUG=true\rAPP_URL=https://www.lgda.fr/ludoscoreback\rLOG_CHANNEL=stack\rLOG_DEPRECATIONS_CHANNEL=null\rLOG_LEVEL=debug\rDB_HOST=lgdafrglegenie.mysql.db\rDB_PORT=3306\rDB_DATABASE=lgdafrglegenie\rDB_USERNAME=${{ secrets.BDD_USERNAME }}\rDB_PASSWORD=${{ secrets.BDD_PASSWORD }}\rDB_PREFIX=ludo$\r"
+    - name: Remplacement des variables d'environnement
+      run: |-
+        sed -i "s/$VARIABLE.IMAGES_PATH/${{var.IMAGES_PATH}}/g" "./deployment/.env"
+        sed -i "s/$SECRET.APP_KEY/${{secrets.APP_KEY}}/g" "./deployment/.env"
+        sed -i "s/$SECRET.BDD_USERNAME/${{secrets.BDD_USERNAME}}/g" "./deployment/.env"
+        sed -i "s/$SECRET.BDD_PASSWORD/${{secrets.BDD_PASSWORD}}/g" "./deployment/.env"
+        sed -i "s/$VARIABLE.BDD_PREFIX/${{vars.BDD_PREFIX}}/g" "./deployment/.env"
       
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
