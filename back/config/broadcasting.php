@@ -33,8 +33,8 @@ return [
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
+            'secret' => env('PUSHER_APP_SECRET', "6655e7ea814a9ff56681"),
+            'app_id' => env('PUSHER_APP_ID', "38b8aa27d92ef96861d1"),
             'options' => [
                 'host' => env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',
                 'port' => env('PUSHER_PORT', 443),
