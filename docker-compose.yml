@@ -31,6 +31,7 @@ services:
     container_name: laravel-app
     ports:
       - 8000:80
+      - 6001:6001
     environment:
       - APACHE_RUN_USER=#1000
       - APACHE_RUN_GROUP=#1000
