@@ -61,6 +61,12 @@ jobs:
         sed -i "s/SECRET_BDD_USERNAME/${{secrets.BDD_USERNAME}}/g" "./deployment/.env"
         sed -i "s/SECRET_BDD_PASSWORD/${{secrets.BDD_PASSWORD}}/g" "./deployment/.env"
         sed -i "s/VARIABLE_BDD_PREFIX/${{vars.BDD_PREFIX}}/g" "./deployment/.env"
+        sed -i "s/SECRET_PUSHER_APP_ID/${{secrets.PUSHER_APP_ID}}/g" "./deployment/.env"
+        sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./deployment/.env"
+        sed -i "s/SECRET_PUSHER_APP_SECRET/${{secrets.PUSHER_APP_SECRET}}/g" "./deployment/.env"
+        sed -i "s/VARIABLE_BACK_URL/${{vars.BACK_URL}}/g" "./deployment/.env"
+        sed -i "s/VARIABLE_NAME/${{vars.NAME}}/g" "./deployment/.env"
+        
       
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
