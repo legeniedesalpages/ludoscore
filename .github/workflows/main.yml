@@ -56,11 +56,11 @@ jobs:
     
     - name: Remplacement des variables d'environnement
       run: |-
-        sed -i "s/$VARIABLE.IMAGES_PATH/${{vars.IMAGES_PATH}}/g" "./deployment/.env"
-        sed -i "s/$SECRET.APP_KEY/${{secrets.APP_KEY}}/g" "./deployment/.env"
-        sed -i "s/$SECRET.BDD_USERNAME/${{secrets.BDD_USERNAME}}/g" "./deployment/.env"
-        sed -i "s/$SECRET.BDD_PASSWORD/${{secrets.BDD_PASSWORD}}/g" "./deployment/.env"
-        sed -i "s/$VARIABLE.BDD_PREFIX/${{vars.BDD_PREFIX}}/g" "./deployment/.env"
+        sed -i "s/VARIABLE_IMAGES_PATH/${{vars.IMAGES_PATH}}/g" "./deployment/.env"
+        sed -i "s/SECRET_APP_KEY/${{secrets.APP_KEY}}/g" "./deployment/.env"
+        sed -i "s/SECRET_BDD_USERNAME/${{secrets.BDD_USERNAME}}/g" "./deployment/.env"
+        sed -i "s/SECRET_BDD_PASSWORD/${{secrets.BDD_PASSWORD}}/g" "./deployment/.env"
+        sed -i "s/VARIABLE_BDD_PREFIX/${{vars.BDD_PREFIX}}/g" "./deployment/.env"
       
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
