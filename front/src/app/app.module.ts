@@ -25,6 +25,7 @@ import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from 'src/environments/environment';
 import { AuthState } from './core/state/auth/auth.state';
+import { PusherService } from './core/services/pusher/pusher.service';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { AuthState } from './core/state/auth/auth.state';
   ],
 
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
+    PusherService
   ],
 
   bootstrap: [AppComponent]
