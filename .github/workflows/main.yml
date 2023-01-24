@@ -56,7 +56,7 @@ jobs:
     
     - name: Remplacement des variables d'environnement
       run: |-
-        sed -i "s/$VARIABLE.IMAGES_PATH/${{var.IMAGES_PATH}}/g" "./deployment/.env"
+        sed -i "s/$VARIABLE.IMAGES_PATH/${{vars.IMAGES_PATH}}/g" "./deployment/.env"
         sed -i "s/$SECRET.APP_KEY/${{secrets.APP_KEY}}/g" "./deployment/.env"
         sed -i "s/$SECRET.BDD_USERNAME/${{secrets.BDD_USERNAME}}/g" "./deployment/.env"
         sed -i "s/$SECRET.BDD_PASSWORD/${{secrets.BDD_PASSWORD}}/g" "./deployment/.env"
