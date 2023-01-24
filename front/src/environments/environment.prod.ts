@@ -15,5 +15,6 @@ export const environment = {
     title: 'Ludoscore',
     apiURL: 'https://www.lgda.fr/ludoscoreback',
     imagesURL: 'https://www.lgda.fr/ludoscoreimages',
-    recaptchaV2SiteKey:'6LdpRPcjAAAAAJoT5EM4BaIoPwlviqnhT1gfH9aw',
+    recaptchaV2SiteKey:'SECRET_RECAPTCHA_SITE_KEY',
+    pusherApiKey: 'SECRET_PUSHER_APP_KEY'
 };

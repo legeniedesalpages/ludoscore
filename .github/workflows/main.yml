@@ -19,6 +19,11 @@ jobs:
     steps:
     
     - uses: actions/checkout@v3
+
+    - name: Remplacement des variables d'environnement 'angular'
+      run: |-
+        sed -i "s/SECRET_RECAPTCHA_SITE_KEY/${{secrets.RECAPTCHA_SITE_KEY}}/g" "./front/src/environment/environment.prod.ts"
+        sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./front/src/environment/environment.prod.ts"
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -54,7 +59,7 @@ jobs:
       with:
         args: zip -qq -r ./deployment/back.zip ./back
     
-    - name: Remplacement des variables d'environnement
+    - name: Remplacement des variables d'environnement '.env'
       run: |-
         sed -i "s/VARIABLE_IMAGES_PATH/${{vars.IMAGES_PATH}}/g" "./deployment/.env"
         sed -i "s/SECRET_APP_KEY/${{secrets.APP_KEY}}/g" "./deployment/.env"
@@ -65,8 +70,7 @@ jobs:
         sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./deployment/.env"
         sed -i "s/SECRET_PUSHER_APP_SECRET/${{secrets.PUSHER_APP_SECRET}}/g" "./deployment/.env"
         sed -i "s/VARIABLE_BACK_URL/${{vars.BACK_URL}}/g" "./deployment/.env"
-        sed -i "s/VARIABLE_NAME/${{vars.NAME}}/g" "./deployment/.env"
-        
+        sed -i "s/VARIABLE_NAME/${{vars.NAME}}/g" "./deployment/.env"        
       
     - name: Copie des fichiers pour le déploiement
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
