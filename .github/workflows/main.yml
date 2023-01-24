@@ -20,10 +20,10 @@ jobs:
     
     - uses: actions/checkout@v3
 
-    - name: Remplacement des variables d'environnement 'angular'
+    - name: Remplacement des variables d'environnement 'front'
       run: |-
-        sed -i "s/SECRET_RECAPTCHA_SITE_KEY/${{secrets.RECAPTCHA_SITE_KEY}}/g" "./front/src/environment/environment.prod.ts"
-        sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./front/src/environment/environment.prod.ts"
+        sed -i "s/SECRET_RECAPTCHA_SITE_KEY/${{secrets.RECAPTCHA_SITE_KEY}}/g" "./front/src/environments/environment.prod.ts"
+        sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./front/src/environments/environment.prod.ts"
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
