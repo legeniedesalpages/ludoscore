@@ -40,28 +40,32 @@
             </div>
         </div>
 
-        <div class="sidenav-overlay" [@fadeInOut]="menuState">
-        </div>
+        <div class="sidenav-overlay" [@fadeInOut]="menuState"></div>
         <div class="sidenav" [@slideInOut]="menuState" [ngClass]="menuState">
-            <div class="header-sidenav">
-                <div class="title-sidenav">Filtrer</div>
-                <span class="menu-spacer"></span>
-                <button mat-icon-button (click)="toggleMenu()" class="close-sidenav">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </div>
+            <div class="content-sidenav">
+                <div class="header-sidenav">
+                    <div class="title-sidenav">Filtrer</div>
+                    <span class="menu-spacer"></span>
+                    <button mat-icon-button (click)="toggleMenu()" class="close-sidenav">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
 
-            <p><mat-checkbox color="primary">Uniquement coopératif</mat-checkbox></p>
-            <p><mat-checkbox color="primary">Pour 2 joueurs exclusivement</mat-checkbox></p>
-            <p><mat-checkbox color="primary">Plus que 4 joueurs</mat-checkbox></p>
-            <mat-divider></mat-divider>
-            <p><mat-checkbox color="primary">Moins de 30 minutes</mat-checkbox></p>
-            <p><mat-checkbox color="primary">Plus que 1h30</mat-checkbox></p>
+                <div class="sidenav-section">
+                    <p><mat-checkbox color="primary">Uniquement coopératif</mat-checkbox></p>
+                    <p><mat-checkbox color="primary">Pour 2 joueurs exclusivement</mat-checkbox></p>
+                    <p><mat-checkbox color="primary">Plus que 4 joueurs</mat-checkbox></p>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="sidenav-section">
+                    <p><mat-checkbox color="primary">Moins de 30 minutes</mat-checkbox></p>
+                    <p><mat-checkbox color="primary">Plus que 1h30</mat-checkbox></p>
+                </div>
 
-            <div class="header-sidenav">
-                <button mat-flat-button (click)="toggleMenu()">
-                    Appliquer les
-                </button>
+                <div class="bottom-sidenav">
+                    <button mat-flat-button color="primary" (click)="toggleMenu()">Appliquer</button>
+                    <button mat-stroked-button (click)="toggleMenu()">Annuler</button>
+                </div>
             </div>
         </div>
 

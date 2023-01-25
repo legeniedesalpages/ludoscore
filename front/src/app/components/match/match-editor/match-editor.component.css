@@ -100,7 +100,6 @@
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   transform-origin: top right;
   background-color: white;
-  padding-left:15px;
   touch-action: none;
 }
 
@@ -116,10 +115,32 @@
 
 .title-sidenav {
   align-self: left;
-  padding-left:10px;
+  padding-left:20px;
   font-weight: 700;
 }
 
 .invisible {
   display: none;
+}
+
+.bottom-sidenav  {
+  border-top: 1px solid lightgrey;
+  width: 100%;
+  position:absolute;
+  bottom:0;
+  padding:25px;
+  padding-top:15px;
+}
+
+.bottom-sidenav button {
+  margin-right:10px;
+}
+
+.content-sidenav {
+  position: relative;
+  height: 100%;
+}
+
+.sidenav-section {
+  padding-left: 10px;;
 }
