@@ -17,48 +17,56 @@
 
     <ng-container role="body">
 
-        <div [@fadeInOut]="menuState" [ngClass]="menuState === 'out' ? 'outi' : 'outo'">
-            <div class="headline">
-                <span class="choice">Choisir un jeu</span>
+        <div class="headline">
+            <span class="choice">Choisir un jeu</span>
+            <span class="menu-spacer"></span>
+            <button mat-icon-button (click)="toggleMenu()">
+                <mat-icon>filter_list</mat-icon>
+            </button>
+        </div>
+
+        <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
+
+        <div *ngFor="let game of gameList" class="result-list" matRipple>
+            <div class="visual">
+                <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
+            </div>
+            <div class="content">
+                <div class="heading">{{ game.title }}</div>
+                <div class="supporting">Dernière partie il y a 1 semaine et 3 jours, victoire de Renaud</div>
+            </div>
+            <div class="action">
+
+            </div>
+        </div>
+
+        <div class="sidenav-overlay" [@fadeInOut]="menuState">
+        </div>
+        <div class="sidenav" [@slideInOut]="menuState" [ngClass]="menuState">
+            <div class="header-sidenav">
+                <div class="title-sidenav">Filtrer</div>
                 <span class="menu-spacer"></span>
-                <button mat-icon-button (click)="toggleMenu()">
-                    <mat-icon>filter_list</mat-icon>
+                <button mat-icon-button (click)="toggleMenu()" class="close-sidenav">
+                    <mat-icon>close</mat-icon>
                 </button>
             </div>
 
-            <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
+            <p><mat-checkbox color="primary">Uniquement coopératif</mat-checkbox></p>
+            <p><mat-checkbox color="primary">Pour 2 joueurs exclusivement</mat-checkbox></p>
+            <p><mat-checkbox color="primary">Plus que 4 joueurs</mat-checkbox></p>
+            <mat-divider></mat-divider>
+            <p><mat-checkbox color="primary">Moins de 30 minutes</mat-checkbox></p>
+            <p><mat-checkbox color="primary">Plus que 1h30</mat-checkbox></p>
 
-            <div *ngFor="let game of gameList" class="result-list" matRipple>
-                <div class="visual">
-                    <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
-                </div>
-                <div class="content">
-                    <div class="heading">{{ game.title }}</div>
-                    <div class="supporting">Dernière partie il y a 1 semaine et 3 jours, victoire de Renaud</div>
-                </div>
-                <div class="action">
-
-                </div>
+            <div class="header-sidenav">
+                <button mat-flat-button (click)="toggleMenu()">
+                    Appliquer les
+                </button>
             </div>
         </div>
+
     </ng-container>
 
+
+
 </app-layout>
-
-<div class="sidenav" [@slideInOut]="menuState" [ngClass]="menuState">
-    <div class="header-sidenav">
-        <div class="title-sidenav">Filtrer</div>
-        <span class="menu-spacer"></span>
-        <button mat-icon-button (click)="toggleMenu()" class="close-sidenav">
-            <mat-icon>close</mat-icon>
-        </button>
-    </div>
-
-    <p><mat-checkbox color="primary">Uniquement coopératif</mat-checkbox></p>
-    <p><mat-checkbox color="primary">Pour 2 joueurs exclusivement</mat-checkbox></p>
-    <p><mat-checkbox color="primary">Plus que 4 joueurs</mat-checkbox></p>
-    <mat-divider></mat-divider>
-    <p><mat-checkbox color="primary">Moins de 30 minutes</mat-checkbox></p>
-    <p><mat-checkbox color="primary">Plus que 1h30</mat-checkbox></p>
-
-</div>

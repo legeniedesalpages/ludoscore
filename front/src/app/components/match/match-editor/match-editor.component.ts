@@ -16,6 +16,7 @@ import { GameEntity } from 'src/app/core/entity/game-entity.model';
 import { GameCrudService } from 'src/app/core/services/crud/game-crud.service';
 import { environment } from 'src/environments/environment';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
 
 @Component({
   templateUrl: './match-editor.component.html',
@@ -23,23 +24,25 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   animations: [
     trigger('slideInOut', [
       state('in', style({
-        transform: 'scaleX(1)',        
+        transform: 'scaleX(1)',
       })),
       state('out', style({
         transform: 'scaleX(0)',
       })),
       transition('in => out', animate('300ms ease-in-out')),
-      transition('out => in', animate('300ms ease-out'))
+      transition('out => in', animate('300ms ease-in-out'))
     ]),
     trigger('fadeInOut', [
       state('in', style({
-        opacity: 0.9
+        background: 'rgba(70, 70,70, 0.7)',
+        display: 'visible',
       })),
       state('out', style({
-        opacity: 1
+        background: 'rgba(70, 70,70, 0)',
+        display: 'none'
       })),
-      transition('in => out', [style({ opacity: 0.9 }), animate(200, style({ opacity: 1 }))]),
-      transition('out => in', [style({ opacity: 1 }), animate(200, style({ opacity: 0.9 }))])
+      transition('in => out', [style({ display: 'visible', background: 'rgba(70, 70,70, 0.7)' }), animate(200, style({ display: 'visible', background: 'rgba(70, 70,70, 0)' }))]),
+      transition('out => in', [style({ display: 'visible',background: 'rgba(70, 70,70, 0)' }), animate(200, style({ display: 'visible', background: 'rgba(70, 70,70, 0.7)' }))])
     ])
   ]
 })
