@@ -22,6 +22,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatchEditorComponent } from './match-editor.component';
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 import { LayoutModule } from '../../layout/layout.module';
+import { MatRippleModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { A11yModule } from '@angular/cdk/a11y'
+import { FormsModule } from '@angular/forms';
+
 
 const routes: Routes = [
   {
@@ -42,7 +48,12 @@ const routes: Routes = [
     MatMenuModule,
     LayoutModule,
     MatProgressSpinnerModule,
-    LoadingSpinnerModule
+    LoadingSpinnerModule,
+    MatRippleModule,
+    MatFormFieldModule,
+    MatInputModule,
+    A11yModule,
+    FormsModule
   ]
 })
 export class MatchEditorModule { }

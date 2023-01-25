@@ -7,7 +7,7 @@
     </div>
 
     <button mat-flat-button color="primary" [matMenuTriggerFor]="login" *ngIf="!loggingOut">
-      <span>{{ (loggedUser | async)?.name }}</span>
+      <span>{{ (loggedUser | async)?.email }}</span>
       <mat-icon>person</mat-icon>
     </button>
 

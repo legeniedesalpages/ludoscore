@@ -10,17 +10,18 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Channel } from 'pusher-js';
 import Pusher from 'pusher-js';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
-export class PusherService {
+export class PusherService implements OnDestroy {
 
     private pusher: Pusher
     private channel: Channel
+    private channel2: Channel
 
     constructor(private snackBar: MatSnackBar) {
         console.info("Enabling pusher")
@@ -34,6 +35,17 @@ export class PusherService {
                 duration: 5000
             })
         });
+
+        this.channel2 = this.pusher.subscribe('user-connection');
+        this.channel2.bind('App\\Events\\UserConnected', (data: any) => {
+            this.snackBar.open("Msg2: " + data, 'Fermer', {
+                duration: 5000
+            })
+        });
+    }
+    ngOnDestroy(): void {
+        this.channel.disconnect();
+        this.channel2.disconnect();
     }
 
     public init() {

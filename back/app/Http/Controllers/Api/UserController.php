@@ -31,7 +31,7 @@ class UserController extends Controller
         if (Auth::user()->id == $id) {
             return $user;
         } else {
-            return ['name' => $user->name];
+            return ['utilisateur' => $user->utilisateur];
         }
     }
 

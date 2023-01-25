@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\UserConnectedEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -23,7 +24,6 @@ class AuthController extends Controller
             $validateUser = Validator::make(
                 $request->all(),
                 [
-                    'name' => 'required',
                     'email' => 'required|email|unique:users,email',
                     'password' => 'required'
                 ]
@@ -38,7 +38,6 @@ class AuthController extends Controller
             }
 
             $user = User::create([
-                'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password)
             ]);
@@ -72,6 +71,8 @@ class AuthController extends Controller
             if (Auth::attempt($credentials)) {
 
                 $request->session()->regenerate();
+
+                UserConnectedEvent::dispatch("utilisateur");
 
                 return response()->json(Auth::user()->id);
             } else {

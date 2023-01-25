@@ -49,17 +49,17 @@ jobs:
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
     
-    - name: Installation des dépendances
+    - name: Installation des dépendances Back Office
       uses: php-actions/composer@v6
       with:
         command: install --no-dev --ansi --no-progress --no-interaction --prefer-dist --working-dir=./back/
     
-    - name: Compression du repertoire
+    - name: Compression du repertoire  Back Office
       uses: montudor/action-zip@v1
       with:
         args: zip -qq -r ./deployment/back.zip ./back
     
-    - name: Remplacement des variables d'environnement '.env'
+    - name: Remplacement des variables d'environnement '.env' Back Office
       run: |-
         sed -i "s/VARIABLE_IMAGES_PATH/${{vars.IMAGES_PATH}}/g" "./deployment/.env"
         sed -i "s/SECRET_APP_KEY/${{secrets.APP_KEY}}/g" "./deployment/.env"
@@ -72,7 +72,7 @@ jobs:
         sed -i "s/VARIABLE_BACK_URL/${{vars.BACK_URL}}/g" "./deployment/.env"
         sed -i "s/VARIABLE_NAME/${{vars.NAME}}/g" "./deployment/.env"        
       
-    - name: Copie des fichiers pour le déploiement
+    - name: Copie des fichiers pour le déploiement Back Office
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ${{ secrets.OVH_SERVER }}
@@ -82,19 +82,19 @@ jobs:
         username: ${{ secrets.OVH_USERNAME }}
         password: ${{ secrets.OVH_PASSWORD }}
         
-    - name: Suppression de la version précédente
+    - name: Suppression de la version précédente Back Office
       uses: satak/webrequest-action@master
       with:
         url: https://www.lgda.fr/ludoscore_deploiement/clean.php
         method: GET
     
-    - name: Lancement du déploiement distant
+    - name: Lancement du déploiement distant Back Office
       uses: satak/webrequest-action@master
       with:
         url: https://www.lgda.fr/ludoscore_deploiement/install.php
         method: GET
         
-    - name: Lancement de la migration si besoin
+    - name: Lancement de la migration si besoin Back Office
       uses: satak/webrequest-action@master
       with:
         url: https://www.lgda.fr/ludoscoreback/finir_installation
