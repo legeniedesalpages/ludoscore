@@ -16,28 +16,46 @@
     </ng-container>
 
     <ng-container role="body">
-        <div class="headline">
-            <span class="choice">Choisir un jeu</span>
-            <span class="menu-spacer"></span>
-            <button mat-icon-button>
-                <mat-icon>filter_list</mat-icon>
-            </button>
-        </div>
 
-        <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
-
-        <div *ngFor="let game of gameList" class="result-list" matRipple>
-            <div class="visual">
-                <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
+        <div [@fadeInOut]="menuState" [ngClass]="menuState === 'out' ? 'outi' : 'outo'">
+            <div class="headline">
+                <span class="choice">Choisir un jeu</span>
+                <span class="menu-spacer"></span>
+                <button mat-icon-button (click)="toggleMenu()">
+                    <mat-icon>filter_list</mat-icon>
+                </button>
             </div>
-            <div class="content">
-                <div class="heading">{{ game.title }}</div>
-                <div class="supporting">Dernière partie il y a 1 semaine et 3 jours, victoire de Renaud</div>
-            </div>
-            <div class="action">
 
+            <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
+
+            <div *ngFor="let game of gameList" class="result-list" matRipple>
+                <div class="visual">
+                    <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
+                </div>
+                <div class="content">
+                    <div class="heading">{{ game.title }}</div>
+                    <div class="supporting">Dernière partie il y a 1 semaine et 3 jours, victoire de Renaud</div>
+                </div>
+                <div class="action">
+
+                </div>
             </div>
         </div>
     </ng-container>
 
 </app-layout>
+
+<div class="sidenav" [@slideInOut]="menuState" [ngClass]="menuState">
+    <div class="header-sidenav">
+        <div class="title-sidenav">Filtrer</div>
+        <span class="menu-spacer"></span>
+        <button mat-icon-button (click)="toggleMenu()" class="close-sidenav">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <p><mat-checkbox color="primary">Pepperoni</mat-checkbox></p>
+    <p><mat-checkbox color="primary">Extra Cheese</mat-checkbox></p>
+    <p><mat-checkbox color="primary">Mushroom</mat-checkbox></p>
+
+</div>
