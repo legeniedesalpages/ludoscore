@@ -33,13 +33,13 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     ]),
     trigger('fadeInOut', [
       state('in', style({
-        opacity: 0.4
+        opacity: 0.9
       })),
       state('out', style({
         opacity: 1
       })),
-      transition('in => out', [style({ opacity: 0.4 }), animate(200, style({ opacity: 1 }))]),
-      transition('out => in', [style({ opacity: 1 }), animate(200, style({ opacity: 0.4 }))])
+      transition('in => out', [style({ opacity: 0.9 }), animate(200, style({ opacity: 1 }))]),
+      transition('out => in', [style({ opacity: 1 }), animate(200, style({ opacity: 0.9 }))])
     ])
   ]
 })

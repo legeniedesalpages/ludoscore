@@ -25,6 +25,7 @@ import { MatInputModule } from '@angular/material/input';
 import { A11yModule } from '@angular/cdk/a11y'
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
 
 const routes: Routes = [
   {
@@ -48,7 +49,8 @@ const routes: Routes = [
     MatInputModule,
     A11yModule,
     FormsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatDividerModule
   ]
 })
 export class MatchEditorModule { }
