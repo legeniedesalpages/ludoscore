@@ -27,16 +27,15 @@ return [
     | each available type of connection are provided inside this array.
     |
     */
-
     'connections' => [
 
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET', "6655e7ea814a9ff56681"),
-            'app_id' => env('PUSHER_APP_ID', "38b8aa27d92ef96861d1"),
+            'secret' => env('PUSHER_APP_SECRET'),
+            'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-                'host' => env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',
+                'host' => env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'eu').'.pusher.com',
                 'port' => env('PUSHER_PORT', 443),
                 'scheme' => env('PUSHER_SCHEME', 'https'),
                 'encrypted' => true,

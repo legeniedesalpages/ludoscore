@@ -25,16 +25,27 @@ export class MatchEditorComponent implements OnInit {
   public env = environment
   public loading: boolean = true
   public gameList: GameEntity[] = []
+  public searching: boolean = false;
+  public searchText: string = "";
 
   constructor(private store: Store, private gameCrudService: GameCrudService) {
   }
 
   ngOnInit(): void {
     this.loading = true
+    this.searching = false;
     this.gameCrudService.findAll().subscribe(res => {
       const myClonedArray  = Object.assign([], res);
       this.gameList = res.concat(res, myClonedArray)
       this.loading = false
     })
+  }
+
+  public showSearch() {
+    this.searching = true
+  }
+
+  public cancelSearch() {
+    this.searching = false
   }
 }
