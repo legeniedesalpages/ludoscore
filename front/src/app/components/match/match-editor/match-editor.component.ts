@@ -42,7 +42,7 @@ import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
         display: 'none'
       })),
       transition('in => out', [style({ display: 'visible', background: 'rgba(70, 70,70, 0.7)' }), animate(200, style({ display: 'visible', background: 'rgba(70, 70,70, 0)' }))]),
-      transition('out => in', [style({ display: 'visible',background: 'rgba(70, 70,70, 0)' }), animate(200, style({ display: 'visible', background: 'rgba(70, 70,70, 0.7)' }))])
+      transition('out => in', [style({ display: 'visible', background: 'rgba(70, 70,70, 0)' }), animate(200, style({ display: 'visible', background: 'rgba(70, 70,70, 0.7)' }))])
     ])
   ]
 })
@@ -61,6 +61,11 @@ export class MatchEditorComponent implements OnInit {
   }
 
   constructor(private store: Store, private gameCrudService: GameCrudService) {
+    fromEvent(window, "scroll").subscribe(e => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false
+    })
   }
 
   ngOnInit(): void {
@@ -71,5 +76,12 @@ export class MatchEditorComponent implements OnInit {
       this.gameList = res.concat(res, myClonedArray)
       this.loading = false
     })
+
+    window.addEventListener('wheel', (e) => {
+      if (this.menuState === 'in') {
+        e.preventDefault()
+      }
+    }, { passive: false });
   }
+
 }
