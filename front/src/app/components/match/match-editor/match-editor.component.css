@@ -124,8 +124,6 @@
 }
 
 .bottom-sidenav  {
-  border-top: 1px solid lightgrey;
-  width: 100%;
   position:absolute;
   bottom:0;
   padding:25px;
@@ -142,5 +140,5 @@
 }
 
 .sidenav-section {
-  padding-left: 10px;;
+  padding-left: 10px;
 }
