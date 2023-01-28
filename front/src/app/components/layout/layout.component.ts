@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Location } from '@angular/common';
-import { Component, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, EventEmitter, Output } from '@angular/core';
 import { fromEvent } from "rxjs";
 
 @Component({
@@ -70,6 +70,7 @@ export class LayoutComponent {
   @ViewChild('headerDiv', { static: true }) private headerDiv!: ElementRef<HTMLDivElement>
 
   @Input() public withBackButton!: boolean
+  @Output() public backButtonAction = new EventEmitter<void>
 
   constructor(private location: Location) {
 
@@ -84,6 +85,10 @@ export class LayoutComponent {
   }
 
   public back(): void {
-    this.location.back()
+    if (this.backButtonAction.observed) {
+      this.backButtonAction.emit()
+    } else {
+      this.location.back()
+    }
   }
 }

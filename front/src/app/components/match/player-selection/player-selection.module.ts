@@ -16,7 +16,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatchEditorComponent } from './match-editor.component';
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 import { LayoutModule } from '../../layout/layout.module';
 import { MatRippleModule } from '@angular/material/core';
@@ -26,17 +25,14 @@ import { A11yModule } from '@angular/cdk/a11y'
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { SidenavModule } from '../../layout/sidenav/sidenav.module';
+import { PlayerSelectionComponent } from './player-selection.component';
+import { MatSelectModule } from '@angular/material/select';
 
-const routes: Routes = [
-  {
-    path: '',
-    component: MatchEditorComponent,
-    canActivate: [AuthGuardService]
-  }
-];
+const routes: Routes = [ { path: '', component: PlayerSelectionComponent, canActivate: [AuthGuardService] }];
 
 @NgModule({
-  declarations: [MatchEditorComponent],
+  declarations: [PlayerSelectionComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -50,7 +46,9 @@ const routes: Routes = [
     A11yModule,
     FormsModule,
     MatCheckboxModule,
-    MatDividerModule
+    MatDividerModule,
+    SidenavModule,
+    MatSelectModule
   ]
 })
-export class MatchEditorModule { }
+export class PlayerSelectionModule { }

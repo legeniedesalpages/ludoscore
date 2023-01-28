@@ -24,10 +24,6 @@ import { User } from "../../model/user.model";
 @Injectable()
 export class AuthState {
 
-    @Selector() static authenticatedUser(state: AuthStateModel) {
-        return state
-    }
-
     @Selector() static isAuthenticated(state: AuthStateModel) {
         console.debug("Loggin state:" + state.id)
         return state.id > 0 && state.id != undefined
