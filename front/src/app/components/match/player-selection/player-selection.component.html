@@ -25,8 +25,7 @@
                     <div class="column">
                         <mat-form-field appearance="fill">
                             <mat-label>Ajouter un joueur</mat-label>
-                            <mat-select (selectionChange)="actionPlayer($event.value)" [(ngModel)]="playerSelection"
-                                #playerSelector>
+                            <mat-select (selectionChange)="actionPlayer($event.value)" #playerSelector>
                                 <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
                                 <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
                                 <mat-divider></mat-divider>
@@ -43,6 +42,10 @@
                     <button mat-flat-button (click)="cancelMatchCreation()">Cancel</button>
                 </div>
             </fieldset>
+
+            <div *ngFor="let player of players">
+                {{player.name}}
+            </div>
         </div>
     </ng-container>
 

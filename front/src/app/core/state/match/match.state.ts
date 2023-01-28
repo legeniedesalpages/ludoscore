@@ -13,7 +13,8 @@
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { CancelMatchCreation, CreateMatch } from "./match.action";
+import { AddPlayer, CancelMatchCreation, CreateMatch } from "./match.action";
+import { Player } from "../../model/player.model";
 
 @State<MatchStateModel>({
     name: 'match',
@@ -21,11 +22,17 @@ import { CancelMatchCreation, CreateMatch } from "./match.action";
         gameId: 0,
         gameTitle: "",
         creating: true,
-        started: false
+        started: false,
+        players: []
     }
 })
 @Injectable()
 export class MatchState {
+
+    @Selector()
+    static players(state: MatchStateModel): Player[] {
+        return state.players
+    }
 
     constructor() { }
 
@@ -36,7 +43,8 @@ export class MatchState {
             gameId: createMatch.gameId,
             gameTitle: createMatch.gameTitle,
             creating: true,
-            started: false
+            started: false,
+            players: []
         })
     }
 
@@ -46,7 +54,22 @@ export class MatchState {
             gameId: 0,
             gameTitle: "",
             creating: true,
-            started: false
+            started: false,
+            players: []
+        })
+    }
+
+    @Action(AddPlayer)
+    addPlayer({ setState, getState }: StateContext<MatchStateModel>, addPlayer: AddPlayer) {
+        const newPlayerList = Object.assign([], getState().players);
+        newPlayerList.push({
+            id: addPlayer.playerId,
+            avatar: addPlayer.avatar,
+            name: addPlayer.playerName
+        })
+        setState({
+            ...getState(),
+            players: newPlayerList
         })
     }
 }
