@@ -1,3 +1,5 @@
+import { Player } from "../../model/player.model"
+
 /**
     * @description      : 
     * @author           : renau
@@ -14,5 +16,6 @@ export interface MatchStateModel {
     gameId: number
     gameTitle: string,
     creating: boolean,
-    started: boolean
+    started: boolean,
+    players: Player[]
 }

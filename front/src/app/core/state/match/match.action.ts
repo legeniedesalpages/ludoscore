@@ -18,3 +18,12 @@ export class CreateMatch {
 export class CancelMatchCreation {
     static readonly type: string = '[Match] CancelMatchCreation';
 }
+
+export class AddPlayer {
+    static readonly type: string = '[Match] AddPlayer';
+    constructor(public playerId: number, public playerName: string, public avatar: string) { }
+}
+
+export class PlayerAdded {
+    static readonly type: string = '[Match] PlayerAdded';
+}
