@@ -60,6 +60,12 @@ export class MatchState {
 
     @Action(AddPlayer)
     addPlayer({ setState, getState }: StateContext<MatchStateModel>, addedPlayer: AddPlayer) {
+
+        if (getState().players.find(p => p.id === addedPlayer.playerId)) {
+            console.warn("Player already added")
+            return
+        }
+
         const newPlayerList = Object.assign([], getState().players);
         newPlayerList.push({
             id: addedPlayer.playerId,
