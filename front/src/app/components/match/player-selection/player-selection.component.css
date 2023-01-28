@@ -18,14 +18,6 @@
   align-items: center;
 }
 
-.player {
-  height: 60px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
-}
-
 .avatar {
   height: 40px;
   width: 40px;
@@ -36,4 +28,11 @@
   align-items: center;
   justify-content: center;
   margin-right:15px;
+}
+
+.player {
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }

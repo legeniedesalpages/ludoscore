@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, CancelMatchCreation, CreateMatch } from "./match.action";
+import { AddPlayer, CancelMatchCreation, CreateMatch, RemovePlayer } from "./match.action";
 import { Player } from "../../model/player.model";
 
 @State<MatchStateModel>({
@@ -37,9 +37,8 @@ export class MatchState {
     constructor() { }
 
     @Action(CreateMatch)
-    createMatch({ setState, getState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
+    createMatch({ setState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
         setState({
-            ...getState(),
             gameId: createMatch.gameId,
             gameTitle: createMatch.gameTitle,
             creating: true,
@@ -60,16 +59,24 @@ export class MatchState {
     }
 
     @Action(AddPlayer)
-    addPlayer({ setState, getState }: StateContext<MatchStateModel>, addPlayer: AddPlayer) {
+    addPlayer({ setState, getState }: StateContext<MatchStateModel>, addedPlayer: AddPlayer) {
         const newPlayerList = Object.assign([], getState().players);
         newPlayerList.push({
-            id: addPlayer.playerId,
-            avatar: addPlayer.avatar,
-            name: addPlayer.playerName
+            id: addedPlayer.playerId,
+            avatar: addedPlayer.avatar,
+            name: addedPlayer.playerName
         })
         setState({
             ...getState(),
             players: newPlayerList
+        })
+    }
+
+    @Action(RemovePlayer)
+    removePlayer({ setState, getState }: StateContext<MatchStateModel>, removedPlayer: RemovePlayer) {
+        setState({
+            ...getState(),
+            players: getState().players.filter(p => p.id !== removedPlayer.playerId)
         })
     }
 }

@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+use Illuminate\Support\Facades\DB as FacadesDB;
+use Illuminate\Support\Facades\Log as FacadesLog;
+
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -24,5 +28,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        // Add in boot function
+        FacadesDB::listen(function ($query) {
+            FacadesLog::info(
+                $query->sql,
+                $query->bindings,
+                $query->time
+            );
+        });
     }
 }

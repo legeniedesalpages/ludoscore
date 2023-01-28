@@ -48,19 +48,28 @@
             <div *ngFor="let player of players" mat-ripple>
                 <div class="row">
                     <div class="column">
-                        <div class="player">
-                            <div class="avatar">
-                                RB
+                        <swipeable-element
+                            [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
+                            [leftWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
+                            (rightSwipeEvent)="deleteAction(player)"
+                            (leftSwipeEvent)="deleteAction(player)">
+                            <div class="player">
+                                <div class="avatar">
+                                    <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg"
+                                        style="border-radius: 50%; height:50px; width:50px;">
+                                </div>
+                                <div class="pseudo">
+                                    {{player.name}}
+                                </div>
+                                <span class="menu-spacer"></span>
+                                <div class="mover">
+                                    <button mat-icon-button>
+                                        <mat-icon>drag_handle</mat-icon>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="pseudo">
-                                {{player.name}}
-                            </div>
-                            <span class="menu-spacer"></span>
-                            <div class="mover">
-                                <mat-icon>drag_handle</mat-icon>
-                            </div>
-                        </div>
-                       
+                        </swipeable-element>
+
                     </div>
                 </div>
                 <mat-divider></mat-divider>
