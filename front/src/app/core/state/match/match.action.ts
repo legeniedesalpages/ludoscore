@@ -24,6 +24,7 @@ export class AddPlayer {
     constructor(public playerId: number, public playerName: string, public avatar: string) { }
 }
 
-export class PlayerAdded {
-    static readonly type: string = '[Match] PlayerAdded';
+export class RemovePlayer {
+    static readonly type: string = '[Match] RemovePlayer';
+    constructor(public playerId: number) { }
 }

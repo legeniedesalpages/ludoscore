@@ -28,6 +28,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { PlayerSelectionComponent } from './player-selection.component';
 import { MatSelectModule } from '@angular/material/select';
+import { SwipeableModule } from '../../layout/swipeable/swipeable.module';
 
 const routes: Routes = [ { path: '', component: PlayerSelectionComponent, canActivate: [AuthGuardService] }];
 
@@ -48,7 +49,8 @@ const routes: Routes = [ { path: '', component: PlayerSelectionComponent, canAct
     MatCheckboxModule,
     MatDividerModule,
     SidenavModule,
-    MatSelectModule
+    MatSelectModule,
+    SwipeableModule
   ]
 })
 export class PlayerSelectionModule { }

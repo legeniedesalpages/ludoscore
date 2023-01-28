@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { AddPlayer, CancelMatchCreation } from 'src/app/core/state/match/match.action';
+import { AddPlayer, CancelMatchCreation, RemovePlayer } from 'src/app/core/state/match/match.action';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
@@ -86,5 +86,9 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         this.playerSelector.value = ""
       })
     }
+  }
+
+  public deleteAction(player: Player) {
+    this.store.dispatch(new RemovePlayer(player.id))
   }
 }
