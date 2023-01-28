@@ -1,0 +1,20 @@
+<div class="sidenav-overlay" [@fadeInOut]="isOpen ? 'out' : 'in'"></div>
+<div class="sidenav" [@slideInOut]="isOpen ? 'out' : 'in'" [ngClass]="isOpen ? 'out' : 'in'">
+    <div class="content-sidenav">
+        <div class="header-sidenav">
+            <div class="title-sidenav">Filtrer</div>
+            <span class="menu-spacer"></span>
+            <button mat-icon-button (click)="close()" class="close-sidenav">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <ng-content></ng-content>
+
+        <mat-divider></mat-divider>
+        <div class="bottom-sidenav">
+            <button mat-flat-button color="primary" (click)="close()">Appliquer</button>
+            <button mat-stroked-button (click)="close()">Annuler</button>
+        </div>
+    </div>
+</div>

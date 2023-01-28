@@ -26,6 +26,7 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from 'src/environments/environment';
 import { AuthState } from './core/state/auth/auth.state';
 import { PusherService } from './core/services/pusher/pusher.service';
+import { MatchState } from './core/state/match/match.state';
 
 @NgModule({
   declarations: [
@@ -46,8 +47,8 @@ import { PusherService } from './core/services/pusher/pusher.service';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: !isDevMode(), registrationStrategy: 'registerWhenStable:30000' }),
 
     // NgXs
-    NgxsModule.forRoot([AuthState], { developmentMode: !environment.production }),
-    NgxsStoragePluginModule.forRoot({ key: AuthState }),
+    NgxsModule.forRoot([AuthState, MatchState], { developmentMode: !environment.production }),
+    NgxsStoragePluginModule.forRoot({ key: [AuthState, MatchState] }),
     NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production })
   ],
 

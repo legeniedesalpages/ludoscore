@@ -18,62 +18,75 @@ import {
   transition,
   group,
   animation,
-  keyframes,
-  useAnimation
+  useAnimation,
+  animateChild
 } from '@angular/animations';
 
-export const sharedStyles = {
-  position: 'fixed',
-  overflow: 'hidden',
-  backfaceVisibility: 'hidden',
-  transformStyle: 'preserve-3d'
-};
-
-export const rotateCarouselToRight = animation([
-  query(':enter, :leave', style(sharedStyles)
-    , { optional: true }),
-  group([
+export const slideLeft = animation(
+  [
+    style({ position: 'relative' }),
+    query(':enter, :leave', [
+      style({
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        'transform-origin': 'top right'
+      })
+    ]),
     query(':enter', [
-      style({ 'transform-origin': '100% 50%' }),
-      animate('{{enterTiming}}s {{enterDelay}}s ease', keyframes([
-        style({ opacity: '0.3', transform: 'translateX(-200%) scale(.4) rotateY(-120deg)', offset: 0 }),
-        style({ opacity: '1', transform: 'translate3d(0,0,0)', offset: 1 })
-      ]))
-    ], { optional: true }),
-    query(':leave', [
-      style({ 'transform-origin': '0% 50%' }),
-      animate('{{leaveTiming}}s {{leaveDelay}}s ease', keyframes([
-        style({ opacity: '1', transform: 'translate3d(0, 0, 0)', offset: 0 }),
-        style({ opacity: '.3', transform: 'translateX(200%) scale(.4) rotateY(120deg)', offset: 1 }),
-      ]))
-    ], { optional: true }),
-  ])
-], { params: { enterTiming: '0.5', leaveTiming: '0.5', enterDelay: '0', leaveDelay: '0' } });
+      style({
+        transform: 'scaleX(0)',
+        'transform-origin': 'top left'
+      })
+    ]),
+    query(':leave', animateChild(), { optional: true }),
+    group([
+      query(':leave', [
+        animate('300ms ease-out', style({ transform: 'scaleX(0)' }))
+      ], { optional: true }),
+      query(':enter', [
+        animate('300ms ease-out', style({ transform: 'scaleX(1)' }))
+      ], { optional: true }),
+      query('@*', animateChild(), { optional: true })
+    ]),
+  ]
+);
 
-export const rotateCarouselToLeft = animation([
-  query(':enter, :leave', style(sharedStyles)
-    , { optional: true }),
-  group([
+export const slideRight = animation(
+  [
+    style({ position: 'relative' }),
+    query(':enter, :leave', [
+      style({
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        'transform-origin': 'top left'
+      })
+    ], { optional: true }),
     query(':enter', [
-      style({ 'transform-origin': '0% 50%' }),
-      animate('{{enterTiming}}s {{enterDelay}}s ease', keyframes([
-        style({ opacity: '0.1', transform: 'translateX(150%) scale(.4) rotateY(120deg)', offset: 0 }),
-        style({ opacity: '1', transform: 'translate3d(0,0,0)', offset: 1 })
-      ]))
+      style({
+        transform: 'scaleX(0)',
+        'transform-origin': 'top right'
+      })
     ], { optional: true }),
-    query(':leave', [
-      style({ 'transform-origin': '100% 50%' }),
-      animate('{{leaveTiming}}s {{leaveDelay}}s ease', keyframes([
-        style({ opacity: '1', transform: 'translate3d(0, 0, 0)', offset: 0 }),
-        style({ opacity: '.3', transform: 'translateX(-150%) scale(.4) rotateY(-120deg)', offset: 1 }),
-      ]))
-    ], { optional: true }),
-  ])
-], { params: { enterTiming: '0.5', leaveTiming: '0.5', enterDelay: '0', leaveDelay: '0' } });
+    query(':leave', animateChild(), { optional: true }),
+    group([
+      query(':leave', [
+        animate('300ms ease-out', style({ transform: 'scaleX(0)' }))
+      ], { optional: true }),
+      query(':enter', [
+        animate('300ms ease-out', style({ transform: 'scaleX(1)' }))
+      ], { optional: true }),
+      query('@*', animateChild(), { optional: true })
+    ]),
+  ]
+);
 
 export const pageAnimation = trigger('routeAnimations', [
-  transition('* => isLeft', useAnimation(rotateCarouselToRight)),
-  transition('* => isRight', useAnimation(rotateCarouselToLeft)),
-  transition('isRight => *', useAnimation(rotateCarouselToRight)),
-  transition('isLeft => *', useAnimation(rotateCarouselToLeft))
+  transition('* => home', useAnimation(slideLeft)),
+  transition('home => game-selection', useAnimation(slideRight)),
+  transition('game-selection => player-selection', useAnimation(slideRight)),
+  transition('player-selection => game-selection', useAnimation(slideLeft)),
 ]);

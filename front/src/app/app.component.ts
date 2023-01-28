@@ -14,13 +14,12 @@
 import { Component } from '@angular/core';
 import { pageAnimation } from './core/animation/page.animation';
 
-
 @Component({
   selector: 'app-root',
   animations: [pageAnimation],
   template: `
-    <div class="app" [@routeAnimations]="o && o.activatedRouteData 
-      && o.activatedRouteData['animation']">
+    <div class="app" [@routeAnimations]="o && o.activatedRouteData && o.activatedRouteData['animation']">
+    
       <router-outlet #o="outlet"></router-outlet>
     </div>
   `,
