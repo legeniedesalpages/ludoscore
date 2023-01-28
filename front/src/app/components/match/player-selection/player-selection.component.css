@@ -17,3 +17,23 @@
   flex-direction: row;
   align-items: center;
 }
+
+.player {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+
+.avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  background-color: gainsboro;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-right:15px;
+}
