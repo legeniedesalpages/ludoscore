@@ -38,13 +38,32 @@
                     </div>
                 </div>
                 <div class="row" style="flex-direction: row-reverse;">
-                    <button mat-flat-button color="primary" disabled (click)="cancelMatchCreation()">Continuer</button>
+                    <button mat-flat-button color="primary" (click)="cancelMatchCreation()">Continuer</button>
                     <button mat-flat-button (click)="cancelMatchCreation()">Cancel</button>
                 </div>
             </fieldset>
 
-            <div *ngFor="let player of players">
-                {{player.name}}
+            <mat-divider></mat-divider>
+
+            <div *ngFor="let player of players" mat-ripple>
+                <div class="row">
+                    <div class="column">
+                        <div class="player">
+                            <div class="avatar">
+                                RB
+                            </div>
+                            <div class="pseudo">
+                                {{player.name}}
+                            </div>
+                            <span class="menu-spacer"></span>
+                            <div class="mover">
+                                <mat-icon>drag_handle</mat-icon>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+                <mat-divider></mat-divider>
             </div>
         </div>
     </ng-container>
