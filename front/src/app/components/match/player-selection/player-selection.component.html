@@ -1,27 +1,49 @@
 <app-layout [withBackButton]="true" (backButtonAction)="cancelGameSelection()">
     <ng-container role="header">
-
+        <span class="title">Selection des joueurs</span>
+        <button mat-icon-button>
+            <mat-icon>more_vert</mat-icon>
+        </button>
     </ng-container>
 
     <ng-container role="body">
-        <h3>{{ gameTitle }}</h3>
-        <a routerLink="/">home</a>
-        <hr />
-        <button (click)="cancelMatchCreation()">Cancel</button>
-        <fieldset>
-            <div class="row">
-                <div class="column">
-                    <mat-form-field appearance="fill">
-                        <mat-label>Ajouter un joueur</mat-label>
-                        <mat-select>
-                            <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
-                            <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
-                            <mat-divider></mat-divider>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+
+        <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
+
+        <div *ngIf="!loading">
+
+            <div class="headline">
+                <span class="choice">Jeux: {{ gameTitle }}</span>
+                <span class="menu-spacer"></span>
+                <button mat-icon-button>
+                    <mat-icon>filter_list</mat-icon>
+                </button>
             </div>
-        </fieldset>
+
+            <fieldset>
+                <div class="row">
+                    <div class="column">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Ajouter un joueur</mat-label>
+                            <mat-select (selectionChange)="actionPlayer($event.value)" [(ngModel)]="playerSelection"
+                                #playerSelector>
+                                <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
+                                <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
+                                <mat-divider></mat-divider>
+                                <mat-option *ngFor="let choosingPlayer of filteredChoosablePlayers"
+                                    [value]="choosingPlayer">
+                                    {{choosingPlayer.pseudo}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row" style="flex-direction: row-reverse;">
+                    <button mat-flat-button color="primary" disabled (click)="cancelMatchCreation()">Continuer</button>
+                    <button mat-flat-button (click)="cancelMatchCreation()">Cancel</button>
+                </div>
+            </fieldset>
+        </div>
     </ng-container>
 
 </app-layout>
