@@ -7,7 +7,6 @@
     </ng-container>
 
     <ng-container role="body">
-
         <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
 
         <div *ngIf="!loading">
@@ -25,12 +24,11 @@
                     <div class="column">
                         <mat-form-field appearance="fill">
                             <mat-label>Ajouter un joueur</mat-label>
-                            <mat-select (selectionChange)="actionPlayer($event.value)" #playerSelector>
+                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector>
                                 <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
                                 <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
                                 <mat-divider></mat-divider>
-                                <mat-option *ngFor="let choosingPlayer of choosablePlayers"
-                                    [value]="choosingPlayer">
+                                <mat-option *ngFor="let choosingPlayer of choosablePlayers" [value]="choosingPlayer">
                                     {{choosingPlayer.pseudo}}
                                 </mat-option>
                             </mat-select>
@@ -39,40 +37,41 @@
                 </div>
                 <div class="row" style="flex-direction: row-reverse;">
                     <button mat-flat-button color="primary" (click)="cancelMatchCreation()">Continuer</button>
-                    <button mat-flat-button (click)="cancelMatchCreation()">Cancel</button>
+                    <button mat-flat-button (click)="cancelMatchCreation()">Annuler</button>
                 </div>
             </fieldset>
 
             <mat-divider></mat-divider>
 
-            <div *ngFor="let player of playerChange | async" mat-ripple>
-                <div class="row">
-                    <div class="column">
-                        <swipeable-element
-                            [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
-                            [leftWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
-                            (rightSwipeEvent)="deleteAction(player)"
-                            (leftSwipeEvent)="deleteAction(player)">
-                            <div class="player">
-                                <div class="avatar">
-                                    <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg"
-                                        style="border-radius: 50%; height:50px; width:50px;">
+            <div class="player-container">
+                <div *ngFor="let player of playerChange | async" mat-ripple>
+                    <div class="row">
+                        <div class="column">
+                            <swipeable-element
+                                [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
+                                [leftWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
+                                (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="deleteAction(player)" (actionEvent)="actionPlayer(player)">
+                                <div class="player">
+                                    <div class="avatar">
+                                        <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg">
+                                    </div>
+                                    <div class="line">
+                                        <div class="pseudo">
+                                            {{player.name}}
+                                        </div>
+                                        <div class="tags">
+                                            {{player.tags}}
+                                        </div>
+                                    </div>
+                                    <div class="action">
+                                        <mat-icon>color_lens</mat-icon>
+                                    </div>
                                 </div>
-                                <div class="pseudo">
-                                    {{player.name}}
-                                </div>
-                                <span class="menu-spacer"></span>
-                                <div class="mover">
-                                    <button mat-icon-button>
-                                        <mat-icon>drag_handle</mat-icon>
-                                    </button>
-                                </div>
-                            </div>
-                        </swipeable-element>
-
+                            </swipeable-element>
+                        </div>
                     </div>
+                    <mat-divider></mat-divider>
                 </div>
-                <mat-divider></mat-divider>
             </div>
         </div>
     </ng-container>

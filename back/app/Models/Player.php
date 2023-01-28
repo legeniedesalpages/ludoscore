@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\Log;
 
 class Player extends Model
 {
@@ -22,7 +21,7 @@ class Player extends Model
     public function getGravatarAttribute()
     {
         if ($this->user == null) {
-            return md5(strtolower(trim($this->login)));
+            return md5(strtolower(trim($this->pseudo)));
         } else {
             return md5(strtolower(trim($this->user->email)));
         }

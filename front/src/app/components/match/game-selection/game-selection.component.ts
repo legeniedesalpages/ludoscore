@@ -59,7 +59,7 @@ export class GameSelectionComponent implements OnInit {
   }
 
   public gameSelection(game: GameEntity) {
-    this.store.dispatch(new CreateMatch(game.id, game.title)).subscribe(() => this.router.navigate(['player-selection']))
+    this.store.dispatch(new CreateMatch(game.id, game.title, game.imageId)).subscribe(() => this.router.navigate(['player-selection']))
   }
 
   public cancelMatchCreation() {

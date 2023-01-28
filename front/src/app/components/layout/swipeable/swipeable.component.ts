@@ -32,7 +32,7 @@ export interface WipeActionStyle {
           <div #action class="txt"><mat-icon>{{ icon }}</mat-icon>{{ text}}</div>
         </div>
         <div #draggable matRipple class="front" draggable="false">
-          <ng-content></ng-content>
+          <ng-content></ng-content>          
         </div>
       </div>  
     `,
@@ -69,7 +69,7 @@ export class SwipeableComponent implements OnInit {
   ngOnInit() {
 
     // overlap divs : back behind front
-    let height = this.draggableDiv.nativeElement.offsetHeight
+    let height = this.draggableDiv.nativeElement.clientHeight
     this.draggableDiv.nativeElement.style.marginTop = `-${height}px`
     this.backDiv.nativeElement.style.height = `${height}px`
 
