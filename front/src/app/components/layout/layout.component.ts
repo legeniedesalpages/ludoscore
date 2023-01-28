@@ -24,7 +24,7 @@ import { fromEvent } from "rxjs";
         <span class="menu-spacer" *ngIf="!withBackButton"></span>
         <ng-content select="ng-container[role=header]"></ng-content>
       </div>
-
+      
       <ng-content select="ng-container[role=body]" (scrollPosition)="scrollChanged($event)"></ng-content>
 
       <div class="bottom">
@@ -34,7 +34,8 @@ import { fromEvent } from "rxjs";
   `,
   styles: [`
     .container {
-      min-height: 100%;
+      min-height:100%;
+      width:100%;
     }
 
     .header {

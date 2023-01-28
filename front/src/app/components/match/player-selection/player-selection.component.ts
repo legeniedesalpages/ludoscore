@@ -12,16 +12,15 @@
 **/
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, State, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { AddPlayer, CancelMatchCreation, RemovePlayer } from 'src/app/core/state/match/match.action';
+import { AddPlayer, AddTagToPlayer, CancelMatchCreation, RemovePlayer } from 'src/app/core/state/match/match.action';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
-import { forkJoin, Observable, of, Subject } from 'rxjs';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
-import { map, tap } from 'rxjs/operators';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -36,7 +35,10 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public env = environment
   public loading: boolean = true
   public gameTitle: string = ""
+  public gameImage: string = ""
   public choosablePlayers!: PlayerEntity[]
+
+  private playerChangeSubscription!: Subscription
 
   constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService) {
   }
@@ -49,11 +51,12 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       allPlayers: this.playerCrudService.findAll()
     }).subscribe(actions => {
       this.gameTitle = actions.state.gameTitle
+      this.gameImage = actions.state.image
       this.loading = false
 
-      this.playerChange.subscribe(x => {
-        this.store.selectOnce(MatchState).subscribe(t => {
-          const ids = t.players.map((y: PlayerEntity) => y.id)
+      this.playerChangeSubscription = this.playerChange.subscribe(() => {
+        this.store.selectOnce(MatchState).subscribe(match => {
+          const ids = match.players.map((player: PlayerEntity) => player.id)
           this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
         })
       })
@@ -61,7 +64,9 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // TODO : unsubscribe
+    if (this.playerChangeSubscription) {
+      this.playerChangeSubscription.unsubscribe()
+    }
   }
 
   public cancelMatchCreation() {
@@ -72,7 +77,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CancelMatchCreation()).subscribe(() => this.router.navigate(['game-selection']))
   }
 
-  public actionPlayer(event: string | PlayerEntity) {
+  public selectPlayer(event: string | PlayerEntity) {
     if (event === 'search') {
       console.log("Recherche")
     } else if (event === 'team') {
@@ -87,5 +92,9 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public deleteAction(player: Player) {
     this.store.dispatch(new RemovePlayer(player.id))
+  }
+
+  public actionPlayer(player: Player) {
+    this.store.dispatch(new AddTagToPlayer(player.id, "un tag"))
   }
 }

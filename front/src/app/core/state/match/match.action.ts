@@ -12,7 +12,7 @@
 **/
 export class CreateMatch {
     static readonly type: string = '[Match] CreateMatch';
-    constructor(public gameId: number, public gameTitle: string) { }
+    constructor(public gameId: number, public title: string, public image: string) { }
 }
 
 export class CancelMatchCreation {
@@ -27,4 +27,9 @@ export class AddPlayer {
 export class RemovePlayer {
     static readonly type: string = '[Match] RemovePlayer';
     constructor(public playerId: number) { }
+}
+
+export class AddTagToPlayer {
+    static readonly type: string = '[Match] AddTagToPlayer';
+    constructor(public playerId: number, public tag: string) { }
 }

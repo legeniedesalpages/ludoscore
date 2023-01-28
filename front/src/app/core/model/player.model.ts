@@ -13,5 +13,6 @@
 export interface Player {
     id: number,
     name: string,
-    avatar: string
+    avatar: string,
+    tags: string[]
 }

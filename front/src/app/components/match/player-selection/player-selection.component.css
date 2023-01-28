@@ -18,21 +18,47 @@
   align-items: center;
 }
 
+/* --------------------- list -------------- */
+
+.player {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  padding-left: 16px;
+  padding-right: 24px;
+  height: 64px;
+}
+
 .avatar {
   height: 40px;
   width: 40px;
-  border-radius: 100%;
-  background-color: gainsboro;
-  display: flex;
-  flex-direction: row;
+  margin-right: 16px;
   align-items: center;
-  justify-content: center;
-  margin-right:15px;
 }
 
-.player {
-  background-color: white;
-  display: flex;
-  flex-direction: row;
+.avatar img {
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+}
+
+.line {
   align-items: center;
+  flex-grow: 1;
+}
+
+.action {
+  align-items: center;
+}
+
+.pseudo {
+  padding-top: 5px;
+  padding-bottom: 2px;
+}
+
+.tags {
+  font-size: small;
+  padding-top: 2px;
+  padding-bottom: 5px;
 }

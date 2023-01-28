@@ -14,7 +14,8 @@ import { Player } from "../../model/player.model"
 **/
 export interface MatchStateModel {
     gameId: number
-    gameTitle: string,
+    title: string,
+    image: string,
     creating: boolean,
     started: boolean,
     players: Player[]
