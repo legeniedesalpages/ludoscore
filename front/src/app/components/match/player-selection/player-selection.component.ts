@@ -12,15 +12,16 @@
 **/
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
+import { Select, State, Store } from '@ngxs/store';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
 import { AddPlayer, CancelMatchCreation, RemovePlayer } from 'src/app/core/state/match/match.action';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, of, Subject } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -35,20 +36,12 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public env = environment
   public loading: boolean = true
   public gameTitle: string = ""
-  public filteredChoosablePlayers: PlayerEntity[] = []
-  public players: Player[] = []
+  public choosablePlayers!: PlayerEntity[]
 
   constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService) {
   }
 
-
   ngOnInit(): void {
-
-    this.playerChange.subscribe(changedPlayerList => {
-      console.log("changedPlayerList:", changedPlayerList)
-      this.players = changedPlayerList
-    })
-
     this.loading = true
 
     forkJoin({
@@ -56,10 +49,14 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       allPlayers: this.playerCrudService.findAll()
     }).subscribe(actions => {
       this.gameTitle = actions.state.gameTitle
-
-      this.filteredChoosablePlayers = actions.allPlayers
-
       this.loading = false
+
+      this.playerChange.subscribe(x => {
+        this.store.selectOnce(MatchState).subscribe(t => {
+          const ids = t.players.map((y: PlayerEntity) => y.id)
+          this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
+        })
+      })
     })
   }
 
