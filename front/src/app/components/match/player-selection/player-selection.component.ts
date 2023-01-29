@@ -21,6 +21,7 @@ import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
+import { MatchStateModel } from 'src/app/core/state/match/match.model';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -37,6 +38,8 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public gameTitle: string = ""
   public gameImage: string = ""
   public choosablePlayers!: PlayerEntity[]
+  public minPlayers: number = 0
+  public maxPlayers: number = 0
 
   private playerChangeSubscription!: Subscription
 
@@ -55,8 +58,10 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       this.loading = false
 
       this.playerChangeSubscription = this.playerChange.subscribe(() => {
-        this.store.selectOnce(MatchState).subscribe(match => {
-          const ids = match.players.map((player: PlayerEntity) => player.id)
+        this.store.selectOnce(MatchState).subscribe((match: MatchStateModel) => {
+          this.minPlayers = match.minPlayers
+          this.maxPlayers = match.maxPlayers
+          const ids = match.players.map(player => player.id)
           this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
         })
       })

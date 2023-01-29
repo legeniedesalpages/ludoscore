@@ -62,3 +62,26 @@
   padding-top: 2px;
   padding-bottom: 5px;
 }
+
+.background-player {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+  font-size: large;
+}
+
+.background-player-minimum {
+  background: linear-gradient(rgba(255,0,0,.1), rgba(255,0,0,.05));
+}
+
+.background-player-maximum {
+  background: linear-gradient(rgba(0,255,0,.05), rgba(0,255,0,.1));
+}
+
+.divider {
+  width: 100%;
+  background-color: grey;
+  height:1px;
+}

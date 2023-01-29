@@ -29,8 +29,9 @@ import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { PlayerSelectionComponent } from './player-selection.component';
 import { MatSelectModule } from '@angular/material/select';
 import { SwipeableModule } from '../../layout/swipeable/swipeable.module';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
-const routes: Routes = [ { path: '', component: PlayerSelectionComponent, canActivate: [AuthGuardService] }];
+const routes: Routes = [{ path: '', component: PlayerSelectionComponent, canActivate: [AuthGuardService] }];
 
 @NgModule({
   declarations: [PlayerSelectionComponent],
@@ -50,7 +51,8 @@ const routes: Routes = [ { path: '', component: PlayerSelectionComponent, canAct
     MatDividerModule,
     SidenavModule,
     MatSelectModule,
-    SwipeableModule
+    SwipeableModule,
+    ScrollingModule
   ]
 })
 export class PlayerSelectionModule { }
