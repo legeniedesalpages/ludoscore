@@ -24,6 +24,8 @@ import { Player } from "../../model/player.model";
         image: "",
         creating: true,
         started: false,
+        minPlayers: 0,
+        maxPlayers: 0,
         players: []
     }
 })
@@ -45,6 +47,8 @@ export class MatchState {
             image: createMatch.image,
             creating: true,
             started: false,
+            minPlayers: createMatch.minPlayers,
+            maxPlayers: createMatch.maxPlayers,
             players: []
         })
     }
@@ -57,6 +61,8 @@ export class MatchState {
             image: "",
             creating: true,
             started: false,
+            minPlayers: 0,
+            maxPlayers: 0,
             players: []
         })
     }

@@ -12,7 +12,7 @@
 **/
 export class CreateMatch {
     static readonly type: string = '[Match] CreateMatch';
-    constructor(public gameId: number, public title: string, public image: string) { }
+    constructor(public gameId: number, public title: string, public image: string, public minPlayers: number, public maxPlayers: number) { }
 }
 
 export class CancelMatchCreation {
