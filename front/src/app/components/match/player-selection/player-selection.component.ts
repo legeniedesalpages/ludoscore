@@ -40,6 +40,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public choosablePlayers!: PlayerEntity[]
   public minPlayers: number = 0
   public maxPlayers: number = 0
+  public canContinue: boolean = false;
 
   private playerChangeSubscription!: Subscription
 
@@ -53,12 +54,13 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       state: this.store.selectOnce(MatchState),
       allPlayers: this.playerCrudService.findAll()
     }).subscribe(actions => {
-      this.gameTitle = actions.state.gameTitle
+      this.gameTitle = actions.state.title
       this.gameImage = actions.state.image
       this.loading = false
 
       this.playerChangeSubscription = this.playerChange.subscribe(() => {
         this.store.selectOnce(MatchState).subscribe((match: MatchStateModel) => {
+          this.canContinue = match.players.length >= match.minPlayers
           this.minPlayers = match.minPlayers
           this.maxPlayers = match.maxPlayers
           const ids = match.players.map(player => player.id)
