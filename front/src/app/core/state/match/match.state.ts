@@ -10,14 +10,16 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
 import { AddPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, RemovePlayer } from "./match.action";
 import { Player } from "../../model/player.model";
 
+const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match');
+
 @State<MatchStateModel>({
-    name: 'match',
+    name: MATCH_STATE_TOKEN,
     defaults: {
         gameId: 0,
         title: "",

@@ -58,7 +58,8 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       this.gameImage = actions.state.image
       this.loading = false
 
-      this.playerChangeSubscription = this.playerChange.subscribe(() => {
+      this.playerChangeSubscription = this.playerChange.subscribe(p => {
+        console.log("p", p)
         this.store.selectOnce(MatchState).subscribe((match: MatchStateModel) => {
           this.canContinue = match.players.length >= match.minPlayers
           this.minPlayers = match.minPlayers

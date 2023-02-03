@@ -6,13 +6,19 @@
         </button>
     </ng-container>
 
+    <ng-container role="footer">
+        <div class="row" style="justify-content: end; height:50px; align-items: center;">
+            <button mat-flat-button [disabled]="!canContinue" color="primary" (click)="cancelMatchCreation()" style="margin-right: 10px;">Lancer la partie</button>
+        </div>
+    </ng-container>
+
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
 
         <div *ngIf="!loading">
 
             <div class="headline">
-                <span class="choice">Jeux: {{ gameTitle }}</span>
+                <span class="choice">{{ gameTitle }}</span>
                 <span class="menu-spacer"></span>
                 <button mat-icon-button>
                     <svg viewBox="0 0 512 512">
@@ -41,11 +47,7 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="row" style="flex-direction: row-reverse;">
-                    <button mat-flat-button [disabled]="!canContinue" color="primary"
-                        (click)="cancelMatchCreation()">Continuer</button>
-                    <button mat-flat-button (click)="cancelMatchCreation()">Annuler</button>
-                </div>
+
             </fieldset>
 
             <div class="divider"></div>
