@@ -10,17 +10,17 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
 import { GameEntity } from 'src/app/core/entity/game-entity.model';
 import { GameCrudService } from 'src/app/core/services/crud/game-crud.service';
 import { CreateMatch } from 'src/app/core/state/match/match.action';
 import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
-import { take } from 'rxjs/operators';
+
 
 @Component({
   templateUrl: './game-selection.component.html',
@@ -32,10 +32,10 @@ export class GameSelectionComponent implements OnInit {
 
   public env = environment
   public loading: boolean = true
-  public gameList: GameEntity[] = []
   public searching: boolean = false;
   public searchText: string = "";
   public isFilterMenuOpen: boolean = false;
+  public gameList!: Observable<GameEntity[]>
 
   constructor(private gameCrudService: GameCrudService, private store: Store, private router: Router) {
   }
@@ -44,22 +44,22 @@ export class GameSelectionComponent implements OnInit {
     this.loading = true
     this.searching = false;
 
-    this.matchState.pipe(take(1)).subscribe(state => {
-      if (state.gameId > 0) {
-        console.debug("Game already selected")
-        this.router.navigate(['player-selection'])
-      } else {
-        this.gameCrudService.findAll().subscribe(res => {
-          const myClonedArray = Object.assign([], res);
-          this.gameList = res.concat(res, myClonedArray)
-          this.loading = false
-        })
-      }
-    })
+    const gameId = this.store.selectSnapshot<number>(state => state.match.gameId)
+
+    if (gameId > 0) {
+      console.debug("Game already selected")
+      this.router.navigate(['player-selection'])
+    } else {
+      console.debug("Game not selected, fetch game list")
+      this.gameList = this.gameCrudService.findAll().pipe(tap(() => this.loading = false))
+    }
   }
 
   public gameSelection(game: GameEntity) {
-    this.store.dispatch(new CreateMatch(game.id, game.title, game.imageId, game.minPlayers, game.maxPlayers)).subscribe(() => this.router.navigate(['player-selection']))
+    this.loading = true
+    this.store.dispatch(new CreateMatch(game.id, game.title, game.imageId, game.minPlayers, game.maxPlayers)).subscribe(() =>
+      this.router.navigate(['player-selection'])
+    )
   }
 
   public cancelMatchCreation() {

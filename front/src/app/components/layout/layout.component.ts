@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Location } from '@angular/common';
-import { Component, ViewChild, ElementRef, Input, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { fromEvent } from "rxjs";
 
 @Component({
@@ -25,23 +25,25 @@ import { fromEvent } from "rxjs";
         <ng-content select="ng-container[role=header]"></ng-content>
       </div>
       
-      <ng-content select="ng-container[role=body]" (scrollPosition)="scrollChanged($event)"></ng-content>
-
+      <div class="content" #contentDiv>
+        <ng-content select="ng-container[role=body]" (scrollPosition)="scrollChanged($event)"></ng-content>
+      </div>
+      
       <div class="bottom">
         <ng-content select="ng-container[role=footer]"></ng-content>
       </div>
     </div>
+
   `,
   styles: [`
     .container {
-      min-height:100%;
       width:100%;
+      height:100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .header {
-      top:0px;
-      position: sticky;
-      bottom: 0px;  
       width: 100%;
       height: 60px;
       display: flex;
@@ -51,12 +53,16 @@ import { fromEvent } from "rxjs";
     }
 
     .scrolling {
-      box-shadow: 0 5px 5px -1px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 8px 5px -1px rgba(0, 0, 0, 0.18);
+    }
+
+    .content {
+      flex: 1;
+      overflow: auto;
     }
 
     .bottom {
-      position: sticky;
-      bottom:0;
+      width:100%;
     }
 
     ::ng-deep.title {
@@ -66,18 +72,20 @@ import { fromEvent } from "rxjs";
     }
   `]
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
 
   @ViewChild('headerDiv', { static: true }) private headerDiv!: ElementRef<HTMLDivElement>
+  @ViewChild('contentDiv', { static: true }) private contentDiv!: ElementRef<HTMLDivElement>
 
   @Input() public withBackButton!: boolean
   @Output() public backButtonAction = new EventEmitter<void>
 
-  constructor(private location: Location) {
+  constructor(private location: Location) { }
 
-    fromEvent(window, "scroll").subscribe(() => {
-      const verticalOffset = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-      if (verticalOffset == 0) {
+  ngOnInit(): void {
+    fromEvent(this.contentDiv.nativeElement, "scroll").subscribe(() => {
+      const elt = this.contentDiv.nativeElement
+      if (elt.scrollTop == 0) {
         this.headerDiv.nativeElement.classList.remove('scrolling')
       } else {
         this.headerDiv.nativeElement.classList.add('scrolling')

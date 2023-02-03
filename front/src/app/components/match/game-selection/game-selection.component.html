@@ -15,7 +15,7 @@
         </button>
     </ng-container>
 
-    <ng-container role="body">
+    <ng-container role="body" >
 
         <div class="headline">
             <span class="choice">Choisir un jeu</span>
@@ -27,7 +27,7 @@
 
         <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
 
-        <div *ngFor="let game of gameList" class="result-list" matRipple (click)="gameSelection(game)">
+        <div *ngFor="let game of gameList | async" class="result-list" matRipple (click)="gameSelection(game)">
             <div class="visual">
                 <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
             </div>
