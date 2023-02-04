@@ -10,30 +10,22 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { mergeMap, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from '../../model/user.model';
 import { UserCrudService } from '../crud/user-crud.service';
-import { Actions, ofActionDispatched, ofActionSuccessful } from '@ngxs/store';
-import { LoggedIn, LoggedOut } from '../../state/auth/auth.actions';
-import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
-export class AuthService implements OnInit {
+export class AuthService {
 
   private readonly csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
   private readonly loginUrl = environment.apiURL + '/api/auth/login';
   private readonly logoutUrl = environment.apiURL + '/api/auth/logout';
 
-  constructor(private http: HttpClient, private userCrudService: UserCrudService, private actions: Actions, private router: Router) {
-    this.actions.pipe(ofActionSuccessful(LoggedIn)).subscribe(() => this.router.navigate(['/']))
-    this.actions.pipe(ofActionDispatched(LoggedOut)).subscribe(() => this.router.navigate(['/login']))
-  }
-
-  ngOnInit(): void {
+  constructor(private http: HttpClient, private userCrudService: UserCrudService) {
   }
 
   public login(email: string, password: string): Observable<User> {
@@ -49,6 +41,6 @@ export class AuthService implements OnInit {
   }
 
   public logout(): Observable<string> {
-    return this.http.get<string>(this.logoutUrl).pipe(tap(_ => console.info("Utilisateur déconnecté")))
+    return this.http.get<string>(this.logoutUrl).pipe(tap(() => console.info("Utilisateur déconnecté")))
   }
 }

@@ -11,56 +11,56 @@
     * - Modification    : 
 **/
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { tap, mergeMap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { AuthStateModel } from "./auth.model";
 import { AuthService } from "../../services/auth/auth.service";
 import { Injectable } from '@angular/core';
-import { DoLogin, DoLogout, LoggedIn, LoggedOut } from "./auth.actions";
-import { User } from "../../model/user.model";
+import { DoLogin, DoLogout } from "./auth.actions";
 
 @State<AuthStateModel>({
-    name: 'auth'
+    name: 'auth',
+    defaults: {
+        id: 0,
+        name: "",
+        email: ""
+    }
 })
 @Injectable()
 export class AuthState {
 
-    @Selector() static isAuthenticated(state: AuthStateModel) {
-        console.debug("Loggin state:" + state.id)
+    @Selector() static isAuthenticated(state: AuthStateModel): boolean {
         return state.id > 0 && state.id != undefined
+    }
+
+    @Selector() static userName(state: AuthStateModel): string {
+        return (state.name == undefined || state.name === "")  ? state.email : state.name
     }
 
     constructor(private authService: AuthService) { }
 
     @Action(DoLogin)
-    login({ setState, getState, dispatch }: StateContext<AuthStateModel>, { email, password }: DoLogin) {
+    login({ patchState }: StateContext<AuthStateModel>, { email, password }: DoLogin) {
         return this.authService.login(email, password).pipe(
             tap(returnData => {
-                setState({
-                    ...getState(),
+                patchState({
                     id: returnData.id,
-                    name: returnData.name
+                    name: returnData.name,
+                    email: returnData.email,
                 })
-            }),
-            mergeMap((returnData: User) => {
-                return dispatch(new LoggedIn(returnData.name))
             })
         )
     }
 
     @Action(DoLogout)
-    logout({ setState, getState, dispatch }: StateContext<AuthStateModel>) {
+    logout({ patchState }: StateContext<AuthStateModel>) {
         return this.authService.logout().pipe(
-            tap(_ => {
-                setState({
-                    ...getState(),
+            tap(() => {
+                patchState({
                     id: 0,
-                    name: ""
+                    name: "",
+                    email: ""
                 })
-            }),
-            mergeMap(() => {
-                return dispatch(new LoggedOut())
             })
         )
     }
-
 }

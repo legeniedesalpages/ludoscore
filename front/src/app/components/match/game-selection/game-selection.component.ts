@@ -10,10 +10,10 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Navigate } from '@ngxs/router-plugin';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subscription, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { GameEntity } from 'src/app/core/entity/game-entity.model';
 import { GameCrudService } from 'src/app/core/services/crud/game-crud.service';
 import { CreateMatch } from 'src/app/core/state/match/match.action';
@@ -37,7 +37,7 @@ export class GameSelectionComponent implements OnInit {
   public isFilterMenuOpen: boolean = false;
   public gameList!: Observable<GameEntity[]>
 
-  constructor(private gameCrudService: GameCrudService, private store: Store, private router: Router) {
+  constructor(private gameCrudService: GameCrudService, private store: Store) {
   }
 
   ngOnInit(): void {
@@ -48,7 +48,7 @@ export class GameSelectionComponent implements OnInit {
 
     if (gameId > 0) {
       console.debug("Game already selected")
-      this.router.navigate(['player-selection'])
+      this.store.dispatch(new Navigate(['player-selection']))
     } else {
       console.debug("Game not selected, fetch game list")
       this.gameList = this.gameCrudService.findAll().pipe(tap(() => this.loading = false))
@@ -58,11 +58,11 @@ export class GameSelectionComponent implements OnInit {
   public gameSelection(game: GameEntity) {
     this.loading = true
     this.store.dispatch(new CreateMatch(game.id, game.title, game.imageId, game.minPlayers, game.maxPlayers)).subscribe(() =>
-      this.router.navigate(['player-selection'])
+      this.store.dispatch(new Navigate(['player-selection']))
     )
   }
 
   public cancelMatchCreation() {
-    this.router.navigate(['/'])
+    this.store.dispatch(new Navigate(['/']))
   }
 }

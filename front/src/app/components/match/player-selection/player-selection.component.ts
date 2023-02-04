@@ -19,9 +19,8 @@ import { AddPlayer, AddTagToPlayer, CancelMatchCreation, RemovePlayer } from 'sr
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
-import { forkJoin, Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription, first } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
-import { MatchStateModel } from 'src/app/core/state/match/match.model';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -51,22 +50,19 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     this.loading = true
 
     forkJoin({
-      state: this.store.selectOnce(MatchState),
+      match: this.store.selectOnce(MatchState),
       allPlayers: this.playerCrudService.findAll()
-    }).subscribe(actions => {
-      this.gameTitle = actions.state.title
-      this.gameImage = actions.state.image
+    }).pipe(first()).subscribe(actions => {
+      this.gameTitle = actions.match.title
+      this.gameImage = actions.match.image
+      this.minPlayers = actions.match.minPlayers
+      this.maxPlayers = actions.match.maxPlayers
       this.loading = false
 
-      this.playerChangeSubscription = this.playerChange.subscribe(p => {
-        console.log("p", p)
-        this.store.selectOnce(MatchState).subscribe((match: MatchStateModel) => {
-          this.canContinue = match.players.length >= match.minPlayers
-          this.minPlayers = match.minPlayers
-          this.maxPlayers = match.maxPlayers
-          const ids = match.players.map(player => player.id)
-          this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
-        })
+      this.playerChangeSubscription = this.playerChange.subscribe(players => {
+        this.canContinue = players.length >= this.minPlayers
+        const ids = players.map(player => player.id)
+        this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
       })
     })
   }
@@ -78,11 +74,11 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   public cancelMatchCreation() {
-    this.store.dispatch(new CancelMatchCreation()).subscribe(() => this.router.navigate(['']))
+    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.router.navigate(['/']))
   }
 
   public cancelGameSelection() {
-    this.store.dispatch(new CancelMatchCreation()).subscribe(() => this.router.navigate(['game-selection']))
+    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.router.navigate(['game-selection']))
   }
 
   public selectPlayer(event: string | PlayerEntity) {
@@ -92,7 +88,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       console.log("Equipe")
     } else {
       const player = event as PlayerEntity
-      this.store.dispatch(new AddPlayer(player.id, player.pseudo, player.gravatar)).subscribe(() => {
+      this.store.dispatch(new AddPlayer(player.id, player.pseudo, player.gravatar)).pipe(first()).subscribe(() => {
         this.playerSelector.value = ""
       })
     }

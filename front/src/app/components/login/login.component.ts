@@ -10,10 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngxs/store';
-import { DoLogin } from 'src/app/core/state/auth/auth.actions';
+import { Component, OnInit } from '@angular/core'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { Navigate } from '@ngxs/router-plugin'
+import { Store } from '@ngxs/store'
+import { DoLogin } from 'src/app/core/state/auth/auth.actions'
 
 @Component({
   selector: 'app-login',
@@ -30,13 +31,13 @@ export class LoginComponent implements OnInit {
   public loading: boolean
 
   constructor(private store: Store) {
-    this.hidePassword = true
-
+   
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.email, Validators.required]),
       password: new FormControl('', Validators.required),
     });
 
+    this.hidePassword = true
     this.errors = false
     this.errorMessage = null
     this.loading = false
@@ -52,6 +53,18 @@ export class LoginComponent implements OnInit {
     this.errors = false
     this.errorMessage = null
 
-    this.store.dispatch(new DoLogin(this.loginForm.value['email'], this.loginForm.value['password']))
+    this.store.dispatch(new DoLogin(
+      this.loginForm.value['email'],
+      this.loginForm.value['password']
+    )).subscribe({
+      next: () => {
+        this.store.dispatch(new Navigate(['/']))
+      },
+      error: () => {
+        this.errors = true
+        this.errorMessage = "login ou mot de passe inccorect"
+        this.loading = false
+      }
+    })
   }
 }
