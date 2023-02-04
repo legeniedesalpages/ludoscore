@@ -85,3 +85,24 @@
   background-color: lightgrey;
   height:1px;
 }
+
+.footer.row {
+  height:50px;   
+  width: 100%;
+  flex-flow: column wrap;
+  align-content: space-between;
+  justify-content: center;
+}
+
+svg {
+  height: 30px;
+  width: 30px;
+}
+
+.footer.row .lead {
+  margin-left:10px;
+}
+
+.footer.row .end {
+  margin-right:10px;
+}

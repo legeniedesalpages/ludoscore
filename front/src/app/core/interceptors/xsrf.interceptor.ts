@@ -13,14 +13,15 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
-import { Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Store } from '@ngxs/store';
+import { Navigate } from '@ngxs/router-plugin';
 
 @Injectable()
 export class HttpXSRFInterceptor implements HttpInterceptor {
 
-    constructor(private tokenExtractor: HttpXsrfTokenExtractor, private router: Router, private authService: AuthService, private snackBar: MatSnackBar) {
+    constructor(private tokenExtractor: HttpXsrfTokenExtractor, private store: Store, private authService: AuthService, private snackBar: MatSnackBar) {
     }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -47,8 +48,8 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
             // redirect to login page if not authenticated (401) and if is not a authentication page
             if (err.status == 401 && !req.url.includes('api/auth')) {
                 console.warn("No more authenticated, redirect to login page")
-                this.authService.logout().subscribe(_ => {
-                    this.router.navigate(['/login']);
+                this.authService.logout().subscribe(() => {
+                    this.store.dispatch(new Navigate(['/login']))
                 })
             }
 

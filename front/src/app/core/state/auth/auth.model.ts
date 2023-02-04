@@ -11,6 +11,7 @@
     * - Modification    : 
 **/
 export interface AuthStateModel {
-  id: number;
-  name: string;
+  id: number
+  name: string
+  email: string
 }

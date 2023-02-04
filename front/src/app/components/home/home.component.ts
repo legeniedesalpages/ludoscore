@@ -11,11 +11,11 @@
     * - Modification    : 
 **/
 import { Component } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { Select } from '@ngxs/store';
 import { DoLogout } from 'src/app/core/state/auth/auth.actions';
 import { AuthState } from 'src/app/core/state/auth/auth.state';
 import { Observable } from 'rxjs';
-import { User } from 'src/app/core/model/user.model';
+import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 
 @Component({
   templateUrl: './home.component.html',
@@ -23,15 +23,14 @@ import { User } from 'src/app/core/model/user.model';
 })
 export class HomeComponent {
 
-  @Select(AuthState) loggedUser!: Observable<User>;
+  @Select(AuthState.userName) loggedUser!: Observable<any>;
+
+  @Dispatch()
+  public logout = () => {
+    this.loggingOut = true
+    return new DoLogout()
+  }
 
   public loggingOut: boolean = false
 
-  constructor(private store: Store) {
-  }
-
-  public logout() {
-    this.loggingOut = true
-    this.store.dispatch(new DoLogout())
-  }
 }

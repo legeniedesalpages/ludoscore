@@ -15,15 +15,6 @@ export class DoLogin {
   constructor(public email: string, public password: string) { }
 }
 
-export class LoggedIn {
-  static readonly type = '[Auth] LoggedIn';
-  constructor(public username: string) { }
-}
-
 export class DoLogout {
   static readonly type = '[Auth] DoLogout';
-}
-
-export class LoggedOut {
-  static readonly type = '[Auth] LoggedOut';
 }

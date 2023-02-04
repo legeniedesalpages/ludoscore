@@ -20,13 +20,14 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { HttpXSRFInterceptor } from './core/interceptors/xsrf.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './app.component';
-import { NgxsModule } from '@ngxs/store';
-import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
-import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from 'src/environments/environment';
 import { AuthState } from './core/state/auth/auth.state';
 import { PusherService } from './core/services/pusher/pusher.service';
 import { MatchState } from './core/state/match/match.state';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
+import { NgxsRouterPluginModule } from '@ngxs/router-plugin';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 @NgModule({
   declarations: [
@@ -46,10 +47,11 @@ import { MatchState } from './core/state/match/match.state';
     // PWA
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: !isDevMode(), registrationStrategy: 'registerWhenStable:30000' }),
 
-    // NgXs
+    // NgXs    
     NgxsModule.forRoot([AuthState, MatchState], { developmentMode: !environment.production }),
     NgxsStoragePluginModule.forRoot({ key: [AuthState, MatchState] }),
-    NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production })
+    NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production }),
+    NgxsRouterPluginModule.forRoot(),
   ],
 
   providers: [
