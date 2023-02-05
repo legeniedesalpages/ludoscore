@@ -12,15 +12,17 @@
 **/
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { AddPlayer, AddTagToPlayer, CancelMatchCreation, RemovePlayer } from 'src/app/core/state/match/match.action';
-import { MatchState } from 'src/app/core/state/match/match.state';
+import { AddPlayer, AddTagToPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer } from 'src/app/core/state/match/match.action';
+import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
 import { forkJoin, Observable, Subscription, first } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
+import { Navigate } from '@ngxs/router-plugin';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -43,11 +45,18 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   private playerChangeSubscription!: Subscription
 
-  constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService) {
+  constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService, private actions: Actions, private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
     this.loading = true
+
+    this.actions.pipe(ofActionCompleted(LaunchMatch)).subscribe(() => {
+      this.store.dispatch(new Navigate(['/']))
+      this.snackBar.open("Partie créée", 'Fermer', {
+        duration: 5000
+      })
+    })
 
     forkJoin({
       match: this.store.selectOnce(MatchState),
@@ -100,5 +109,9 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public actionPlayer(player: Player) {
     this.store.dispatch(new AddTagToPlayer(player.id, "un tag"))
+  }
+
+  public launchMatch() {
+    this.store.dispatch(new LaunchMatch())
   }
 }

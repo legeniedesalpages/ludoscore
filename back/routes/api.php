@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\GameMatchController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\UserController;
 
@@ -29,6 +30,13 @@ Route::middleware('auth:sanctum')->resource('user', UserController::class, ['exc
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->resource('game', GameController::class, ['except' => ['edit', 'create', 'store']]);
+
+/*
+|--------------------------------------------------------------------------
+| Match
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------

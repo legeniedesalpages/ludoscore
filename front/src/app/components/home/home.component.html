@@ -32,7 +32,15 @@
       </div>
       <span class="title">Ludo Score</span>
       <span class="description">Comptabilisateur de score</span>
-      <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
+      <div *ngIf="(matchState | async) === matchStateEnum.CREATING">
+        <button mat-raised-button routerLink="/game-selection">Reprendre la création du match</button>
+      </div>
+      <div *ngIf="(matchState | async) === matchStateEnum.STARTED">
+        <button mat-raised-button routerLink="/game-selection">Voir le match</button>
+      </div>
+      <div *ngIf="(matchState | async) === matchStateEnum.FINISHED">
+        <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
+      </div>
     </div>
   </ng-container>
 </app-layout>
