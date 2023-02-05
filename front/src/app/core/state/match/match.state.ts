@@ -13,10 +13,18 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, RemovePlayer } from "./match.action";
+import { AddPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, RemovePlayer } from "./match.action";
 import { Player } from "../../model/player.model";
+import { MatchService } from "../../services/match/match.service";
+import { tap } from 'rxjs/operators';
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match');
+
+export enum MatchStateEnum {
+    CREATING,
+    STARTED,
+    FINISHED
+}
 
 @State<MatchStateModel>({
     name: MATCH_STATE_TOKEN,
@@ -24,7 +32,7 @@ const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match');
         gameId: 0,
         title: "",
         image: "",
-        creating: true,
+        creating: false,
         started: false,
         minPlayers: 0,
         maxPlayers: 0,
@@ -39,7 +47,12 @@ export class MatchState {
         return state.players
     }
 
-    constructor() { }
+    @Selector()
+    static state(state: MatchStateModel): MatchStateEnum {
+        return state.creating ? MatchStateEnum.CREATING : state.started ? MatchStateEnum.STARTED : MatchStateEnum.FINISHED
+    }
+
+    constructor(private matchService: MatchService) { }
 
     @Action(CreateMatch)
     createMatch({ setState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
@@ -55,13 +68,22 @@ export class MatchState {
         })
     }
 
+    @Action(LaunchMatch)
+    launchMatch({ patchState, getState }: StateContext<MatchStateModel>) {
+        return this.matchService.createMatch(getState().gameId).pipe(tap(() =>
+            patchState({
+                creating: false,
+                started: true
+            })))
+    }
+
     @Action(CancelMatchCreation)
     cancelMatchCreation({ setState }: StateContext<MatchStateModel>) {
         setState({
             gameId: 0,
             title: "",
             image: "",
-            creating: true,
+            creating: false,
             started: false,
             minPlayers: 0,
             maxPlayers: 0,
@@ -107,7 +129,7 @@ export class MatchState {
             return
         }
 
-        const modifiedPlayer = {...player, tags: [...player.tags, tagAddedToPlayer.tag]}
+        const modifiedPlayer = { ...player, tags: [...player.tags, tagAddedToPlayer.tag] }
         const modifiedPlayerList = getState().players.filter(p => p.id !== tagAddedToPlayer.playerId)
         modifiedPlayerList.push(modifiedPlayer)
 

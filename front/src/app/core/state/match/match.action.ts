@@ -15,6 +15,10 @@ export class CreateMatch {
     constructor(public gameId: number, public title: string, public image: string, public minPlayers: number, public maxPlayers: number) { }
 }
 
+export class LaunchMatch {
+    static readonly type: string = '[Match] LaunchMatch';
+}
+
 export class CancelMatchCreation {
     static readonly type: string = '[Match] CancelMatchCreation';
 }
