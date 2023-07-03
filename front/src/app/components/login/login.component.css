@@ -12,10 +12,10 @@ svg {
 }
 
 .dice {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 15px;
 }
 
 .login-form {
@@ -46,4 +46,11 @@ svg {
   justify-content: center;
   align-items: center;
   padding-bottom: 10px;
+}
+
+a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
 }

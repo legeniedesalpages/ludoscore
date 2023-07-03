@@ -1,14 +1,14 @@
 /**
-    * @description      : 
+    * @description      :
     * @author           : renau
-    * @group            : 
+    * @group            :
     * @created          : 13/12/2022 - 11:30:28
-    * 
+    *
     * MODIFICATION LOG
     * - Version         : 1.0.0
     * - Date            : 13/12/2022
     * - Author          : renau
-    * - Modification    : 
+    * - Modification    :
 **/
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -17,7 +17,9 @@ const routes: Routes = [
   { path: '', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: { animation: 'home' } },
   { path: 'login', loadChildren: () => import('./components/login/login.module').then(m => m.LoginModule), data: { animation: 'login' } },
   { path: 'game-selection', loadChildren: () => import('./components/match/game-selection/game-selection.module').then(m => m.GameSelectionModule), data: { animation: 'game-selection' } },
-  { path: 'player-selection', loadChildren: () => import('./components/match/player-selection/player-selection.module').then(m => m.PlayerSelectionModule), data: { animation: 'player-selection' } }
+  { path: 'player-selection', loadChildren: () => import('./components/match/player-selection/player-selection.module').then(m => m.PlayerSelectionModule), data: { animation: 'player-selection' } },
+  { path: 'user-create', loadChildren: () => import('./components/user/create/user-create.module').then(m => m.UserCreateModule), data: { animation: 'user-create' } },
+
 ];
 
 @NgModule({
