@@ -83,11 +83,11 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   public cancelMatchCreation() {
-    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.router.navigate(['/']))
+    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['/'])))
   }
 
   public cancelGameSelection() {
-    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.router.navigate(['game-selection']))
+    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
   }
 
   public selectPlayer(event: string | PlayerEntity) {
