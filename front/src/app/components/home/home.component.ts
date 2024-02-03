@@ -15,7 +15,6 @@ import { Select } from '@ngxs/store';
 import { DoLogout } from 'src/app/core/state/auth/auth.actions';
 import { AuthState } from 'src/app/core/state/auth/auth.state';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
 
@@ -30,6 +29,7 @@ export class HomeComponent implements OnInit {
   @Select(MatchState.state) matchState!: Observable<MatchStateEnum>;
 
   public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
+  public loggingOut: boolean = false
 
   @Dispatch()
   public logout = () => {
@@ -39,8 +39,4 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
-
-  public loggingOut: boolean = false
-
 }

@@ -12,6 +12,7 @@
 **/
 import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { Router } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { DoLogin } from 'src/app/core/state/auth/auth.actions'
@@ -30,7 +31,7 @@ export class LoginComponent implements OnInit {
   public errorMessage: any
   public loading: boolean
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private router: Router) {
    
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.email, Validators.required]),
@@ -58,7 +59,8 @@ export class LoginComponent implements OnInit {
       this.loginForm.value['password']
     )).subscribe({
       next: () => {
-        this.store.dispatch(new Navigate(['/']))
+        //this.store.dispatch(new Navigate(['/']))
+        this.router.navigate(['/'])
       },
       error: () => {
         this.errors = true

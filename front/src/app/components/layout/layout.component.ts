@@ -12,6 +12,7 @@
 **/
 import { Location } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { fromEvent } from "rxjs";
 
 @Component({
@@ -19,7 +20,7 @@ import { fromEvent } from "rxjs";
   template: `
     <div class="container">
       <div class="header" #headerDiv>
-        <button mat-icon-button *ngIf="!withBackButton"><mat-icon>menu</mat-icon></button>
+        <button mat-icon-button *ngIf="!withBackButton" (click)="reset()"><mat-icon>menu</mat-icon></button>
         <button mat-icon-button *ngIf="withBackButton" (click)="back()"><mat-icon>keyboard_backspace</mat-icon></button>
         <span class="menu-spacer" *ngIf="!withBackButton"></span>
         <ng-content select="ng-container[role=header]"></ng-content>
@@ -80,7 +81,7 @@ export class LayoutComponent implements OnInit {
   @Input() public withBackButton!: boolean
   @Output() public backButtonAction = new EventEmitter<void>
 
-  constructor(private location: Location) { }
+  constructor(private location: Location, private store: Store) { }
 
   ngOnInit(): void {
     fromEvent(this.contentDiv.nativeElement, "scroll").subscribe(() => {
@@ -99,5 +100,9 @@ export class LayoutComponent implements OnInit {
     } else {
       this.location.back()
     }
+  }
+
+  public reset(): void {
+    this.store.reset({})
   }
 }
