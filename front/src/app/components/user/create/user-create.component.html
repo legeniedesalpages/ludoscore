@@ -1,10 +1,23 @@
 <app-layout [withBackButton]="true">
-    <ng-container role="header">
-        S'enregistrer
-    </ng-container>
+  <ng-container role="header">
+    S'enregistrer
+  </ng-container>
 
-    <ng-container role="body" >
-      conatiner
-    </ng-container>
-
+  <ng-container role="body">
+    <div class="login-page">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" autocomplete="username">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Mot de passe</mat-label>
+          <input matInput formControlName="password" type="password" autocomplete="new-password">
+        </mat-form-field>
+        <button mat-raised-button color="primary" [disabled]="!registerForm.valid" [hidden]="loading">
+          C'est parti !
+        </button>
+      </form>
+    </div>
+  </ng-container>
 </app-layout>

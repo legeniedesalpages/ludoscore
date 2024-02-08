@@ -11,7 +11,7 @@
     * - Modification    :
 **/
 import { Component, OnInit } from '@angular/core';
-
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 
 @Component({
   templateUrl: './user-create.component.html',
@@ -19,9 +19,25 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserCreateComponent implements OnInit {
 
+  public readonly registerForm: FormGroup
+
+  public loading: boolean
+
   constructor() {
+    this.registerForm = new FormGroup({
+      email: new FormControl('', [Validators.email, Validators.required]),
+      password: new FormControl('', Validators.required),
+    });
+
+    this.loading = false
   }
 
   ngOnInit(): void {
+    console.debug('Show register page')
+  }
+  
+  public onSubmit() {
+    console.info("submitting login form")
+    this.loading = true
   }
 }

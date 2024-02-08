@@ -21,7 +21,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { A11yModule } from '@angular/cdk/a11y'
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
@@ -45,7 +45,8 @@ const routes: Routes = [ { path: '', component: UserCreateComponent }];
     FormsModule,
     MatCheckboxModule,
     MatDividerModule,
-    SidenavModule
+    SidenavModule,
+    ReactiveFormsModule
   ]
 })
 export class UserCreateModule { }
