@@ -52,7 +52,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     this.loading = true
 
     this.actions.pipe(ofActionCompleted(LaunchMatch)).subscribe(() => {
-      this.store.dispatch(new Navigate(['/']))
+      this.store.dispatch(new Navigate(['/match-display']))
       this.snackBar.open("Partie créée", 'Fermer', {
         duration: 5000
       })

@@ -18,6 +18,7 @@ export interface MatchStateModel {
     image: string,
     creating: boolean,
     started: boolean,
+    startedAt: Date | undefined,
     minPlayers: number,
     maxPlayers: number,
     players: Player[]

@@ -11,10 +11,9 @@
     * - Modification    : 
 **/
 
-import { PlayerEntity } from "./player-entity.model";
-
 export interface MatchEntity {
     id?: number,
     gameId: number,
-    players: PlayerEntity[]
+    players: number[],
+    startedAt: Date | undefined
 }

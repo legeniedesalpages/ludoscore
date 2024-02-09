@@ -11,9 +11,10 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { MatchCrudService } from '../crud/match-crud.service';
 import { MatchEntity } from '../../entity/match-entity.model';
+import { Player } from '../../model/player.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -21,11 +22,12 @@ export class MatchService {
     constructor(private matchCrudService: MatchCrudService) {
     }
 
-    public createMatch(gameId: number): Observable<MatchEntity> {
+    public createMatch(gameId: number, players: Player[]): Observable<MatchEntity> {
         const matchEntity: MatchEntity = {
             gameId: gameId,
-            players: []
+            startedAt: undefined,
+            players: players.map(p => p.id)
         }
-        return this.matchCrudService.save(matchEntity)
+        return this.matchCrudService.save(matchEntity).pipe(tap(console.log))
     }
 }

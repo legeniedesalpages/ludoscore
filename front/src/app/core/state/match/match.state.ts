@@ -34,6 +34,7 @@ export enum MatchStateEnum {
         image: "",
         creating: false,
         started: false,
+        startedAt: undefined,
         minPlayers: 0,
         maxPlayers: 0,
         players: []
@@ -62,6 +63,7 @@ export class MatchState {
             image: createMatch.image,
             creating: true,
             started: false,
+            startedAt: undefined,
             minPlayers: createMatch.minPlayers,
             maxPlayers: createMatch.maxPlayers,
             players: []
@@ -70,10 +72,11 @@ export class MatchState {
 
     @Action(LaunchMatch)
     launchMatch({ patchState, getState }: StateContext<MatchStateModel>) {
-        return this.matchService.createMatch(getState().gameId).pipe(tap(() =>
+        return this.matchService.createMatch(getState().gameId, getState().players).pipe(tap((entity) =>
             patchState({
                 creating: false,
-                started: true
+                started: true,
+                startedAt: entity.startedAt
             })))
     }
 
@@ -85,6 +88,7 @@ export class MatchState {
             image: "",
             creating: false,
             started: false,
+            startedAt: undefined,
             minPlayers: 0,
             maxPlayers: 0,
             players: []
@@ -125,7 +129,7 @@ export class MatchState {
 
         const player: Player | undefined = getState().players.find(p => p.id === tagAddedToPlayer.playerId)
         if (player === undefined) {
-            console.warn("Cannot add tag to player")
+            console.warn("Cannot add tag to player because player is undefined")
             return
         }
 
