@@ -1,0 +1,20 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
+    <ng-container role="header">
+        <span class="title">Partie en cours</span>
+    </ng-container>
+
+    <ng-container role="body">
+
+        <div class="elapsedtime">
+            Temps écoulé :<br />
+            <span class="bold">{{ elapsedTime }}</span>
+        </div>
+
+        <div class="elapsedtime">
+            <button mat-raised-button color="primary">
+                Cliquer ici pour mettre fin à la partie
+            </button>
+        </div>
+    </ng-container>
+
+</app-layout>

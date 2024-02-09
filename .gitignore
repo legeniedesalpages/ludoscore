@@ -2,3 +2,4 @@ data
 .vscode-janus-debug
 ludoscore.code-workspace
 back/public/images
+.vscode/
