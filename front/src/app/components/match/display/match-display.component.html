@@ -5,15 +5,21 @@
 
     <ng-container role="body">
 
-        <div class="elapsedtime">
-            Temps écoulé :<br />
-            <span class="bold">{{ elapsedTime }}</span>
-        </div>
+        <div class="game"
+            [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat top / cover'}">
+            <div class="heading">{{ gameName }}</div>
 
-        <div class="elapsedtime">
-            <button mat-raised-button color="primary">
-                Cliquer ici pour mettre fin à la partie
-            </button>
+            <div class="elapsedtime">
+                Temps écoulé :<br />
+                <span class="bold">{{ elapsedTime }}</span>
+            </div>
+
+            <div class="elapsedtime">
+                <button mat-raised-button color="primary">
+                    Cliquer ici pour mettre fin à la partie
+                </button>
+            </div>
+
         </div>
     </ng-container>
 

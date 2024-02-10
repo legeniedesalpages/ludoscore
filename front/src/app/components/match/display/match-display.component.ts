@@ -16,6 +16,7 @@ import { Select, Store } from '@ngxs/store';
 import { Observable, first } from 'rxjs';
 import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
+import { environment } from 'src/environments/environment';
 
 @Component({
   templateUrl: './match-display.component.html',
@@ -27,6 +28,9 @@ export class MatchDisplayComponent implements OnInit {
 
   public startDate?: Date
   public elapsedTime: String
+  public env = environment
+  public gameName?: String
+  public imageUrl?: String
 
   constructor(private store: Store) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
@@ -38,6 +42,8 @@ export class MatchDisplayComponent implements OnInit {
       if (state.startedAt) {
         this.startDate = new Date(state.startedAt)
       }
+      this.imageUrl = this.env.imagesURL + '/' + state.image
+      this.gameName = state.title
     })
 
     setInterval(() => {
