@@ -47,7 +47,7 @@ export class PlayerScoreComponent implements OnInit {
     });
 
     this.playerScore = new FormGroup({
-      score: new FormControl('', [Validators.required])
+      score: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(1)])
     });
   }
 

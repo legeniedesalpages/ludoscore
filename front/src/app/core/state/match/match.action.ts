@@ -15,20 +15,8 @@ export class CreateMatch {
     constructor(public gameId: number, public title: string, public image: string, public minPlayers: number, public maxPlayers: number) { }
 }
 
-export class LaunchMatch {
-    static readonly type: string = '[Match] LaunchMatch';
-}
-
 export class CancelMatchCreation {
     static readonly type: string = '[Match] CancelMatchCreation';
-}
-
-export class SaveMatchResult {
-    static readonly type: string = '[Match] SaveMatchResult';
-}
-
-export class MatchAborted {
-    static readonly type: string = '[Match] MatchAborted';
 }
 
 export class AddPlayer {
@@ -46,7 +34,26 @@ export class AddTagToPlayer {
     constructor(public playerId: number, public tag: string) { }
 }
 
+export class LaunchMatch {
+    static readonly type: string = '[Match] LaunchMatch';
+}
+
+
+
+export class MatchEnded {
+    static readonly type: string = '[Match] SaveMatchResult';
+    constructor(public endDate: Date) { }
+}
+
 export class AddScoreToPlayer {
     static readonly type: string = '[Match] AddScoreToPlayer';
     constructor(public playerId: number, public score: number) { }
+}
+
+export class SaveMatchResult {
+    static readonly type: string = '[Match] SaveMatchResult';
+}
+
+export class MatchAborted {
+    static readonly type: string = '[Match] MatchAborted';
 }
