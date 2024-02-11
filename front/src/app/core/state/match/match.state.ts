@@ -146,14 +146,14 @@ export class MatchState {
 
     @Action(AddScoreToPlayer)
     addScoreToPlayer({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToPlayer: AddScoreToPlayer) {
-        const player: Player | undefined = getState().players.find(p => p.id === scoreAddedToPlayer.playerId)
+        const player: Player | undefined = getState().players.find(p => p.id == scoreAddedToPlayer.playerId)
         if (player === undefined) {
             console.warn("Cannot add tag to player because player is undefined => ", scoreAddedToPlayer.playerId)
             return
         }
 
         const modifiedPlayer = { ...player, score: scoreAddedToPlayer.score }
-        const modifiedPlayerList = getState().players.filter(p => p.id !== scoreAddedToPlayer.playerId)
+        const modifiedPlayerList = getState().players.filter(p => p.id != scoreAddedToPlayer.playerId)
         modifiedPlayerList.push(modifiedPlayer)
 
         setState({
