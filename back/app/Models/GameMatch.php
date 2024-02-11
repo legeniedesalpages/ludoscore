@@ -10,4 +10,9 @@ class GameMatch extends Model
     use HasFactory;
 
     protected $table = 'matches';
+
+    public function teams()
+    {
+        return $this->hasMany(Team::class, 'match_id');
+    }
 }

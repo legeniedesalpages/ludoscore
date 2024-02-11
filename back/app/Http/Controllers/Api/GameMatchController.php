@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GameMatch;
 use App\Models\Team;
 use App\Models\TeamPlayer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,16 @@ class GameMatchController extends Controller
 
     public function update(Request $request, $id)
     {        
+        Log::info("Mise à jour du match d'id : " . $id);
+        Log::debug($request);
+
+        $gameMatch = GameMatch::find($id);
+        $gameMatch->running = $request->running;
+        $gameMatch->canceled = $request->canceled;
+        $gameMatch->finished_at = Carbon::createFromFormat('Y-m-d\TH:i:s+', $request->finished_at);
+        $gameMatch->save();
+
+        return $gameMatch;
     }
 
     public function store(Request $request)
@@ -59,5 +70,11 @@ class GameMatchController extends Controller
         $gameMatchId = $gameMatch->id;
         Log::debug("Game match ID : " . $gameMatchId);
         return $gameMatch;
+    }
+
+    public function show($id)
+    {
+        Log::debug("Recherche le match d'id : " . $id);
+        return GameMatch::find($id);
     }
 }

@@ -26,4 +26,9 @@ class Player extends Model
             return md5(strtolower(trim($this->user->email)));
         }
     }
+
+    public function teamplayers()
+    {
+        return $this->hasMany(TeamPlayer::class);
+    }
 }

@@ -41,7 +41,7 @@ export class LaunchMatch {
 
 
 export class MatchEnded {
-    static readonly type: string = '[Match] SaveMatchResult';
+    static readonly type: string = '[Match] MatchEnded';
     constructor(public endDate: Date) { }
 }
 

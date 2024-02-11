@@ -13,12 +13,14 @@ import { Player } from "../../model/player.model"
     * - Modification    : 
 **/
 export interface MatchStateModel {
+    matchId: number,
     gameId: number
     title: string,
     image: string,
     creating: boolean,
     started: boolean,
     startedAt: Date | undefined,
+    endedAt: Date | undefined,
     minPlayers: number,
     maxPlayers: number,
     players: Player[]
