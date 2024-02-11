@@ -17,5 +17,7 @@ export interface PlayerEntity {
     firstName: string,
     initials: string,
     preferedColor: string,
-    gravatar: string
+    gravatar: string,
+    score: number,
+    matchId: number
 }

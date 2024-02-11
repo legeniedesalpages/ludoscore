@@ -28,7 +28,7 @@ export abstract class CrudService<T, ID> implements CrudOperations<T, ID> {
     }
 
     update(id: ID, t: T): Observable<T> {
-        return this.http.put<T>(`${this.apiUrl}${this.base}/${id}`, t, {}).pipe(tap(res => console.debug("update " + this.base + " => ", res)))
+        return this.http.put<T>(`${this.apiUrl}${this.base}/${id}`, t).pipe(tap(res => console.debug("update " + this.base + " => ", res)))
     }
 
     findOne(id: ID): Observable<T> {

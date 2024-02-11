@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddScoreToPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, RemovePlayer } from "./match.action";
+import { AddPlayer, AddScoreToPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult } from "./match.action";
 import { Player } from "../../model/player.model";
 import { MatchService } from "../../services/match/match.service";
 import { tap } from 'rxjs/operators';
@@ -26,19 +26,23 @@ export enum MatchStateEnum {
     FINISHED
 }
 
+const defaultMatchModel = {
+    matchId: 0,
+    gameId: 0,
+    title: "",
+    image: "",
+    creating: false,
+    started: false,
+    startedAt: undefined,
+    endedAt: undefined,
+    minPlayers: 0,
+    maxPlayers: 0,
+    players: []
+};
+
 @State<MatchStateModel>({
     name: MATCH_STATE_TOKEN,
-    defaults: {
-        gameId: 0,
-        title: "",
-        image: "",
-        creating: false,
-        started: false,
-        startedAt: undefined,
-        minPlayers: 0,
-        maxPlayers: 0,
-        players: []
-    }
+    defaults: defaultMatchModel
 })
 @Injectable()
 export class MatchState {
@@ -58,12 +62,14 @@ export class MatchState {
     @Action(CreateMatch)
     createMatch({ setState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
         setState({
+            matchId: 0,
             gameId: createMatch.gameId,
             title: createMatch.title,
             image: createMatch.image,
             creating: true,
             started: false,
             startedAt: undefined,
+            endedAt: undefined,
             minPlayers: createMatch.minPlayers,
             maxPlayers: createMatch.maxPlayers,
             players: []
@@ -74,6 +80,7 @@ export class MatchState {
     launchMatch({ patchState, getState }: StateContext<MatchStateModel>) {
         return this.matchService.createMatch(getState().gameId, getState().players).pipe(tap((entity) =>
             patchState({
+                matchId: entity.id,
                 creating: false,
                 started: true,
                 startedAt: entity.startedAt
@@ -82,17 +89,7 @@ export class MatchState {
 
     @Action(CancelMatchCreation)
     cancelMatchCreation({ setState }: StateContext<MatchStateModel>) {
-        setState({
-            gameId: 0,
-            title: "",
-            image: "",
-            creating: false,
-            started: false,
-            startedAt: undefined,
-            minPlayers: 0,
-            maxPlayers: 0,
-            players: []
-        })
+        setState(defaultMatchModel)
     }
 
     @Action(AddPlayer)
@@ -159,6 +156,31 @@ export class MatchState {
         setState({
             ...getState(),
             players: modifiedPlayerList
+        })
+    }
+
+    @Action(MatchEnded)
+    matchEnded({ setState, getState }: StateContext<MatchStateModel>, matchEnded: MatchEnded) {
+        setState({
+            ...getState(),
+            endedAt: matchEnded.endDate
+        })
+    }
+
+    @Action(MatchAborted)
+    matchAborted({ setState, getState }: StateContext<MatchStateModel>) {
+        this.matchService.cancelMatch(getState().matchId, getState().endedAt!).subscribe((canceledMatch) => {
+            console.log("Match canceled", canceledMatch)
+            setState(defaultMatchModel)
+        })
+        
+    }
+
+    @Action(SaveMatchResult)
+    saveMatchResult({ setState, getState }: StateContext<MatchStateModel>) {
+        this.matchService.saveMatchResult(getState().matchId, getState().players, getState().endedAt!).subscribe((savedMatch) => {
+            console.log("Match and scores saved", savedMatch)
+            setState(defaultMatchModel)
         })
     }
 }

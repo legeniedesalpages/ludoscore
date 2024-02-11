@@ -15,7 +15,7 @@ import { Navigate } from '@ngxs/router-plugin';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subscription, first } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
-import { CancelMatchCreation, MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action';
+import { MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action';
 import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
 

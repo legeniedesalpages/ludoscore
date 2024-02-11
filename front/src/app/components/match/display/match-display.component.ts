@@ -12,8 +12,9 @@
 **/
 import { Component, OnInit } from '@angular/core';
 import { Navigate } from '@ngxs/router-plugin';
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { Observable, first } from 'rxjs';
+import { MatchEnded } from 'src/app/core/state/match/match.action';
 import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
@@ -32,7 +33,7 @@ export class MatchDisplayComponent implements OnInit {
   public gameName?: String
   public imageUrl?: String
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private actions: Actions) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
   }
 
@@ -46,6 +47,8 @@ export class MatchDisplayComponent implements OnInit {
       this.gameName = state.title
     })
 
+    this.actions.pipe(ofActionSuccessful(MatchEnded)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
+
     setInterval(() => {
       if (this.startDate) {
         let t = new Date().getTime() - new Date(this.startDate).getTime()
@@ -58,7 +61,7 @@ export class MatchDisplayComponent implements OnInit {
   }
 
   public endGame() {
-    this.store.dispatch(new Navigate(['/match-end']))
+    this.store.dispatch(new MatchEnded(new Date()))
   }
 
 
