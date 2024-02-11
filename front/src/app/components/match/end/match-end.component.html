@@ -1,0 +1,32 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToGame()">
+    <ng-container role="header">
+        <span class="title">Fin de partie</span>
+    </ng-container>
+
+    <ng-container role="body">
+        <div class="score">Enregitrement des scores</div>
+        <ul class="player-list">
+            <div *ngFor="let player of (matchState | async)?.players" class="result-list" matRipple>
+                <li class="player" (click)="setPlayerScore(player)">
+                    <div class="player-name">{{ player.name }}</div>
+                </li>
+            </div>
+        </ul>
+
+        <mat-form-field appearance="fill" class="winner">
+            <mat-label>Et le vainqueur est...</mat-label>
+            <mat-select>
+                <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
+                <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="buttons">
+            <button mat-raised-button color="primary" (click)="endMatch()">Enregistrer et mettre fin à la
+                partie</button>
+            <button mat-raised-button color="warn" (click)="abortMatch()">Le match est abandonné</button>
+        </div>
+
+    </ng-container>
+
+</app-layout>

@@ -14,8 +14,14 @@
                 <span class="bold">{{ elapsedTime }}</span>
             </div>
 
+            <ul class="player-list">
+                <div *ngFor="let player of (matchState | async)?.players" class="result-list" matRipple>
+                    <li class="player">{{ player.name }}</li>
+                </div>
+            </ul>
+
             <div class="elapsedtime">
-                <button mat-raised-button color="primary">
+                <button mat-raised-button color="primary" (click)="endGame()">
                     Cliquer ici pour mettre fin à la partie
                 </button>
             </div>
