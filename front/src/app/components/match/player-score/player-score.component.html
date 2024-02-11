@@ -8,8 +8,8 @@
 
         <form [formGroup]="playerScore" (ngSubmit)="onSubmit()" class="buttons">
             <mat-form-field appearance="fill">
-              <mat-label>Score</mat-label>
-              <input matInput formControlName="score">
+              <mat-label>Score (uniquement des chiffres)</mat-label>
+              <input matInput formControlName="score" type="tel">
             </mat-form-field>
             <button mat-raised-button color="primary" [disabled]="!playerScore.valid">
               Enregistrer le score
