@@ -14,7 +14,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Navigate } from '@ngxs/router-plugin';
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { Observable, first, of } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
 import { AddScoreToPlayer } from 'src/app/core/state/match/match.action';
@@ -34,24 +34,30 @@ export class PlayerScoreComponent implements OnInit {
 
   public readonly playerScore: FormGroup
 
-  constructor(private store: Store, activatedRoute: ActivatedRoute) {
+  constructor(private store: Store, activatedRoute: ActivatedRoute, private actions: Actions) {
+    this.playerScore = new FormGroup({
+      score: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(1)])
+    });
+
     activatedRoute.queryParams.pipe(first()).subscribe(params => {
       this.playerId = params['id']
       this.matchState.pipe(first()).subscribe(matchState => {
         let player = matchState.players.find(player => player.id == this.playerId)
         console.log("joueur trouvé", player)
         if (player) {
+          this.playerScore.setValue({
+            score: player.score,
+          });
           this.player = of(player);
         }
       })
     });
 
-    this.playerScore = new FormGroup({
-      score: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(1)])
-    });
+    
   }
 
   ngOnInit(): void {
+    this.actions.pipe(ofActionSuccessful(AddScoreToPlayer)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])));
   }
 
   public onSubmit() {
