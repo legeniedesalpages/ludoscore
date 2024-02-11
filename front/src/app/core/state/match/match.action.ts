@@ -23,6 +23,14 @@ export class CancelMatchCreation {
     static readonly type: string = '[Match] CancelMatchCreation';
 }
 
+export class SaveMatchResult {
+    static readonly type: string = '[Match] SaveMatchResult';
+}
+
+export class MatchAborted {
+    static readonly type: string = '[Match] MatchAborted';
+}
+
 export class AddPlayer {
     static readonly type: string = '[Match] AddPlayer';
     constructor(public playerId: number, public playerName: string, public avatar: string) { }
@@ -36,4 +44,9 @@ export class RemovePlayer {
 export class AddTagToPlayer {
     static readonly type: string = '[Match] AddTagToPlayer';
     constructor(public playerId: number, public tag: string) { }
+}
+
+export class AddScoreToPlayer {
+    static readonly type: string = '[Match] AddScoreToPlayer';
+    constructor(public playerId: number, public score: number) { }
 }

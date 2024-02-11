@@ -20,7 +20,9 @@ const routes: Routes = [
   { path: 'player-selection', loadChildren: () => import('./components/match/player-selection/player-selection.module').then(m => m.PlayerSelectionModule), data: { animation: 'player-selection' } },
   { path: 'user-create', loadChildren: () => import('./components/user/create/user-create.module').then(m => m.UserCreateModule), data: { animation: 'user-create' } },
   { path: 'match-display', loadChildren: () => import('./components/match/display/match-display.module').then(m => m.MatchDisplayModule), data: { animation: 'match-display' } },
-
+  { path: 'match-end', loadChildren: () => import('./components/match/end/match-end.module').then(m => m.MatchEndModule), data: { animation: 'match-end' } },
+  { path: 'player-score', loadChildren: () => import('./components/match/player-score/player-score.module').then(m => m.PlayerScoreModule), data: { animation: 'player-score' } }
+  
 ];
 
 @NgModule({

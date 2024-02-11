@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, RemovePlayer } from "./match.action";
+import { AddPlayer, AddScoreToPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, RemovePlayer } from "./match.action";
 import { Player } from "../../model/player.model";
 import { MatchService } from "../../services/match/match.service";
 import { tap } from 'rxjs/operators';
@@ -108,7 +108,8 @@ export class MatchState {
             id: addedPlayer.playerId,
             avatar: addedPlayer.avatar,
             name: addedPlayer.playerName,
-            tags: []
+            tags: [],
+            score: 0
         })
         setState({
             ...getState(),
@@ -135,6 +136,24 @@ export class MatchState {
 
         const modifiedPlayer = { ...player, tags: [...player.tags, tagAddedToPlayer.tag] }
         const modifiedPlayerList = getState().players.filter(p => p.id !== tagAddedToPlayer.playerId)
+        modifiedPlayerList.push(modifiedPlayer)
+
+        setState({
+            ...getState(),
+            players: modifiedPlayerList
+        })
+    }
+
+    @Action(AddScoreToPlayer)
+    addScoreToPlayer({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToPlayer: AddScoreToPlayer) {
+        const player: Player | undefined = getState().players.find(p => p.id === scoreAddedToPlayer.playerId)
+        if (player === undefined) {
+            console.warn("Cannot add tag to player because player is undefined => ", scoreAddedToPlayer.playerId)
+            return
+        }
+
+        const modifiedPlayer = { ...player, score: scoreAddedToPlayer.score }
+        const modifiedPlayerList = getState().players.filter(p => p.id !== scoreAddedToPlayer.playerId)
         modifiedPlayerList.push(modifiedPlayer)
 
         setState({

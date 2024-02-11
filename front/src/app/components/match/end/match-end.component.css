@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.score {
+  width: 100;
+  text-align: center;
+  margin-top:10px;
+}
+
+.player-list {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  margin-top:10px;
+  border-top: 1px solid lightgrey;
+}
+
+.player {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  margin: 0;
+  background-color: #fafafa;
+  border-bottom: 1px solid lightgrey;
+  user-select: none;
+}
+
+.buttons {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.buttons button {
+  margin: 10px;
+}
+
+.winner {
+  width: 100%;
+  text-align: center;
+  padding-top: 15px;
+}

@@ -1,0 +1,20 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToScore()">
+    <ng-container role="header">
+        <span class="title">Fin de partie</span>
+    </ng-container>
+
+    <ng-container role="body">
+        <div class="score">{{ (player | async)?.name }}</div>
+
+        <form [formGroup]="playerScore" (ngSubmit)="onSubmit()" class="buttons">
+            <mat-form-field appearance="fill">
+              <mat-label>Score</mat-label>
+              <input matInput formControlName="score">
+            </mat-form-field>
+            <button mat-raised-button color="primary" [disabled]="!playerScore.valid">
+              Enregistrer le score
+            </button>
+          </form>
+    </ng-container>
+
+</app-layout>

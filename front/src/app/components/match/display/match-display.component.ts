@@ -57,6 +57,11 @@ export class MatchDisplayComponent implements OnInit {
     }, 1000)
   }
 
+  public endGame() {
+    this.store.dispatch(new Navigate(['/match-end']))
+  }
+
+
   public returnToHome() {
     this.store.dispatch(new Navigate(['/']))
   }
