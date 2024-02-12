@@ -85,6 +85,7 @@ export class LayoutComponent implements OnInit {
 
   ngOnInit(): void {
     fromEvent(this.contentDiv.nativeElement, "scroll").subscribe(() => {
+      console.log("scroll")
       const elt = this.contentDiv.nativeElement
       if (elt.scrollTop == 0) {
         this.headerDiv.nativeElement.classList.remove('scrolling')
