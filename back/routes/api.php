@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\GameMatchController;
+use App\Http\Controllers\Api\GameSearchController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\UserController;
 
@@ -44,3 +45,16 @@ Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::c
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create', 'store']]);
+
+/*
+|--------------------------------------------------------------------------
+| Game search
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->get('/game_search', ['as' => 'game_search', function () {
+    return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = ['searchText' => request()->q]);
+}]);
+
+Route::middleware('auth:sanctum')->get('/game_search_detail', ['as' => 'game_search_detail', function () {
+    return app()->make(GameSearchController::class)->callAction('searchById', $parameters = ['id' => request()->id]);
+}]);

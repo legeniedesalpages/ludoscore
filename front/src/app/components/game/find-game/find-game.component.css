@@ -1,0 +1,62 @@
+.find-game, .find-game-form, .find-game-search-field {
+  width: 100%;
+}
+
+.find-game-result {
+  margin-top: -22px;
+}
+
+.row {
+  cursor: pointer;  
+  height: 150px;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  user-select: none;
+}
+
+.thumbnail {
+  width: 150px;
+}
+
+.thumbnail img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  padding: 0;
+  margin: 0;
+}
+
+.owned {
+  opacity: 0.5;
+}
+
+.text {
+  vertical-align:middle;
+  width: 100%;
+}
+
+.title {
+  width: 100%;  
+  font-size: larger;
+  padding: 10px;
+}
+
+.details {
+  padding: 10px;
+  height: 150px;
+}
+
+.detail {
+  font-size: smaller;
+  padding-bottom: 5px;
+}
+
+.emphasis {
+  font-weight: bold;
+}
+
+.mat-mdc-progress-spinner {
+  float: right; 
+  padding:0; 
+  margin-top: -32px;
+}
