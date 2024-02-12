@@ -1,0 +1,98 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToGameList()">
+    <ng-container role="header">
+        <span class="title">Ajouter un jeu</span>
+    </ng-container>
+
+    <ng-container role="body">
+        <div class="game-editor">
+            <div [hidden]="!loading">
+                <br />
+                <div class="spinner searching">
+                    <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+                </div>
+            </div>
+
+            <form [formGroup]="gameEditorForm"
+                [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.9)), url(' + imageUrl + ') no-repeat top / cover'}"
+                *ngIf="imageUrl != null && !loading">
+
+                <fieldset [disabled]="saving">
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Nom du jeu</mat-label>
+                                <input matInput formControlName="name">
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Uniquement coopérarif</mat-label>
+                                <mat-select formControlName="cooperative">
+                                    <mat-option value="true">Oui</mat-option>
+                                    <mat-option value="false">Non</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Joueurs minimum</mat-label>
+                                <input matInput formControlName="minPlayer">
+                            </mat-form-field>
+                        </div>
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Joueurs maximum</mat-label>
+                                <input matInput formControlName="maxPlayer">
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Date d'obtention</mat-label>
+                                <input matInput formControlName="ownership" [matDatepicker]="ownership">
+                                <mat-datepicker-toggle matIconSuffix [for]="ownership"></mat-datepicker-toggle>
+                                <mat-datepicker #ownership></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <tag-editor [tags]="tagsGame" [title]="'Tags du jeu'"></tag-editor>
+                        </div>
+                        <div class="column">
+                            <tag-editor [tags]="tagsPlayer" [title]="'Tags des joueurs'"></tag-editor>
+                        </div>
+                        <div class="column">
+                            <color-tag-editor [tags]="tagsColor" [title]="'Couleurs'"></color-tag-editor>
+                        </div>
+                    </div>
+
+                    <div class="row button_row">
+                        <div class="column">
+                            <button mat-raised-button [disabled]="saving" color="primary"
+                                (click)="saveGame()">Enregistrer le jeu</button>
+                        </div>
+                    </div>
+
+                    <div class="row button_row">
+                        <div class="column">
+                            <button mat-raised-button [disabled]="saving" (click)="cancel()">Annuler</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
+
+        </div>
+    </ng-container>
+</app-layout>
