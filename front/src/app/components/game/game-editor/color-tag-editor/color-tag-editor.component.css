@@ -1,0 +1,30 @@
+
+.mat-mdc-form-field {
+  opacity: 0.9;
+  width: 100%;
+}
+
+.mdc-evolution-chip-set {
+  padding-right: 36px;
+}
+
+.color-add {
+  display: inline; 
+  float: right; 
+  vertical-align: top; 
+  margin-left: -100px; 
+  margin-top: 8px; 
+  margin-right: 10px;
+}
+
+.mat-mdc-standard-chip {
+  height: 20px;
+}
+
+.mdc-evolution-chip-set .mdc-evolution-chip, .mdc-evolution-chip-set, .mdc-evolution-chip {
+  margin-top: 0px !important;
+}
+
+input {
+  display: none;
+}

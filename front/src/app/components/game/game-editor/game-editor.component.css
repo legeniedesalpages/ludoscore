@@ -1,0 +1,39 @@
+.game-editor {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex: 1 1 auto;
+}
+
+form {
+  width: 100%;
+  padding-top: 10px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.mat-mdc-form-field {
+  opacity: 0.9;
+}
+
+.button_row {
+  height: 50px;
+}
+
+fieldset {
+  border:0 none;
+}

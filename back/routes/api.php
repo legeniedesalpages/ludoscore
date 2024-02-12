@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->resource('user', UserController::class, ['exc
 | Game
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->resource('game', GameController::class, ['except' => ['edit', 'create', 'store']]);
+Route::middleware('auth:sanctum')->resource('game', GameController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------

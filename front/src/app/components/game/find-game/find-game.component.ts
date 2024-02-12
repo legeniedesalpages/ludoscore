@@ -73,4 +73,8 @@ export class FindGameComponent implements OnInit {
     console.debug("Go to edition page for id :" + id);
     this.router.navigate(['/game-editor', 'bgg', id]);
   }
+
+  public returnToHome() { 
+    this.router.navigate(['/']);
+  }
 }

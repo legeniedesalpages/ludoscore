@@ -1,0 +1,19 @@
+<mat-form-field appearance="fill">
+    <mat-label>{{ title }}</mat-label>
+    <mat-chip-grid #chipGridTag aria-label="Ajouter des tags">
+        <mat-chip-row *ngFor="let tag of tags" (removed)="removeTag(tag)" [ngStyle]="{'background-color': tag.code}">
+            <span [ngStyle]="{'color': tag.invert}">{{tag.name}}</span>
+            <button matChipRemove [attr.aria-label]="'remove ' + tag">
+                <mat-icon>cancel</mat-icon>
+            </button>
+        </mat-chip-row>
+        
+        <input [matChipInputFor]="chipGridTag" disabled="true" />
+            
+    </mat-chip-grid>
+    
+</mat-form-field>
+
+<button mat-mini-fab color="primary" class="color-add" (click)="addColorTag()">
+    <mat-icon>add</mat-icon>
+</button>
