@@ -27,16 +27,13 @@
 
         <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
 
-        <div *ngFor="let game of gameList | async" class="result-list" matRipple (click)="gameSelection(game)">
+        <div *ngFor="let game of gameList | async" class="result-list" (click)="gameSelection(game)">
             <div class="visual">
                 <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
             </div>
             <div class="content">
                 <div class="heading">{{ game.title }}</div>
-                <div class="supporting">Dernière partie il y a 1 semaine et 3 jours, victoire de Renaud</div>
-            </div>
-            <div class="action">
-
+                <div class="supporting"></div>
             </div>
         </div>
 
