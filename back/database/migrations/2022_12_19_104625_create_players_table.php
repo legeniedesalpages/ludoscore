@@ -21,7 +21,6 @@ return new class extends Migration
         });
 
         Schema::table('users', function ($table) {
-            $table->boolean('is_admin');
             $table->unsignedBigInteger('player_id')->nullable()->index();
             $table->foreign('player_id')->references('id')->on('players');
         });

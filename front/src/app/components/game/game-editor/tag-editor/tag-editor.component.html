@@ -1,15 +1,18 @@
 <mat-form-field appearance="fill">
     <mat-label>{{ title }}</mat-label>
     <mat-chip-grid #chipGridTag aria-label="Ajouter des tags">
-        <mat-chip-row *ngFor="let tag of tags" (removed)="removeTag(tag)" [editable]="true"
-            (edited)="editTag(tag, $event)">
-            {{tag.name}}
+        <mat-chip-row *ngFor="let tag of tags" (removed)="removeTag(tag)" [editable]="true">
+            {{tag.category}}
             <button matChipRemove [attr.aria-label]="'remove ' + tag">
                 <mat-icon>cancel</mat-icon>
             </button>
         </mat-chip-row>
-        <input placeholder="Ajouter un tag" [matChipInputFor]="chipGridTag"
-            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-            (matChipInputTokenEnd)="addTag($event)" />
+
+        <input [matChipInputFor]="chipGridTag" disabled="true" />
+
     </mat-chip-grid>
 </mat-form-field>
+
+<button mat-mini-fab color="primary" class="tag-add" (click)="addTag()">
+    <mat-icon>add</mat-icon>
+</button>

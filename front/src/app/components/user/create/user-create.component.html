@@ -4,20 +4,34 @@
   </ng-container>
 
   <ng-container role="body">
-    <div class="login-page">
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="fill">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" autocomplete="username">
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Mot de passe</mat-label>
-          <input matInput formControlName="password" type="password" autocomplete="new-password">
-        </mat-form-field>
-        <button mat-raised-button color="primary" [disabled]="!registerForm.valid" [hidden]="loading">
-          C'est parti !
-        </button>
-      </form>
-    </div>
+    <div class="title">Créer un compte 2</div>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <fieldset>
+        <div class="row">
+          <div class="column">
+
+            <mat-form-field appearance="fill">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" autocomplete="username">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <mat-form-field appearance="fill">
+              <mat-label>Mot de passe</mat-label>
+              <input matInput formControlName="password" type="password" autocomplete="new-password">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <button mat-raised-button color="primary" [disabled]="!registerForm.valid" [hidden]="loading">
+              C'est parti !
+            </button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
   </ng-container>
 </app-layout>

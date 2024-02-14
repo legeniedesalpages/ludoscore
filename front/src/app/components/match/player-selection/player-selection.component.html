@@ -8,7 +8,7 @@
 
     <ng-container role="footer">
         <div class="footer row">
-            <button mat-mini-fab [disabled]="!canContinue" color="primary" class="lead">
+            <button mat-mini-fab [disabled]="!canContinue" color="primary" class="lead" (click)="showRandomToolbox()">
                 <svg viewBox="0 0 512 512">
                     <g transform="translate(0,0)">
                       <path 
@@ -89,8 +89,6 @@
                                         <div class="tags">
                                             {{player.tags}}
                                         </div>
-                                    </div>
-                                    <div class="action">
                                     </div>
                                 </div>
                             </swipeable-element>

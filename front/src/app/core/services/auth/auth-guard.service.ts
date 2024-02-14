@@ -30,8 +30,7 @@ export class AuthGuardService {
       console.debug(`Authenticated, can show this page: ${state.url}`)
     } else {
       console.warn(`Not authenticated for page /${next.url}, redirect to login page`)
-      //this.store.dispatch(new Navigate(['/login']))
-      this.router.navigate(['/login'])
+      this.store.dispatch(new Navigate(['/login']))
     }
 
     return isAuthenticated

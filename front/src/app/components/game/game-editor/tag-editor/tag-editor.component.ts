@@ -10,10 +10,12 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Tag } from 'src/app/core/model/tag.model';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
@@ -31,15 +33,9 @@ export class TagEditorComponent implements OnInit {
     @Input()
     public title: string = '';
 
-    ngOnInit(): void {
-    }
+    constructor(private dialog: MatDialog) { }
 
-    public addTag(event: MatChipInputEvent): void {
-        const value = (event.value || '').trim();
-        if (value) {
-            this.tags.push({ name: value });
-        }
-        event.chipInput!.clear();
+    ngOnInit(): void {
     }
 
     public removeTag(tag: Tag): void {
@@ -50,14 +46,34 @@ export class TagEditorComponent implements OnInit {
     }
 
     public editTag(tag: Tag, event: MatChipEditedEvent) {
-        const value = event.value.trim();
-        if (!value) {
-            this.removeTag(tag);
-            return;
-        }
-        const index = this.tags.indexOf(tag);
-        if (index > 0) {
-            this.tags[index].name = value;
-        }
+        
+    }
+
+    public addTag(): void {
+        this.dialog.open(DialogTagEditorComponent, {
+            data: {
+                colorTags: this.tags
+            }
+        })
+    }
+}
+
+@Component({
+    selector: 'dialog-tag-editor',
+    templateUrl: '../tag-editor-dialog/tag-editor-dialog.component.html',
+    styleUrls: ['../tag-editor-dialog/tag-editor-dialog.component.css']
+})
+export class DialogTagEditorComponent {
+
+    public tagEditorForm: FormGroup;
+   
+
+    constructor(public dialogRef: MatDialogRef<DialogTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+        this.tagEditorForm = new FormGroup({
+            category: new FormControl('', Validators.required),
+            unique: new FormControl('', Validators.required),
+            minOcurrences: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
+            maxOcurrences: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)])
+          });
     }
 }
