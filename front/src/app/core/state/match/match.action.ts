@@ -1,3 +1,5 @@
+import { Tag } from "../../model/tag.model";
+
 /**
     * @description      : 
     * @author           : renau
@@ -31,7 +33,7 @@ export class RemovePlayer {
 
 export class AddTagToPlayer {
     static readonly type: string = '[Match] AddTagToPlayer';
-    constructor(public playerId: number, public tag: string) { }
+    constructor(public playerId: number, public tag: Tag) { }
 }
 
 export class LaunchMatch {

@@ -4,3 +4,20 @@
   width: 100%;
   height: 100%;
 }
+
+.register-page {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.column {
+  width: 100%;
+}
+
+.title {
+  padding-top:25px;
+  padding-bottom:30px;
+}

@@ -24,6 +24,9 @@ export class AuthService {
   private readonly csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
   private readonly loginUrl = environment.apiURL + '/api/auth/login';
   private readonly logoutUrl = environment.apiURL + '/api/auth/logout';
+  private readonly registerUrl = environment.apiURL + '/api/auth/register';
+
+
 
   constructor(private http: HttpClient, private userCrudService: UserCrudService) {
   }
@@ -42,5 +45,14 @@ export class AuthService {
 
   public logout(): Observable<string> {
     return this.http.get<string>(this.logoutUrl).pipe(tap(() => console.info("Utilisateur déconnecté")))
+  }
+
+  public createUser(email: string, password: string) {
+    return this.http.get(this.csrfUrl).pipe(
+      // second request : authentication
+      mergeMap(() => this.http.post(this.registerUrl, {
+        email: email,
+        password: password
+      })))
   }
 }

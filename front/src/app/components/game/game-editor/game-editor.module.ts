@@ -31,7 +31,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { TagEditorComponent } from './tag-editor/tag-editor.component';
+import { TagEditorComponent, DialogTagEditorComponent } from './tag-editor/tag-editor.component';
 import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-tag-editor/color-tag-editor.component';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
@@ -47,7 +47,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [GameEditorComponent, TagEditorComponent, ColorTagEditorComponent, DialogColorTagEditorComponent],
+  declarations: [GameEditorComponent, TagEditorComponent, ColorTagEditorComponent, DialogColorTagEditorComponent, DialogTagEditorComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

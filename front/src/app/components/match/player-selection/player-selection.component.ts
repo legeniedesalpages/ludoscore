@@ -108,10 +108,16 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   public actionPlayer(player: Player) {
-    this.store.dispatch(new AddTagToPlayer(player.id, "un tag"))
+    this.store.dispatch(new AddTagToPlayer(player.id, {
+      category: "action", unique: true, minOcurrences: 1, maxOcurrences: 1, names: []
+    }))
   }
 
   public launchMatch() {
     this.store.dispatch(new LaunchMatch())
+  }
+
+  public showRandomToolbox() {
+    this.store.dispatch(new Navigate(['/random-toolbox']))
   }
 }

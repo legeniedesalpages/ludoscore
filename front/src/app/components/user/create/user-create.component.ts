@@ -12,6 +12,9 @@
 **/
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { Router } from '@angular/router';
+import { first } from 'rxjs';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({
   templateUrl: './user-create.component.html',
@@ -23,7 +26,7 @@ export class UserCreateComponent implements OnInit {
 
   public loading: boolean
 
-  constructor() {
+  constructor(private authServie: AuthService, private router: Router) {
     this.registerForm = new FormGroup({
       email: new FormControl('', [Validators.email, Validators.required]),
       password: new FormControl('', Validators.required),
@@ -39,5 +42,9 @@ export class UserCreateComponent implements OnInit {
   public onSubmit() {
     console.info("submitting login form")
     this.loading = true
+    this.authServie.createUser(this.registerForm.value.email, this.registerForm.value.password).pipe(first()).subscribe(() => {
+      this.loading = false
+      this.router.navigate(['/']);
+    })
   }
 }

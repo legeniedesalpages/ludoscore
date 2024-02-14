@@ -26,6 +26,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { UserCreateComponent } from './user-create.component';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 const routes: Routes = [ { path: '', component: UserCreateComponent }];
 
@@ -47,6 +48,7 @@ const routes: Routes = [ { path: '', component: UserCreateComponent }];
     MatDividerModule,
     SidenavModule,
     ReactiveFormsModule
-  ]
+  ],
+  providers: [AuthService]
 })
 export class UserCreateModule { }

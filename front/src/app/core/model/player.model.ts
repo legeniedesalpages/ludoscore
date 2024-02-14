@@ -1,3 +1,5 @@
+import { Tag } from "./tag.model";
+
 /**
     * @description      : 
     * @author           : renau
@@ -14,6 +16,6 @@ export interface Player {
     id: number,
     name: string,
     avatar: string,
-    tags: string[],
+    tags: Tag[],
     score: number
 }

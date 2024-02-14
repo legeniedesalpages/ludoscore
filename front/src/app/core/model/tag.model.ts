@@ -11,5 +11,9 @@
     * - Modification    : 
 **/
 export interface Tag {
-    name: string;
+    category: string
+    unique: boolean
+    minOcurrences: number
+    maxOcurrences: number
+    names: string[]
 }
