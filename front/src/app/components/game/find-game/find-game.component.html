@@ -15,7 +15,7 @@
             </form>
 
             <div class="find-game-result" *ngIf="findGameService.searchedGames.length > 0">
-                <div *ngFor="let item of findGameService.searchedGames" matRipple (click)="gameDetail(item.id)">
+                <div *ngFor="let item of findGameService.searchedGames" (click)="gameDetail(item.id)">
                     <div [class]="item.owned ? 'row owned' : 'row'">
                         <div class="thumbnail">
                             <img src={{item.thumbnail}} />
