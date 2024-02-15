@@ -21,7 +21,6 @@ import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 
-
 @Component({
   templateUrl: './game-selection.component.html',
   styleUrls: ['./game-selection.component.css'],

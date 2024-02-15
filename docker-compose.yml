@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   angular-app:
-    image: angular:2.4.1
+    image: angular:2.5
     build:
       context: ./docker/
       dockerfile: Dockerfile-Node
