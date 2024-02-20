@@ -23,7 +23,7 @@ import { environment } from 'src/environments/environment';
 
 @Component({
   templateUrl: './game-selection.component.html',
-  styleUrls: ['./game-selection.component.css'],
+  styleUrls: ['./game-selection.component.css', '../../../core/css/list.css'],
 })
 export class GameSelectionComponent implements OnInit {
 

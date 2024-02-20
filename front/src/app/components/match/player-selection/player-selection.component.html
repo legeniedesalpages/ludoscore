@@ -62,13 +62,13 @@
                     [ngStyle]="{'height': (minPlayers * 65) + 'px'}">
                     {{minPlayers}} joueur{{minPlayers > 1 ? 's' : ''}} minimum
                 </div>
-                <div class="background-player background-player-maximum"
-                    [ngStyle]="{'height': (maxPlayers * 65) + 'px'}">
+                <div class="background-player background-player-maximum" *ngIf="maxPlayers > minPlayers"
+                    [ngStyle]="{'height': ((maxPlayers - minPlayers) * 65) + 'px'}">
                     {{maxPlayers}} joueurs maximum
                 </div>
             </div>
 
-            <div class="player-container" [ngStyle]="{'margin-top': ((minPlayers + maxPlayers) * -65) + 'px'}"
+            <div class="player-container" [ngStyle]="{'margin-top': ((maxPlayers) * -65) + 'px'}"
                 style="position: relative;">
                 <div *ngFor="let player of playerChange | async" mat-ripple>
                     <div class="row">
