@@ -17,7 +17,7 @@ import { FindGameService } from 'src/app/core/services/game/find-game.service';
 @Component({
   selector: 'find-game',
   templateUrl: './find-game.component.html',
-  styleUrls: ['./find-game.component.css']
+  styleUrls: ['./find-game.component.css', '../../../core/css/list.css']
 })
 export class FindGameComponent implements OnInit {
   

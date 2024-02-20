@@ -30,19 +30,32 @@
           </g>
         </svg>
       </div>
+
       <span class="title">Ludo Score</span>
+
       <span class="description">Comptabilisateur de score</span>
-      <div *ngIf="(matchState | async) === matchStateEnum.CREATING">
-        <button mat-raised-button routerLink="/game-selection">Reprendre la création du match</button>
-      </div>
-      <div *ngIf="(matchState | async) === matchStateEnum.STARTED">
-        <button mat-raised-button routerLink="/match-display">Voir le match en cours</button>
-      </div>
-      <div *ngIf="(matchState | async) === matchStateEnum.FINISHED">
-        <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
+
+      <div class="match-state">
+        <div *ngIf="(matchState | async) === matchStateEnum.CREATING">
+          <button mat-raised-button routerLink="/game-selection">Reprendre la création du match</button>
+        </div>
+        <div *ngIf="(matchState | async) === matchStateEnum.STARTED">
+          <button mat-raised-button routerLink="/match-display">Voir le match en cours</button>
+        </div>
+        <div *ngIf="(matchState | async) === matchStateEnum.FINISHED">
+          <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
+        </div>
       </div>
     </div>
 
-    <button mat-raised-button routerLink="/find-game">Chercher un jeu</button>
+    <div class="action-list">
+      <div class="action">
+        <button mat-fab color="primary" aria-label="Rechercher un jeu pour ensuite pouvoir l'ajouter" routerLink="/find-game">
+          <mat-icon>manage_search</mat-icon>
+        </button>
+        <div class="caption">Rechercher un jeu</div>
+      </div>
+    </div>
+
   </ng-container>
 </app-layout>
