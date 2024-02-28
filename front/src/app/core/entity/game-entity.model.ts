@@ -1,3 +1,5 @@
+import { Tag } from "../model/tag.model";
+
 /**
     * @description      : 
     * @author           : renau
@@ -18,5 +20,7 @@ export interface GameEntity {
     isOnlyCooperative: boolean,
     minPlayers: number,
     maxPlayers: number,
-    bggId: number
+    bggId: number,
+    matchTags: string,
+    playerTags: string
 }

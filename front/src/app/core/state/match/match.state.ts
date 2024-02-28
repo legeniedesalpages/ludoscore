@@ -37,7 +37,9 @@ const defaultMatchModel = {
     endedAt: undefined,
     minPlayers: 0,
     maxPlayers: 0,
-    players: []
+    players: [],
+    matchTags: [],
+    playerTags: []
 };
 
 @State<MatchStateModel>({
@@ -72,7 +74,9 @@ export class MatchState {
             endedAt: undefined,
             minPlayers: createMatch.minPlayers,
             maxPlayers: createMatch.maxPlayers,
-            players: []
+            players: [],
+            matchTags: JSON.parse(createMatch.matchTags),
+            playerTags: JSON.parse(createMatch.playerTags)
         })
     }
 

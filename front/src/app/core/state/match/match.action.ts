@@ -14,7 +14,7 @@ import { Tag } from "../../model/tag.model";
 **/
 export class CreateMatch {
     static readonly type: string = '[Match] CreateMatch';
-    constructor(public gameId: number, public title: string, public image: string, public minPlayers: number, public maxPlayers: number) { }
+    constructor(public gameId: number, public title: string, public image: string, public minPlayers: number, public maxPlayers: number, public matchTags: string, public playerTags: string) { }
 }
 
 export class CancelMatchCreation {

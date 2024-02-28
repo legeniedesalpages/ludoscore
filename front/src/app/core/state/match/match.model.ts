@@ -1,4 +1,5 @@
 import { Player } from "../../model/player.model"
+import { Tag } from "../../model/tag.model"
 
 /**
     * @description      : 
@@ -23,5 +24,7 @@ export interface MatchStateModel {
     endedAt: Date | undefined,
     minPlayers: number,
     maxPlayers: number,
-    players: Player[]
+    players: Player[],
+    matchTags: Tag[],
+    playerTags: Tag[]
 }
