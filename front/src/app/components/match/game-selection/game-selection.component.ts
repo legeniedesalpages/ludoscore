@@ -56,8 +56,12 @@ export class GameSelectionComponent implements OnInit {
 
   public gameSelection(game: GameEntity) {
     this.loading = true
-    this.store.dispatch(new CreateMatch(game.id, game.title, game.imageId, game.minPlayers, game.maxPlayers)).subscribe(() =>
-      this.store.dispatch(new Navigate(['player-selection']))
+    this.store.dispatch(new CreateMatch(game.id, game.title, game.imageId, game.minPlayers, game.maxPlayers, game.matchTags, game.playerTags)).subscribe((e) =>
+      {
+        console.debug("Tags du match", e.match.matchTags)
+        console.debug("Tags des joueurs", e.match.playerTags)
+        this.store.dispatch(new Navigate(['player-selection']))
+      }
     )
   }
 
