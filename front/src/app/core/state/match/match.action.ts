@@ -1,3 +1,4 @@
+import { ChoosenTag } from "../../model/choosen-tag.model";
 import { Tag } from "../../model/tag.model";
 
 /**
@@ -33,7 +34,12 @@ export class RemovePlayer {
 
 export class AddTagToPlayer {
     static readonly type: string = '[Match] AddTagToPlayer';
-    constructor(public playerId: number, public tag: Tag) { }
+    constructor(public playerId: number, public tag: ChoosenTag) { }
+}
+
+export class AddTagToMatch {
+    static readonly type: string = '[Match] AddTagToMatch';
+    constructor(public tag: ChoosenTag) { }
 }
 
 export class LaunchMatch {

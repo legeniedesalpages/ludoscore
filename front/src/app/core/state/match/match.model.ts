@@ -1,3 +1,4 @@
+import { ChoosenTag } from "../../model/choosen-tag.model"
 import { Player } from "../../model/player.model"
 import { Tag } from "../../model/tag.model"
 
@@ -26,5 +27,6 @@ export interface MatchStateModel {
     maxPlayers: number,
     players: Player[],
     matchTags: Tag[],
-    playerTags: Tag[]
+    playerTags: Tag[],
+    choosenTags: ChoosenTag[]
 }

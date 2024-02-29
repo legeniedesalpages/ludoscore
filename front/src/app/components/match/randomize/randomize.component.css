@@ -33,3 +33,18 @@ hr {
   padding: 0;
   margin-bottom: 10px;
 }
+
+.icon-all-random {
+  fill: white;
+}
+
+.text-all-random {
+  fill: white;
+  padding-right: 10px;
+}
+
+.all-random div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

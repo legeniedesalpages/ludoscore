@@ -1,5 +1,4 @@
-import { Tag } from "./tag.model";
-
+import { ChoosenTag } from "./choosen-tag.model";
 /**
     * @description      : 
     * @author           : renau
@@ -16,6 +15,6 @@ export interface Player {
     id: number,
     name: string,
     avatar: string,
-    tags: Tag[],
+    tags: ChoosenTag[],
     score: number
 }
