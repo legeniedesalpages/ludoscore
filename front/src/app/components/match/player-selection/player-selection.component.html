@@ -76,8 +76,7 @@
                             <swipeable-element
                                 [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
                                 [leftWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
-                                (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="deleteAction(player)"
-                                (actionEvent)="actionPlayer(player)">
+                                (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="deleteAction(player)">
                                 <div class="player">
                                     <div class="avatar">
                                         <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg">
@@ -87,7 +86,9 @@
                                             {{player.name}}
                                         </div>
                                         <div class="tags">
-                                            {{player.tags}}
+                                            <ul *ngFor="let tag of player.tags" mat-ripple>
+                                                <li>{{tag.category}}: {{tag.name}}</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>

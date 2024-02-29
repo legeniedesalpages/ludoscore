@@ -59,8 +59,6 @@
 
 .tags {
   font-size: small;
-  padding-top: 2px;
-  padding-bottom: 5px;
 }
 
 .background-player {
@@ -105,4 +103,9 @@ svg {
 
 .footer.row .end {
   margin-right:10px;
+}
+
+ul li {
+  margin: 0;
+  padding: 0;
 }

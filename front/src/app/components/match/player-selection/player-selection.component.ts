@@ -15,8 +15,8 @@ import { Router } from '@angular/router';
 import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { AddPlayer, AddTagToPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer } from 'src/app/core/state/match/match.action';
-import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
+import { AddPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer } from 'src/app/core/state/match/match.action';
+import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
 import { forkJoin, Observable, Subscription, first } from 'rxjs';
@@ -105,12 +105,6 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public deleteAction(player: Player) {
     this.store.dispatch(new RemovePlayer(player.id))
-  }
-
-  public actionPlayer(player: Player) {
-    this.store.dispatch(new AddTagToPlayer(player.id, {
-      category: "action", unique: true, minOcurrences: 1, maxOcurrences: 1, names: []
-    }))
   }
 
   public launchMatch() {

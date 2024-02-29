@@ -39,7 +39,8 @@ const defaultMatchModel = {
     maxPlayers: 0,
     players: [],
     matchTags: [],
-    playerTags: []
+    playerTags: [],
+    choosenTags: []
 };
 
 @State<MatchStateModel>({
@@ -76,7 +77,8 @@ export class MatchState {
             maxPlayers: createMatch.maxPlayers,
             players: [],
             matchTags: JSON.parse(createMatch.matchTags),
-            playerTags: JSON.parse(createMatch.playerTags)
+            playerTags: JSON.parse(createMatch.playerTags),
+            choosenTags: []
         })
     }
 
@@ -135,9 +137,13 @@ export class MatchState {
             return
         }
 
-        const modifiedPlayer = { ...player, tags: [...player.tags, tagAddedToPlayer.tag] }
-        const modifiedPlayerList = getState().players.filter(p => p.id !== tagAddedToPlayer.playerId)
-        modifiedPlayerList.push(modifiedPlayer)
+        const modifiedPlayerList = getState().players.map(unmodifiedPlayer => {
+            if (unmodifiedPlayer.id !== tagAddedToPlayer.playerId) {
+                return unmodifiedPlayer;
+            } else {
+                return { ...player, tags: [...player.tags.filter(p => {p.category != tagAddedToPlayer.tag.category}), tagAddedToPlayer.tag] };
+            }
+        });
 
         setState({
             ...getState(),
