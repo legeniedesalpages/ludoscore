@@ -13,10 +13,11 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddScoreToPlayer, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult } from "./match.action";
+import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult } from "./match.action";
 import { Player } from "../../model/player.model";
 import { MatchService } from "../../services/match/match.service";
 import { tap } from 'rxjs/operators';
+import { ChoosenTag } from "../../model/choosen-tag.model";
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match');
 
@@ -106,7 +107,7 @@ export class MatchState {
             return
         }
 
-        const newPlayerList = Object.assign([], getState().players);
+        const newPlayerList = Object.assign([], getState().players)
         newPlayerList.push({
             id: addedPlayer.playerId,
             avatar: addedPlayer.avatar,
@@ -141,13 +142,45 @@ export class MatchState {
             if (unmodifiedPlayer.id !== tagAddedToPlayer.playerId) {
                 return unmodifiedPlayer;
             } else {
-                return { ...player, tags: [...player.tags.filter(p => {p.category != tagAddedToPlayer.tag.category}), tagAddedToPlayer.tag] };
+                const playerTags: ChoosenTag[] = player.tags.map(tags => {
+                    if (tags.category != tagAddedToPlayer.category) {
+                        tags.names[tagAddedToPlayer.index] = tagAddedToPlayer.name
+                    }
+                    return tags
+                })
+                return { ...player, tags: playerTags };
             }
         });
 
         setState({
             ...getState(),
             players: modifiedPlayerList
+        })
+    }
+
+    @Action(AddTagToMatch)
+    addTagToMatch({ setState, getState }: StateContext<MatchStateModel>, tagAddedToMatch: AddTagToMatch) {
+
+        console.log("Ajout d'un tag de match: ", tagAddedToMatch.category, tagAddedToMatch.name, tagAddedToMatch.index )
+
+        const modifiedChoosenTags: ChoosenTag[] = Object.assign([], getState().choosenTags.filter(tags => tags.category != tagAddedToMatch.category));
+        const categoryTag = getState().choosenTags.filter(tags => tags.category == tagAddedToMatch.category)[0]
+        const length = getState().matchTags.filter(tag => tag.category == tagAddedToMatch.category)[0].maxOcurrences
+        let names: string[] = []
+        for (let i = 0; i < length; i++) {
+            if (i == tagAddedToMatch.index) {
+                names.push(tagAddedToMatch.name)  
+            } else {
+                names.push(categoryTag.names[i])
+            }
+        }
+
+        console.log("Nouvelle liste de tags: ", tagAddedToMatch.category, names)
+        modifiedChoosenTags.push({ category: tagAddedToMatch.category, names: names })
+        
+        setState({
+            ...getState(),
+            choosenTags: modifiedChoosenTags
         })
     }
 
@@ -183,7 +216,7 @@ export class MatchState {
             console.log("Match canceled", canceledMatch)
             setState(defaultMatchModel)
         })
-        
+
     }
 
     @Action(SaveMatchResult)

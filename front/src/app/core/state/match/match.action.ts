@@ -34,12 +34,12 @@ export class RemovePlayer {
 
 export class AddTagToPlayer {
     static readonly type: string = '[Match] AddTagToPlayer';
-    constructor(public playerId: number, public tag: ChoosenTag) { }
+    constructor(public playerId: number, public category: string, public name: string, public index: number) { }
 }
 
 export class AddTagToMatch {
     static readonly type: string = '[Match] AddTagToMatch';
-    constructor(public tag: ChoosenTag) { }
+    constructor(public category: string, public name: string, public index: number) { }
 }
 
 export class LaunchMatch {
