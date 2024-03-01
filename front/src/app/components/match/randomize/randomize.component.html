@@ -24,16 +24,16 @@
             </h2>
             <div *ngFor="let matchTag of (matchState | async)?.matchTags" class="game-tag">
                 <hr />
-                <div *ngFor="let i of [].constructor(matchTag.maxOcurrences)">
+                <div *ngFor="let occurence of [].constructor(matchTag.maxOcurrences); let i = index;">
                     <mat-form-field appearance="fill" class="selection">
                         <mat-label>{{ matchTag.category }}</mat-label>
-                        <mat-select (selectionChange)="selectMatchTag($event.value, matchTag.category)">
-                            <mat-option *ngFor="let matchTagName of matchTag.names" [value]="matchTagName">
+                        <mat-select (selectionChange)="selectMatchTag($event.value, matchTag.category, i)" [value]="alreadySelectedMatchTag(matchTag, i)">
+                            <mat-option *ngFor="let matchTagName of matchTagAvailable(matchTag, i)" [value]="matchTagName">
                                 {{matchTagName}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <button mat-mini-fab color="primary" class="individual-random">
+                    <button mat-mini-fab color="primary" class="individual-random" (click)="randomizeMatchTag(matchTag, i)">
                         <svg viewBox="0 0 512 512">
                             <g transform="translate(0,20)">
                                 <path
@@ -70,11 +70,11 @@
                 <h3>{{ player.name }}</h3>
                 <div *ngFor="let playerTag of (matchState | async)?.playerTags" class="player-tag">
                     <hr />
-                    <div *ngFor="let i of [].constructor(playerTag.maxOcurrences)">
+                    <div *ngFor="let occurence of [].constructor(playerTag.maxOcurrences); let i = index;">
                         <mat-form-field appearance="fill" class="selection">
                             <mat-label>{{ playerTag.category }}</mat-label>
-                            <mat-select (selectionChange)="selectPlayerTag(player, $event.value, playerTag.category)"
-                                [value]="alreadySelectedTag(playerTag.category, player)">
+                            <mat-select (selectionChange)="selectPlayerTag(player, $event.value, playerTag.category, i)"
+                                [value]="alreadySelectedPlayerTag(playerTag.category, player, i)">
                                 <mat-option *ngFor="let playerTagName of playerTagAvailable(playerTag, player)"
                                     [value]="playerTagName">
                                     {{playerTagName}}
@@ -82,7 +82,7 @@
                             </mat-select>
                         </mat-form-field>
                         <button mat-mini-fab color="primary" class="individual-random"
-                            (click)="randomizePlayerTag(playerTag, player)">
+                            (click)="randomizePlayerTag(playerTag, player, i)">
                             <svg viewBox="0 0 512 512">
                                 <g transform="translate(0,20)">
                                     <path

@@ -12,5 +12,5 @@
 **/
 export interface ChoosenTag {
     category: string
-    name: string
+    names: string[]
 }
