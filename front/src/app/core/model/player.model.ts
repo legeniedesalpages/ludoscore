@@ -15,6 +15,6 @@ export interface Player {
     id: number,
     name: string,
     avatar: string,
-    tags: ChoosenTag[],
+    choosenTags: ChoosenTag[],
     score: number
 }

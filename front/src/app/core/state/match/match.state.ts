@@ -112,7 +112,7 @@ export class MatchState {
             id: addedPlayer.playerId,
             avatar: addedPlayer.avatar,
             name: addedPlayer.playerName,
-            tags: [],
+            choosenTags: [],
             score: 0
         })
         setState({
@@ -132,25 +132,40 @@ export class MatchState {
     @Action(AddTagToPlayer)
     addTagToPlayer({ setState, getState }: StateContext<MatchStateModel>, tagAddedToPlayer: AddTagToPlayer) {
 
+        console.log("Ajout d'un tag de joueur: ", tagAddedToPlayer.playerId, tagAddedToPlayer.category, tagAddedToPlayer.name, tagAddedToPlayer.index)
+
         const player: Player | undefined = getState().players.find(p => p.id === tagAddedToPlayer.playerId)
         if (player === undefined) {
             console.warn("Cannot add tag to player because player is undefined")
             return
         }
 
+        const categoryTag = player.choosenTags.filter(tags => tags.category == tagAddedToPlayer.category)[0]
+        const length = getState().playerTags.filter(tag => tag.category == tagAddedToPlayer.category)[0].maxOcurrences
+        let names: string[] = []
+        for (let i = 0; i < length; i++) {
+            if (i == tagAddedToPlayer.index) {
+                names.push(tagAddedToPlayer.name)
+            } else {
+                if (categoryTag != undefined) {
+                    names.push(categoryTag.names[i])
+                } else {
+                    names.push(categoryTag)
+                }
+            }
+        }
+        console.log("Nouvelle liste de tags: ", tagAddedToPlayer.category, names)
+
+        const modifiedChoosenTags: ChoosenTag[] = Object.assign([], player.choosenTags.filter(tags => tags.category != tagAddedToPlayer.category))
+        modifiedChoosenTags.push({ category: tagAddedToPlayer.category, names: names })
+
         const modifiedPlayerList = getState().players.map(unmodifiedPlayer => {
-            if (unmodifiedPlayer.id !== tagAddedToPlayer.playerId) {
+            if (unmodifiedPlayer.id != tagAddedToPlayer.playerId) {
                 return unmodifiedPlayer;
             } else {
-                const playerTags: ChoosenTag[] = player.tags.map(tags => {
-                    if (tags.category != tagAddedToPlayer.category) {
-                        tags.names[tagAddedToPlayer.index] = tagAddedToPlayer.name
-                    }
-                    return tags
-                })
-                return { ...player, tags: playerTags };
+                return { ...player, choosenTags: modifiedChoosenTags };
             }
-        });
+        })
 
         setState({
             ...getState(),
@@ -161,23 +176,27 @@ export class MatchState {
     @Action(AddTagToMatch)
     addTagToMatch({ setState, getState }: StateContext<MatchStateModel>, tagAddedToMatch: AddTagToMatch) {
 
-        console.log("Ajout d'un tag de match: ", tagAddedToMatch.category, tagAddedToMatch.name, tagAddedToMatch.index )
+        console.log("Ajout d'un tag de match: ", tagAddedToMatch.category, tagAddedToMatch.name, tagAddedToMatch.index)
 
-        const modifiedChoosenTags: ChoosenTag[] = Object.assign([], getState().choosenTags.filter(tags => tags.category != tagAddedToMatch.category));
         const categoryTag = getState().choosenTags.filter(tags => tags.category == tagAddedToMatch.category)[0]
         const length = getState().matchTags.filter(tag => tag.category == tagAddedToMatch.category)[0].maxOcurrences
         let names: string[] = []
         for (let i = 0; i < length; i++) {
             if (i == tagAddedToMatch.index) {
-                names.push(tagAddedToMatch.name)  
+                names.push(tagAddedToMatch.name)
             } else {
-                names.push(categoryTag.names[i])
+                if (categoryTag != undefined) {
+                    names.push(categoryTag.names[i])
+                } else {
+                    names.push(categoryTag)
+                }
             }
         }
-
         console.log("Nouvelle liste de tags: ", tagAddedToMatch.category, names)
+
+        const modifiedChoosenTags: ChoosenTag[] = Object.assign([], getState().choosenTags.filter(tags => tags.category != tagAddedToMatch.category))
         modifiedChoosenTags.push({ category: tagAddedToMatch.category, names: names })
-        
+
         setState({
             ...getState(),
             choosenTags: modifiedChoosenTags
