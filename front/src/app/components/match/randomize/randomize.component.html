@@ -7,7 +7,7 @@
 
         <div *ngIf="((matchState | async)?.matchTags?.length ?? 0) > 0">
             <h2>Tag du match
-                <button mat-flat-button color="primary" class="all-random">
+                <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllMatchTag()">
                     <div>
                         <span class="text-all-random">Tout au hasard</span>
                         <span class="icon-all-random">
@@ -75,7 +75,7 @@
                             <mat-label>{{ playerTag.category }}</mat-label>
                             <mat-select (selectionChange)="selectPlayerTag(player, $event.value, playerTag.category, i)"
                                 [value]="alreadySelectedPlayerTag(playerTag.category, player, i)">
-                                <mat-option *ngFor="let playerTagName of playerTagAvailable(playerTag, player)"
+                                <mat-option *ngFor="let playerTagName of playerTagAvailable(playerTag, player, i)"
                                     [value]="playerTagName">
                                     {{playerTagName}}
                                 </mat-option>
