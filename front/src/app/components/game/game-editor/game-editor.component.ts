@@ -1,14 +1,14 @@
 /**
-    * @description      : 
+    * @description      :
     * @author           : renau
-    * @group            : 
+    * @group            :
     * @created          : 19/12/2022 - 11:27:36
-    * 
+    *
     * MODIFICATION LOG
     * - Version         : 1.0.0
     * - Date            : 19/12/2022
     * - Author          : renau
-    * - Modification    : 
+    * - Modification    :
 **/
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
@@ -104,27 +104,27 @@ export class GameEditorComponent implements OnInit {
 
   public saveGame(): void {
     this.saving = true;
-    
+
     let formName = this.gameEditorForm.get('name')?.value;
     console.log("saving " + formName + ", owning date [" + this.gameEditorForm.get('ownership')?.value + "]");
 
     let game: Game = {
       id: null,
       title: formName,
-      image_id: this.imageResource!,
-      thumbnail_id: this.thumbnailResource!,
+      imageId: this.imageResource!,
+      thumbnailId: this.thumbnailResource!,
       isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value == "false" ? false : true,
-      min_players: this.gameEditorForm.get('minPlayer')?.value,
-      max_players: this.gameEditorForm.get('maxPlayer')?.value,
+      minPlayers: this.gameEditorForm.get('minPlayer')?.value,
+      maxPlayers: this.gameEditorForm.get('maxPlayer')?.value,
       ownershipDate: this.gameEditorForm.get('ownership')?.value!,
       matchTags: this.tagsGame,
       playerTags: this.tagsPlayer,
       playerColors: this.tagsColor,
       bggId: this.bggId!,
-      created_at: null
+      createdAt: null
     };
 
-    
+
     this.gameService.save(game).subscribe({
       next: (game) => {
 
@@ -135,9 +135,10 @@ export class GameEditorComponent implements OnInit {
         });
         this.saving = false;
 
-        this.router.navigate(['/']);
+        //this.router.navigate(['/']);
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error saving game', err);
         this.saving = false;
       }
     });

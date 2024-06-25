@@ -1,14 +1,14 @@
 /**
-    * @description      : 
+    * @description      :
     * @author           : renau
-    * @group            : 
+    * @group            :
     * @created          : 19/12/2022 - 11:27:36
-    * 
+    *
     * MODIFICATION LOG
     * - Version         : 1.0.0
     * - Date            : 19/12/2022
     * - Author          : renau
-    * - Modification    : 
+    * - Modification    :
 **/
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -36,7 +36,7 @@ export class PlayerScoreComponent implements OnInit {
 
   constructor(private store: Store, activatedRoute: ActivatedRoute, private actions: Actions) {
     this.playerScore = new FormGroup({
-      score: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(1)])
+      score: new FormControl('', [Validators.required, Validators.pattern("^[0-9\-]*$"), Validators.minLength(1)])
     });
 
     activatedRoute.queryParams.pipe(first()).subscribe(params => {
@@ -53,7 +53,7 @@ export class PlayerScoreComponent implements OnInit {
       })
     });
 
-    
+
   }
 
   ngOnInit(): void {

@@ -1,14 +1,14 @@
 /**
-    * @description      : 
+    * @description      :
     * @author           : renau
-    * @group            : 
+    * @group            :
     * @created          : 09/01/2023 - 00:34:56
-    * 
+    *
     * MODIFICATION LOG
     * - Version         : 1.0.0
     * - Date            : 09/01/2023
     * - Author          : renau
-    * - Modification    : 
+    * - Modification    :
 **/
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -34,11 +34,11 @@ export class GameService {
 
         return this.http.post<Game>(this.gameUrl, {
             name: game.title,
-            image_id: game.image_id,
-            thumbnail_id: game.thumbnail_id,
+            image_id: game.imageId,
+            thumbnail_id: game.thumbnailId,
             isOnlyCooperative: game.isOnlyCooperative,
-            minPlayers: game.min_players,
-            maxPlayers: game.max_players,
+            minPlayers: game.minPlayers,
+            maxPlayers: game.maxPlayers,
             ownershipDate: formOwnershipDate,
             matchTags: JSON.stringify(game.matchTags),
             playerTags: JSON.stringify(game.playerTags),
@@ -56,7 +56,7 @@ export class GameService {
         return this.http.get<Game[]>(this.gameUrl).pipe(
             tap(games => {
                 let modifiedGames = games.map(x => {
-                    x.thumbnail_id = environment.imagesURL + '/' + x.thumbnail_id
+                    x.thumbnailId = environment.imagesURL + '/' + x.thumbnailId
                     return x;
                 })
                 console.log(modifiedGames)
@@ -73,8 +73,8 @@ export class GameService {
         return this.http.get<Game>(this.gameUrl + "/" + gameId).pipe(
             tap(game => {
                 console.log(game)
-                game.thumbnail_id = environment.imagesURL + '/' + game.thumbnail_id
-                game.image_id = environment.imagesURL + '/' + game.image_id
+                game.thumbnailId = environment.imagesURL + '/' + game.thumbnailId
+                game.imageId = environment.imagesURL + '/' + game.imageId
                 return game;
             }),
             catchError(error => {
