@@ -37,8 +37,9 @@ Route::middleware('auth:sanctum')->resource('game', GameController::class, ['exc
 | Match
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
+Route::middleware('auth:sanctum')->get('/running-match', [GameMatchController::class, 'findRunning']);
 
+Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 /*
 |--------------------------------------------------------------------------
 | Player

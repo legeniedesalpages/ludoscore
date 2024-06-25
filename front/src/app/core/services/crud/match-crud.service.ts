@@ -14,6 +14,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CrudService } from './abstract-crud.service';
 import { MatchEntity } from '../../entity/match-entity.model';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MatchCrudService extends CrudService<MatchEntity, number> {
@@ -21,5 +22,11 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
     constructor(protected override http: HttpClient) {
         super(http, '/game-match');
     }
+
+    findRunningMatch(): Observable<MatchEntity> {
+        var url = `${this.apiUrl}/running-match`
+        return this.http.get<MatchEntity>(url).pipe(tap(res => console.debug("find running " + url + " => ", res)))
+    }
+
 
 }
