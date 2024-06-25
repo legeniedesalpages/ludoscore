@@ -42,25 +42,28 @@ class GameMatchController extends Controller
             
             $gameMatch->game_id = $request->game_id;
             $gameMatch->canceled = false;
-            $gameMatch->tags = "{}";
             $gameMatch->running = true;
             $gameMatch->started_at = now();
+            $gameMatch->tags = $request->tags;
             $gameMatch->save();
 
             $position = 0;
-            foreach ($request->players as $playerId) {
-                Log::debug("Ajout joueur " . $playerId);
+            foreach ($request->players as $p) {
+                $player = (object)$p;
+                Log::debug("Ajout joueur " . print_r($p, true));
+                Log::debug("Ajout joueur " . print_r($player, true));
 
                 $team = new Team();
                 $team->tags = "{}";
                 $team->position = $position;
                 $team->match_id = $gameMatch->id;
+                $team->tags = $player->tags;
                 $team->save();
                 
                 $teamPlayer = new TeamPlayer();
                 $teamPlayer->position = 0;            
                 $teamPlayer->team_id = $team->id;
-                $teamPlayer->player_id = $playerId;
+                $teamPlayer->player_id = $player->id;
                 $teamPlayer->save();
 
                 $position++;

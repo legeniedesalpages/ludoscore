@@ -48,3 +48,11 @@ hr {
   align-items: center;
   justify-content: center;
 }
+
+.validate-div {
+  width: 100%;
+}
+
+.validate-button {
+  width: 100%;  
+}

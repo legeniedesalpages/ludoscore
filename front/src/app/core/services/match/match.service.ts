@@ -13,10 +13,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, first, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { MatchCrudService } from '../crud/match-crud.service';
-import { MatchEntity } from '../../entity/match-entity.model';
+import { MatchEntity, MatchPlayerEntity } from '../../entity/match-entity.model';
 import { Player } from '../../model/player.model';
 import { PlayerCrudService } from '../crud/player-crud.service';
 import { PlayerEntity } from '../../entity/player-entity.model';
+import { ChoosenTag } from '../../model/choosen-tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -24,14 +25,15 @@ export class MatchService {
     constructor(private matchCrudService: MatchCrudService, private playerCrudService: PlayerCrudService) {
     }
 
-    public createMatch(gameId: number, players: Player[]): Observable<MatchEntity> {
+    public createMatch(gameId: number, players: Player[], choosenMatchTags: ChoosenTag[]): Observable<MatchEntity> {
         const matchEntity: MatchEntity = {
             gameId: gameId,
             startedAt: undefined,
             finishedAt: undefined,
-            players: players.map(p => p.id),
+            players: players.map(p => {return {id: p.id, tags: JSON.stringify(p.choosenTags)}}),
             canceled: false,
-            running: true
+            running: true,
+            tags: JSON.stringify(choosenMatchTags)
         }
         return this.matchCrudService.save(matchEntity).pipe(tap(console.log))
     }

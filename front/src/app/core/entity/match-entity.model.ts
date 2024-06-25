@@ -14,9 +14,15 @@
 export interface MatchEntity {
     id?: number,
     gameId: number,
-    players: number[],
+    players: MatchPlayerEntity[],
     startedAt: Date | undefined,
     finishedAt: Date | undefined,
     canceled: boolean,
-    running: boolean
+    running: boolean,
+    tags: string
+}
+
+export interface MatchPlayerEntity {
+    id: number,
+    tags: string
 }
