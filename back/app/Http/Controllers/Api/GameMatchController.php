@@ -75,6 +75,12 @@ class GameMatchController extends Controller
         return $gameMatch;
     }
 
+    public function findRunning()
+    {
+        Log::info("Recherche du match en cours");
+        return GameMatch::where('running', true)->first();
+    }
+
     public function show($id)
     {
         Log::debug("Recherche le match d'id : " . $id);

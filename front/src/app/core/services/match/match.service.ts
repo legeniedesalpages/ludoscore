@@ -25,6 +25,10 @@ export class MatchService {
     constructor(private matchCrudService: MatchCrudService, private playerCrudService: PlayerCrudService) {
     }
 
+    public findRunningMatch(): Observable<MatchEntity> {
+        return this.matchCrudService.findRunningMatch().pipe(tap(console.log))
+    }
+
     public createMatch(gameId: number, players: Player[], choosenMatchTags: ChoosenTag[]): Observable<MatchEntity> {
         const matchEntity: MatchEntity = {
             gameId: gameId,

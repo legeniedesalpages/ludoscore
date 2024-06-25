@@ -17,7 +17,7 @@ import { environment } from 'src/environments/environment';
 
 export abstract class CrudService<T, ID> implements CrudOperations<T, ID> {
 
-    private readonly apiUrl = `${environment.apiURL}/api`;
+    protected readonly apiUrl = `${environment.apiURL}/api`;
 
     constructor(protected http: HttpClient, protected base: string) { 
         console.debug("Init crud: " + base)

@@ -17,6 +17,7 @@ import { AuthState } from 'src/app/core/state/auth/auth.state';
 import { Observable } from 'rxjs';
 import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
+import { MatchService } from 'src/app/core/services/match/match.service';
 
 @Component({
   templateUrl: './home.component.html',
@@ -31,6 +32,9 @@ export class HomeComponent implements OnInit {
   public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
   public loggingOut: boolean = false
 
+  constructor(private matchService: MatchService) {
+  }
+
   @Dispatch()
   public logout = () => {
     this.loggingOut = true
@@ -38,5 +42,8 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.matchService.findRunningMatch().subscribe(res => {
+      console.log('running match', res)
+    })
   }
 }
