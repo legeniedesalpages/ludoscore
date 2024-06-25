@@ -1,14 +1,14 @@
 /**
-    * @description      : 
+    * @description      :
     * @author           : renau
-    * @group            : 
+    * @group            :
     * @created          : 10/01/2023 - 00:06:52
-    * 
+    *
     * MODIFICATION LOG
     * - Version         : 1.0.0
     * - Date            : 10/01/2023
     * - Author          : renau
-    * - Modification    : 
+    * - Modification    :
 **/
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
@@ -46,7 +46,7 @@ export class TagEditorComponent implements OnInit {
     }
 
     public editTag(tag: Tag, event: MatChipEditedEvent) {
-        
+
     }
 
     public addTag(): void {
@@ -66,12 +66,30 @@ export class TagEditorComponent implements OnInit {
 export class DialogTagEditorComponent {
 
     public tagEditorForm: FormGroup;
-   
+
+    public values: string[] = [];
+
+    public addValue(): void {
+      console.debug(this.tagEditorForm.get('value')?.value)
+      this.values.push(this.tagEditorForm.get('value')?.value)
+      this.tagEditorForm.get('value')?.setValue("")
+
+      var tag: Tag = {
+        category: this.tagEditorForm.get('category')?.value,
+        unique: this.tagEditorForm.get('unique')?.value,
+        names: this.values,
+        minOcurrences: this.tagEditorForm.get('minOcurrences')?.value,
+        maxOcurrences: this.tagEditorForm.get('maxOcurrences')?.value
+      }
+
+      console.debug(tag)
+    }
 
     constructor(public dialogRef: MatDialogRef<DialogTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
         this.tagEditorForm = new FormGroup({
             category: new FormControl('', Validators.required),
             unique: new FormControl('', Validators.required),
+            value: new FormControl(''),
             minOcurrences: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
             maxOcurrences: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)])
           });

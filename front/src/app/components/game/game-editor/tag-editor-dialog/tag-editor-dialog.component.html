@@ -1,25 +1,65 @@
 <h2 mat-dialog-title>Créer un catégorie</h2>
 
 <mat-dialog-content class="dialog row">
-    <form [formGroup]="tagEditorForm">
-        <div class="row">
-            <div class="column">
-                <mat-form-field appearance="fill">
-                    <mat-label>Catégorie</mat-label>
-                    <input matInput formControlName="category">
-                </mat-form-field>
-            </div>
-        </div>
+  <form [formGroup]="tagEditorForm">
+    <div class="row">
+      <div class="column">
+        <mat-form-field appearance="fill">
+          <mat-label>Catégorie</mat-label>
+          <input matInput formControlName="category" />
+        </mat-form-field>
+      </div>
+    </div>
 
-        <div class="row">
-            <div class="column">
-                <mat-label>Unique</mat-label>
-                <mat-checkbox formControlName="unique"></mat-checkbox>
-            </div>
-        </div>
+    <div class="row">
+      <div class="column">
+        <mat-label>Unique</mat-label>
+        <mat-checkbox formControlName="unique"></mat-checkbox>
+      </div>
+      <div class="column">
+        <mat-form-field appearance="fill">
+          <mat-label>Min occurences</mat-label>
+          <input matInput formControlName="minOcurrences" type="number" />
+        </mat-form-field>
+      </div>
+      <div class="column">
+        <mat-form-field appearance="fill">
+          <mat-label>Max occurences</mat-label>
+          <input matInput formControlName="maxOcurrences" type="number" />
+        </mat-form-field>
+      </div>
 
-    </form>
+    </div>
+
+    <div class="row">
+      <div class="column">
+        <mat-form-field appearance="fill">
+          <mat-label>Valeur</mat-label>
+          <input matInput formControlName="value" />
+        </mat-form-field>
+        </div>
+        <div class="column">
+        <button
+          mat-mini-fab
+          color="primary"
+          class="tag-add"
+          (click)="addValue()"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column">
+        <div *ngFor="let value of values" class="value-list" matRipple>
+          <li class="player">{{ value }}</li>
+        </div>
+      </div>
+    </div>
+  </form>
 </mat-dialog-content>
+
 <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Ok</button>
+  <button mat-button mat-dialog-close>Ok</button>
 </mat-dialog-actions>
