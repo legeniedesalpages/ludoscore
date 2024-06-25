@@ -51,6 +51,7 @@ export class TagEditorComponent implements OnInit {
 
     public addTag(): void {
         this.dialog.open(DialogTagEditorComponent, {
+            disableClose: true,
             data: {
                 colorTags: this.tags
             }
@@ -64,6 +65,8 @@ export class TagEditorComponent implements OnInit {
     styleUrls: ['../tag-editor-dialog/tag-editor-dialog.component.css']
 })
 export class DialogTagEditorComponent {
+
+    readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
     public tagEditorForm: FormGroup;
 
@@ -83,6 +86,38 @@ export class DialogTagEditorComponent {
       }
 
       console.debug(tag)
+    }
+
+    remove(value: string): void {
+      const index = this.values.indexOf(value);
+
+      if (index >= 0) {
+        this.values.splice(index, 1);
+      }
+    }
+
+    edit(valueChip: string, event: MatChipEditedEvent) {
+      const value = event.value.trim();
+
+      if (!value) {
+        this.remove(valueChip);
+        return;
+      }
+
+      const index = this.values.indexOf(valueChip);
+      if (index >= 0) {
+        this.values[index] = value;
+      }
+    }
+
+    add(event: MatChipInputEvent): void {
+      const value = (event.value || '').trim();
+
+      if (value) {
+        this.values.push(value);
+      }
+
+      event.chipInput!.clear();
     }
 
     constructor(public dialogRef: MatDialogRef<DialogTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {

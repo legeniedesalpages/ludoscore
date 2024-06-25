@@ -24,3 +24,10 @@
   padding-left: 5px;
   padding-right: 5px;
 }
+
+.tag-add {
+  display: inline;
+  float: right;
+  vertical-align: top;
+  margin-top: -40px;
+}
