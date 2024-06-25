@@ -27,13 +27,16 @@
                 <div *ngFor="let occurence of [].constructor(matchTag.maxOcurrences); let i = index;">
                     <mat-form-field appearance="fill" class="selection">
                         <mat-label>{{ matchTag.category }}</mat-label>
-                        <mat-select (selectionChange)="selectMatchTag($event.value, matchTag.category, i)" [value]="alreadySelectedMatchTag(matchTag, i)">
-                            <mat-option *ngFor="let matchTagName of matchTagAvailable(matchTag, i)" [value]="matchTagName">
+                        <mat-select (selectionChange)="selectMatchTag($event.value, matchTag.category, i)"
+                            [value]="alreadySelectedMatchTag(matchTag, i)">
+                            <mat-option *ngFor="let matchTagName of matchTagAvailable(matchTag, i)"
+                                [value]="matchTagName">
                                 {{matchTagName}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <button mat-mini-fab color="primary" class="individual-random" (click)="randomizeMatchTag(matchTag, i)">
+                    <button mat-mini-fab color="primary" class="individual-random"
+                        (click)="randomizeMatchTag(matchTag, i)">
                         <svg viewBox="0 0 512 512">
                             <g transform="translate(0,20)">
                                 <path
@@ -94,6 +97,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="validate-div">
+            <button mat-raised-button color="primary" (click)="returnToPlayerSelection()"
+                class="validate-button">Valider</button>
         </div>
 
     </ng-container>

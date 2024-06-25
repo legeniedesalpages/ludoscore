@@ -85,7 +85,7 @@ export class MatchState {
 
     @Action(LaunchMatch)
     launchMatch({ patchState, getState }: StateContext<MatchStateModel>) {
-        return this.matchService.createMatch(getState().gameId, getState().players).pipe(tap((entity) =>
+        return this.matchService.createMatch(getState().gameId, getState().players, getState().choosenTags).pipe(tap((entity) =>
             patchState({
                 matchId: entity.id,
                 creating: false,
