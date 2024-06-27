@@ -16,6 +16,8 @@ import { Observable, map, tap, catchError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import moment from 'moment';
 import { Game } from '../../model/game.model';
+import { Tag } from '../../model/tag.model';
+import { ColorTag } from '../../model/color-tag.model';
 
 @Injectable()
 export class GameService {
@@ -42,7 +44,7 @@ export class GameService {
             ownershipDate: formOwnershipDate,
             matchTags: JSON.stringify(game.matchTags),
             playerTags: JSON.stringify(game.playerTags),
-            playerColors: JSON.stringify(game.playerColors.map(c => c.code)),
+            playerColors: JSON.stringify(game.playerColors),
             bggId: game.bggId,
         }).pipe(
             map(res => {
@@ -75,6 +77,39 @@ export class GameService {
                 console.log(game)
                 game.thumbnailId = environment.imagesURL + '/' + game.thumbnailId
                 game.imageId = environment.imagesURL + '/' + game.imageId
+                return game;
+            }),
+            catchError(error => {
+                throw new Error(error)
+            })
+        );
+    }
+
+    public getFromBgg(bggId: number): Observable<Game> {
+        return this.http.get<Game>(this.gameUrl + "/bgg/" + bggId).pipe(
+            tap(game => {
+                console.log(game)
+                game.thumbnailId = environment.imagesURL + '/' + game.thumbnailId
+                game.imageId = environment.imagesURL + '/' + game.imageId
+                
+                if (game.matchTags != null) {
+                    game.matchTags = JSON.parse(game.matchTags.toString())
+                } else {
+                    game.matchTags = [] as Tag[];
+                }
+
+                if (game.playerTags != null) {
+                    game.playerTags = JSON.parse(game.playerTags.toString())
+                } else {
+                    game.playerTags = [] as Tag[];
+                }
+
+                if (game.playerColors != null) {
+                    game.playerColors = JSON.parse(game.playerColors.toString())
+                } else {
+                    game.playerColors = [] as ColorTag[];
+                }
+
                 return game;
             }),
             catchError(error => {

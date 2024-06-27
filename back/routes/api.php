@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->resource('user', UserController::class, ['exc
 */
 Route::middleware('auth:sanctum')->resource('game', GameController::class, ['except' => ['edit', 'create']]);
 
+Route::middleware('auth:sanctum')->get('/game/bgg/{id}', [GameController::class, 'getByBggId']);
+
 /*
 |--------------------------------------------------------------------------
 | Match

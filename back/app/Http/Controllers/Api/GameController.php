@@ -8,7 +8,6 @@ use App\Models\Game;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
 {
@@ -27,8 +26,14 @@ class GameController extends Controller
         return preg_replace('/[^A-Za-z0-9\_]/', '', $string); // Removes special chars.
      }
 
+    public function getByBggId($id)
+    {
+        Log::debug("Get by bgg id : ".$id);
+        return Game::where('bgg_id', $id)->first();
+    }
+
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created or update an existing resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
