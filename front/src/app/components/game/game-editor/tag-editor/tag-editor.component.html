@@ -1,7 +1,7 @@
 <mat-form-field appearance="fill">
     <mat-label>{{ title }}</mat-label>
     <mat-chip-grid #chipGridTag aria-label="Ajouter des tags">
-        <mat-chip-row *ngFor="let tag of tags" (removed)="removeTag(tag)" [editable]="true">
+        <mat-chip-row *ngFor="let tag of tags" (removed)="removeTag(tag)" [editable]="false" (click)="editTag(tag)">
             {{tag.category}}
             <button matChipRemove [attr.aria-label]="'remove ' + tag">
                 <mat-icon>cancel</mat-icon>

@@ -22,6 +22,7 @@ import { Game } from 'src/app/core/model/game.model';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
 import { DateValidator } from 'src/app/core/services/misc/date.validator';
 import { GameService } from 'src/app/core/services/game/game.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'game-editor',
@@ -29,6 +30,8 @@ import { GameService } from 'src/app/core/services/game/game.service';
   styleUrls: ['./game-editor.component.css']
 })
 export class GameEditorComponent implements OnInit {
+
+  public env = environment
 
   public loading: boolean;
   public saving: boolean;
@@ -65,9 +68,43 @@ export class GameEditorComponent implements OnInit {
     this.route.paramMap.subscribe((params) => {
 
       console.log(params)
-      let type = params.get('type');
+      let type = params.get('type')
       if (type === 'bgg') {
         this.initFromSearch(params)
+      } else {
+        this.initFromLibrary(params)
+      }
+    });
+  }
+
+  private initFromLibrary(params: ParamMap) {
+    this.loading = true;
+    console.info('Fill form library, bgg id: ' + params.get('id'))
+    this.bggId = Number(params.get('id'));
+
+    this.gameService.getFromBgg(this.bggId).subscribe({
+
+      next: (game: Game) => {
+        console.info("Game details: [" + game.title + "]");
+
+        this.imageUrl = `'${game.imageId}'`;
+
+        this.gameEditorForm.setValue({
+          name: game.title,
+          minPlayer: game.minPlayers,
+          maxPlayer: game.maxPlayers,
+          cooperative: game.isOnlyCooperative ? "true" : "false",
+          ownership: game.ownershipDate
+        });
+
+        this.tagsGame = game.matchTags;
+        this.tagsPlayer = game.playerTags;
+        this.tagsColor = game.playerColors;
+
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
     });
   }

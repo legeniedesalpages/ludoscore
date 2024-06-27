@@ -69,9 +69,13 @@ export class FindGameComponent implements OnInit {
     });
   }
 
-  public gameDetail(id: number) {
+  public gameDetail(id: number, owned: boolean) {
     console.debug("Go to edition page for id :" + id);
-    this.router.navigate(['/game-editor', 'bgg', id]);
+    if (!owned) {
+      this.router.navigate(['/game-editor', 'bgg', id]);
+    } else {
+      this.router.navigate(['/game-editor', 'owned', id]);
+    }
   }
 
   public returnToHome() { 

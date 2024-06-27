@@ -15,7 +15,7 @@
             </form>
 
             <div *ngIf="findGameService.searchedGames.length > 0">
-                <div *ngFor="let item of findGameService.searchedGames" (click)="gameDetail(item.id)" class="result-list">
+                <div *ngFor="let item of findGameService.searchedGames" (click)="gameDetail(item.id, item.owned)" class="result-list">
                     <div [class]="item.owned ? 'owned' : ''">
                         <div class="visual">
                             <img src={{item.thumbnail}} />
