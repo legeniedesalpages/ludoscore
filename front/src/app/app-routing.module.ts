@@ -27,6 +27,7 @@ const routes: Routes = [
   { path: 'match-display', loadChildren: () => import('./components/match/display/match-display.module').then(m => m.MatchDisplayModule), data: { animation: 'match-display' } },
   { path: 'match-end', loadChildren: () => import('./components/match/end/match-end.module').then(m => m.MatchEndModule), data: { animation: 'match-end' } },
   { path: 'player-score', loadChildren: () => import('./components/match/player-score/player-score.module').then(m => m.PlayerScoreModule), data: { animation: 'player-score' } },
+  { path: 'wheel', loadChildren: () => import('./components/match/wheel/wheel.module').then(m => m.WheelModule), data: { animation: 'wheel' } },
   
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game/game-editor/game-editor.module').then(m => m.GameEditorModule), data: { animation: 'game-editor' } }
 ];

@@ -17,6 +17,9 @@
                     </g>
                   </svg>
             </button>
+            <button mat-mini-fab [disabled]="!canContinue" color="primary" class="lead2" (click)="showWheel()">
+                <mat-icon>group</mat-icon>
+            </button>
             <button mat-flat-button [disabled]="!canContinue" color="primary" (click)="launchMatch()" class="end">
                 Lancer la partie
             </button>

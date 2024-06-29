@@ -101,6 +101,10 @@ svg {
   margin-left:10px;
 }
 
+.footer.row .lead2 {
+  margin-right:60px;
+}
+
 .footer.row .end {
   margin-right:10px;
 }

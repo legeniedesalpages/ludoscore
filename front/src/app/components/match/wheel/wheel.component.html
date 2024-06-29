@@ -1,0 +1,23 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToPlayerSelection()">
+    <ng-container role="header">
+        <span class="title">Choisir un premier joueur</span>
+    </ng-container>
+
+    <ng-container role="body">
+
+        <div class="roue">
+            <div id="wheelOfFortune">
+                <canvas #wheel id="wheel" width="350" height="350"></canvas>
+                <div #spin id="spin" (click)="spinner()">Lancer</div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container role="footer">
+        <div class="footer-bouton">
+            <button mat-flat-button color="primary" (click)="returnToPlayerSelection()">
+                Valider le premier joueur
+            </button>
+        </div>
+    </ng-container>
+</app-layout>

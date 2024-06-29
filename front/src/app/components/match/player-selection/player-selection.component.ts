@@ -114,4 +114,8 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public showRandomToolbox() {
     this.store.dispatch(new Navigate(['/random-toolbox']))
   }
+
+  public showWheel() {
+    this.store.dispatch(new Navigate(['/wheel']))
+  }
 }
