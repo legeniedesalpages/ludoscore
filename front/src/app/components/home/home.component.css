@@ -41,3 +41,10 @@ svg {
 .spinner {
   padding-right: 10px;
 }
+
+.loading {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
