@@ -35,7 +35,7 @@
 
       <span class="description">Comptabilisateur de score</span>
 
-      <div class="match-state">
+      <div class="match-state" [hidden]="loading">
         <div *ngIf="(matchState | async) === matchStateEnum.CREATING">
           <button mat-raised-button routerLink="/game-selection">Reprendre la création du match</button>
         </div>
@@ -48,9 +48,16 @@
       </div>
     </div>
 
-    <div class="action-list">
+    <div [hidden]="!loading">
+      <div class="spinner loading">
+        <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+      </div>
+    </div>
+
+    <div class="action-list" [hidden]="loading">
       <div class="action">
-        <button mat-fab color="primary" aria-label="Rechercher un jeu pour ensuite pouvoir l'ajouter" routerLink="/find-game">
+        <button mat-fab color="primary" aria-label="Rechercher un jeu pour ensuite pouvoir l'ajouter"
+          routerLink="/find-game">
           <mat-icon>manage_search</mat-icon>
         </button>
         <div class="caption">Rechercher un jeu</div>

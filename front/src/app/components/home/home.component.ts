@@ -31,8 +31,10 @@ export class HomeComponent implements OnInit {
 
   public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
   public loggingOut: boolean = false
+  public loading: boolean
 
   constructor(private matchService: MatchService) {
+    this.loading = true
   }
 
   @Dispatch()
@@ -44,6 +46,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.matchService.findRunningMatch().subscribe(res => {
       console.log('running match', res)
+      this.loading = false
     })
   }
 }
