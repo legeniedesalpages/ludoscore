@@ -1,4 +1,5 @@
 import { ChoosenTag } from "./choosen-tag.model";
+import { ColorTag } from "./color-tag.model";
 /**
     * @description      : 
     * @author           : renau
@@ -16,5 +17,6 @@ export interface Player {
     name: string,
     avatar: string,
     choosenTags: ChoosenTag[],
+    color: ColorTag,
     score: number
 }

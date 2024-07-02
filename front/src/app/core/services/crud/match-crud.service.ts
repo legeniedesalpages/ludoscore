@@ -13,7 +13,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CrudService } from './abstract-crud.service';
-import { MatchEntity } from '../../entity/match-entity.model';
+import { MatchEntity, MatchPlayerEntity } from '../../entity/match-entity.model';
 import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -28,5 +28,9 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         return this.http.get<MatchEntity>(url).pipe(tap(res => console.debug("find running " + url + " => ", res)))
     }
 
+    getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchPlayerEntity> {
+        var url = `${this.apiUrl}/previous-match/${playerId}/${gameId}`
+        return this.http.get<MatchPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
+    }
 
 }

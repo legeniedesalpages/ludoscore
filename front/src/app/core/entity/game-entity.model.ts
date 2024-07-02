@@ -22,5 +22,6 @@ export interface GameEntity {
     maxPlayers: number,
     bggId: number,
     matchTags: string,
-    playerTags: string
+    playerTags: string,
+    playerColors: string
 }

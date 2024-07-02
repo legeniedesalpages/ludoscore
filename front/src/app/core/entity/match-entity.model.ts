@@ -25,4 +25,5 @@ export interface MatchEntity {
 export interface MatchPlayerEntity {
     id: number,
     tags: string
+    color: string
 }

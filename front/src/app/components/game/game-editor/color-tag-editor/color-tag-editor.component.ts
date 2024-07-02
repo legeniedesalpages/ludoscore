@@ -12,7 +12,7 @@
 **/
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ColorTag } from 'src/app/core/model/color-tag.model';
+import { ColorTag, COLORS } from 'src/app/core/model/color-tag.model';
 
 @Component({
     selector: 'color-tag-editor',
@@ -57,27 +57,6 @@ export class DialogColorTagEditorComponent {
 
     public tags: ColorTag[];
 
-    public readonly colors: ColorTag[] = [
-
-        { name: "Blanc", code: "#EEE", invert: "black" },
-        { name: "Jaune", code: "yellow", invert: "black" },
-        { name: "Vert clair", code: "lightgreen", invert: "Black" },
-        { name: "Rose", code: "pink", invert: "black" },
-        { name: "Bleu clair", code: "lightblue", invert: "black" },
-        
-        { name: "Gris", code: "grey", invert: "white" },
-        { name: "Orange", code: "orange", invert: "black" },
-        { name: "Vert", code: "limegreen", invert: "white" },
-        { name: "Rouge", code: "red", invert: "white" },
-        { name: "Bleu", code: "blue", invert: "white" },
-
-        { name: "Noir", code: "black", invert: "white" },
-        { name: "Marron", code: "brown", invert: "white" },
-        { name: "Vert foncé", code: "darkgreen", invert: "white" },
-        { name: "Pourpre", code: "purple", invert: "white" },
-        { name: "Bleu foncé", code: "darkblue", invert: "white" },
-    ]
-
     constructor(public dialogRef: MatDialogRef<DialogColorTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
         this.tags = this.data.colorTags;
         console.log(this.tags)
@@ -88,7 +67,7 @@ export class DialogColorTagEditorComponent {
     }
 
     public filteredColors(): ColorTag[] {
-        return this.colors.filter(x => {
+        return COLORS.filter(x => {
             return !this.tags.map(c => c.code).includes(x.code)
         });
     }

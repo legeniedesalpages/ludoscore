@@ -41,6 +41,8 @@ Route::middleware('auth:sanctum')->get('/game/bgg/{id}', [GameController::class,
 */
 Route::middleware('auth:sanctum')->get('/running-match', [GameMatchController::class, 'findRunning']);
 
+Route::middleware('auth:sanctum')->get('/previous-match/{playerid}/{gameid}', [GameMatchController::class, 'previousMatch']);
+
 Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 /*
 |--------------------------------------------------------------------------

@@ -18,6 +18,7 @@ import { Player } from '../../model/player.model';
 import { PlayerCrudService } from '../crud/player-crud.service';
 import { PlayerEntity } from '../../entity/player-entity.model';
 import { ChoosenTag } from '../../model/choosen-tag.model';
+import { ColorTag } from '../../model/color-tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -34,7 +35,7 @@ export class MatchService {
             gameId: gameId,
             startedAt: undefined,
             finishedAt: undefined,
-            players: players.map(p => {return {id: p.id, tags: JSON.stringify(p.choosenTags)}}),
+            players: players.map(p => {return {id: p.id, tags: JSON.stringify(p.choosenTags), color: p.color.name}}),
             canceled: false,
             running: true,
             tags: JSON.stringify(choosenMatchTags)
@@ -79,5 +80,10 @@ export class MatchService {
             }))
         ret.subscribe((error) => console.error(error))
         return ret
+    }
+
+    public getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchPlayerEntity> {
+        console.log('get Previous Match Of Player, for game', playerId, gameId)
+        return this.matchCrudService.getPreviousMatchOfPlayer(playerId, gameId)
     }
 }
