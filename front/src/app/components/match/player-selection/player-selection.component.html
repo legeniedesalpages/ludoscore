@@ -17,7 +17,7 @@
                     </g>
                   </svg>
             </button>
-            <button mat-mini-fab [disabled]="!canContinue" color="primary" class="lead2" (click)="showWheel()">
+            <button mat-mini-fab [disabled]="lessThan2Players" color="primary" class="lead2" (click)="showWheel()">
                 <mat-icon>group</mat-icon>
             </button>
             <button mat-flat-button [disabled]="!canContinue" color="primary" (click)="launchMatch()" class="end">
@@ -87,12 +87,16 @@
                                     <div class="line">
                                         <div class="pseudo">
                                             {{player.name}}
+                                            <div class="color">
+                                                <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
+                                            </div>
                                         </div>
                                         <div class="tags">
                                             <ul *ngFor="let tag of player.choosenTags" mat-ripple>
-                                                <li>{{tag.category}}: {{tag.names}}</li>
+                                                <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
                                             </ul>
                                         </div>
+                                        
                                     </div>
                                 </div>
                             </swipeable-element>

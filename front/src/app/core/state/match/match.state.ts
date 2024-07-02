@@ -41,6 +41,7 @@ const defaultMatchModel = {
     players: [],
     matchTags: [],
     playerTags: [],
+    playerColors: [],
     choosenTags: []
 };
 
@@ -79,6 +80,7 @@ export class MatchState {
             players: [],
             matchTags: JSON.parse(createMatch.matchTags),
             playerTags: JSON.parse(createMatch.playerTags),
+            playerColors: JSON.parse(createMatch.playerColors),
             choosenTags: []
         })
     }
@@ -113,6 +115,7 @@ export class MatchState {
             avatar: addedPlayer.avatar,
             name: addedPlayer.playerName,
             choosenTags: [],
+            color: addedPlayer.color,
             score: 0
         })
         setState({

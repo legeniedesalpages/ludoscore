@@ -1,4 +1,5 @@
 import { ChoosenTag } from "../../model/choosen-tag.model"
+import { ColorTag } from "../../model/color-tag.model"
 import { Player } from "../../model/player.model"
 import { Tag } from "../../model/tag.model"
 
@@ -28,5 +29,6 @@ export interface MatchStateModel {
     players: Player[],
     matchTags: Tag[],
     playerTags: Tag[],
+    playerColors: ColorTag[],
     choosenTags: ChoosenTag[]
 }

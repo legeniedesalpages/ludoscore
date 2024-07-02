@@ -81,6 +81,18 @@ class GameMatchController extends Controller
         return GameMatch::where('running', true)->first();
     }
 
+    public function previousMatch($playerid, $gameid) {
+        Log::debug("Get previousMatch, player : ".$playerid." game : ".$gameid);
+        return DB::table('teams')
+            ->join('matches', 'matches.id', '=', 'teams.match_id')
+            ->where('matches.game_id', $gameid)
+            ->where('matches.canceled', false)
+            ->join('team_players', 'teams.id', '=', 'team_players.team_id')
+            ->where('team_players.player_id', $playerid)
+            ->orderBy('matches.started_at', 'desc')
+            ->get('teams.*');
+    }
+
     public function show($id)
     {
         Log::debug("Recherche le match d'id : " . $id);
