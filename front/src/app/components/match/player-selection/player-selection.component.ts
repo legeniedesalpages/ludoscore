@@ -44,6 +44,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public choosablePlayers!: PlayerEntity[]
   public minPlayers: number = 0
   public maxPlayers: number = 0
+  public numberOfPlayers: number = 0
   public canContinue: boolean = false;
   public canAddPlayer: boolean = false;
   public lessThan2Players: boolean = true;
@@ -81,6 +82,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       this.playerChangeSubscription = this.playerChange.subscribe(players => {
         this.canContinue = players.length >= this.minPlayers
         this.canAddPlayer = players.length < this.maxPlayers
+        this.numberOfPlayers = players.length
         this.lessThan2Players = players.length < 2
         const ids = players.map(player => player.id)
         this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
@@ -140,6 +142,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
       let preferedColor
       let foundPreferedColor = this.playerColors.filter(color => color.name === player.preferedColor)
+      console.log("couleur préféré du joueur:", player.preferedColor)
       if (foundPreferedColor.length > 0) {
         preferedColor = foundPreferedColor[0]
       }

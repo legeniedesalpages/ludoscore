@@ -73,7 +73,7 @@
 
             <div class="player-container" [ngStyle]="{'margin-top': ((maxPlayers) * -65) + 'px'}"
                 style="position: relative;">
-                <div *ngFor="let player of playerChange | async" mat-ripple>
+                <div *ngFor="let player of playerChange | async; let i = index" mat-ripple>
                     <div class="row">
                         <div class="column">
                             <swipeable-element
@@ -89,6 +89,12 @@
                                             {{player.name}}
                                             <div class="color" [hidden]="player.color.name == 'Aucune'">
                                                 <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
+                                                <button mat-icon-button [hidden]="i != numberOfPlayers -1">
+                                                    <mat-icon>arrow_upward</mat-icon>
+                                                </button>
+                                                <button mat-icon-button [hidden]="i == numberOfPlayers -1">
+                                                    <mat-icon>arrow_downward</mat-icon>
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="tags">
