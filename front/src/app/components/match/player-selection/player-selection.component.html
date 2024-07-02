@@ -44,7 +44,7 @@
                     <div class="column">
                         <mat-form-field appearance="fill">
                             <mat-label>Ajouter un joueur</mat-label>
-                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector>
+                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector [disabled]="!canAddPlayer">
                                 <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
                                 <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
                                 <mat-divider></mat-divider>
@@ -87,7 +87,7 @@
                                     <div class="line">
                                         <div class="pseudo">
                                             {{player.name}}
-                                            <div class="color">
+                                            <div class="color" [hidden]="player.color.name == 'Aucune'">
                                                 <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
                                             </div>
                                         </div>

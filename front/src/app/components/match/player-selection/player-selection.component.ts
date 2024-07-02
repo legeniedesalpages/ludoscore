@@ -23,7 +23,7 @@ import { forkJoin, Observable, Subscription, first, map } from 'rxjs';
 import { Player } from 'src/app/core/model/player.model';
 import { Navigate } from '@ngxs/router-plugin';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { COLORS, ColorTag } from 'src/app/core/model/color-tag.model';
+import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model';
 import { MatchService } from 'src/app/core/services/match/match.service';
 
 @Component({
@@ -45,6 +45,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public minPlayers: number = 0
   public maxPlayers: number = 0
   public canContinue: boolean = false;
+  public canAddPlayer: boolean = false;
   public lessThan2Players: boolean = true;
   public playerColors: ColorTag[] = []
   public choosableColors: ColorTag[] = []
@@ -79,6 +80,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
       this.playerChangeSubscription = this.playerChange.subscribe(players => {
         this.canContinue = players.length >= this.minPlayers
+        this.canAddPlayer = players.length < this.maxPlayers
         this.lessThan2Players = players.length < 2
         const ids = players.map(player => player.id)
         this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
@@ -124,6 +126,11 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public chooseColor(player: PlayerEntity): Observable<ColorTag> {
     return this.matchService.getPreviousMatchOfPlayer(player.id, this.gameId).pipe(map(e => {
 
+      if (this.choosableColors.length === 0) {
+        console.log("Aucune couleur disponible")
+        return NO_COLOR
+      }
+
       console.log("couleur encore disponible:",this.choosableColors)
 
       let colorFromPreviousMatch
@@ -136,8 +143,6 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       if (foundPreferedColor.length > 0) {
         preferedColor = foundPreferedColor[0]
       }
-
-      let colorCandidate
 
       if (colorFromPreviousMatch != null && !this.choosableColors.includes(colorFromPreviousMatch)) {
         console.log("Prend la couleur de l'ancienne partie car disponible", colorFromPreviousMatch)
