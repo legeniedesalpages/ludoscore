@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult } from "./match.action";
+import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult, SwapPlayerPosition } from "./match.action";
 import { Player } from "../../model/player.model";
 import { MatchService } from "../../services/match/match.service";
 import { tap } from 'rxjs/operators';
@@ -125,12 +125,32 @@ export class MatchState {
     }
 
     @Action(ChangeFirstPlayer)
-    ChangeFirstPlayer({ setState, getState }: StateContext<MatchStateModel>, firstPlayer: ChangeFirstPlayer) {
+    changeFirstPlayer({ setState, getState }: StateContext<MatchStateModel>, firstPlayer: ChangeFirstPlayer) {
         console.info("Player order change")
         let newOrderPlayers: Player[] = []
         newOrderPlayers.push(firstPlayer.player)
         getState().players.forEach(player => {
             if (player.id != firstPlayer.player.id) {
+                newOrderPlayers.push(player)
+            }
+        })
+        setState({
+            ...getState(),
+            players: newOrderPlayers
+        })
+    }
+
+    @Action(SwapPlayerPosition)
+    swapPlayerPosition({ setState, getState }: StateContext<MatchStateModel>, playersToSwap: SwapPlayerPosition) {
+        console.info("Player order swap")
+        let newOrderPlayers: Player[] = []
+        
+        getState().players.forEach(player => {
+            if (player.id == playersToSwap.firstPlayer.id) {
+                newOrderPlayers.push(playersToSwap.secondPlayer)
+            } else if (player.id == playersToSwap.secondPlayer.id) {
+                newOrderPlayers.push(playersToSwap.firstPlayer)
+            } else {
                 newOrderPlayers.push(player)
             }
         })

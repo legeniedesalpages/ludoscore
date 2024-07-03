@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { AddPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer } from 'src/app/core/state/match/match.action';
+import { AddPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer, SwapPlayerPosition } from 'src/app/core/state/match/match.action';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
 import { MatSelect } from '@angular/material/select';
@@ -123,6 +123,11 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         this.loading = false
       })
     }
+  }
+
+  public swapPlayerPosition(firstPlayerIndex: number, secondPlayerIndex: number) {
+    let players: Player[] = this.store.selectSnapshot(MatchState.players)
+    this.store.dispatch(new SwapPlayerPosition(players[firstPlayerIndex], players[secondPlayerIndex]))
   }
 
   public chooseColor(player: PlayerEntity): Observable<ColorTag> {

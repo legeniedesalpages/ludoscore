@@ -34,6 +34,11 @@ export class ChangeFirstPlayer {
     constructor(public player: Player) { }
 }
 
+export class SwapPlayerPosition {
+    static readonly type: string = '[Match] SwapPlayerPosition';
+    constructor(public firstPlayer: Player, public secondPlayer: Player) { }
+}
+
 export class RemovePlayer {
     static readonly type: string = '[Match] RemovePlayer';
     constructor(public playerId: number) { }

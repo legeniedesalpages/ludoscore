@@ -89,10 +89,10 @@
                                             {{player.name}}
                                             <div class="color" [hidden]="player.color.name == 'Aucune'">
                                                 <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
-                                                <button mat-icon-button [hidden]="i != numberOfPlayers -1">
+                                                <button mat-icon-button [hidden]="i != numberOfPlayers -1" (click)="swapPlayerPosition(i, i-1)">
                                                     <mat-icon>arrow_upward</mat-icon>
                                                 </button>
-                                                <button mat-icon-button [hidden]="i == numberOfPlayers -1">
+                                                <button mat-icon-button [hidden]="i == numberOfPlayers -1" (click)="swapPlayerPosition(i, i+1)">
                                                     <mat-icon>arrow_downward</mat-icon>
                                                 </button>
                                             </div>
