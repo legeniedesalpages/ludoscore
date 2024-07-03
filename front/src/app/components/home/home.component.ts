@@ -11,13 +11,14 @@
     * - Modification    : 
 **/
 import { Component, OnInit } from '@angular/core';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { DoLogout } from 'src/app/core/state/auth/auth.actions';
 import { AuthState } from 'src/app/core/state/auth/auth.state';
 import { Observable } from 'rxjs';
 import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
 import { MatchService } from 'src/app/core/services/match/match.service';
+import { Navigate } from '@ngxs/router-plugin';
 
 @Component({
   templateUrl: './home.component.html',
@@ -33,7 +34,7 @@ export class HomeComponent implements OnInit {
   public loggingOut: boolean = false
   public loading: boolean
 
-  constructor(private matchService: MatchService) {
+  constructor(private matchService: MatchService, private store: Store) {
     this.loading = true
   }
 
@@ -48,5 +49,13 @@ export class HomeComponent implements OnInit {
       console.log('running match', res)
       this.loading = false
     })
+  }
+
+  navigateToFindGame() {
+    this.store.dispatch(new Navigate(['/find-game']))
+  }
+
+  navigateToManagePlayer() {
+    this.store.dispatch(new Navigate(['/manage-player']))
   }
 }

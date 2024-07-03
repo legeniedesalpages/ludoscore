@@ -55,12 +55,15 @@
     </div>
 
     <div class="action-list" [hidden]="loading">
-      <div class="action">
-        <button mat-fab color="primary" aria-label="Rechercher un jeu pour ensuite pouvoir l'ajouter"
-          routerLink="/find-game">
-          <mat-icon>manage_search</mat-icon>
-        </button>
+
+      <div class="action" map-ripple (click)="navigateToFindGame()">        
+        <mat-icon>manage_search</mat-icon>
         <div class="caption">Rechercher un jeu</div>
+      </div>
+
+      <div class="action" map-ripple (click)="navigateToManagePlayer()">
+        <mat-icon>group</mat-icon>
+        <div class="caption">Gérer les joueurs</div>
       </div>
     </div>
 

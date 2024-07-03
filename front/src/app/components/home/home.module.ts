@@ -19,6 +19,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatRippleModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LayoutModule } from '../layout/layout.module';
 
@@ -40,7 +41,8 @@ const routes: Routes = [
     MatButtonModule,
     MatMenuModule,
     LayoutModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatRippleModule
   ]
 })
 export class HomeModule { }
