@@ -18,5 +18,5 @@ export interface Player {
     avatar: string,
     choosenTags: ChoosenTag[],
     color: ColorTag,
-    score: number
+    score: number | undefined
 }

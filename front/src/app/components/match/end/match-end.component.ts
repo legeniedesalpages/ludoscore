@@ -10,7 +10,8 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatSelect } from '@angular/material/select';
 import { Navigate } from '@ngxs/router-plugin';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subscription, first } from 'rxjs';
@@ -25,9 +26,13 @@ import { MatchState } from 'src/app/core/state/match/match.state';
 })
 export class MatchEndComponent implements OnInit, OnDestroy {
 
+  @ViewChild('winnerPlayerSelector') public playerSelector!: MatSelect
+
   @Select(MatchState) matchState!: Observable<MatchStateModel>;
 
   private subscription!: Subscription;
+
+  public winningPlayer!: Player;
 
   constructor(private store: Store) {
   }
@@ -42,6 +47,11 @@ export class MatchEndComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  public selectWiningPlayer(player: Player) {
+    console.log("choose wining player", player)
+    this.winningPlayer = player
   }
 
   public setPlayerScore(player: Player) {

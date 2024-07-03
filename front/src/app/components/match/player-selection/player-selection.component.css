@@ -69,10 +69,11 @@
 .background-player {
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: end;
+  justify-content: right;
   font-weight: 400;
   font-size: large;
+  color: lightgrey
 }
 
 .background-player-minimum {
@@ -132,8 +133,21 @@ ul {
   vertical-align: middle;
   cursor: pointer;
   margin-bottom: 15px;
+  border: 1px solid grey;
 }
 
 .color {
   float:right;
+}
+
+.game-category {
+  opacity: 0.7;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-top: 5px;
+}
+
+.game-category .value {
+  opacity: 0.7;
+  font-style: italic;
 }

@@ -45,9 +45,11 @@ export class PlayerScoreComponent implements OnInit {
         let player = matchState.players.find(player => player.id == this.playerId)
         console.log("joueur trouvé", player)
         if (player) {
-          this.playerScore.setValue({
-            score: player.score,
-          });
+          if (player.score != undefined) {
+            this.playerScore.setValue({
+              score: player.score,
+            });
+          }
           this.player = of(player);
         }
       })

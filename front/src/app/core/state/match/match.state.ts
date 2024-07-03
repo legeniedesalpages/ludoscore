@@ -58,6 +58,11 @@ export class MatchState {
     }
 
     @Selector()
+    static matchTags(state: MatchStateModel): ChoosenTag[] {
+        return state.choosenTags
+    }
+
+    @Selector()
     static state(state: MatchStateModel): MatchStateEnum {
         return state.creating ? MatchStateEnum.CREATING : state.started ? MatchStateEnum.STARTED : MatchStateEnum.FINISHED
     }
@@ -116,7 +121,7 @@ export class MatchState {
             name: addedPlayer.playerName,
             choosenTags: [],
             color: addedPlayer.color,
-            score: 0
+            score: undefined
         })
         setState({
             ...getState(),

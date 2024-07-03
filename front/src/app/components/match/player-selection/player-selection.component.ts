@@ -25,6 +25,8 @@ import { Navigate } from '@ngxs/router-plugin';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model';
 import { MatchService } from 'src/app/core/services/match/match.service';
+import { Tag } from 'src/app/core/model/tag.model';
+import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -35,6 +37,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   @ViewChild('playerSelector') public playerSelector!: MatSelect
 
   @Select(MatchState.players) playerChange!: Observable<Player[]>;
+  @Select(MatchState.matchTags) matchTags!: Observable<ChoosenTag[]>;
 
   public env = environment
   public loading: boolean = true
@@ -50,6 +53,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public lessThan2Players: boolean = true;
   public playerColors: ColorTag[] = []
   public choosableColors: ColorTag[] = []
+  public currentSwapOrderIsDownward: boolean = true
 
   private playerChangeSubscription!: Subscription
 
@@ -125,12 +129,24 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  public swapPlayerPosition(firstPlayerIndex: number, secondPlayerIndex: number) {
+  public swapPlayerPosition(firstPlayerIndex: number, secondPlayerIndex: number, isDownward: boolean) {
     let players: Player[] = this.store.selectSnapshot(MatchState.players)
+    this.currentSwapOrderIsDownward = isDownward
     this.store.dispatch(new SwapPlayerPosition(players[firstPlayerIndex], players[secondPlayerIndex]))
   }
 
-  public chooseColor(player: PlayerEntity): Observable<ColorTag> {
+  public isDownwardArrowHidden(index: number): boolean {
+    if (index == 0) {
+      return false;
+    } else if (index === this.numberOfPlayers - 1) {
+      return true;
+    } else if (this.currentSwapOrderIsDownward) {
+      return false;
+    }
+    return true;
+  }
+
+  private chooseColor(player: PlayerEntity): Observable<ColorTag> {
     return this.matchService.getPreviousMatchOfPlayer(player.id, this.gameId).pipe(map(e => {
 
       if (this.choosableColors.length === 0) {

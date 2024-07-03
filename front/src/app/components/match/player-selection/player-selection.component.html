@@ -1,9 +1,9 @@
 <app-layout [withBackButton]="true" (backButtonAction)="cancelGameSelection()">
     <ng-container role="header">
         <span class="title">Selection des joueurs</span>
-        <button mat-icon-button>
+        <!--<button mat-icon-button>
             <mat-icon>more_vert</mat-icon>
-        </button>
+        </button>-->
     </ng-container>
 
     <ng-container role="footer">
@@ -34,10 +34,20 @@
             <div class="headline">
                 <span class="choice">{{ gameTitle }}</span>
                 <span class="menu-spacer"></span>
-                <button mat-icon-button>
+                <!--<button mat-icon-button>
                    <mat-icon>edit</mat-icon>
-                </button>
+                </button>-->
             </div>
+
+            <div class="game-category">
+                <ul>
+                    <li *ngFor="let matchCategory of matchTags | async; let i = index">
+                        {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
 
             <fieldset>
                 <div class="row">
@@ -45,9 +55,9 @@
                         <mat-form-field appearance="fill">
                             <mat-label>Ajouter un joueur</mat-label>
                             <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector [disabled]="!canAddPlayer">
-                                <mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
+                                <!--<mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
                                 <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
-                                <mat-divider></mat-divider>
+                                <mat-divider></mat-divider>-->
                                 <mat-option *ngFor="let choosingPlayer of choosablePlayers" [value]="choosingPlayer">
                                     {{choosingPlayer.pseudo}}
                                 </mat-option>
@@ -89,11 +99,11 @@
                                             {{player.name}}
                                             <div class="color" [hidden]="player.color.name == 'Aucune'">
                                                 <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
-                                                <button mat-icon-button [hidden]="i != numberOfPlayers -1" (click)="swapPlayerPosition(i, i-1)">
-                                                    <mat-icon>arrow_upward</mat-icon>
-                                                </button>
-                                                <button mat-icon-button [hidden]="i == numberOfPlayers -1" (click)="swapPlayerPosition(i, i+1)">
+                                                <button mat-icon-button [hidden]="isDownwardArrowHidden(i)" (click)="swapPlayerPosition(i, i+1, true)">
                                                     <mat-icon>arrow_downward</mat-icon>
+                                                </button>
+                                                <button mat-icon-button [hidden]="! isDownwardArrowHidden(i)" (click)="swapPlayerPosition(i, i-1, false)">
+                                                    <mat-icon>arrow_upward</mat-icon>
                                                 </button>
                                             </div>
                                         </div>

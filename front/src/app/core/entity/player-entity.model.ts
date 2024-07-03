@@ -18,6 +18,6 @@ export interface PlayerEntity {
     initials: string,
     preferedColor: string,
     gravatar: string,
-    score: number,
+    score: number | undefined,
     matchId: number
 }
