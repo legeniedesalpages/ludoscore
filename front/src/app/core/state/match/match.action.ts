@@ -1,5 +1,6 @@
 import { ChoosenTag } from "../../model/choosen-tag.model";
 import { ColorTag } from "../../model/color-tag.model";
+import { Player } from "../../model/player.model";
 import { Tag } from "../../model/tag.model";
 
 /**
@@ -26,6 +27,11 @@ export class CancelMatchCreation {
 export class AddPlayer {
     static readonly type: string = '[Match] AddPlayer';
     constructor(public playerId: number, public playerName: string, public avatar: string, public color: ColorTag) { }
+}
+
+export class ChangeFirstPlayer {
+    static readonly type: string = '[Match] ChangeFirstPlayer';
+    constructor(public player: Player) { }
 }
 
 export class RemovePlayer {

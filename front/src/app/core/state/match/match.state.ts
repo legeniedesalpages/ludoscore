@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult } from "./match.action";
+import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult } from "./match.action";
 import { Player } from "../../model/player.model";
 import { MatchService } from "../../services/match/match.service";
 import { tap } from 'rxjs/operators';
@@ -121,6 +121,22 @@ export class MatchState {
         setState({
             ...getState(),
             players: newPlayerList
+        })
+    }
+
+    @Action(ChangeFirstPlayer)
+    ChangeFirstPlayer({ setState, getState }: StateContext<MatchStateModel>, firstPlayer: ChangeFirstPlayer) {
+        console.info("Player order change")
+        let newOrderPlayers: Player[] = []
+        newOrderPlayers.push(firstPlayer.player)
+        getState().players.forEach(player => {
+            if (player.id != firstPlayer.player.id) {
+                newOrderPlayers.push(player)
+            }
+        })
+        setState({
+            ...getState(),
+            players: newOrderPlayers
         })
     }
 

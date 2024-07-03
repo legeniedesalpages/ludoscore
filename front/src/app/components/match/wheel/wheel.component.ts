@@ -15,13 +15,16 @@ import {
   Component,
   DoCheck,
   ElementRef,
-  Input,
   OnInit,
   ViewChild
 } from "@angular/core";
 import { Navigate } from "@ngxs/router-plugin";
-import { Store } from "@ngxs/store";
-const COLORS = ["#f82", "#0bf", "#fb0", "#0fb", "#b0f", "#f0b", "#bf0"];
+import { Select, Store } from "@ngxs/store";
+import { Observable } from "rxjs";
+import { Player } from "src/app/core/model/player.model";
+import { ChangeFirstPlayer } from "src/app/core/state/match/match.action";
+import { MatchState } from "src/app/core/state/match/match.state";
+
 
 @Component({
   selector: "app-wheel",
@@ -30,12 +33,12 @@ const COLORS = ["#f82", "#0bf", "#fb0", "#0fb", "#b0f", "#f0b", "#bf0"];
 })
 export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
 
+  @Select(MatchState.players) players!: Observable<Player[]>;
+
   @ViewChild("wheel") wheel: ElementRef<HTMLCanvasElement> | undefined;
   @ViewChild("spin") spin: ElementRef | undefined;
-  colors = ["#f82", "#0bf", "#fb0", "#0fb", "#b0f", "#f0b", "#bf0"];
   sectors: any[] = [];
-
-  rand = (m: any, M: any) => Math.random() * (M - m) + m;
+  winner: Player | undefined;
 
   tot: any;
   ctx: any;
@@ -45,29 +48,26 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
   TAU: any;
   arc0: any;
 
-  winners = [];
-
-  modeDelete = true;
-
-  friction = this.rand(0.992, 0.997); // 0.995=soft, 0.99=mid, 0.98=hard
-  angVel = 0; // Angular velocity
-  ang = 0; // Angle in radians
+  private rand = (m: any, M: any) => Math.random() * (M - m) + m;
+  friction = this.rand(0.992, 0.998);
+  angularVelocity = 0;
+  angleInRadians = 0;
   lastSelection: any;
 
   constructor(private store: Store) {
-    let values = ["renaud", "ancé"];
-    this.sectors = values.map((opts, i) => {
+    this.sectors = store.selectSnapshot(MatchState.players).map((player: Player, i) => {
       return {
-        color: COLORS[(i >= COLORS.length ? i + 1 : i) % COLORS.length],
-        label: opts
+        color: player.color.code,
+        label: this.truncateString(player.name, 8),
+        player: player
       };
     });
 
-    console.log(this.sectors);
     if (this.wheel) {
       this.createWheel();
     }
   }
+
   ngDoCheck(): void {
     this.engine();
   }
@@ -77,6 +77,13 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
 
   ngAfterViewInit(): void {
     this.createWheel();
+  }
+
+  truncateString(str: string, num: number) {
+    if (str.length <= num) {
+      return str
+    }
+    return str.slice(0, num) + '.'
   }
 
   createWheel() {
@@ -95,13 +102,14 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
   }
 
   spinner() {
-    if (!this.angVel) this.angVel = this.rand(0.25, 0.35);
+    this.friction = this.rand(0.992, 0.999);
+    if (!this.angularVelocity) this.angularVelocity = this.rand(0.25, 0.35);
   }
 
   getIndex = () =>
-    Math.floor(this.tot - (this.ang / this.TAU) * this.tot) % this.tot;
+    Math.floor(this.tot - (this.angleInRadians / this.TAU) * this.tot) % this.tot;
 
-  drawSector(sector: { color: any; label: any; }, i: number) {
+  drawSector(sector: { color: any; label: any; player:Player }, i: number) {
     const ang = this.arc0 * i;
     this.ctx.save();
     // COLOR
@@ -125,50 +133,49 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
 
   rotate(first = false) {
     const sector = this.sectors[this.getIndex()];
-    this.ctx.canvas.style.transform = `rotate(${this.ang - this.PI / 2}rad)`;
+    this.ctx.canvas.style.transform = `rotate(${this.angleInRadians - this.PI / 2}rad)`;
     if (this.spin && this.spin.nativeElement) {
-      this.spin.nativeElement.textContent = !this.angVel ? "Lancer" : sector.label;
+      this.spin.nativeElement.textContent = !this.angularVelocity ? "Lancer" : sector.label;
       if (!first) {
-        this.lastSelection = !this.angVel ? this.lastSelection : this.getIndex();
-        this.deleteOption();
+        this.lastSelection = !this.angularVelocity ? this.lastSelection : this.getIndex();
+        //this.deleteOption();
       }
       this.spin.nativeElement.style.background = sector.color;
     }
   }
 
   frame() {
-    if (!this.angVel) return;
+    if (!this.angularVelocity) return;
 
-    this.angVel *= this.friction; // Decrement velocity by friction
-    if (this.angVel < 0.002) this.angVel = 0; // Bring to stop
-    this.ang += this.angVel; // Update angle
-    this.ang %= this.TAU; // Normalize angle
+    this.angularVelocity *= this.friction; // Decrement velocity by friction
+    if (this.angularVelocity < 0.001) this.angularVelocity = 0; // Bring to stop
+    this.angleInRadians += this.angularVelocity; // Update angle
+    this.angleInRadians %= this.TAU; // Normalize angle
     this.rotate();
+    this.checkWinner();
   }
 
   engine() {
     requestAnimationFrame(this.frame.bind(this));
   }
 
-  deleteOption() {
-    if (this.modeDelete && !this.angVel) {
-      this.addNewWinner(this.sectors[this.lastSelection].label);
-      if (this.spin && this.spin.nativeElement) {
-        
-        this.spin.nativeElement.textContent = this.sectors[
-          this.lastSelection
-        ].label;
-        
-        
+  checkWinner() {
+    if (!this.angularVelocity) {
+      this.winner = this.sectors[this.lastSelection].player
+      console.log("player randomly choosen", this.winner);
+      if (this.spin && this.spin.nativeElement) {        
+        this.spin.nativeElement.textContent = this.sectors[this.lastSelection].label;
       }
     }
   }
 
-  addNewWinner(value: any) {
-    console.log(value);
-  }
-
   public returnToPlayerSelection() {
-    this.store.dispatch(new Navigate(['/player-selection']))
+    if (this.winner) {
+      this.store.dispatch(new ChangeFirstPlayer(this.winner)).subscribe(() => {
+        this.store.dispatch(new Navigate(['/player-selection']))
+      })
+    } else {
+      this.store.dispatch(new Navigate(['/player-selection']))  
+    }
   }
 }

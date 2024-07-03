@@ -15,9 +15,9 @@
 
     <ng-container role="footer">
         <div class="footer-bouton">
-            <button mat-flat-button color="primary" (click)="returnToPlayerSelection()">
+            <button mat-flat-button color="primary" (click)="returnToPlayerSelection()" [disabled]="angularVelocity > 0 || winner == undefined">
                 Valider le premier joueur
             </button>
-        </div>
+        </div>        
     </ng-container>
 </app-layout>
