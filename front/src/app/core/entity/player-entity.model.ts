@@ -19,5 +19,6 @@ export interface PlayerEntity {
     preferedColor: string,
     gravatar: string,
     score: number | undefined,
-    matchId: number
+    matchId: number,
+    createdAt: Date
 }

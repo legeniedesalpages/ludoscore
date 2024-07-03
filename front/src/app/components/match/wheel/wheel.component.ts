@@ -21,6 +21,7 @@ import {
 import { Navigate } from "@ngxs/router-plugin";
 import { Select, Store } from "@ngxs/store";
 import { Observable } from "rxjs";
+import { ColorTag } from "src/app/core/model/color-tag.model";
 import { Player } from "src/app/core/model/player.model";
 import { ChangeFirstPlayer } from "src/app/core/state/match/match.action";
 import { MatchState } from "src/app/core/state/match/match.state";
@@ -57,7 +58,7 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
   constructor(private store: Store) {
     this.sectors = store.selectSnapshot(MatchState.players).map((player: Player, i) => {
       return {
-        color: player.color.code,
+        color: player.color,
         label: this.truncateString(player.name, 8),
         player: player
       };
@@ -109,22 +110,30 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
   getIndex = () =>
     Math.floor(this.tot - (this.angleInRadians / this.TAU) * this.tot) % this.tot;
 
-  drawSector(sector: { color: any; label: any; player:Player }, i: number) {
+  drawSector(sector: { color: ColorTag; label: any; player:Player }, i: number) {
     const ang = this.arc0 * i;
     this.ctx.save();
     // COLOR
     this.ctx.beginPath();
-    this.ctx.fillStyle = sector.color;
+    this.ctx.fillStyle = sector.color.code;
     this.ctx.moveTo(this.rad, this.rad);
 
     this.ctx.arc(this.rad, this.rad, this.rad, ang, ang + this.arc0);
     this.ctx.lineTo(this.rad, this.rad);
     this.ctx.fill();
+
+    this.ctx.fillStyle = "#000";
+    this.ctx.moveTo(this.rad, this.rad);
+
+    this.ctx.arc(this.rad, this.rad, this.rad, ang, ang + this.arc0);
+    this.ctx.lineTo(this.rad, this.rad);
+    this.ctx.stroke();
     // TEXT
     this.ctx.translate(this.rad, this.rad);
     this.ctx.rotate(ang + this.arc0 / 2);
     this.ctx.textAlign = "right";
-    this.ctx.fillStyle = "#fff";
+    console.log(sector.color);
+    this.ctx.fillStyle = sector.color.invert;
     this.ctx.font = "bold 30px sans-serif";
     this.ctx.fillText(sector.label, this.rad - 10, 10);
     //
@@ -138,9 +147,9 @@ export class WheelComponent implements OnInit, AfterViewInit, DoCheck {
       this.spin.nativeElement.textContent = !this.angularVelocity ? "Lancer" : sector.label;
       if (!first) {
         this.lastSelection = !this.angularVelocity ? this.lastSelection : this.getIndex();
-        //this.deleteOption();
       }
-      this.spin.nativeElement.style.background = sector.color;
+      this.spin.nativeElement.style.background = sector.color.code;
+      this.spin.nativeElement.style.color = sector.color.invert;
     }
   }
 

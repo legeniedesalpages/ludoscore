@@ -38,4 +38,5 @@ export const COLORS: ColorTag[] = [
     { name: "Bleu foncé", code: "darkblue", invert: "white", fallback: ["Bleu", "Bleu clair"] },
 ]
 
-export const NO_COLOR: ColorTag = { name: "Aucune", code: "transparent", invert: "white", fallback: [] }
+export const NO_COLOR: ColorTag = { name: "Aucune", code: "white", invert: "black", fallback: [] }
+

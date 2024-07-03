@@ -13,6 +13,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Navigate } from '@ngxs/router-plugin';
 import { Store } from '@ngxs/store';
+import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
+import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
 
 @Component({
   selector: 'manage-player',
@@ -21,12 +23,21 @@ import { Store } from '@ngxs/store';
 })
 export class ManagePlayerComponent implements OnInit {
   
+  public playerEntities: PlayerEntity[]
+  public loading: boolean = true
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private playerService: PlayerCrudService) {
+    this.playerEntities = []
   }
+
   ngOnInit(): void {
+    this.playerService.findAll().subscribe({
+      next: (playerEntities: PlayerEntity[]) => {
+        this.playerEntities = playerEntities
+        this.loading = false
+      }
+    });
   }
-
 
   public returnToHome() { 
     this.store.dispatch(new Navigate(['/']))

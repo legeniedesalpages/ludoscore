@@ -26,6 +26,9 @@ import { MatRippleModule } from '@angular/material/core';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { LayoutModule } from '../layout/layout.module';
 import { ManagePlayerComponent } from './manage-player.component';
+import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
+import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
+import { MatChipsModule } from '@angular/material/chips';
 
 const routes: Routes = [
   {
@@ -50,10 +53,12 @@ const routes: Routes = [
     MatGridListModule,
     MatDividerModule,
     MatRippleModule,
-    LayoutModule
+    LayoutModule,
+    LoadingSpinnerModule,
+    MatChipsModule
   ],
   exports: [ManagePlayerComponent],
-  providers: []
+  providers: [PlayerCrudService]
 })
 
 export class ManagePlayerModule { }

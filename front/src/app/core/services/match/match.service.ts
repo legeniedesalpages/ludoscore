@@ -11,14 +11,13 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core';
-import { Observable, first, forkJoin, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, forkJoin, map, mergeMap,  tap } from 'rxjs';
 import { MatchCrudService } from '../crud/match-crud.service';
 import { MatchEntity, MatchPlayerEntity } from '../../entity/match-entity.model';
 import { Player } from '../../model/player.model';
 import { PlayerCrudService } from '../crud/player-crud.service';
 import { PlayerEntity } from '../../entity/player-entity.model';
 import { ChoosenTag } from '../../model/choosen-tag.model';
-import { ColorTag } from '../../model/color-tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {

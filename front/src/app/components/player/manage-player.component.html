@@ -4,7 +4,23 @@
     </ng-container>
 
     <ng-container role="body">
+        <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
         <div class="manage-player">
+            <div *ngFor="let player of playerEntities" class="result-list" mat-ripple>
+                <div class="visual">
+                    <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
+                </div>
+                <div class="content">
+                    <div class="heading">{{ player.pseudo }}</div>
+                    <div class="supporting">
+                        {{ player.firstName }} {{ player.lastName }}
+                        <br/>
+                        Nous à rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
+                        <br/>
+                        Associé au compte: <a>renaud.balu@hotmail.com</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </ng-container>
 </app-layout>
