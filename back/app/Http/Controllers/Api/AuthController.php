@@ -59,7 +59,7 @@ class AuthController extends Controller
             ]);
 
             try {
-                Mail::to($request->email)->send(new ConfirmAccountEmail(env("FRONT_URL")."/confirm-account/".$user->confirmation_key));
+                Mail::to($request->email)->send(new ConfirmAccountEmail(env("FRONT_URL")."/confirm-account?key=".$user->confirmation_key));
             } catch (\Throwable $th) {
                 DB::rollBack();
                 Log::error("Impossible d'envoyer email: ".$th->getMessage());

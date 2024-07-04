@@ -35,7 +35,7 @@ const routes: Routes = [
   { path: 'manage-player', loadChildren: () => import('./components/player/manage-player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },
   { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } },
 
-  { path: 'confirm-account/:key', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: { animation: 'home' } },
+  { path: 'confirm-account', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: { animation: 'home' } },
 
   
 ];
