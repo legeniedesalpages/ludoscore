@@ -24,22 +24,23 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
-import { LayoutModule } from '../layout/layout.module';
-import { ManagePlayerComponent } from './manage-player.component';
+import { LayoutModule } from '../../layout/layout.module';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
+import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 import { MatChipsModule } from '@angular/material/chips';
+import { EditPlayerComponent } from './edit-player.component';
+import { MatSelectModule } from '@angular/material/select';
 
 const routes: Routes = [
   {
     path: '',
-    component: ManagePlayerComponent,
+    component: EditPlayerComponent,
     canActivate: [AuthGuardService]
   }
 ];
 
 @NgModule({
-  declarations: [ManagePlayerComponent],
+  declarations: [EditPlayerComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -55,10 +56,11 @@ const routes: Routes = [
     MatRippleModule,
     LayoutModule,
     LoadingSpinnerModule,
-    MatChipsModule
+    MatChipsModule,
+    MatSelectModule
   ],
-  exports: [ManagePlayerComponent],
+  exports: [EditPlayerComponent],
   providers: [PlayerCrudService]
 })
 
-export class ManagePlayerModule { }
+export class EditPlayerModule { }

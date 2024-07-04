@@ -15,8 +15,6 @@ import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, Http
 import { catchError, Observable, throwError } from 'rxjs';
 import { AuthService } from '../services/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Store } from '@ngxs/store';
-import { Navigate } from '@ngxs/router-plugin';
 import { Router } from '@angular/router';
 
 @Injectable()

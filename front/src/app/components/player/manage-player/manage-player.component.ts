@@ -19,7 +19,7 @@ import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.servic
 @Component({
   selector: 'manage-player',
   templateUrl: './manage-player.component.html',
-  styleUrls: ['./manage-player.component.css', '../../core/css/list.css']
+  styleUrls: ['./manage-player.component.css', '../../../core/css/list.css']
 })
 export class ManagePlayerComponent implements OnInit {
   
@@ -41,5 +41,13 @@ export class ManagePlayerComponent implements OnInit {
 
   public returnToHome() { 
     this.store.dispatch(new Navigate(['/']))
+  }
+
+  public editPlayer(id: number) {
+    this.store.dispatch(new Navigate(['/edit-player', id]));
+  }
+
+  public createPlayer() {
+    this.store.dispatch(new Navigate(['/edit-player/0']));
   }
 }

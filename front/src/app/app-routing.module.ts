@@ -31,7 +31,8 @@ const routes: Routes = [
   { path: 'find-game', loadChildren: () => import('./components/game/find-game/find-game.module').then(m => m.FindGameModule), data: { animation: 'find-game' } },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game/game-editor/game-editor.module').then(m => m.GameEditorModule), data: { animation: 'game-editor' } },
 
-  { path: 'manage-player', loadChildren: () => import('./components/player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },
+  { path: 'manage-player', loadChildren: () => import('./components/player/manage-player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },
+  { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } }
 ];
 
 @NgModule({

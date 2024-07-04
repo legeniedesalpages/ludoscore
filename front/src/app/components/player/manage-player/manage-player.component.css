@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.compte {
+  overflow: hidden; 
+  white-space: nowrap;
+}
+
+.email {
+  color:red;
+}
+
+.actions {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
