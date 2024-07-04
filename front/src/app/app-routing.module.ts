@@ -12,6 +12,7 @@
 **/
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { PagenotfoundComponent } from './components/misc/page-not-found.component';
 
 const routes: Routes = [
   { path: '', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: { animation: 'home' } },
@@ -32,7 +33,11 @@ const routes: Routes = [
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game/game-editor/game-editor.module').then(m => m.GameEditorModule), data: { animation: 'game-editor' } },
 
   { path: 'manage-player', loadChildren: () => import('./components/player/manage-player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },
-  { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } }
+  { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } },
+
+  { path: 'confirm-account/:key', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: { animation: 'home' } },
+
+  
 ];
 
 @NgModule({

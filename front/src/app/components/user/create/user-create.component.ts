@@ -56,7 +56,7 @@ export class UserCreateComponent implements OnInit {
     this.authServie.createUser(this.registerForm.value.email, this.registerForm.value.password).pipe(first()).subscribe({
       next: () => {
         this.loading = false
-        this.snackBar.open("Compte créé, un email de confirmation a été envoyé", 'Fermer', {
+        this.snackBar.open("Compte créé, un email de confirmation a été envoyé (il est probablement dans les SPAM)", 'Fermer', {
           duration: 10000
         })
         this.router.navigate(['/']);
