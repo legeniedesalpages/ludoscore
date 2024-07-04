@@ -68,7 +68,7 @@
 
             </fieldset>
 
-            <div class="divider"></div>
+            <div class="divider rattrapage"></div>
 
             <div>
                 <div class="background-player background-player-minimum"
@@ -97,8 +97,10 @@
                                     <div class="line">
                                         <div class="pseudo">
                                             {{player.name}}
-                                            <div class="color" [hidden]="player.color.name == 'Aucune'">
-                                                <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
+                                            <div class="color">
+                                                <span [hidden]="player.color.name == 'Aucune'">
+                                                    <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
+                                                </span>
                                                 <button mat-icon-button [hidden]="isDownwardArrowHidden(i)" (click)="swapPlayerPosition(i, i+1, true)">
                                                     <mat-icon>arrow_downward</mat-icon>
                                                 </button>

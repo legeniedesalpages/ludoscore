@@ -60,6 +60,17 @@ services:
         aliases:
           - mysql-db
 
+  fake-smtp:
+    image: reachfive/fake-smtp-server
+    container_name: fake-smtp
+    ports:
+      - 1080:1080
+      - 1025:1025
+    networks:
+      backend:
+        aliases:
+          - fake-smp
+
 networks:
   backend:
     name: backend-network

@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Events\UserConnectedEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Mail\MyTestEmail;;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -30,6 +33,14 @@ class AuthController extends Controller
             );
 
             if ($validateUser->fails()) {
+                Log::error($validateUser->errors());
+                if ($validateUser->errors() == '{"email":["validation.unique"]}') {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Email Déjà Utilisé',
+                        'errors' => $validateUser->errors()
+                    ], 401);
+                }
                 return response()->json([
                     'status' => false,
                     'message' => 'validation error',
@@ -37,10 +48,23 @@ class AuthController extends Controller
                 ], 401);
             }
 
+            try {
+                Mail::to("renaud_balu@hotmail.com")->send(new MyTestEmail());
+            } catch (\Throwable $th) {
+                Log::error("Impossible d'envoyer email: ".$th->getMessage());
+                return response()->json([
+                    'status' => false,
+                        'message' => 'Impossible de créer le compte car on ne peut envoyer le mail de confirmation',
+                        'errors' => $th->getMessage()
+                ], 500);
+            }
+
             $user = User::create([
                 'email' => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'is_admin' => false
             ]);
+            
 
             return response()->json([
                 'status' => true,
@@ -48,9 +72,10 @@ class AuthController extends Controller
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
         } catch (\Throwable $th) {
+            Log::error($th->getMessage());
             return response()->json([
                 'status' => false,
-                'message' => $th->getMessage()
+                'message' => "User Creation Failed"
             ], 500);
         }
     }

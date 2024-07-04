@@ -25,7 +25,6 @@ import { Navigate } from '@ngxs/router-plugin';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model';
 import { MatchService } from 'src/app/core/services/match/match.service';
-import { Tag } from 'src/app/core/model/tag.model';
 import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
 
 @Component({

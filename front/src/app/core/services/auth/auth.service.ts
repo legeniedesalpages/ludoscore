@@ -49,7 +49,6 @@ export class AuthService {
 
   public createUser(email: string, password: string) {
     return this.http.get(this.csrfUrl).pipe(
-      // second request : authentication
       mergeMap(() => this.http.post(this.registerUrl, {
         email: email,
         password: password

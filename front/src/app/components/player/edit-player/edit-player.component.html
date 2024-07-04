@@ -1,0 +1,70 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToList()">
+    <ng-container role="header">
+        <span class="title" [hidden]="creating">Editer un joueur</span>
+        <span class="title" [hidden]="!creating">Créer un joueur</span>
+    </ng-container>
+
+    <ng-container role="body">
+        <loading-spinner [loading]="loading" caption="Chargement du joueur"></loading-spinner>
+        <div class="edit-player" [hidden]="loading">
+            <form [formGroup]="playerEditorForm">
+                <fieldset [disabled]="saving">
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Pseudo</mat-label>
+                                <input matInput formControlName="pseudo">
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Prénom</mat-label>
+                                <input matInput formControlName="prenom">
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Nom</mat-label>
+                                <input matInput formControlName="nom">
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Couleur préférée</mat-label>
+                                <mat-select formControlName="couleur">
+                                    <mat-option *ngFor="let color of colors"  [value]="color.name">
+                                        <div [style.background]="color.code" [style.color]="color.invert" class="couleur">{{color.name}}</div>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Compte associé</mat-label>
+                                <mat-select formControlName="user">
+                                    <mat-option *ngFor="let user of users"  [value]="user.id">
+                                        {{user.email}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
+        </div>
+    </ng-container>
+</app-layout>

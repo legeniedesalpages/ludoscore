@@ -17,6 +17,7 @@ class PlayerController extends Controller
      */
     public function index()
     {
+        Log::debug("Liste les joueurs");
         return Player::get();
     }
 

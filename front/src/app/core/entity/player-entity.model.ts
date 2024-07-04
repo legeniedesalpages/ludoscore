@@ -20,5 +20,9 @@ export interface PlayerEntity {
     gravatar: string,
     score: number | undefined,
     matchId: number,
-    createdAt: Date
+    createdAt: Date,
+    user: {
+        email: string,
+        id: number
+    }
 }

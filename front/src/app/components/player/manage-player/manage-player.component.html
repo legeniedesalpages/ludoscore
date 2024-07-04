@@ -5,8 +5,15 @@
 
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
-        <div class="manage-player">
-            <div *ngFor="let player of playerEntities" class="result-list" mat-ripple>
+
+        
+
+        <div class="manage-player" [hidden]="loading">
+            <div class="actions">
+                <button mat-raised-button color="primary" (click)="createPlayer()">Ajouter un joueur</button>
+            </div>
+
+            <div *ngFor="let player of playerEntities" class="result-list" mat-ripple (click)="editPlayer(player.id)">
                 <div class="visual">
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
                 </div>
@@ -17,7 +24,9 @@
                         <br/>
                         Nous à rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
                         <br/>
-                        Associé au compte: <a>renaud.balu@hotmail.com</a>
+                        <span class="compte">
+                            Associé au compte: <span class="email">{{ player.user?.email}}</span>
+                        </span>
                     </div>
                 </div>
             </div>
