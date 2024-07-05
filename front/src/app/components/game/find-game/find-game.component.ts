@@ -21,11 +21,22 @@ import { FindGameService } from 'src/app/core/services/game/find-game.service';
 })
 export class FindGameComponent implements OnInit {
 
+  @ViewChild('iconrecherche', { static: false }) 
+   set inputicon(element: ElementRef<HTMLInputElement>) {
+     if(element) {
+      setTimeout(function(){
+        element.nativeElement.focus()
+      },200);
+       
+     }
+  }
+
   @ViewChild('recherche', { static: false }) 
    set input(element: ElementRef<HTMLInputElement>) {
      if(element) {
       setTimeout(function(){
-        element.nativeElement.click();
+        element.nativeElement.focus()
+        element.nativeElement.click()
       },500);
        
      }
