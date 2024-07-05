@@ -22,6 +22,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LayoutModule } from '../layout/layout.module';
+import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 
 const routes: Routes = [
   {
@@ -42,7 +43,8 @@ const routes: Routes = [
     MatMenuModule,
     LayoutModule,
     MatProgressSpinnerModule,
-    MatRippleModule
+    MatRippleModule,
+    LoadingSpinnerModule
   ]
 })
 export class HomeModule { }

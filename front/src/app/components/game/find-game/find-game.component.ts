@@ -10,16 +10,26 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
 
 @Component({
   selector: 'find-game',
   templateUrl: './find-game.component.html',
-  styleUrls: ['./find-game.component.css', '../../../core/css/list.css']
+  styleUrls: ['./find-game.component.css', '../../../core/css/list.css'],
 })
 export class FindGameComponent implements OnInit {
+
+  @ViewChild('recherche', { static: false }) 
+   set input(element: ElementRef<HTMLInputElement>) {
+     if(element) {
+      setTimeout(function(){
+        element.nativeElement.focus()
+      },500);
+       
+     }
+  }
   
   public searching: boolean;
   public searchString: string;
@@ -28,8 +38,9 @@ export class FindGameComponent implements OnInit {
     this.searching = false;
     this.searchString = '';
   }
-  ngOnInit(): void {
 
+
+  ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {  
       let reset = params.get('no-reset');
       if (reset === 'true') {

@@ -18,3 +18,7 @@
 .emphasis {
   text-decoration: dashed;
 }
+
+.owned {
+  opacity: 0.4;
+}

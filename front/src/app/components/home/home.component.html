@@ -48,11 +48,7 @@
       </div>
     </div>
 
-    <div [hidden]="!loading">
-      <div class="spinner loading">
-        <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
-      </div>
-    </div>
+    <loading-spinner [loading]="loading" caption="Chargement..."></loading-spinner>
 
     <div class="action-list" [hidden]="loading">
 
