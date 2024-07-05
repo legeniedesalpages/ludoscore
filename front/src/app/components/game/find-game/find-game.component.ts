@@ -52,9 +52,7 @@ export class FindGameComponent implements OnInit {
   @ViewChild('recherche', { static: false }) 
    set input(element: ElementRef<HTMLInputElement>) {
      if(element) {
-      setTimeout(function() {
-        focusAndOpenKeyboard(element, 100)
-      }, 500)
+        focusAndOpenKeyboard(element, 1)
      }
   }
 
