@@ -6,7 +6,7 @@
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
 
-        <div class="manage-player" [hidden]="loading">
+        <div class="manage-player" *ngIf="!loading">
             <div class="actions">
                 <button mat-raised-button color="primary" (click)="createPlayer()">Ajouter un joueur</button>
             </div>

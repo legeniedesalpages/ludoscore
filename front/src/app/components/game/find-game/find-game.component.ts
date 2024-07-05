@@ -25,8 +25,7 @@ export class FindGameComponent implements OnInit {
    set input(element: ElementRef<HTMLInputElement>) {
      if(element) {
       setTimeout(function(){
-        element.nativeElement.select()
-        
+        element.nativeElement.click();
       },500);
        
      }
