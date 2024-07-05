@@ -11,7 +11,7 @@
                 <button mat-raised-button color="primary" (click)="createPlayer()">Ajouter un joueur</button>
             </div>
 
-            <div *ngFor="let player of playerEntities" class="result-list" mat-ripple (click)="editPlayer(player.id)">
+            <div *ngFor="let player of playerEntities" class="result-list" (click)="editPlayer(player.id)">
                 <div class="visual">
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
                 </div>

@@ -57,13 +57,21 @@ export class EditPlayerComponent implements OnInit {
         this.users = users;
 
         if (!this.creating) {        
+          
           this.playerService.findOne(id).subscribe(playerEntity => {
+            let userId
+            if (playerEntity.user) {
+              userId = playerEntity.user.id;
+            } else {
+              userId = null;
+            }
+
             this.playerEditorForm.setValue({
               pseudo: playerEntity.pseudo,
               prenom: playerEntity.firstName,
               nom: playerEntity.lastName,
               couleur: playerEntity.preferedColor,
-              user: playerEntity.user.id
+              user: userId
             })
             this.loading = false;
           })

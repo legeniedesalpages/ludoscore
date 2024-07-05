@@ -14,6 +14,34 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
 
+
+function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: any) {
+  if(!timeout) {
+    timeout = 100;
+  }
+  if(el) {
+    // Align temp input element approximately where the input element is
+    // so the cursor doesn't jump around
+    var __tempEl__ = document.createElement('input');
+    __tempEl__.style.position = 'absolute';
+    __tempEl__.style.top = (el.nativeElement.offsetTop + 7) + 'px';
+    __tempEl__.style.left = el.nativeElement.offsetLeft + 'px';
+    __tempEl__.style.height = '0';
+    __tempEl__.style.opacity = '0';
+    // Put this temp element as a child of the page <body> and focus on it
+    document.body.appendChild(__tempEl__);
+    __tempEl__.focus();
+
+    // The keyboard is open. Now do a delayed focus on the target element
+    setTimeout(function() {
+      el.nativeElement.focus();
+      el.nativeElement.click();
+      // Remove the temp element
+      document.body.removeChild(__tempEl__);
+    }, timeout);
+  }
+}
+
 @Component({
   selector: 'find-game',
   templateUrl: './find-game.component.html',
@@ -21,26 +49,14 @@ import { FindGameService } from 'src/app/core/services/game/find-game.service';
 })
 export class FindGameComponent implements OnInit {
 
-  @ViewChild('iconrecherche', { static: false }) 
-   set inputicon(element: ElementRef<HTMLInputElement>) {
-     if(element) {
-      setTimeout(function(){
-        element.nativeElement.focus()
-      },200);
-       
-     }
-  }
-
   @ViewChild('recherche', { static: false }) 
    set input(element: ElementRef<HTMLInputElement>) {
      if(element) {
-      setTimeout(function(){
-        element.nativeElement.focus()
-        element.nativeElement.click()
-      },500);
-       
+      focusAndOpenKeyboard(element, 100);
      }
   }
+
+  
   
   public searching: boolean;
   public searchString: string;
