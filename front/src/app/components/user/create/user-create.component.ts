@@ -34,9 +34,9 @@ export class UserCreateComponent implements OnInit {
 
     this.registerForm = formBuilder.group(
       {
-        email: new FormControl('test@test.com', [Validators.email, Validators.required]),
-        password: ['un', Validators.required],
-        confirmPassword: ['un', Validators.required]
+        email: new FormControl('', [Validators.email, Validators.required]),
+        password: ['', Validators.required],
+        confirmPassword: ['', Validators.required]
       },
       {
         validators: this.matchValidator('password', 'confirmPassword')

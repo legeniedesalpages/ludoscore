@@ -1,0 +1,32 @@
+<app-layout [withBackButton]="false">
+  <ng-container role="header">
+    <span class="title">Confirmation du compte</span>
+  </ng-container>
+
+  <ng-container role="body">
+    <loading-spinner [loading]="loading" [caption]="'Confirmation du compte en cours'"></loading-spinner>
+
+    <div *ngIf="confirmed === true">
+      <div class="message">
+        <div class="message">
+          Votre compte est confirmé,<br />
+          Bienvenue sur LudoScore
+        </div>
+        <div class="detail">
+          Cliquez ici pour vous connecter: <a routerLink="/login">login</a>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="confirmed === false">
+      <div class="message">
+        Impossible de confirmer votre compte<br />
+      </div>
+      <div class="detail">
+        Soit il est déjà activé, soit le lien de confirmation est incorrect<br />
+        <br />
+        <a routerLink="/login">Revenir à la page de login</a>
+      </div>
+    </div>
+  </ng-container>
+</app-layout>

@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\UserController;
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 Route::get('/auth/logout', [AuthController::class, 'logoutUser']);
+Route::post('/auth/confirm', [AuthController::class, 'confirmUser']);
 
 /*
 |--------------------------------------------------------------------------

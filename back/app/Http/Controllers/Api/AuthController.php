@@ -105,6 +105,10 @@ class AuthController extends Controller
 
                 UserConnectedEvent::dispatch("utilisateur");
 
+                if (Auth::user()->email_verified_at == null) {
+                    return response()->json('User Not Confirmed', 401);
+                }
+
                 return response()->json(Auth::user()->id);
             } else {
 
@@ -121,5 +125,25 @@ class AuthController extends Controller
         $request->session()->invalidate();
 
         return response()->json('User Logged Out Successfully');
+    }
+
+    public function confirmUser(Request $request)
+    {
+        $user = User::where('confirmation_key', $request->key)->first();
+        if ($user) {
+            $user->confirmation_key = null;
+            $user->email_verified_at = now();
+            $user->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'User Confirmed Successfully',
+                'token' => $user->createToken("API TOKEN")->plainTextToken
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Confirmation key Not Found'
+            ], 404);
+        }
     }
 }

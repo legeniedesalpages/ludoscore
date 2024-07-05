@@ -25,7 +25,7 @@ export class AuthService {
   private readonly loginUrl = environment.apiURL + '/api/auth/login';
   private readonly logoutUrl = environment.apiURL + '/api/auth/logout';
   private readonly registerUrl = environment.apiURL + '/api/auth/register';
-
+  private readonly confirmrUrl = environment.apiURL + '/api/auth/confirm';
 
 
   constructor(private http: HttpClient, private userCrudService: UserCrudService) {
@@ -52,6 +52,13 @@ export class AuthService {
       mergeMap(() => this.http.post(this.registerUrl, {
         email: email,
         password: password
+      })))
+  }
+
+  public confirmUser(key: string) {
+    return this.http.get(this.csrfUrl).pipe(
+      mergeMap(() => this.http.post(this.confirmrUrl, {
+        key: key
       })))
   }
 }

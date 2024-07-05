@@ -4,7 +4,10 @@
   </ng-container>
 
   <ng-container role="body">
-    <div class="title">Créer un compte</div>
+    <div class="title" [hidden]="loading">Créer un compte</div>
+
+    <loading-spinner [loading]="loading" [caption]="'Création du compte'"></loading-spinner>
+
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <fieldset [disabled]="loading">
         <div class="row">
@@ -22,7 +25,7 @@
               <mat-label>Mot de passe</mat-label>
               <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password">
               <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'"
-                  type="button" [attr.aria-pressed]="hidePassword">
+                  type="button" [attr.aria-pressed]="hidePassword" tabindex="-1">
                   <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
             </mat-form-field>
@@ -34,7 +37,7 @@
               <mat-label>Répeter le mot de passe</mat-label>
               <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword" autocomplete="new-password">
               <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'"
-                  type="button" [attr.aria-pressed]="hidePassword">
+                  type="button" [attr.aria-pressed]="hidePassword" tabindex="-1">
                   <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
             </mat-form-field>
@@ -42,7 +45,7 @@
         </div>
         <div class="row">
           <div class="column">
-            <button mat-raised-button color="primary" [disabled]="!registerForm.valid" [hidden]="loading">
+            <button mat-raised-button color="primary" [disabled]="!registerForm.valid || loading">
               C'est parti !
             </button>
           </div>
