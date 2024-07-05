@@ -22,4 +22,8 @@ export class UserCrudService extends CrudService<UserEntity, number> {
         super(http, '/user');
     }
 
+    public updateFirstConnection(id: number) {
+        var url = `${this.apiUrl}/user/${id}/first-connection`
+        return this.http.post<void>(`${url}`, null);
+    }
 }

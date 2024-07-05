@@ -19,6 +19,7 @@ import { UserEntity } from 'src/app/core/entity/user-entity.model';
 import { COLORS } from 'src/app/core/model/color-tag.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
+import { AuthState } from 'src/app/core/state/auth/auth.state';
 
 @Component({
   selector: 'edit-player',
@@ -42,7 +43,7 @@ export class EditPlayerComponent implements OnInit {
       prenom: new FormControl(''),
       nom: new FormControl(''),
       couleur: new FormControl(''),
-      user: new FormControl('')
+      user: new FormControl({value: '', disabled: true})
     });
   }
 
@@ -55,15 +56,21 @@ export class EditPlayerComponent implements OnInit {
 
       this.userCrudService.findAll().subscribe(users => {
         this.users = users;
+        let loggedUserId: number = this.store.selectSnapshot(AuthState).id
+        let loggedUser: UserEntity = this.users.find(user => user.id === loggedUserId)!
+        console.debug("Logged user: ", loggedUser);
+        if (loggedUser.isAdmin) {
+          this.playerEditorForm.get('user')?.enable();
+        }
+        
 
         if (!this.creating) {        
           
           this.playerService.findOne(id).subscribe(playerEntity => {
-            let userId
+            let userId = null
             if (playerEntity.user) {
+              console.debug("Le joueur à déjà un utilisateur associé, on le prend: ", playerEntity.user);
               userId = playerEntity.user.id;
-            } else {
-              userId = null;
             }
 
             this.playerEditorForm.setValue({
@@ -76,6 +83,21 @@ export class EditPlayerComponent implements OnInit {
             this.loading = false;
           })
         } else {
+          console.log(this.store.selectSnapshot(AuthState))
+          
+          console.debug("On est en train de créer un joueur, on vérifie si l'utilisateur connecté a déjà été connecté à un joueur: ", loggedUserId);
+          
+          if (!this.users.find(user => user.id === loggedUserId)?.playerId) {
+            console.debug("L'utilisateur connecté n'a pas de joueur associé, on le prend: ", loggedUserId);
+            this.playerEditorForm.setValue({    
+              pseudo: '',
+              prenom: '',
+              nom: '',
+              couleur: '',
+              user: loggedUserId
+            })
+          }
+
           this.loading = false;
         }
       })
@@ -84,5 +106,10 @@ export class EditPlayerComponent implements OnInit {
 
   public returnToList() { 
     this.store.dispatch(new Navigate(['/manage-player']))
+  }
+
+  public save() {
+    this.saving = true
+    this.store.dispatch(new Navigate(['/']))
   }
 }

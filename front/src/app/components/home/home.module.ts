@@ -12,7 +12,7 @@
 **/
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HomeComponent } from './home.component';
+import { HomeComponent, WelcomeDialogComponent } from './home.component';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -23,6 +23,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LayoutModule } from '../layout/layout.module';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
+import { MatDialogModule } from '@angular/material/dialog';
 
 const routes: Routes = [
   {
@@ -33,7 +34,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, WelcomeDialogComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -44,7 +45,8 @@ const routes: Routes = [
     LayoutModule,
     MatProgressSpinnerModule,
     MatRippleModule,
-    LoadingSpinnerModule
+    LoadingSpinnerModule,
+    MatDialogModule,
   ]
 })
 export class HomeModule { }

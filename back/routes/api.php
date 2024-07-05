@@ -24,8 +24,10 @@ Route::post('/auth/confirm', [AuthController::class, 'confirmUser']);
 | User
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth:sanctum')->resource('user', UserController::class, ['except' => ['edit', 'create', 'store']]);
 
+Route::middleware('auth:sanctum')->post('/user/{id}/first-connection', [AuthController::class, 'deactivateFirstConnection']);
 /*
 |--------------------------------------------------------------------------
 | Game

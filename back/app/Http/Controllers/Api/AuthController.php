@@ -17,6 +17,17 @@ use Ramsey\Uuid\Uuid;
 
 class AuthController extends Controller
 {
+
+    public function deactivateFirstConnection($id)
+    {
+        $user = User::find($id);
+        $user->first_connection = false;
+        $user->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'First Connection Deactivated Successfully'
+        ], 200);
+    }
     /**
      * Create User
      * @param Request $request

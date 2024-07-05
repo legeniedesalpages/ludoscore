@@ -63,6 +63,10 @@ svg {
   border-radius: 4px;
 }
 
+.associate {
+  border: 1px solid transparent;
+}
+
 .caption {
   padding-left: 15px;
 }

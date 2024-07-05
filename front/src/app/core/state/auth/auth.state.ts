@@ -36,12 +36,17 @@ export class AuthState {
         return (state.name == undefined || state.name === "")  ? state.email : state.name
     }
 
+    @Selector() static userId(state: AuthStateModel): number {
+        return state.id
+    }
+
     constructor(private authService: AuthService) { }
 
     @Action(DoLogin)
     login({ patchState }: StateContext<AuthStateModel>, { email, password }: DoLogin) {
         return this.authService.login(email, password).pipe(
             tap(returnData => {
+                console.log("returnData", returnData)
                 patchState({
                     id: returnData.id,
                     name: returnData.name,

@@ -52,7 +52,7 @@
 
                     <div class="row">
                         <div class="column">
-                            <mat-form-field appearance="fill">
+                            <mat-form-field appearance="fill" >
                                 <mat-label>Compte associé</mat-label>
                                 <mat-select formControlName="user">
                                     <mat-option *ngFor="let user of users"  [value]="user.id">
@@ -60,6 +60,13 @@
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row button_row">
+                        <div class="column">
+                            <button mat-raised-button [hidden]="saving" (click)="save()" color="primary">Enregistrer le joueur</button>
+                            <loading-spinner [loading]="saving" caption="Enregistrement du joueur"></loading-spinner>
                         </div>
                     </div>
                 </fieldset>
