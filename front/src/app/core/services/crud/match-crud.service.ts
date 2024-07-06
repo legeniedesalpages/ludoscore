@@ -15,6 +15,7 @@ import { HttpClient } from '@angular/common/http';
 import { CrudService } from './abstract-crud.service';
 import { MatchEntity, MatchPlayerEntity } from '../../entity/match-entity.model';
 import { Observable, tap } from 'rxjs';
+import { PlayerEntity } from '../../entity/player-entity.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchCrudService extends CrudService<MatchEntity, number> {
@@ -31,6 +32,11 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
     getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchPlayerEntity> {
         var url = `${this.apiUrl}/previous-match/${playerId}/${gameId}`
         return this.http.get<MatchPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
+    }
+
+    updatePlayerScore(playerEntity: PlayerEntity): Observable<PlayerEntity> {
+        var url = `${this.apiUrl}/game-match/update-score`
+        return this.http.put<PlayerEntity>(url, playerEntity).pipe(tap(res => console.debug("update player score " + url + " => ", res)))
     }
 
 }

@@ -75,9 +75,8 @@ export class MatchService {
                 console.info('playerEntity, match', playerEntity, matchId)
                 playerEntity.score = player.score;
                 playerEntity.matchId = matchId;
-                return this.playerCrudService.update(player.id, playerEntity)
+                return this.matchCrudService.updatePlayerScore(playerEntity)
             }))
-        ret.subscribe((error) => console.error(error))
         return ret
     }
 
