@@ -14,6 +14,8 @@ import { Component, OnInit } from '@angular/core';
 import { Navigate } from '@ngxs/router-plugin';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { Observable, first } from 'rxjs';
+import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
+import { Player } from 'src/app/core/model/player.model';
 import { MatchEnded } from 'src/app/core/state/match/match.action';
 import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
@@ -26,6 +28,8 @@ import { environment } from 'src/environments/environment';
 export class MatchDisplayComponent implements OnInit {
 
   @Select(MatchState) matchState!: Observable<MatchStateModel>;
+  @Select(MatchState.matchTags) matchTags!: Observable<ChoosenTag[]>;
+  @Select(MatchState.players) players!: Observable<Player[]>;
 
   public startDate?: Date
   public elapsedTime: String

@@ -9,16 +9,47 @@
             [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat top / cover'}">
             <div class="heading">{{ gameName }}</div>
 
+            <ul class="game-category">
+                <li *ngFor="let matchCategory of matchTags | async; let i = index">
+                    {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
+                </li>
+            </ul>
+
             <div class="elapsedtime">
                 Temps écoulé :<br />
                 <span class="bold">{{ elapsedTime }}</span>
             </div>
 
-            <ul class="player-list">
-                <div *ngFor="let player of (matchState | async)?.players" class="result-list" matRipple>
-                    <li class="player">{{ player.name }}</li>
+            <div class="player-list">
+                <div *ngFor="let player of players | async; let i = index" mat-ripple>
+                    <div class="row">
+                        <div class="column">
+                            <div class="player">
+                                <div class="avatar">
+                                    <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg">
+                                </div>
+                                <div class="line">
+                                    <div class="pseudo">
+                                        {{player.name}}
+                                        <div class="color">
+                                            <span [hidden]="player.color.name == 'Aucune'">
+                                                <span class="dot"
+                                                    [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="tags">
+                                        <ul *ngFor="let tag of player.choosenTags" mat-ripple>
+                                            <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </ul>
+            </div>
 
             <div class="elapsedtime">
                 <button mat-raised-button color="primary" (click)="endGame()">
