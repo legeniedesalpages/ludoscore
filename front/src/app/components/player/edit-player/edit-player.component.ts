@@ -12,9 +12,11 @@
 **/
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { Navigate } from '@ngxs/router-plugin';
 import { Store } from '@ngxs/store';
+import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { UserEntity } from 'src/app/core/entity/user-entity.model';
 import { COLORS } from 'src/app/core/model/color-tag.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
@@ -36,8 +38,10 @@ export class EditPlayerComponent implements OnInit {
   public creating: boolean = false
   public saving: boolean = false
   public colors = COLORS
+  public currentPlayerId: number = 0
+  public isEditable: boolean = false
 
-  constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private userCrudService: UserCrudService) {
+  constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private userCrudService: UserCrudService, private snackBar: MatSnackBar) {
     this.playerEditorForm = new FormGroup({
       pseudo: new FormControl('', Validators.required),
       prenom: new FormControl(''),
@@ -49,28 +53,32 @@ export class EditPlayerComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      let id = Number(params.get('id'));
-      console.debug("Id: ", id);
-      this.creating = (id === 0);
-      console.debug("Creating: ", this.creating);
+      this.currentPlayerId = Number(params.get('id'))
+      console.debug("Id: ", this.currentPlayerId)
+      this.creating = (this.currentPlayerId === 0)
+      console.debug("Creating: ", this.creating)
+      let loggedUserId: number = this.store.selectSnapshot(AuthState).id
 
       this.userCrudService.findAll().subscribe(users => {
-        this.users = users;
-        let loggedUserId: number = this.store.selectSnapshot(AuthState).id
-        let loggedUser: UserEntity = this.users.find(user => user.id === loggedUserId)!
-        console.debug("Logged user: ", loggedUser);
-        if (loggedUser.isAdmin) {
-          this.playerEditorForm.get('user')?.enable();
-        }
+        this.users = users
         
+        let loggedUser: UserEntity = this.users.find(user => user.id === loggedUserId)!
+
+        console.debug("Logged user: ", loggedUser)
+        if (loggedUser.isAdmin) {
+          this.playerEditorForm.get('user')?.enable()
+          this.isEditable = true
+        }
 
         if (!this.creating) {        
           
-          this.playerService.findOne(id).subscribe(playerEntity => {
+          this.playerService.findOne(this.currentPlayerId).subscribe(playerEntity => {
             let userId = null
             if (playerEntity.user) {
-              console.debug("Le joueur à déjà un utilisateur associé, on le prend: ", playerEntity.user);
-              userId = playerEntity.user.id;
+              userId = playerEntity.user.id
+              if (loggedUserId === userId) {
+                this.isEditable = true
+              }    
             }
 
             this.playerEditorForm.setValue({
@@ -83,21 +91,14 @@ export class EditPlayerComponent implements OnInit {
             this.loading = false;
           })
         } else {
-          console.log(this.store.selectSnapshot(AuthState))
-          
-          console.debug("On est en train de créer un joueur, on vérifie si l'utilisateur connecté a déjà été connecté à un joueur: ", loggedUserId);
+          this.isEditable = true
+          console.debug("On est en train de créer un joueur, on vérifie si l'utilisateur connecté a déjà été connecté à un joueur: ", loggedUserId)
           
           if (!this.users.find(user => user.id === loggedUserId)?.playerId) {
-            console.debug("L'utilisateur connecté n'a pas de joueur associé, on le prend: ", loggedUserId);
-            this.playerEditorForm.setValue({    
-              pseudo: '',
-              prenom: '',
-              nom: '',
-              couleur: '',
-              user: loggedUserId
-            })
+            console.debug("L'utilisateur connecté n'a pas de joueur associé, on le prend: ", loggedUserId)
+            this.playerEditorForm.get('user')?.setValue(loggedUserId)
           }
-
+          
           this.loading = false;
         }
       })
@@ -110,6 +111,41 @@ export class EditPlayerComponent implements OnInit {
 
   public save() {
     this.saving = true
-    this.store.dispatch(new Navigate(['/']))
+    let playerEntity: PlayerEntity = {
+      id: this.currentPlayerId,
+      pseudo: this.playerEditorForm.get('pseudo')?.value,
+      firstName: this.playerEditorForm.get('prenom')?.value,
+      lastName: this.playerEditorForm.get('nom')?.value,
+      preferedColor: this.playerEditorForm.get('couleur')?.value,
+      user: {
+        id: this.playerEditorForm.get('user')?.value,
+        email: ''
+      },
+      initials: '',
+      gravatar: '',
+      score: undefined,
+      matchId: 0,
+      createdAt: new Date()
+    }
+
+    if (this.creating) {
+      this.playerService.save(playerEntity).subscribe(() => {
+        console.debug("Player created")
+        this.saving = false
+        this.snackBar.open("Joueur créé", 'Fermer', {
+          duration: 10000
+        })
+        this.store.dispatch(new Navigate(['/']))
+      })
+    } else {
+      this.playerService.update(playerEntity.id, playerEntity).subscribe(() => {
+        console.debug("Player updated")
+        this.saving = false
+        this.snackBar.open("Joueur mis à jour", 'Fermer', {
+          duration: 10000
+        })
+        this.store.dispatch(new Navigate(['/']))
+      })
+    }
   }
 }

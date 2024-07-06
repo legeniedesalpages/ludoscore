@@ -30,6 +30,7 @@ import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.modul
 import { MatChipsModule } from '@angular/material/chips';
 import { EditPlayerComponent } from './edit-player.component';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 const routes: Routes = [
   {
@@ -57,7 +58,8 @@ const routes: Routes = [
     LayoutModule,
     LoadingSpinnerModule,
     MatChipsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   exports: [EditPlayerComponent],
   providers: [PlayerCrudService]

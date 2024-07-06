@@ -11,7 +11,6 @@ class Player extends Model
     use HasFactory;
 
     protected $appends = ['gravatar'];
-    //protected $hidden = ['user'];
 
     public function user(): HasOne
     {

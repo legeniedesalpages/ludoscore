@@ -1,6 +1,6 @@
 <app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
     <ng-container role="header">
-        <span class="title">Gérer les joueurs</span>
+        <span class="title">joueurs</span>
     </ng-container>
 
     <ng-container role="body">
@@ -16,11 +16,9 @@
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
                 </div>
                 <div class="content">
-                    <div class="heading">{{ player.pseudo }}</div>
+                    <div class="heading">{{ player.pseudo }}<span class="supporting" *ngIf="player.firstName || player.lastName">({{ player.firstName }} {{ player.lastName }})</span></div>
                     <div class="supporting">
-                        {{ player.firstName }} {{ player.lastName }}
-                        <br/>
-                        Nous à rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
+                        Nous a rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
                         <br/>
                         <span class="compte" [hidden]="player?.user?.email == undefined">
                             Associé au compte: <span class="email">{{ player?.user?.email}}</span>

@@ -66,7 +66,8 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'is_admin' => false,
-                'confirmation_key' => Uuid::uuid4()->toString()
+                'confirmation_key' => Uuid::uuid4()->toString(),
+                'first_connection' => true,
             ]);
 
             try {

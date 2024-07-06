@@ -54,7 +54,7 @@ Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::c
 | Player
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create', 'store']]);
+Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------
