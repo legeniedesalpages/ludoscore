@@ -13,8 +13,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Navigate } from '@ngxs/router-plugin';
 import { Store } from '@ngxs/store';
+import { first, forkJoin } from 'rxjs';
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
+import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
+import { AuthState } from 'src/app/core/state/auth/auth.state';
 
 @Component({
   selector: 'manage-player',
@@ -25,18 +28,21 @@ export class ManagePlayerComponent implements OnInit {
   
   public playerEntities: PlayerEntity[]
   public loading: boolean = true
+  public isAdmin: boolean = false
 
-  constructor(private store: Store, private playerService: PlayerCrudService) {
+  constructor(private store: Store, private playerService: PlayerCrudService, private userService: UserCrudService) {
     this.playerEntities = []
   }
 
   ngOnInit(): void {
-    this.playerService.findAll().subscribe({
-      next: (playerEntities: PlayerEntity[]) => {
-        this.playerEntities = playerEntities
+      forkJoin({
+        user: this.userService.findOne(this.store.selectSnapshot(AuthState).id),
+        playerEntities: this.playerService.findAll()
+      }).pipe(first()).subscribe(actions => {
+        this.playerEntities = actions.playerEntities
         this.loading = false
-      }
-    });
+        this.isAdmin = actions.user.isAdmin
+      })
   }
 
   public returnToHome() { 

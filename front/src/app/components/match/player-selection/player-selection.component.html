@@ -8,7 +8,7 @@
 
     <ng-container role="footer">
         <div class="footer row">
-            <button mat-mini-fab [disabled]="!canContinue" color="primary" class="lead" (click)="showRandomToolbox()">
+            <button mat-mini-fab [disabled]="!canContinue" [hidden]="saving" color="primary" class="lead" (click)="showRandomToolbox()">
                 <svg viewBox="0 0 512 512">
                     <g transform="translate(0,0)">
                       <path 
@@ -17,12 +17,13 @@
                     </g>
                   </svg>
             </button>
-            <button mat-mini-fab [disabled]="lessThan2Players" color="primary" class="lead2" (click)="showWheel()">
+            <button mat-mini-fab [disabled]="lessThan2Players" [hidden]="saving" color="primary" class="lead2" (click)="showWheel()">
                 <mat-icon>group</mat-icon>
             </button>
-            <button mat-flat-button [disabled]="!canContinue" color="primary" (click)="launchMatch()" class="end">
+            <button mat-flat-button [disabled]="!canContinue" [hidden]="saving" color="primary" (click)="launchMatch()" class="end">
                 Lancer la partie
             </button>
+            <loading-spinner [loading]="saving" caption="Lancement de la partie..."></loading-spinner>
         </div>
     </ng-container>
 
@@ -49,12 +50,12 @@
 
             <div class="divider"></div>
 
-            <fieldset>
+            <fieldset [disabled]="saving">
                 <div class="row">
                     <div class="column">
                         <mat-form-field appearance="fill">
                             <mat-label>Ajouter un joueur</mat-label>
-                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector [disabled]="!canAddPlayer">
+                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector [disabled]="!canAddPlayer || saving">
                                 <!--<mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
                                 <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
                                 <mat-divider></mat-divider>-->

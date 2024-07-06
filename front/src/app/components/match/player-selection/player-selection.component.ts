@@ -26,6 +26,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model';
 import { MatchService } from 'src/app/core/services/match/match.service';
 import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
+import { AuthState } from 'src/app/core/state/auth/auth.state';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -40,6 +41,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public env = environment
   public loading: boolean = true
+  public saving: boolean = false
   public gameId: number = 0
   public gameTitle: string = ""
   public gameImage: string = ""
@@ -80,6 +82,18 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       this.maxPlayers = actions.match.maxPlayers
       this.playerColors = actions.match.playerColors
       console.log("Couleurs pouvant être choisie par les joueurs", this.playerColors)
+
+      /*let loggedUserId: number = this.store.selectSnapshot(AuthState).id
+      let loggedPlayers: PlayerEntity[] = actions.allPlayers.filter(player => {
+        console.log("test:", player.user?.id, loggedUserId, player.user?.id == loggedUserId)
+        return player.user?.id == loggedUserId
+      })
+      console.log("Joueurs connectés:", loggedPlayers.length)
+      if (loggedPlayers.length == 1) {
+        console.log("Joueur connecté trouvé:", loggedPlayers[0])
+        this.selectPlayer(loggedPlayers[0])
+      }*/
+
       this.loading = false
 
       this.playerChangeSubscription = this.playerChange.subscribe(players => {
@@ -89,7 +103,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         this.lessThan2Players = players.length < 2
         const ids = players.map(player => player.id)
         this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
-        this.choosableColors = this.playerColors.filter(color => !players.map(p => p.color.name).includes(color.name))
+        this.choosableColors = this.playerColors.filter(color => !players.map(p => p.color.name).includes(color.name))       
       })
     })
   }
@@ -186,6 +200,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   public launchMatch() {
+    this.saving = true;
     this.store.dispatch(new LaunchMatch())
   }
 

@@ -20,7 +20,7 @@
                     <div class="supporting">
                         Nous a rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
                         <br/>
-                        <span class="compte" [hidden]="player?.user?.email == undefined">
+                        <span class="compte" [hidden]="player?.user?.email == undefined || !isAdmin">
                             Associé au compte: <span class="email">{{ player?.user?.email}}</span>
                         </span>
                     </div>
