@@ -11,6 +11,7 @@
     * - Modification    : 
 **/
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Navigate } from '@ngxs/router-plugin';
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store';
 import { Observable, first } from 'rxjs';
@@ -20,6 +21,7 @@ import { MatchEnded } from 'src/app/core/state/match/match.action';
 import { MatchStateModel } from 'src/app/core/state/match/match.model';
 import { MatchState } from 'src/app/core/state/match/match.state';
 import { environment } from 'src/environments/environment';
+import { PlayerDetailComponent } from '../player-detail/player-detail.component';
 
 @Component({
   templateUrl: './match-display.component.html',
@@ -37,8 +39,9 @@ export class MatchDisplayComponent implements OnInit {
   public gameName?: String
   public imageUrl?: String
 
-  constructor(private store: Store, private actions: Actions) {
+  constructor(private store: Store, private actions: Actions, private dialog: MatDialog) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
+    this.dialog.closeAll()
   }
 
   ngOnInit(): void {
@@ -66,6 +69,10 @@ export class MatchDisplayComponent implements OnInit {
 
   public endGame() {
     this.store.dispatch(new MatchEnded(new Date()))
+  }
+
+  public goToPlayerDetail(player: Player) {
+    this.dialog.open(PlayerDetailComponent)
   }
 
 

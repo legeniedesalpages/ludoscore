@@ -21,7 +21,7 @@
             </div>
 
             <div class="player-list">
-                <div *ngFor="let player of players | async; let i = index" mat-ripple>
+                <div *ngFor="let player of players | async; let i = index" mat-ripple (click)="goToPlayerDetail(player)">
                     <div class="row">
                         <div class="column">
                             <div class="player">

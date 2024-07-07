@@ -27,6 +27,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { MatchDisplayComponent } from './match-display.component';
+import { PlayerDetailModule } from '../player-detail/player-detail.module';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActivate: [AuthGuardService] }];
 
@@ -46,7 +48,12 @@ const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActiva
     FormsModule,
     MatCheckboxModule,
     MatDividerModule,
-    SidenavModule
-  ]
+    SidenavModule,
+    MatDialogModule
+  ],
+  providers: [
+    { provide: MatDialogRef, useValue: {} },
+    { provide: MAT_DIALOG_DATA, useValue:{} }
+ ],
 })
 export class MatchDisplayModule { }
