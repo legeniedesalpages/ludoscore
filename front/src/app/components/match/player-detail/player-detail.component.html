@@ -1,9 +1,20 @@
-<h2 mat-dialog-title>Joueur</h2>
+<h2 mat-dialog-title>{{player.name}}</h2>
 
 <mat-dialog-content class="dialog row">
-    content
+    <fieldset>
+        <mat-form-field appearance="fill" class="champs" [hidden]="colors.length == 0">
+            <mat-label [style.background]="player.color.code" [style.color]="player.color.invert">Couleur du joueur</mat-label>
+            <mat-select [value]="player.color.name" (selectionChange)="colorChange($event.value)">
+                <mat-option *ngFor="let color of colors" [value]="color.name">
+                    <div [style.background]="color.code" [style.color]="color.invert" class="couleur">{{color.name}}
+                    </div>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>        
+    </fieldset>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Annuler</button>
     <button mat-button mat-dialog-close>Ok</button>
 </mat-dialog-actions>

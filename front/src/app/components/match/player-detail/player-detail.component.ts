@@ -13,6 +13,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
+import { ColorTag } from 'src/app/core/model/color-tag.model';
+import { Player } from 'src/app/core/model/player.model';
+import { MatchState } from 'src/app/core/state/match/match.state';
 
 @Component({
   selector: 'player-detail',
@@ -21,7 +24,10 @@ import { Store } from '@ngxs/store';
 })
 export class PlayerDetailComponent implements OnInit {
 
-  constructor(public dialogRef: MatDialogRef<PlayerDetailComponent>, @Inject(MAT_DIALOG_DATA) public data: any, private store: Store) {
+  public colors: ColorTag[] = []
+
+  constructor(public dialogRef: MatDialogRef<PlayerDetailComponent>, @Inject(MAT_DIALOG_DATA) public player: Player, private store: Store) {
+    this.colors = this.store.selectSnapshot(MatchState).playerColors
   }
 
   close() {
@@ -29,5 +35,14 @@ export class PlayerDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  public colorChange(color: string) {
+    let newColor = this.colors.find(c => c.name == color)!
+    console.debug("Nouvelle couleur:", newColor)
+    this.player = {
+      ...this.player,
+      color: newColor
+    }
   }
 }

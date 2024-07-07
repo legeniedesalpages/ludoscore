@@ -29,6 +29,7 @@ import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { MatchDisplayComponent } from './match-display.component';
 import { PlayerDetailModule } from '../player-detail/player-detail.module';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 
 const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActivate: [AuthGuardService] }];
 
@@ -49,7 +50,8 @@ const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActiva
     MatCheckboxModule,
     MatDividerModule,
     SidenavModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSelectModule,
   ],
   providers: [
     { provide: MatDialogRef, useValue: {} },

@@ -29,6 +29,11 @@ export class AddPlayer {
     constructor(public playerId: number, public playerName: string, public avatar: string, public color: ColorTag) { }
 }
 
+export class ChangePlayerColor {
+    static readonly type: string = '[Match] ChangePlayerColor';
+    constructor(public playerId: number, public color: ColorTag) { }
+}
+
 export class ChangeFirstPlayer {
     static readonly type: string = '[Match] ChangeFirstPlayer';
     constructor(public player: Player) { }

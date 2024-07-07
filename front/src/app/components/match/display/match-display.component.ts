@@ -72,7 +72,11 @@ export class MatchDisplayComponent implements OnInit {
   }
 
   public goToPlayerDetail(player: Player) {
-    this.dialog.open(PlayerDetailComponent)
+    this.dialog.open(PlayerDetailComponent, { 
+      data: player,
+      width: '100%',
+      maxWidth: '90vw',
+    })
   }
 
 

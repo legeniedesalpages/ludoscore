@@ -1,0 +1,18 @@
+.mat-dialog-title {
+  text-align: left;
+}
+
+.champs {
+  width: 100%;
+}
+
+.dot {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  margin-bottom: 15px;
+  border: 1px solid grey;
+}
