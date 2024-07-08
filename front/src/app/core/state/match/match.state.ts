@@ -278,9 +278,12 @@ export class MatchState {
             return
         }
 
-        const modifiedPlayer = { ...player, score: scoreAddedToPlayer.score }
-        const modifiedPlayerList = getState().players.filter(p => p.id != scoreAddedToPlayer.playerId)
-        modifiedPlayerList.push(modifiedPlayer)
+        const modifiedPlayerList: Player[] = getState().players.map(player => {
+            if (player.id == scoreAddedToPlayer.playerId) {
+                return { ...player, score: scoreAddedToPlayer.score }
+            }
+            return player
+        })
 
         setState({
             ...getState(),
