@@ -13,11 +13,12 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { MatchStateModel } from "./match.model";
 import { Injectable } from '@angular/core';
-import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult, SwapPlayerPosition } from "./match.action";
+import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, ChangePlayerColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult, SwapPlayerPosition } from "./match.action";
 import { Player } from "../../model/player.model";
 import { MatchService } from "../../services/match/match.service";
 import { tap } from 'rxjs/operators';
 import { ChoosenTag } from "../../model/choosen-tag.model";
+import { ColorTag } from "../../model/color-tag.model";
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match');
 
@@ -142,6 +143,28 @@ export class MatchState {
         setState({
             ...getState(),
             players: newOrderPlayers
+        })
+    }
+
+    @Action(ChangePlayerColor)
+    changePlayerColor({ setState, getState }: StateContext<MatchStateModel>, playerWithColorToChange: ChangePlayerColor) {
+
+        const oldColor: ColorTag = getState().players.find(p => p.id == playerWithColorToChange.playerId)!.color
+
+        const modifiedPlayerList: Player[] = getState().players.map(player => {
+            let pp : Player = player
+            if (player.id == playerWithColorToChange.playerId) {
+                pp = { ...player, color: playerWithColorToChange.color }
+            }
+            if (player.id != playerWithColorToChange.playerId && player.color.name == playerWithColorToChange.color.name) {
+                pp = { ...player, color: oldColor }
+            }
+            return pp
+        })
+
+        setState({
+            ...getState(),
+            players: modifiedPlayerList
         })
     }
 
