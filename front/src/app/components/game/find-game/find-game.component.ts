@@ -45,7 +45,7 @@ function focusAndOpenKeyboard(element: ElementRef<HTMLInputElement>) {
 export class FindGameComponent implements OnInit {
 
   @ViewChild('recherche', { static: false })
-  set input(element: ElementRef<HTMLInputElement>) {
+  set searchInputElement(element: ElementRef<HTMLInputElement>) {
     focusAndOpenKeyboard(element)
   }
 
@@ -59,9 +59,10 @@ export class FindGameComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {
-      let reset = params.get('no-reset')
-      if (reset === 'true') {
-        console.debug("No reset")
+      focusAndOpenKeyboard(this.searchInputElement)
+      let doNotResetSearchField = params.get('no-reset')
+      if (doNotResetSearchField === 'true') {
+        console.debug("Do not reset search field")
       } else {
         this.findGameService.resetPreviousSearch()
       }
