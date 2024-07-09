@@ -18,7 +18,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 import { LayoutModule } from '../../layout/layout.module';
-import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { A11yModule } from '@angular/cdk/a11y'
@@ -40,7 +39,6 @@ const routes: Routes = [ { path: '', component: MatchEndComponent, canActivate: 
     MatButtonModule,
     LayoutModule,
     LoadingSpinnerModule,
-    MatRippleModule,
     MatFormFieldModule,
     MatInputModule,
     A11yModule,

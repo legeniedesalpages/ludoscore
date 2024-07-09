@@ -21,7 +21,7 @@
             </div>
 
             <div class="player-list">
-                <div *ngFor="let player of players | async; let i = index" mat-ripple (click)="goToPlayerDetail(player)">
+                <div *ngFor="let player of players | async; let i = index" (click)="goToPlayerDetail(player)">
                     <div class="row">
                         <div class="column">
                             <div class="player">
@@ -39,7 +39,7 @@
                                         </div>
                                     </div>
                                     <div class="tags">
-                                        <ul *ngFor="let tag of player.choosenTags" mat-ripple>
+                                        <ul *ngFor="let tag of player.choosenTags">
                                             <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
                                         </ul>
                                     </div>

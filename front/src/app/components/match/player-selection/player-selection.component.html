@@ -84,7 +84,7 @@
 
             <div class="player-container" [ngStyle]="{'margin-top': ((maxPlayers) * -65) + 'px'}"
                 style="position: relative;">
-                <div *ngFor="let player of playerChange | async; let i = index" mat-ripple>
+                <div *ngFor="let player of playerChange | async; let i = index">
                     <div class="row">
                         <div class="column">
                             <swipeable-element
@@ -111,7 +111,7 @@
                                             </div>
                                         </div>
                                         <div class="tags">
-                                            <ul *ngFor="let tag of player.choosenTags" mat-ripple>
+                                            <ul *ngFor="let tag of player.choosenTags">
                                                 <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
                                             </ul>
                                         </div>

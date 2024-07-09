@@ -6,7 +6,7 @@
     <ng-container role="body">
         <div class="score">Saisie des scores</div>
         <ul class="player-list">
-            <div *ngFor="let player of (matchState | async)?.players" class="result-list" matRipple>
+            <div *ngFor="let player of (matchState | async)?.players" class="result-list">
                 <li class="player" (click)="setPlayerScore(player)">
                     <div class="player-name">
                         <div *ngIf="player.score != undefined"><mat-icon class="check">done</mat-icon></div>

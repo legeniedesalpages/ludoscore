@@ -22,7 +22,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatRippleModule } from '@angular/material/core';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { LayoutModule } from '../../layout/layout.module';
 import { ManagePlayerComponent } from './manage-player.component';
@@ -52,7 +51,6 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
-    MatRippleModule,
     LayoutModule,
     LoadingSpinnerModule,
     MatChipsModule

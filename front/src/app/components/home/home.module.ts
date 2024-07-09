@@ -19,7 +19,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatRippleModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LayoutModule } from '../layout/layout.module';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
@@ -44,7 +43,6 @@ const routes: Routes = [
     MatMenuModule,
     LayoutModule,
     MatProgressSpinnerModule,
-    MatRippleModule,
     LoadingSpinnerModule,
     MatDialogModule,
   ]

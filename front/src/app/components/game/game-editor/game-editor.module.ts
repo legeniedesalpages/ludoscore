@@ -23,7 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { GameEditorComponent } from './game-editor.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -60,7 +60,6 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
-    MatRippleModule,
     MatCheckboxModule,
     MatSelectModule,
     MatDatepickerModule,

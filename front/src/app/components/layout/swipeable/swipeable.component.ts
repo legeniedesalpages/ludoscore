@@ -31,7 +31,7 @@ export interface WipeActionStyle {
         <div #back class="back">
           <div #action class="txt"><mat-icon>{{ icon }}</mat-icon>{{ text}}</div>
         </div>
-        <div #draggable matRipple class="front" draggable="false">
+        <div #draggable class="front" draggable="false">
           <ng-content></ng-content>          
         </div>
       </div>  

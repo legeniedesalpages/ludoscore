@@ -52,17 +52,17 @@
 
     <div class="action-list" [hidden]="loading">
 
-      <div class="action associate" mapRipple (click)="associatePlayer()" *ngIf="notAssociated">        
+      <div class="action associate" (click)="associatePlayer()" *ngIf="notAssociated">        
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
       </div>
 
-      <div class="action" mapRipple (click)="navigateToFindGame()">        
+      <div class="action" (click)="navigateToFindGame()">        
         <mat-icon>manage_search</mat-icon>
         <div class="caption">Rechercher un jeu</div>
       </div>
 
-      <div class="action" mapRipple (click)="navigateToManagePlayer()">
+      <div class="action" (click)="navigateToManagePlayer()">
         <mat-icon>group</mat-icon>
         <div class="caption">Voir les joueurs</div>
       </div>

@@ -3,7 +3,7 @@
 <mat-dialog-content class="dialog row">
     <div *ngFor="let color of filteredColors()" class="column">
         <div (click)="chooseColor(color)">
-            <span class="dot" [ngStyle]="{'background-color': color.code, 'color': color.invert}" matRipple></span>
+            <span class="dot" [ngStyle]="{'background-color': color.code, 'color': color.invert}"></span>
         </div>
     </div>
 </mat-dialog-content>
