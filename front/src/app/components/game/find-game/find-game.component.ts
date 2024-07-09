@@ -28,6 +28,7 @@ export class FindGameComponent implements OnInit, AfterViewInit {
   
   public searching: boolean
   public searchString: string
+  public hyy: boolean = true
 
   constructor(public findGameService: FindGameService, private router: Router, private route: ActivatedRoute) {
     this.searching = false
@@ -35,8 +36,11 @@ export class FindGameComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    timer(500).subscribe(() => {
-      this.firstElement?.nativeElement.click()
+    timer(2000).subscribe(() => {
+      this.hyy = false
+      timer(1000).subscribe(() => {
+        this.firstElement?.nativeElement.click()
+      })
     })
   }
 

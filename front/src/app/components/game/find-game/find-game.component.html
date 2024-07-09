@@ -8,7 +8,7 @@
             <form class="find-game-form">
                 <mat-form-field class="find-game-search-field">
                     <mat-label>Rechercher un jeu</mat-label>
-                    <input matInput (keydown.enter)="search($event)" (blur)="search($event)" #recherche>
+                    <input matInput (keydown.enter)="search($event)" (blur)="search($event)" #recherche [hidden]="hyy">
                     <mat-icon matSuffix *ngIf="!searching">search</mat-icon>
                     <mat-spinner [diameter]=25 [strokeWidth]="4" *ngIf="searching"></mat-spinner>
                 </mat-form-field>
