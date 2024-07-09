@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { timer } from 'rxjs'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
@@ -30,9 +30,11 @@ function focusAndOpenKeyboard(element: ElementRef<HTMLInputElement>) {
   document.body.appendChild(tempElement)
   tempElement.focus()
 
-  element.nativeElement.focus()
-  element.nativeElement.click()
-  document.body.removeChild(tempElement)
+  timer(100).subscribe(() => {
+    element.nativeElement.focus()
+    element.nativeElement.click()
+    document.body.removeChild(tempElement)
+  })
 }
 
 @Component({
@@ -42,11 +44,10 @@ function focusAndOpenKeyboard(element: ElementRef<HTMLInputElement>) {
 })
 export class FindGameComponent implements OnInit {
 
-  @ViewChild('recherche', { static: true })
+  @ViewChild('recherche', { static: false })
   set input(element: ElementRef<HTMLInputElement>) {
     focusAndOpenKeyboard(element)
   }
-
 
   public searching: boolean
   public searchString: string
