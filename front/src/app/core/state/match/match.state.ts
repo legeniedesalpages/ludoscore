@@ -43,7 +43,8 @@ const defaultMatchModel = {
     matchTags: [],
     playerTags: [],
     playerColors: [],
-    choosenTags: []
+    choosenTags: [],
+    winnigPlayer: undefined
 };
 
 @State<MatchStateModel>({
@@ -87,7 +88,8 @@ export class MatchState {
             matchTags: JSON.parse(createMatch.matchTags),
             playerTags: JSON.parse(createMatch.playerTags),
             playerColors: JSON.parse(createMatch.playerColors),
-            choosenTags: []
+            choosenTags: [],
+            winnigPlayer: undefined
         })
     }
 
@@ -285,9 +287,15 @@ export class MatchState {
             return player
         })
 
+        let winnigPlayer: Player | undefined = undefined
+        if (modifiedPlayerList.filter(player => player.score == undefined).length == 0) {
+            winnigPlayer = modifiedPlayerList.reduce((prev, current) => (prev.score! > current.score!) ? prev : current)
+        }
+
         setState({
             ...getState(),
-            players: modifiedPlayerList
+            players: modifiedPlayerList,
+            winnigPlayer: winnigPlayer
         })
     }
 

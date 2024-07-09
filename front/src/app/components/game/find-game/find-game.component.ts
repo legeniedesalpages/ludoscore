@@ -10,34 +10,26 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
 
 
-function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: any) {
-  if(!timeout) {
-    timeout = 100;
-  }
+function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: number) {
   if(el) {
-    // Align temp input element approximately where the input element is
-    // so the cursor doesn't jump around
-    var __tempEl__ = document.createElement('input');
-    __tempEl__.style.position = 'absolute';
-    __tempEl__.style.top = (el.nativeElement.offsetTop + 7) + 'px';
-    __tempEl__.style.left = el.nativeElement.offsetLeft + 'px';
-    __tempEl__.style.height = '0';
-    __tempEl__.style.opacity = '0';
-    // Put this temp element as a child of the page <body> and focus on it
-    document.body.appendChild(__tempEl__);
-    __tempEl__.focus();
+    var tempElement = document.createElement('input');
+    tempElement.style.position = 'absolute';
+    tempElement.style.top = (el.nativeElement.offsetTop + 7) + 'px';
+    tempElement.style.left = el.nativeElement.offsetLeft + 'px';
+    tempElement.style.height = '0';
+    tempElement.style.opacity = '0';
+    document.body.appendChild(tempElement);
+    tempElement.focus();
 
-    // The keyboard is open. Now do a delayed focus on the target element
     setTimeout(function() {
       el.nativeElement.focus();
       el.nativeElement.click();
-      // Remove the temp element
-      document.body.removeChild(__tempEl__);
+      document.body.removeChild(tempElement);
     }, timeout);
   }
 }
@@ -47,16 +39,10 @@ function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: any) {
   templateUrl: './find-game.component.html',
   styleUrls: ['./find-game.component.css', '../../../core/css/list.css'],
 })
-export class FindGameComponent implements OnInit {
+export class FindGameComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('recherche', { static: false }) 
-   set input(element: ElementRef<HTMLInputElement>) {
-     if(element) {
-        focusAndOpenKeyboard(element, 1)
-     }
-  }
-
-  
+  @ViewChild('recherche', {read: ElementRef, static: true})
+  firstElement?: ElementRef<HTMLInputElement>;  
   
   public searching: boolean;
   public searchString: string;
@@ -66,6 +52,9 @@ export class FindGameComponent implements OnInit {
     this.searchString = '';
   }
 
+  ngAfterViewInit(): void {
+    this.firstElement?.nativeElement.click();
+  }
 
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {  

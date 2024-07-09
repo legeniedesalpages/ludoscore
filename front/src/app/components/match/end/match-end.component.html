@@ -20,7 +20,7 @@
 
         <mat-form-field appearance="fill" class="winner">
             <mat-label>Et le vainqueur est...</mat-label>
-            <mat-select (valueChange)="selectWiningPlayer($event.value)" #winnerPlayerSelector>
+            <mat-select (valueChange)="selectWiningPlayer($event.value)" [value]="(matchState | async)?.winnigPlayer">
                 <mat-option *ngFor="let winningPlayer of (matchState | async)?.players" [value]="winningPlayer">
                     {{winningPlayer.name}}
                 </mat-option>

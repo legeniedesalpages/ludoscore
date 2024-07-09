@@ -26,13 +26,9 @@ import { MatchState } from 'src/app/core/state/match/match.state';
 })
 export class MatchEndComponent implements OnInit, OnDestroy {
 
-  @ViewChild('winnerPlayerSelector') public playerSelector!: MatSelect
-
   @Select(MatchState) matchState!: Observable<MatchStateModel>;
 
   private subscription!: Subscription;
-
-  public winningPlayer!: Player;
 
   constructor(private store: Store) {
   }
@@ -51,7 +47,6 @@ export class MatchEndComponent implements OnInit, OnDestroy {
 
   public selectWiningPlayer(player: Player) {
     console.log("choose wining player", player)
-    this.winningPlayer = player
   }
 
   public setPlayerScore(player: Player) {

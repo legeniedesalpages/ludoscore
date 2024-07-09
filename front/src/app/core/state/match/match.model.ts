@@ -30,5 +30,6 @@ export interface MatchStateModel {
     matchTags: Tag[],
     playerTags: Tag[],
     playerColors: ColorTag[],
-    choosenTags: ChoosenTag[]
+    choosenTags: ChoosenTag[],
+    winnigPlayer: Player | undefined,
 }
