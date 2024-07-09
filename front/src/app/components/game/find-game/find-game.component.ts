@@ -10,11 +10,30 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { timer } from 'rxjs'
-import { FindGameService } from 'src/app/core/services/game/find-game.service'
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { timeout, timer } from 'rxjs';
+import { FindGameService } from 'src/app/core/services/game/find-game.service';
 
+
+function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: number) {
+  if(el) {
+    var tempElement = document.createElement('input');
+    tempElement.style.position = 'absolute';
+    tempElement.style.top = (el.nativeElement.offsetTop + 7) + 'px';
+    tempElement.style.left = el.nativeElement.offsetLeft + 'px';
+    tempElement.style.height = '0';
+    tempElement.style.opacity = '0';
+    document.body.appendChild(tempElement);
+    tempElement.focus();
+
+    setTimeout(function() {
+      el.nativeElement.focus();
+      el.nativeElement.click();
+      document.body.removeChild(tempElement);
+    }, timeout);
+  }
+}
 
 @Component({
   selector: 'find-game',
@@ -28,7 +47,6 @@ export class FindGameComponent implements OnInit, AfterViewInit {
   
   public searching: boolean
   public searchString: string
-  public hyy: boolean = true
 
   constructor(public findGameService: FindGameService, private router: Router, private route: ActivatedRoute) {
     this.searching = false
@@ -36,11 +54,8 @@ export class FindGameComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    timer(2000).subscribe(() => {
-      this.hyy = false
-      timer(1000).subscribe(() => {
-        this.firstElement?.nativeElement.click()
-      })
+    timer(1000).subscribe(() => {
+      focusAndOpenKeyboard(this.firstElement!, 1000)
     })
   }
 
@@ -87,9 +102,9 @@ export class FindGameComponent implements OnInit, AfterViewInit {
   public gameDetail(id: number, owned: boolean) {
     console.debug("Go to edition page for id :" + id)
     if (!owned) {
-      this.router.navigate(['/game-editor', 'bgg', id])
+      this.router.navigate(['/game-editor', 'bgg', id]);
     } else {
-      this.router.navigate(['/game-editor', 'owned', id])
+      this.router.navigate(['/game-editor', 'owned', id]);
     }
   }
 
