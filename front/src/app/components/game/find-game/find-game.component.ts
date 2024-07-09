@@ -10,37 +10,29 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { timer } from 'rxjs';
-import { FindGameService } from 'src/app/core/services/game/find-game.service';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { timer } from 'rxjs'
+import { FindGameService } from 'src/app/core/services/game/find-game.service'
 
 
-function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: any) {
-  if(!timeout) {
-    timeout = 100;
+function focusAndOpenKeyboard(element: ElementRef<HTMLInputElement>) {
+  if (!element) {
+    return
   }
-  if(el) {
-    // Align temp input element approximately where the input element is
-    // so the cursor doesn't jump around
-    var __tempEl__ = document.createElement('input');
-    __tempEl__.style.position = 'absolute';
-    __tempEl__.style.top = (el.nativeElement.offsetTop + 7) + 'px';
-    __tempEl__.style.left = el.nativeElement.offsetLeft + 'px';
-    __tempEl__.style.height = '0';
-    __tempEl__.style.opacity = '0';
-    // Put this temp element as a child of the page <body> and focus on it
-    document.body.appendChild(__tempEl__);
-    __tempEl__.focus();
 
-    // The keyboard is open. Now do a delayed focus on the target element
-    setTimeout(function() {
-      el.nativeElement.focus();
-      el.nativeElement.click();
-      // Remove the temp element
-      document.body.removeChild(__tempEl__);
-    }, timeout);
-  }
+  const tempElement = document.createElement('input')
+  tempElement.style.position = 'absolute'
+  tempElement.style.top = (element.nativeElement.offsetTop + 7) + 'px'
+  tempElement.style.left = element.nativeElement.offsetLeft + 'px'
+  tempElement.style.height = '0'
+  tempElement.style.opacity = '0'
+  document.body.appendChild(tempElement)
+  tempElement.focus()
+
+  element.nativeElement.focus()
+  element.nativeElement.click()
+  document.body.removeChild(tempElement)
 }
 
 @Component({
@@ -50,14 +42,11 @@ function focusAndOpenKeyboard(el: ElementRef<HTMLInputElement>, timeout: any) {
 })
 export class FindGameComponent implements OnInit {
 
-  @ViewChild('recherche', { static: false }) 
+  @ViewChild('recherche', { static: true })
   set input(element: ElementRef<HTMLInputElement>) {
-    if(element) {
-      timer(1000).subscribe(() => {
-        focusAndOpenKeyboard(element, 1000)
-      })
-    }
- }
+    focusAndOpenKeyboard(element)
+  }
+
 
   public searching: boolean
   public searchString: string
