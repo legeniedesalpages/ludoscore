@@ -56,7 +56,7 @@ export class FindGameComponent implements OnInit {
       return
     }
 
-    this.searchString = event.value
+    this.searchString = event.value.toLowerCase()
     console.debug("Search value: ", this.searchString)
     this.searching = true
 
