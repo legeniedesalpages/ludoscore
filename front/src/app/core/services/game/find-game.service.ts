@@ -25,40 +25,19 @@ export class FindGameService {
     private readonly gameSearchUrl = environment.apiURL + '/api/game_search';
     private readonly gameSearchDetailUrl = environment.apiURL + '/api/game_search_detail';
 
-    public searchedGames: GameSearchResult[];
-    public searchString: string;
-    public currentSearchedGame: GameSearchDetail | undefined;
-
     constructor(private http: HttpClient) {
-        this.searchString = '';
-        this.searchedGames = [];
     }
 
     public search(searchString: string): Observable<GameSearchResult[]> {
-        this.searchString = encodeURIComponent(searchString);
-        return this.http.get<GameSearchResult[]>(this.gameSearchUrl, { params: { q: searchString } }).pipe(
-            tap(gameResult => this.searchedGames = gameResult),
-            catchError(error => {
-                this.searchedGames = []
-                throw new Error(error)
-            })
-        );
+        return this.http.get<GameSearchResult[]>(this.gameSearchUrl, { params: { q: searchString } });
     }
 
     public detail(bggId: number): Observable<GameSearchDetail> {
         return this.http.get<GameSearchDetail>(this.gameSearchDetailUrl,
             { params: { id: bggId } }).pipe(
-                tap(gameResult => this.currentSearchedGame = gameResult),
                 catchError(error => {
-                    this.currentSearchedGame = undefined
                     throw new Error(error)
                 })
             );
-    }
-
-    public resetPreviousSearch() {
-        this.searchString = '';
-        this.searchedGames = [];
-        this.currentSearchedGame = undefined
     }
 }

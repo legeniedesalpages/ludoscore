@@ -11,31 +11,13 @@
     * - Modification    : 
 **/
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
-import { timer } from 'rxjs'
+import { catchError, Observable, of, tap } from 'rxjs'
+import { GameSearchResult } from 'src/app/core/model/game-search.model'
+import { Game } from 'src/app/core/model/game.model'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
-
-
-function focusAndOpenKeyboard(element: ElementRef<HTMLInputElement>) {
-  if (!element) {
-    return
-  }
-
-  const tempElement = document.createElement('input')
-  tempElement.style.position = 'absolute'
-  tempElement.style.top = (element.nativeElement.offsetTop + 7) + 'px'
-  tempElement.style.left = element.nativeElement.offsetLeft + 'px'
-  tempElement.style.height = '0'
-  tempElement.style.opacity = '0'
-  document.body.appendChild(tempElement)
-  tempElement.focus()
-
-  timer(100).subscribe(() => {
-    element.nativeElement.focus()
-    element.nativeElement.click()
-    document.body.removeChild(tempElement)
-  })
-}
+import { focusAndOpenKeyboard } from 'src/app/utils/focus-util'
 
 @Component({
   selector: 'find-game',
@@ -44,66 +26,68 @@ function focusAndOpenKeyboard(element: ElementRef<HTMLInputElement>) {
 })
 export class FindGameComponent implements OnInit {
 
-  @ViewChild('recherche', { static: false })
+  @ViewChild('searchInput', { static: false })
   set searchInputElement(element: ElementRef<HTMLInputElement>) {
-    focusAndOpenKeyboard(element)
+    //focusAndOpenKeyboard(element)
   }
 
   public searching: boolean
   public searchString: string
+  public searchedGameResult: Observable<GameSearchResult[]>
 
-  constructor(public findGameService: FindGameService, private router: Router, private route: ActivatedRoute) {
+  constructor(public findGameService: FindGameService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar) {
     this.searching = false
     this.searchString = ''
+    this.searchedGameResult = of()
   }
 
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {
-      focusAndOpenKeyboard(this.searchInputElement)
       let doNotResetSearchField = params.get('no-reset')
       if (doNotResetSearchField === 'true') {
         console.debug("Do not reset search field")
       } else {
-        this.findGameService.resetPreviousSearch()
+        this.searchString = ''
       }
     })
   }
 
   public search(event: any) {
 
-    if (!event.target.value) {
+    if (!event.value) {
       console.debug('No search string')
       return
     }
 
-    if (event.target.value === this.searchString) {
+    if (event.value === this.searchString) {
       console.debug('No new search, old search : ' + this.searchString)
       return
     }
 
-    this.searchString = event.target.value
+    this.searchString = event.value
+    console.debug("Search value: ", this.searchString)
     this.searching = true
-    console.debug("Search: ", this.searchString)
 
-    this.findGameService.search(this.searchString).subscribe({
-
-      next: (res: any) => {
-        console.info("Result count: " + res.length)
+    this.searchedGameResult = this.findGameService.search(this.searchString).pipe(
+      tap((result) => {
+        console.info("Number of found game: " + result.length)
         this.searching = false
-      },
-
-      error: () => {
+      }),
+      catchError((error) => {
+        console.error("Error during search", error)
+        this.snackBar.open('Erreur lors de la recherche', 'Fermer', { duration: 10000 })
         this.searching = false
-      }
-    })
+        return of([])
+      })
+    )
   }
 
-  public gameDetail(id: number, owned: boolean) {
-    console.debug("Go to edition page for id :" + id)
-    if (!owned) {
-      this.router.navigate(['/game-editor', 'bgg', id]);
+  public goToGameDetail(gameFound: GameSearchResult) {
+    console.debug("Go to edition page for id :" + gameFound.id)
+    if (!gameFound.owned) {
+      this.router.navigate(['/game-editor', 'bgg', gameFound.id]);
     } else {
-      this.router.navigate(['/game-editor', 'owned', id]);
+      this.router.navigate(['/game-editor', 'owned', gameFound.id]);
     }
   }
 

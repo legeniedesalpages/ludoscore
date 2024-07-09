@@ -8,35 +8,33 @@
             <form class="find-game-form">
                 <mat-form-field class="find-game-search-field">
                     <mat-label>Rechercher un jeu</mat-label>
-                    <input matInput (keydown.enter)="search($event)" (blur)="search($event)" #recherche>
+                    <input matInput (keydown.enter)="search($event.target)" (blur)="search($event.target)" #searchInput>
+                    {{ searchInput.focus() }}
                     <mat-icon matSuffix *ngIf="!searching">search</mat-icon>
                     <mat-spinner [diameter]=25 [strokeWidth]="4" *ngIf="searching"></mat-spinner>
                 </mat-form-field>
             </form>
 
-            <div *ngIf="findGameService.searchedGames.length > 0">
-                <div *ngFor="let item of findGameService.searchedGames" (click)="gameDetail(item.id, item.owned)"
-                    class="result-list">
-                    <div class="visual">
-                        <img src={{item.thumbnail}} />
-                    </div>
+            <div *ngFor="let gameFound of searchedGameResult | async" (click)="goToGameDetail(gameFound)"
+                class="result-list">
+                <div class="visual">
+                    <img src={{gameFound.thumbnail}} />
+                </div>
 
-                    <div [class]="item.owned ? 'owned content' : 'content'">
-                        <div class="heading">{{item.name}}</div>
-                        <div class="supporting">
-                            <div class="detail">
-                                Année: <span class="emphasis">{{item.year}}</span>
-                            </div>
-                            <div class="detail">
-                                Popularité: <span class="emphasis">{{item.popularity}}</span>
-                            </div>
-                            <div class="detail" *ngIf="item.owned">
-                                <span class="emphasis">Jeu déjà dans la liste</span>
-                            </div>
+                <div [class]="gameFound.owned ? 'owned content' : 'content'">
+                    <div class="heading">{{gameFound.name}}</div>
+                    <div class="supporting">
+                        <div class="detail">
+                            Année: <span class="emphasis">{{gameFound.year}}</span>
+                        </div>
+                        <div class="detail">
+                            Popularité: <span class="emphasis">{{gameFound.popularity}}</span>
+                        </div>
+                        <div class="detail" *ngIf="gameFound.owned">
+                            <span class="emphasis">Jeu déjà dans la liste</span>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </ng-container>

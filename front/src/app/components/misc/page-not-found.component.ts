@@ -14,6 +14,6 @@ import { Component } from "@angular/core";
 
 @Component({
     standalone: true,
-    template: `<div>No found</div>`
+    template: `<div>Page not found</div>`
 })
 export class PagenotfoundComponent { }
