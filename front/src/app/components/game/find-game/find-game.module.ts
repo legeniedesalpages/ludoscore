@@ -27,6 +27,7 @@ import { FindGameComponent } from './find-game.component';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
 import { LayoutModule } from '../../layout/layout.module';
+import { AutoFocus } from 'src/app/core/directives/auto-focus.directive';
 
 const routes: Routes = [
   {
@@ -51,7 +52,8 @@ const routes: Routes = [
     MatGridListModule,
     MatDividerModule,
     MatRippleModule,
-    LayoutModule
+    LayoutModule,
+    AutoFocus
   ],
   exports: [FindGameComponent],
   providers: [FindGameService]

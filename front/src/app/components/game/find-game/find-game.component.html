@@ -8,14 +8,13 @@
             <form class="find-game-form">
                 <mat-form-field class="find-game-search-field">
                     <mat-label>Rechercher un jeu</mat-label>
-                    <input matInput (keydown.enter)="search($event.target)" (blur)="search($event.target)" #searchInput>
-                    {{ searchInput.focus() }}
+                    <input autofocus ngModel matInput (keydown.enter)="search($event.target)" (blur)="search($event.target)" [ngModelOptions]="{standalone: true}">
                     <mat-icon matSuffix *ngIf="!searching">search</mat-icon>
                     <mat-spinner [diameter]=25 [strokeWidth]="4" *ngIf="searching"></mat-spinner>
                 </mat-form-field>
             </form>
 
-            <div *ngFor="let gameFound of searchedGameResult | async" (click)="goToGameDetail(gameFound)"
+            <div *ngFor="let gameFound of searchedGameResult" (click)="goToGameDetail(gameFound)"
                 class="result-list">
                 <div class="visual">
                     <img src={{gameFound.thumbnail}} />

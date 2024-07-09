@@ -10,14 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
-import { catchError, Observable, of, tap } from 'rxjs'
 import { GameSearchResult } from 'src/app/core/model/game-search.model'
-import { Game } from 'src/app/core/model/game.model'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
-import { focusAndOpenKeyboard } from 'src/app/utils/focus-util'
 
 @Component({
   selector: 'find-game',
@@ -26,19 +23,14 @@ import { focusAndOpenKeyboard } from 'src/app/utils/focus-util'
 })
 export class FindGameComponent implements OnInit {
 
-  @ViewChild('searchInput', { static: false })
-  set searchInputElement(element: ElementRef<HTMLInputElement>) {
-    //focusAndOpenKeyboard(element)
-  }
-
   public searching: boolean
   public searchString: string
-  public searchedGameResult: Observable<GameSearchResult[]>
+  public searchedGameResult: GameSearchResult[]
 
   constructor(public findGameService: FindGameService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar) {
     this.searching = false
     this.searchString = ''
-    this.searchedGameResult = of()
+    this.searchedGameResult = []
   }
 
   ngOnInit() {
@@ -68,18 +60,26 @@ export class FindGameComponent implements OnInit {
     console.debug("Search value: ", this.searchString)
     this.searching = true
 
-    this.searchedGameResult = this.findGameService.search(this.searchString).pipe(
-      tap((result) => {
+    this.findGameService.search(this.searchString).subscribe({
+      next: (result: GameSearchResult[]) => {
         console.info("Number of found game: " + result.length)
+        if (result.length === 0) {
+          this.snackBar.open("Aucun jeu trouvé", 'Fermer', {
+            duration: 5000
+          })
+        }
+        this.searchedGameResult = result
+      },
+      error: (error: any) => {
+        this.searchedGameResult = []
+        this.snackBar.open("Erreur:" + error, 'Fermer', {
+          duration: 10000
+        })
+      },
+      complete: () => {
         this.searching = false
-      }),
-      catchError((error) => {
-        console.error("Error during search", error)
-        this.snackBar.open('Erreur lors de la recherche', 'Fermer', { duration: 10000 })
-        this.searching = false
-        return of([])
-      })
-    )
+      }
+    })
   }
 
   public goToGameDetail(gameFound: GameSearchResult) {
