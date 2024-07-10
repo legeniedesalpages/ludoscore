@@ -27,6 +27,8 @@ import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model';
 import { MatchService } from 'src/app/core/services/match/match.service';
 import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
 import { AuthState } from 'src/app/core/state/auth/auth.state';
+import { MatDialog } from '@angular/material/dialog';
+import { PlayerDetailComponent } from '../player-detail/player-detail.component';
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -58,7 +60,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   private playerChangeSubscription!: Subscription
 
-  constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService, private actions: Actions, private snackBar: MatSnackBar, private matchService: MatchService) {
+  constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService, private actions: Actions, private snackBar: MatSnackBar, private matchService: MatchService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -210,5 +212,13 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public showWheel() {
     this.store.dispatch(new Navigate(['/wheel']))
+  }
+
+  public goToPlayerDetail(player: Player) {
+    this.dialog.open(PlayerDetailComponent, { 
+      data: player,
+      width: '100%',
+      maxWidth: '90vw',
+    })
   }
 }

@@ -16,10 +16,8 @@
             <div *ngFor="let occurence of [].constructor(playerTag.maxOcurrences); let i = index;">
                 <mat-form-field appearance="fill" class="champs">
                     <mat-label>{{ playerTag.category }}</mat-label>
-                    <mat-select (selectionChange)="selectPlayerTag(player, $event.value, playerTag.category, i)"
-                        [value]="alreadySelectedPlayerTag(playerTag.category, player, i)">
-                        <mat-option *ngFor="let playerTagName of playerTagAvailable(playerTag, player, i)"
-                            [value]="playerTagName">
+                    <mat-select (selectionChange)="selectPlayerTag(player, $event.value, playerTag.category, i, selection)" [value]="alreadySelectedPlayerTag(playerTag.category, player, i)" #selection>
+                        <mat-option *ngFor="let playerTagName of playerTagAvailable(playerTag, player, i)" [value]="playerTagName">
                             {{playerTagName}}
                         </mat-option>
                     </mat-select>

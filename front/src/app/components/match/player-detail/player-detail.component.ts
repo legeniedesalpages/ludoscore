@@ -10,10 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSelect } from '@angular/material/select';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ColorTag } from 'src/app/core/model/color-tag.model';
 import { Player } from 'src/app/core/model/player.model';
 import { Tag } from 'src/app/core/model/tag.model';
@@ -26,9 +27,9 @@ import { MatchState } from 'src/app/core/state/match/match.state';
   templateUrl: './player-detail.component.html',
   styleUrls: ['./player-detail.component.css']
 })
-export class PlayerDetailComponent implements OnInit {
+export class PlayerDetailComponent {
 
-  @Select(MatchState) matchState!: Observable<MatchStateModel>;
+  @Select(MatchState) matchState!: Observable<MatchStateModel>
 
   public colors: ColorTag[] = []
 
@@ -39,9 +40,6 @@ export class PlayerDetailComponent implements OnInit {
 
   close() {
     this.dialogRef.close()
-  }
-
-  ngOnInit(): void {
   }
 
   public colorChange(color: string) {
@@ -57,20 +55,23 @@ export class PlayerDetailComponent implements OnInit {
     return player.choosenTags.filter(tag => tag.category == category)[0]?.names[index]
   }
 
-  public selectPlayerTag(player: Player, name: string, category: string, index: number) {
+  public selectPlayerTag(player: Player, name: string, category: string, index: number,element: MatSelect | undefined) {
     this.store.dispatch(new AddTagToPlayer(player.id, category, name, index))
   }
 
-  public playerTagAvailable(playerTag: Tag, player: Player, index: number): string[] {
+  public playerTagAvailable(playerTag: Tag, pp: Player, index: number): string[] {
     if (!playerTag.unique) {
       return playerTag.names
     }
 
     const players: Player[] = this.store.selectSnapshot(MatchState).players
+    const player = players.find(p => p.id == pp.id)!
+
     const alreadySelectedName: string[] = players.flatMap(player => player.choosenTags.filter(tag => tag.category == playerTag.category)[0]?.names)
     const availableTagName = playerTag.names.filter(name => !alreadySelectedName.includes(name))
 
     const nameSelectedForThisTag = this.alreadySelectedPlayerTag(playerTag.category, player, index)
+    console.log(nameSelectedForThisTag)
     if (nameSelectedForThisTag != undefined) {
       availableTagName.unshift(nameSelectedForThisTag)
     }
