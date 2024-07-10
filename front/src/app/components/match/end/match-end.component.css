@@ -36,9 +36,8 @@
 }
 
 .player .mat-icon {
-  position: absolute;
-  right: 10px;
-  top:15px;
+  float: right;
+  margin-right: 30px;
 }
 
 .check {
