@@ -10,111 +10,90 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap, catchError } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import moment from 'moment';
-import { Game } from '../../model/game.model';
-import { Tag } from '../../model/tag.model';
-import { ColorTag } from '../../model/color-tag.model';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { Observable, map } from 'rxjs'
+import { environment } from 'src/environments/environment'
+import moment from 'moment'
+import { DrawBreaker, Game, GameToSave } from '../../model/game.model'
+import { Tag } from '../../model/tag.model'
+import { ColorTag } from '../../model/color-tag.model'
+import { GameCrudService } from '../crud/game-crud.service'
+import { GameEntity } from '../../entity/game-entity.model'
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class GameService {
 
-    public searchedGames: Game[];
+    public searchedGames: Game[]
 
-    private readonly gameUrl = environment.apiURL + '/api/game';
+    private readonly gameUrl = environment.apiURL + '/api/game'
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private gameCrudService: GameCrudService) {
         this.searchedGames = []
     }
 
-    public save(game: Game): Observable<Game> {
+    public save(gameToSave: GameToSave): Observable<Game> {
 
-        let formOwnershipDate = game.ownershipDate ? moment(game.ownershipDate).format('YYYY-MM-DD') : null;
-
-        return this.http.post<Game>(this.gameUrl, {
-            name: game.title,
-            image_id: game.imageId,
-            thumbnail_id: game.thumbnailId,
-            isOnlyCooperative: game.isOnlyCooperative,
-            minPlayers: game.minPlayers,
-            maxPlayers: game.maxPlayers,
-            ownershipDate: formOwnershipDate,
-            matchTags: JSON.stringify(game.matchTags),
-            playerTags: JSON.stringify(game.playerTags),
-            playerColors: JSON.stringify(game.playerColors),
-            bggId: game.bggId,
+        return this.http.post<GameEntity>(this.gameUrl, {
+            id: gameToSave.id,
+            name: gameToSave.title,
+            isOnlyCooperative: gameToSave.isOnlyCooperative,
+            minPlayers: gameToSave.minPlayers,
+            maxPlayers: gameToSave.maxPlayers,
+            ownershipDate: gameToSave.ownershipDate ? moment(gameToSave.ownershipDate).format('YYYY-MM-DD') : null,
+            matchTags: JSON.stringify(gameToSave.matchTags),
+            playerTags: JSON.stringify(gameToSave.playerTags),
+            playerColors: JSON.stringify(gameToSave.playerColors),
+            bggId: gameToSave.bggId,
+            drawAllowed: gameToSave.drawAllowed,
+            drawBreaker: JSON.stringify(gameToSave.drawBreaker),
+            quantifiableScore: gameToSave.quantifiableScore,
+            highestScoreWin: gameToSave.highestScoreWin,
+            imageUrlFromBgg: gameToSave.imageUrlFromBgg,
+            thumbnailUrlFromBgg: gameToSave.thumbnailUrlFromBgg,
         }).pipe(
-            map(res => {
-                game.id = res.id
-                return game
-            })
-        );
+            map(gameEntity => this.gameEntityToGame(gameEntity))
+        )
     }
 
-    public list(): Observable<Game[]> {
-        return this.http.get<Game[]>(this.gameUrl).pipe(
-            tap(games => {
-                let modifiedGames = games.map(x => {
-                    x.thumbnailId = environment.imagesURL + '/' + x.thumbnailId
-                    return x;
-                })
-                console.log(modifiedGames)
-                this.searchedGames = modifiedGames
-            }),
-            catchError(error => {
-                this.searchedGames = []
-                throw new Error(error)
-            })
-        );
+    public listAllGames(): Observable<Game[]> {
+        return this.gameCrudService.findAll().pipe(map(gameEntities =>
+            gameEntities.map(gameEntity =>
+                this.gameEntityToGame(gameEntity)
+            )
+        ))
     }
 
     public get(gameId: number): Observable<Game> {
-        return this.http.get<Game>(this.gameUrl + "/" + gameId).pipe(
-            tap(game => {
-                console.log(game)
-                game.thumbnailId = environment.imagesURL + '/' + game.thumbnailId
-                game.imageId = environment.imagesURL + '/' + game.imageId
-                return game;
-            }),
-            catchError(error => {
-                throw new Error(error)
-            })
-        );
+        return this.gameCrudService.findOne(gameId).pipe(map(gameEntity =>
+            this.gameEntityToGame(gameEntity)
+        ))
     }
 
     public getFromBgg(bggId: number): Observable<Game> {
-        return this.http.get<Game>(this.gameUrl + "/bgg/" + bggId).pipe(
-            tap(game => {
-                console.log(game)
-                game.thumbnailId = environment.imagesURL + '/' + game.thumbnailId
-                game.imageId = environment.imagesURL + '/' + game.imageId
-                
-                if (game.matchTags != null) {
-                    game.matchTags = JSON.parse(game.matchTags.toString())
-                } else {
-                    game.matchTags = [] as Tag[];
-                }
+        return this.http.get<GameEntity>(this.gameUrl + "/bgg/" + bggId).pipe(map(gameEntity =>
+            this.gameEntityToGame(gameEntity)
+        ))
+    }
 
-                if (game.playerTags != null) {
-                    game.playerTags = JSON.parse(game.playerTags.toString())
-                } else {
-                    game.playerTags = [] as Tag[];
-                }
-
-                if (game.playerColors != null) {
-                    game.playerColors = JSON.parse(game.playerColors.toString())
-                } else {
-                    game.playerColors = [] as ColorTag[];
-                }
-
-                return game;
-            }),
-            catchError(error => {
-                throw new Error(error)
-            })
-        );
+    private gameEntityToGame(gameEntity: GameEntity): Game {
+        return {
+            id: gameEntity.id,
+            title: gameEntity.title,
+            imageUrl: environment.imagesURL + '/' + gameEntity.imageId,
+            thumbnailUrl: environment.imagesURL + '/' + gameEntity.thumbnailId,
+            isOnlyCooperative: gameEntity.isOnlyCooperative,
+            minPlayers: gameEntity.minPlayers,
+            maxPlayers: gameEntity.maxPlayers,
+            ownershipDate: gameEntity.ownershipDate,
+            matchTags: gameEntity.matchTags ? JSON.parse(gameEntity.matchTags) : [] as Tag[],
+            playerTags: gameEntity.playerTags ? JSON.parse(gameEntity.playerTags) : [] as Tag[],
+            playerColors: gameEntity.playerColors ? JSON.parse(gameEntity.playerColors) : [] as ColorTag[],
+            bggId: gameEntity.bggId,
+            drawAllowed: gameEntity.drawAllowed,
+            drawBreaker: gameEntity.drawBreaker ? JSON.parse(gameEntity.drawBreaker) : [] as DrawBreaker[],
+            quantifiableScore: gameEntity.quantifiableScore,
+            highestScoreWin: gameEntity.highestScoreWin
+        }
     }
 }

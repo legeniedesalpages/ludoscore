@@ -5,7 +5,7 @@
 
     <ng-container role="body">
         <div class="score">Saisie des scores</div>
-        <ul class="player-list">
+        <ul class="player-list" *ngIf="(matchState | async)?.game?.quantifiableScore">
             <div *ngFor="let player of (matchState | async)?.players" class="result-list">
                 <li class="player" (click)="setPlayerScore(player)">
                     <div class="player-name">

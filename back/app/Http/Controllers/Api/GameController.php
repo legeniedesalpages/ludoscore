@@ -18,6 +18,7 @@ class GameController extends Controller
      */
     public function index()
     {
+        Log::debug("Get list of all games");
         return Game::orderBy('created_at', 'desc')->get();
     }
 
@@ -48,7 +49,7 @@ class GameController extends Controller
 
         if ($existingGame == null || $existingGame->image_id == null) {
             $uuid_image = $clean_name."_".Str::uuid().".jpg";
-            Storage::disk('images')->writeStream($uuid_image, fopen($request->image_id, 'r'));
+            Storage::disk('images')->writeStream($uuid_image, fopen($request->image_url_from_bgg, 'r'));
         } else {
             $uuid_image = $existingGame->image_id;
         }
@@ -56,7 +57,7 @@ class GameController extends Controller
 
         if ($existingGame == null || $existingGame->thumbnail_id == null) {
             $uuid_thumbnail = $clean_name."_thumb_".Str::uuid().".jpg";
-            Storage::disk('images')->writeStream($uuid_thumbnail, fopen($request->thumbnail_id, 'r'));
+            Storage::disk('images')->writeStream($uuid_thumbnail, fopen($request->thumbnail_url_from_bgg, 'r'));
         } else {
             $uuid_thumbnail = $existingGame->thumbnail_id;
         }

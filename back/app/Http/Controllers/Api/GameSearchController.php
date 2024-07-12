@@ -107,8 +107,8 @@ class GameSearchController extends Controller
     {
         return array(
             'id' => $item['@attributes']['id'],
-            'thumbnail' => $this->extractThumbnail($item),
-            'image' => $this->extractImage($item),
+            'thumbnail_url_from_bgg' => $this->extractThumbnail($item),
+            'image_url_from_bgg' => $this->extractImage($item),
             'name' => $this->extractName($item),
             'year' => $this->extractYear($item),
             'popularity' => $this->extractPopularity($item),
@@ -121,7 +121,7 @@ class GameSearchController extends Controller
     {
         return array(
             'id' => $item['@attributes']['id'],
-            'thumbnail' => $this->extractThumbnail($item),
+            'thumbnail_url_from_bgg' => $this->extractThumbnail($item),
             'name' => $this->extractName($item),
             'year' => $this->extractYear($item),
             'popularity' => $this->extractPopularity($item)

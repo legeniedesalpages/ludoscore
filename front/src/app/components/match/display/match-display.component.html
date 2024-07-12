@@ -6,11 +6,11 @@
     <ng-container role="body">
 
         <div class="game"
-            [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + imageUrl + ') no-repeat top / cover'}">
-            <div class="heading">{{ gameName }}</div>
+            [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + (matchState | async)?.game?.imageUrl + ') no-repeat top / cover'}">
+            <div class="heading">{{ (matchState | async)?.game?.title }}</div>
 
             <ul class="game-category">
-                <li *ngFor="let matchCategory of matchTags | async; let i = index">
+                <li *ngFor="let matchCategory of (matchState | async)?.choosenTags; let i = index">
                     {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
                 </li>
             </ul>
@@ -21,7 +21,7 @@
             </div>
 
             <div class="player-list">
-                <div *ngFor="let player of players | async; let i = index" (click)="goToPlayerDetail(player)">
+                <div *ngFor="let player of (matchState | async)?.players; let i = index" (click)="goToPlayerDetail(player)">
                     <div class="row">
                         <div class="column">
                             <div class="player">

@@ -21,6 +21,7 @@ import { MatchService } from 'src/app/core/services/match/match.service';
 import { Navigate } from '@ngxs/router-plugin';
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { FindGameService } from 'src/app/core/services/game/find-game.service';
 
 @Component({
   templateUrl: './home.component.html',
@@ -38,7 +39,7 @@ export class HomeComponent implements OnInit {
   public loading: boolean
   public notAssociated: boolean
 
-  constructor(private matchService: MatchService, private userService: UserCrudService, private store: Store, private dialog: MatDialog) {
+  constructor(private matchService: MatchService, private userService: UserCrudService, private store: Store, private dialog: MatDialog, private findGameService: FindGameService) {
     this.loading = true
     this.notAssociated = false
   }
@@ -75,6 +76,7 @@ export class HomeComponent implements OnInit {
   }
 
   navigateToFindGame() {
+    this.findGameService.resetSearch()
     this.store.dispatch(new Navigate(['/find-game']))
   }
 

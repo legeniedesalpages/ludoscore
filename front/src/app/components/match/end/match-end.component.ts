@@ -10,15 +10,14 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSelect } from '@angular/material/select';
-import { Navigate } from '@ngxs/router-plugin';
-import { Select, Store } from '@ngxs/store';
-import { Observable, Subscription, first } from 'rxjs';
-import { Player } from 'src/app/core/model/player.model';
-import { MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action';
-import { MatchStateModel } from 'src/app/core/state/match/match.model';
-import { MatchState } from 'src/app/core/state/match/match.state';
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Navigate } from '@ngxs/router-plugin'
+import { Select, Store } from '@ngxs/store'
+import { Observable, Subscription, } from 'rxjs'
+import { Player } from 'src/app/core/model/player.model'
+import { MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action'
+import { MatchStateModel } from 'src/app/core/state/match/match.model'
+import { MatchState } from 'src/app/core/state/match/match.state'
 
 @Component({
   templateUrl: './match-end.component.html',
@@ -26,9 +25,9 @@ import { MatchState } from 'src/app/core/state/match/match.state';
 })
 export class MatchEndComponent implements OnInit, OnDestroy {
 
-  @Select(MatchState) matchState!: Observable<MatchStateModel>;
+  @Select(MatchState) matchState!: Observable<MatchStateModel>
 
-  private subscription!: Subscription;
+  private subscription!: Subscription
 
   constructor(private store: Store) {
   }
@@ -42,7 +41,7 @@ export class MatchEndComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscription.unsubscribe()
   }
 
   public selectWiningPlayer(player: Player) {

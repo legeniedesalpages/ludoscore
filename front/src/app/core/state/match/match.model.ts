@@ -1,7 +1,6 @@
 import { ChoosenTag } from "../../model/choosen-tag.model"
-import { ColorTag } from "../../model/color-tag.model"
+import { Game } from "../../model/game.model"
 import { Player } from "../../model/player.model"
-import { Tag } from "../../model/tag.model"
 
 /**
     * @description      : 
@@ -17,19 +16,12 @@ import { Tag } from "../../model/tag.model"
 **/
 export interface MatchStateModel {
     matchId: number,
-    gameId: number
-    title: string,
-    image: string,
+    game: Game | undefined,
     creating: boolean,
     started: boolean,
     startedAt: Date | undefined,
     endedAt: Date | undefined,
-    minPlayers: number,
-    maxPlayers: number,
     players: Player[],
-    matchTags: Tag[],
-    playerTags: Tag[],
-    playerColors: ColorTag[],
     choosenTags: ChoosenTag[],
-    winnigPlayer: Player | undefined,
+    winnigPlayer: Player | undefined
 }

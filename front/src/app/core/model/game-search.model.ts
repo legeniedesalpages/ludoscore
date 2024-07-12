@@ -12,7 +12,7 @@
 **/
 export interface GameSearchResult {
     id: number,
-    thumbnail: string,
+    thumbnailUrlFromBgg: string,
     name: string,
     year: number,
     popularity: number,

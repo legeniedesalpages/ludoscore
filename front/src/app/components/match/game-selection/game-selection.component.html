@@ -29,7 +29,7 @@
 
         <div *ngFor="let game of gameList | async" class="result-list" (click)="gameSelection(game)">
             <div class="visual">
-                <img src="{{ env.imagesURL + '/' + game.thumbnailId }}">
+                <img src="{{ game.thumbnailUrl }}">
             </div>
             <div class="content">
                 <div class="heading">{{ game.title }}</div>

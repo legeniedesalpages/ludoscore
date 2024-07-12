@@ -13,15 +13,20 @@ import { Tag } from "../model/tag.model";
     * - Modification    : 
 **/
 export interface GameEntity {
-    id: number,
-    title: string,
-    imageId: string,
-    thumbnailId: string,
-    isOnlyCooperative: boolean,
-    minPlayers: number,
-    maxPlayers: number,
-    bggId: number,
-    matchTags: string,
-    playerTags: string,
+    id: number
+    title: string
+    imageId: string
+    thumbnailId: string
+    isOnlyCooperative: boolean
+    ownershipDate: Date
+    minPlayers: number
+    maxPlayers: number
+    bggId: number
+    matchTags: string
+    playerTags: string
     playerColors: string
+    drawAllowed: boolean
+    drawBreaker: string
+    quantifiableScore: boolean
+    highestScoreWin: boolean
 }

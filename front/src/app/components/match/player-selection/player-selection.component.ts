@@ -10,25 +10,24 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { Actions, Select, Store, ofActionCompleted } from '@ngxs/store';
-import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
-import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { AddPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer, SwapPlayerPosition } from 'src/app/core/state/match/match.action';
-import { MatchState } from 'src/app/core/state/match/match.state';
-import { environment } from 'src/environments/environment';
-import { MatSelect } from '@angular/material/select';
-import { forkJoin, Observable, Subscription, first, map } from 'rxjs';
-import { Player } from 'src/app/core/model/player.model';
-import { Navigate } from '@ngxs/router-plugin';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model';
-import { MatchService } from 'src/app/core/services/match/match.service';
-import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
-import { AuthState } from 'src/app/core/state/auth/auth.state';
-import { MatDialog } from '@angular/material/dialog';
-import { PlayerDetailComponent } from '../player-detail/player-detail.component';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
+import { Select, Store } from '@ngxs/store'
+import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
+import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
+import { AddPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer, SwapPlayerPosition } from 'src/app/core/state/match/match.action'
+import { MatchState } from 'src/app/core/state/match/match.state'
+import { environment } from 'src/environments/environment'
+import { MatSelect } from '@angular/material/select'
+import { Observable, Subscription, first, map } from 'rxjs'
+import { Player } from 'src/app/core/model/player.model'
+import { Navigate } from '@ngxs/router-plugin'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model'
+import { MatchService } from 'src/app/core/services/match/match.service'
+import { MatDialog } from '@angular/material/dialog'
+import { PlayerDetailComponent } from '../player-detail/player-detail.component'
+import { MatchStateModel } from 'src/app/core/state/match/match.model'
+import { Game } from 'src/app/core/model/game.model'
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -36,93 +35,52 @@ import { PlayerDetailComponent } from '../player-detail/player-detail.component'
 })
 export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
+  public env = environment
+
   @ViewChild('playerSelector') public playerSelector!: MatSelect
 
-  @Select(MatchState.players) playerChange!: Observable<Player[]>;
-  @Select(MatchState.matchTags) matchTags!: Observable<ChoosenTag[]>;
+  @Select(MatchState) matchState!: Observable<MatchStateModel>
+  private matchChangeSubscription!: Subscription
 
-  public env = environment
   public loading: boolean = true
   public saving: boolean = false
-  public gameId: number = 0
-  public gameTitle: string = ""
-  public gameImage: string = ""
-  public choosablePlayers!: PlayerEntity[]
-  public minPlayers: number = 0
-  public maxPlayers: number = 0
-  public numberOfPlayers: number = 0
-  public canContinue: boolean = false;
-  public canAddPlayer: boolean = false;
-  public lessThan2Players: boolean = true;
-  public playerColors: ColorTag[] = []
-  public choosableColors: ColorTag[] = []
+  public canContinue: boolean = false
+  public canAddPlayer: boolean = false
+  public lessThan2Players: boolean = true
   public currentSwapOrderIsDownward: boolean = true
 
-  private playerChangeSubscription!: Subscription
+  public choosableColors: ColorTag[] = []
+  public choosablePlayers!: PlayerEntity[]
+  public numberOfPlayers: number = 0
 
-  constructor(private store: Store, private router: Router, private playerCrudService: PlayerCrudService, private actions: Actions, private snackBar: MatSnackBar, private matchService: MatchService, private dialog: MatDialog) {
+  constructor(private store: Store, private playerCrudService: PlayerCrudService, private snackBar: MatSnackBar, private matchService: MatchService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
-    this.loading = true
 
-    this.actions.pipe(ofActionCompleted(LaunchMatch)).subscribe(() => {
-      this.store.dispatch(new Navigate(['/match-display']))
-      this.snackBar.open("Partie créée", 'Fermer', {
-        duration: 5000
-      })
-    })
-
-    forkJoin({
-      match: this.store.selectOnce(MatchState),
-      allPlayers: this.playerCrudService.findAll()
-    }).pipe(first()).subscribe(actions => {
-      this.gameId = actions.match.gameId
-      this.gameTitle = actions.match.title
-      this.gameImage = actions.match.image
-      this.minPlayers = actions.match.minPlayers
-      this.maxPlayers = actions.match.maxPlayers
-      this.playerColors = actions.match.playerColors
-      console.log("Couleurs pouvant être choisie par les joueurs", this.playerColors)
-
-      /*let loggedUserId: number = this.store.selectSnapshot(AuthState).id
-      let loggedPlayers: PlayerEntity[] = actions.allPlayers.filter(player => {
-        console.log("test:", player.user?.id, loggedUserId, player.user?.id == loggedUserId)
-        return player.user?.id == loggedUserId
-      })
-      console.log("Joueurs connectés:", loggedPlayers.length)
-      if (loggedPlayers.length == 1) {
-        console.log("Joueur connecté trouvé:", loggedPlayers[0])
-        this.selectPlayer(loggedPlayers[0])
-      }*/
-
+    this.playerCrudService.findAll().subscribe(allPlayers => {
       this.loading = false
 
-      this.playerChangeSubscription = this.playerChange.subscribe(players => {
-        this.canContinue = players.length >= this.minPlayers
-        this.canAddPlayer = players.length < this.maxPlayers
-        this.numberOfPlayers = players.length
-        this.lessThan2Players = players.length < 2
-        const ids = players.map(player => player.id)
-        this.choosablePlayers = actions.allPlayers.filter(x => !ids.includes(x.id))
-        this.choosableColors = this.playerColors.filter(color => !players.map(p => p.color.name).includes(color.name))       
+     this.matchChangeSubscription = this.matchState.subscribe(matchState => {
+        this.canContinue = matchState.players.length >= matchState.game?.minPlayers!
+        this.canAddPlayer = matchState.players.length < matchState.game?.maxPlayers!
+        this.numberOfPlayers = matchState.players.length
+        this.lessThan2Players = matchState.players.length < 2
+        const ids = matchState.players.map(player => player.id)
+        this.choosablePlayers = allPlayers.filter(x => !ids.includes(x.id))
+        if (matchState.game?.playerColors != null) {
+          this.choosableColors = matchState.game?.playerColors.filter(color => !matchState.players.map(p => p.color.name).includes(color.name))       
+        }
       })
     })
   }
 
   ngOnDestroy(): void {
-    if (this.playerChangeSubscription) {
-      this.playerChangeSubscription.unsubscribe()
+    if (this.matchChangeSubscription) {
+      this.matchChangeSubscription.unsubscribe()
     }
   }
 
-  public cancelMatchCreation() {
-    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['/'])))
-  }
-
-  public cancelGameSelection() {
-    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
-  }
 
   public selectPlayer(event: string | PlayerEntity) {
     if (event === 'search') {
@@ -145,24 +103,26 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   public swapPlayerPosition(firstPlayerIndex: number, secondPlayerIndex: number, isDownward: boolean) {
-    let players: Player[] = this.store.selectSnapshot(MatchState.players)
+    let players: Player[] = this.store.selectSnapshot<Player[]>(MatchState.players)
     this.currentSwapOrderIsDownward = isDownward
     this.store.dispatch(new SwapPlayerPosition(players[firstPlayerIndex], players[secondPlayerIndex]))
   }
 
   public isDownwardArrowHidden(index: number): boolean {
     if (index == 0) {
-      return false;
+      return false
     } else if (index === this.numberOfPlayers - 1) {
-      return true;
+      return true
     } else if (this.currentSwapOrderIsDownward) {
-      return false;
+      return false
     }
-    return true;
+    return true
   }
 
   private chooseColor(player: PlayerEntity): Observable<ColorTag> {
-    return this.matchService.getPreviousMatchOfPlayer(player.id, this.gameId).pipe(map(e => {
+    const game: Game = this.store.selectSnapshot<MatchStateModel>(MatchState).game!
+    console.log("Game", game)
+    return this.matchService.getPreviousMatchOfPlayer(player.id, game.id).pipe(map(e => {
 
       if (this.choosableColors.length === 0) {
         console.log("Aucune couleur disponible")
@@ -177,7 +137,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       }
 
       let preferedColor
-      let foundPreferedColor = this.playerColors.filter(color => color.name === player.preferedColor)
+      let foundPreferedColor = game.playerColors.filter((color: ColorTag) => color.name === player.preferedColor)
       console.log("couleur préféré du joueur:", player.preferedColor)
       if (foundPreferedColor.length > 0) {
         preferedColor = foundPreferedColor[0]
@@ -201,9 +161,22 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     this.store.dispatch(new RemovePlayer(player.id))
   }
 
+  public cancelMatchCreation() {
+    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['/'])))
+  }
+
+  public cancelGameSelection() {
+    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
+  }
+
   public launchMatch() {
-    this.saving = true;
-    this.store.dispatch(new LaunchMatch())
+    this.saving = true
+    this.store.dispatch(new LaunchMatch()).subscribe(() => {
+      this.store.dispatch(new Navigate(['/match-display']))
+      this.snackBar.open("Partie créée", 'Fermer', {
+        duration: 5000
+      })
+    })
   }
 
   public showRandomToolbox() {

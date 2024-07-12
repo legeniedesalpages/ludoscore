@@ -10,12 +10,12 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { tap } from 'rxjs/operators';
-import { AuthStateModel } from "./auth.model";
-import { AuthService } from "../../services/auth/auth.service";
-import { Injectable } from '@angular/core';
-import { DoLogin, DoLogout } from "./auth.actions";
+import { Action, Selector, State, StateContext } from "@ngxs/store"
+import { tap } from 'rxjs/operators'
+import { AuthStateModel } from "./auth.model"
+import { AuthService } from "../../services/auth/auth.service"
+import { Injectable } from '@angular/core'
+import { DoLogin, DoLogout } from "./auth.actions"
 
 @State<AuthStateModel>({
     name: 'auth',

@@ -14,8 +14,8 @@
 export interface GameSearchDetail {
     id: number,
     name: string,
-    image: string,
-    thumbnail: string
+    imageUrlFromBgg: string,
+    thumbnailUrlFromBgg: string
     minplayers: number,
     maxplayers: number
 }

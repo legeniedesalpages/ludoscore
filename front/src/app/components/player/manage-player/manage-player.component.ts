@@ -10,14 +10,15 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
-import { Navigate } from '@ngxs/router-plugin';
-import { Store } from '@ngxs/store';
-import { first, forkJoin } from 'rxjs';
-import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
-import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
-import { AuthState } from 'src/app/core/state/auth/auth.state';
+import { Component, OnInit } from '@angular/core'
+import { Navigate } from '@ngxs/router-plugin'
+import { Store } from '@ngxs/store'
+import { first, forkJoin } from 'rxjs'
+import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
+import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
+import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
+import { AuthStateModel } from 'src/app/core/state/auth/auth.model'
+import { AuthState } from 'src/app/core/state/auth/auth.state'
 
 @Component({
   selector: 'manage-player',
@@ -36,7 +37,7 @@ export class ManagePlayerComponent implements OnInit {
 
   ngOnInit(): void {
       forkJoin({
-        user: this.userService.findOne(this.store.selectSnapshot(AuthState).id),
+        user: this.userService.findOne(this.store.selectSnapshot<AuthStateModel>(AuthState).id),
         playerEntities: this.playerService.findAll()
       }).pipe(first()).subscribe(actions => {
         this.playerEntities = actions.playerEntities
@@ -50,10 +51,10 @@ export class ManagePlayerComponent implements OnInit {
   }
 
   public editPlayer(id: number) {
-    this.store.dispatch(new Navigate(['/edit-player', id]));
+    this.store.dispatch(new Navigate(['/edit-player', id]))
   }
 
   public createPlayer() {
-    this.store.dispatch(new Navigate(['/edit-player/0']));
+    this.store.dispatch(new Navigate(['/edit-player/0']))
   }
 }

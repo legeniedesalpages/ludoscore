@@ -10,32 +10,28 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
-import { Navigate } from '@ngxs/router-plugin';
-import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-import { ChoosenTag } from 'src/app/core/model/choosen-tag.model';
-import { Player } from 'src/app/core/model/player.model';
-import { Tag } from 'src/app/core/model/tag.model';
-import { AddTagToMatch, AddTagToPlayer } from 'src/app/core/state/match/match.action';
-import { MatchStateModel } from 'src/app/core/state/match/match.model';
-import { MatchState } from 'src/app/core/state/match/match.state';
+import { Component } from '@angular/core'
+import { Navigate } from '@ngxs/router-plugin'
+import { Select, Store } from '@ngxs/store'
+import { Observable } from 'rxjs'
+import { ChoosenTag } from 'src/app/core/model/choosen-tag.model'
+import { Player } from 'src/app/core/model/player.model'
+import { Tag } from 'src/app/core/model/tag.model'
+import { AddTagToMatch, AddTagToPlayer } from 'src/app/core/state/match/match.action'
+import { MatchStateModel } from 'src/app/core/state/match/match.model'
+import { MatchState } from 'src/app/core/state/match/match.state'
 
 @Component({
   templateUrl: './randomize.component.html',
   styleUrls: ['./randomize.component.css'],
 })
-export class RandomizeComponent implements OnInit {
+export class RandomizeComponent {
 
-  @Select(MatchState) matchState!: Observable<MatchStateModel>;
+  @Select(MatchState) matchState!: Observable<MatchStateModel>
 
   constructor(private store: Store) {
   }
 
-  ngOnInit(): void {
-    //[{"names": ["Credicor", "Tharsis republic", "Teractor", "Ecoline", "PhobLog", "Helion", "Thorgate", "Inventrix"], "unique": true, "category": "Corporation", "maxOcurrences": 4, "minOcurrences": 1}]
-    //[{"names": ["Standard", "Hellas", "Elysium"], "unique": true, "category": "Plateau", "maxOcurrences": 1, "minOcurrences": 1}, {"names": ["Lune", "Io", "Encelade", "Titan", "Ceres", "Pluton", "Europe"], "unique": true, "category": "Colonies", "maxOcurrences": 5, "minOcurrences": 2}]
-  }
 
   public returnToPlayerSelection() {
     this.store.dispatch(new Navigate(['/player-selection']))
@@ -56,7 +52,7 @@ export class RandomizeComponent implements OnInit {
       return playerTag.names
     }
 
-    const players: Player[] = this.store.selectSnapshot(MatchState).players
+    const players = this.store.selectSnapshot<Player[]>(MatchState.players)
     const alreadySelectedName: string[] = players.flatMap(player => player.choosenTags.filter(tag => tag.category == playerTag.category)[0]?.names)
     const availableTagName = playerTag.names.filter(name => !alreadySelectedName.includes(name))
 
@@ -74,10 +70,10 @@ export class RandomizeComponent implements OnInit {
   }
 
   public randomizeAllPlayerTag() {
-    const matchState = this.store.selectSnapshot(MatchState)
+    const matchState = this.store.selectSnapshot<MatchStateModel>(MatchState)
     const players: Player[] = matchState.players
     players.forEach(player => {
-      const playerTags: Tag[] = matchState.playerTags
+      const playerTags: Tag[] = matchState.game?.playerTags!
       playerTags.forEach(tag => {
         for (let i = 0; i < tag.maxOcurrences; i++) {
           this.randomizePlayerTag(tag, player, i)
@@ -93,7 +89,7 @@ export class RandomizeComponent implements OnInit {
   }
 
   public alreadySelectedMatchTag(matchTag: Tag, index: number): string {
-    const matchState = this.store.selectSnapshot(MatchState)
+    const matchState = this.store.selectSnapshot<MatchStateModel>(MatchState)
     const choosenMatchTags: ChoosenTag[] = matchState.choosenTags
     return choosenMatchTags.filter(tag => tag.category == matchTag.category)[0]?.names[index]
   }  
@@ -103,7 +99,7 @@ export class RandomizeComponent implements OnInit {
       return matchTag.names
     }
 
-    const matchState: MatchStateModel = this.store.selectSnapshot(MatchState)
+    const matchState: MatchStateModel = this.store.selectSnapshot<MatchStateModel>(MatchState)
     const alreadySelectedNameByAll: string[] = matchState.choosenTags.filter(tag => tag.category == matchTag.category).flatMap(tag => tag.names)
     const availableTagName = matchTag.names.filter(name => !alreadySelectedNameByAll.includes(name))
 
@@ -121,7 +117,7 @@ export class RandomizeComponent implements OnInit {
   }
 
   public randomizeAllMatchTag() {
-    const matchTags: Tag[] = this.store.selectSnapshot(MatchState).matchTags
+    const matchTags: Tag[] = this.store.selectSnapshot<MatchStateModel>(MatchState).game?.matchTags!
     matchTags.forEach(tag => {
       for (let i = 0; i < tag.maxOcurrences; i++) {
         this.randomizeMatchTag(tag, i)

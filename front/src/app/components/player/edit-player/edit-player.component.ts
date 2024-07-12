@@ -10,18 +10,19 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
-import { Navigate } from '@ngxs/router-plugin';
-import { Store } from '@ngxs/store';
-import { PlayerEntity } from 'src/app/core/entity/player-entity.model';
-import { UserEntity } from 'src/app/core/entity/user-entity.model';
-import { COLORS } from 'src/app/core/model/color-tag.model';
-import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
-import { AuthState } from 'src/app/core/state/auth/auth.state';
+import { Component, OnInit } from '@angular/core'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { ActivatedRoute } from '@angular/router'
+import { Navigate } from '@ngxs/router-plugin'
+import { Store } from '@ngxs/store'
+import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
+import { UserEntity } from 'src/app/core/entity/user-entity.model'
+import { COLORS } from 'src/app/core/model/color-tag.model'
+import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
+import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
+import { AuthStateModel } from 'src/app/core/state/auth/auth.model'
+import { AuthState } from 'src/app/core/state/auth/auth.state'
 
 @Component({
   selector: 'edit-player',
@@ -30,7 +31,7 @@ import { AuthState } from 'src/app/core/state/auth/auth.state';
 })
 export class EditPlayerComponent implements OnInit {
 
-  public playerEditorForm: FormGroup;
+  public playerEditorForm: FormGroup
 
   public users: UserEntity[] = []
   
@@ -57,7 +58,7 @@ export class EditPlayerComponent implements OnInit {
       console.debug("Id: ", this.currentPlayerId)
       this.creating = (this.currentPlayerId === 0)
       console.debug("Creating: ", this.creating)
-      let loggedUserId: number = this.store.selectSnapshot(AuthState).id
+      let loggedUserId: number = this.store.selectSnapshot<AuthStateModel>(AuthState).id
 
       this.userCrudService.findAll().subscribe(users => {
         this.users = users
@@ -88,7 +89,7 @@ export class EditPlayerComponent implements OnInit {
               couleur: playerEntity.preferedColor,
               user: userId
             })
-            this.loading = false;
+            this.loading = false
           })
         } else {
           this.isEditable = true
@@ -99,7 +100,7 @@ export class EditPlayerComponent implements OnInit {
             this.playerEditorForm.get('user')?.setValue(loggedUserId)
           }
           
-          this.loading = false;
+          this.loading = false
         }
       })
     })

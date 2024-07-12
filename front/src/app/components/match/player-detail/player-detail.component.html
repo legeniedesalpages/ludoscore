@@ -12,7 +12,7 @@
             </mat-select>
         </mat-form-field>
 
-        <div *ngFor="let playerTag of (matchState | async)?.playerTags" class="player-tag">
+        <div *ngFor="let playerTag of (matchState | async)?.game?.playerTags" class="player-tag">
             <div *ngFor="let occurence of [].constructor(playerTag.maxOcurrences); let i = index;">
                 <mat-form-field appearance="fill" class="champs">
                     <mat-label>{{ playerTag.category }}</mat-label>

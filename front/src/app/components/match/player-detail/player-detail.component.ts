@@ -10,17 +10,17 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatSelect } from '@angular/material/select';
-import { Select, Store } from '@ngxs/store';
-import { Observable, Subscription } from 'rxjs';
-import { ColorTag } from 'src/app/core/model/color-tag.model';
-import { Player } from 'src/app/core/model/player.model';
-import { Tag } from 'src/app/core/model/tag.model';
-import { AddTagToPlayer, ChangePlayerColor } from 'src/app/core/state/match/match.action';
-import { MatchStateModel } from 'src/app/core/state/match/match.model';
-import { MatchState } from 'src/app/core/state/match/match.state';
+import { Component, Inject } from '@angular/core'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatSelect } from '@angular/material/select'
+import { Select, Store } from '@ngxs/store'
+import { Observable } from 'rxjs'
+import { ColorTag } from 'src/app/core/model/color-tag.model'
+import { Player } from 'src/app/core/model/player.model'
+import { Tag } from 'src/app/core/model/tag.model'
+import { AddTagToPlayer, ChangePlayerColor } from 'src/app/core/state/match/match.action'
+import { MatchStateModel } from 'src/app/core/state/match/match.model'
+import { MatchState } from 'src/app/core/state/match/match.state'
 
 @Component({
   selector: 'player-detail',
@@ -34,8 +34,8 @@ export class PlayerDetailComponent {
   public colors: ColorTag[] = []
 
   constructor(public dialogRef: MatDialogRef<PlayerDetailComponent>, @Inject(MAT_DIALOG_DATA) public player: Player, private store: Store) {
-    this.colors = this.store.selectSnapshot(MatchState).playerColors
-    console.log("color:", this.colors.length)
+    this.colors = this.store.selectSnapshot<MatchStateModel>(MatchState).game?.playerColors!
+    console.debug("color:", this.colors.length)
   }
 
   close() {
@@ -64,7 +64,7 @@ export class PlayerDetailComponent {
       return playerTag.names
     }
 
-    const players: Player[] = this.store.selectSnapshot(MatchState).players
+    const players: Player[] = this.store.selectSnapshot<MatchStateModel>(MatchState).players
     const player = players.find(p => p.id == pp.id)!
 
     const alreadySelectedName: string[] = players.flatMap(player => player.choosenTags.filter(tag => tag.category == playerTag.category)[0]?.names)

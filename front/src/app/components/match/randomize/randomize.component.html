@@ -5,7 +5,7 @@
 
     <ng-container role="body">
 
-        <div *ngIf="((matchState | async)?.matchTags?.length ?? 0) > 0">
+        <div *ngIf="((matchState | async)?.game?.matchTags?.length ?? 0) > 0">
             <h2>Tag du match
                 <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllMatchTag()">
                     <div>
@@ -22,7 +22,7 @@
                     </div>
                 </button>
             </h2>
-            <div *ngFor="let matchTag of (matchState | async)?.matchTags" class="game-tag">
+            <div *ngFor="let matchTag of (matchState | async)?.game?.matchTags" class="game-tag">
                 <hr />
                 <div *ngFor="let occurence of [].constructor(matchTag.maxOcurrences); let i = index;">
                     <mat-form-field appearance="fill" class="selection">
@@ -51,7 +51,7 @@
 
         <hr />
 
-        <div *ngIf="((matchState | async)?.playerTags?.length ?? 0) > 0">
+        <div *ngIf="((matchState | async)?.game?.playerTags?.length ?? 0) > 0">
             <h2>Tag des joueurs
                 <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllPlayerTag()">
                     <div>
@@ -71,7 +71,7 @@
             <div *ngFor="let player of (matchState | async)?.players" class="players">
                 <hr />
                 <h3>{{ player.name }}</h3>
-                <div *ngFor="let playerTag of (matchState | async)?.playerTags" class="player-tag">
+                <div *ngFor="let playerTag of (matchState | async)?.game?.playerTags" class="player-tag">
                     <hr />
                     <div *ngFor="let occurence of [].constructor(playerTag.maxOcurrences); let i = index;">
                         <mat-form-field appearance="fill" class="selection">

@@ -59,8 +59,7 @@ export class LoginComponent implements OnInit {
       this.loginForm.value['password']
     )).subscribe({
       next: () => {
-        //this.store.dispatch(new Navigate(['/']))
-        this.router.navigate(['/'])
+        this.store.dispatch(new Navigate(['/']))
       },
       error: () => {
         this.errors = true

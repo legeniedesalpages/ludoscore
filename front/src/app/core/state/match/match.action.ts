@@ -1,5 +1,6 @@
 import { ChoosenTag } from "../../model/choosen-tag.model";
 import { ColorTag } from "../../model/color-tag.model";
+import { DrawBreaker, Game } from "../../model/game.model";
 import { Player } from "../../model/player.model";
 import { Tag } from "../../model/tag.model";
 
@@ -17,7 +18,7 @@ import { Tag } from "../../model/tag.model";
 **/
 export class CreateMatch {
     static readonly type: string = '[Match] CreateMatch';
-    constructor(public gameId: number, public title: string, public image: string, public minPlayers: number, public maxPlayers: number, public matchTags: string, public playerTags: string, public playerColors: string) { }
+    constructor(public game: Game) { }
 }
 
 export class CancelMatchCreation {

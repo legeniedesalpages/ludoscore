@@ -10,34 +10,39 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { tap, catchError } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { GameSearchResult } from '../../model/game-search.model';
-import { GameSearchDetail } from '../../model/game-search-detail.model';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { map, Observable, tap } from 'rxjs'
+import { environment } from 'src/environments/environment'
+import { GameSearchResult } from '../../model/game-search.model'
+import { GameSearchDetail } from '../../model/game-search-detail.model'
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class FindGameService {
 
-    private readonly gameSearchUrl = environment.apiURL + '/api/game_search';
-    private readonly gameSearchDetailUrl = environment.apiURL + '/api/game_search_detail';
+    public searchString: string = ''
+    public searchResult: GameSearchResult[] = []
 
     constructor(private http: HttpClient) {
     }
 
-    public search(searchString: string): Observable<GameSearchResult[]> {
-        return this.http.get<GameSearchResult[]>(this.gameSearchUrl, { params: { q: searchString } });
+    public search(searchString: string): Observable<void> {
+        this.searchString = searchString
+        return this.http.get<GameSearchResult[]>(environment.apiURL + '/api/game_search', { params: { q: this.searchString } }).pipe(
+            tap((result: GameSearchResult[]) => {
+                this.searchResult = result
+            }), 
+            map(_ => {})
+        )
+    }
+
+    public resetSearch(): void {
+        this.searchString = ''
+        this.searchResult = []
     }
 
     public detail(bggId: number): Observable<GameSearchDetail> {
-        return this.http.get<GameSearchDetail>(this.gameSearchDetailUrl,
-            { params: { id: bggId } }).pipe(
-                catchError(error => {
-                    throw new Error(error)
-                })
-            );
+        return this.http.get<GameSearchDetail>(environment.apiURL + '/api/game_search_detail', { params: { id: bggId } })
     }
 }

@@ -10,11 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { Store } from '@ngxs/store';
-import { AuthState } from '../../state/auth/auth.state';
-import { Navigate } from '@ngxs/router-plugin';
+import { Injectable } from '@angular/core'
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router'
+import { Store } from '@ngxs/store'
+import { AuthState } from '../../state/auth/auth.state'
+import { Navigate } from '@ngxs/router-plugin'
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuardService {
@@ -24,7 +24,7 @@ export class AuthGuardService {
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
-    const isAuthenticated = this.store.selectSnapshot(AuthState.isAuthenticated)
+    const isAuthenticated = this.store.selectSnapshot<boolean>(AuthState.isAuthenticated)
 
     if (isAuthenticated) {
       console.debug(`Authenticated, can show this page: ${state.url}`)

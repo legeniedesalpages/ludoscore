@@ -10,17 +10,17 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
-import { MatchStateModel } from "./match.model";
-import { Injectable } from '@angular/core';
-import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, ChangePlayerColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult, SwapPlayerPosition } from "./match.action";
-import { Player } from "../../model/player.model";
-import { MatchService } from "../../services/match/match.service";
-import { tap } from 'rxjs/operators';
-import { ChoosenTag } from "../../model/choosen-tag.model";
-import { ColorTag } from "../../model/color-tag.model";
+import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
+import { MatchStateModel } from "./match.model"
+import { Injectable } from '@angular/core'
+import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, ChangePlayerColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult, SwapPlayerPosition } from "./match.action"
+import { Player } from "../../model/player.model"
+import { MatchService } from "../../services/match/match.service"
+import { tap } from 'rxjs/operators'
+import { ChoosenTag } from "../../model/choosen-tag.model"
+import { ColorTag } from "../../model/color-tag.model"
 
-const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match');
+const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 
 export enum MatchStateEnum {
     CREATING,
@@ -30,21 +30,14 @@ export enum MatchStateEnum {
 
 const defaultMatchModel = {
     matchId: 0,
-    gameId: 0,
-    title: "",
-    image: "",
+    game: undefined,
     creating: false,
     started: false,
     startedAt: undefined,
     endedAt: undefined,
-    minPlayers: 0,
-    maxPlayers: 0,
     players: [],
-    matchTags: [],
-    playerTags: [],
-    playerColors: [],
     choosenTags: [],
-    winnigPlayer: undefined
+    winnigPlayer: undefined,
 };
 
 @State<MatchStateModel>({
@@ -75,19 +68,12 @@ export class MatchState {
     createMatch({ setState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
         setState({
             matchId: 0,
-            gameId: createMatch.gameId,
-            title: createMatch.title,
-            image: createMatch.image,
+            game: createMatch.game,
             creating: true,
             started: false,
             startedAt: undefined,
             endedAt: undefined,
-            minPlayers: createMatch.minPlayers,
-            maxPlayers: createMatch.maxPlayers,
             players: [],
-            matchTags: JSON.parse(createMatch.matchTags),
-            playerTags: JSON.parse(createMatch.playerTags),
-            playerColors: JSON.parse(createMatch.playerColors),
             choosenTags: [],
             winnigPlayer: undefined
         })
@@ -95,7 +81,7 @@ export class MatchState {
 
     @Action(LaunchMatch)
     launchMatch({ patchState, getState }: StateContext<MatchStateModel>) {
-        return this.matchService.createMatch(getState().gameId, getState().players, getState().choosenTags).pipe(tap((entity) =>
+        return this.matchService.createMatch(getState().game?.id!, getState().players, getState().choosenTags).pipe(tap((entity) =>
             patchState({
                 matchId: entity.id,
                 creating: false,
@@ -210,7 +196,7 @@ export class MatchState {
         }
 
         const categoryTag = player.choosenTags.filter(tags => tags.category == tagAddedToPlayer.category)[0]
-        const length = getState().playerTags.filter(tag => tag.category == tagAddedToPlayer.category)[0].maxOcurrences
+        const length = getState().game!.playerTags.filter(tag => tag.category == tagAddedToPlayer.category)[0].maxOcurrences
         let names: string[] = []
         for (let i = 0; i < length; i++) {
             if (i == tagAddedToPlayer.index) {
@@ -230,9 +216,9 @@ export class MatchState {
 
         const modifiedPlayerList = getState().players.map(unmodifiedPlayer => {
             if (unmodifiedPlayer.id != tagAddedToPlayer.playerId) {
-                return unmodifiedPlayer;
+                return unmodifiedPlayer
             } else {
-                return { ...player, choosenTags: modifiedChoosenTags };
+                return { ...player, choosenTags: modifiedChoosenTags }
             }
         })
 
@@ -248,7 +234,7 @@ export class MatchState {
         console.log("Ajout d'un tag de match: ", tagAddedToMatch.category, tagAddedToMatch.name, tagAddedToMatch.index)
 
         const categoryTag = getState().choosenTags.filter(tags => tags.category == tagAddedToMatch.category)[0]
-        const length = getState().matchTags.filter(tag => tag.category == tagAddedToMatch.category)[0].maxOcurrences
+        const length = getState().game!.matchTags.filter(tag => tag.category == tagAddedToMatch.category)[0].maxOcurrences
         let names: string[] = []
         for (let i = 0; i < length; i++) {
             if (i == tagAddedToMatch.index) {
