@@ -11,65 +11,99 @@
   display: block;
   padding-left: 5px;
   padding-top: 10px;
+  width: 100%;
 }
 
 .headline {
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100%;
+  cursor: pointer;
 }
 
+.edit-game-icon {
+  float: right;
+  padding-right:10px;
+}
 
 .rattrapage {
   margin-top: -20px;
 }
-/* --------------------- list -------------- */
 
-.player {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+/* --------------------- list element -------------- */
+
+.team {
   width: 100%;
-  padding-left: 16px;
-  padding-right: 2px;
   height: 64px;
+  display: flex;
+  align-items: center;
 }
 
 .avatar {
   height: 40px;
   width: 40px;
-  margin-right: 16px;
-  align-items: center;
+  display: inline;
+  float: left;
+  margin-left: 5px;
 }
-
 .avatar img {
   height: 40px;
   width: 40px;
   border-radius: 100%;
 }
 
-.line {
-  align-items: center;
-  flex-grow: 1;
-}
-
-.action {
-  align-items: center;
+.detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  float: left;
+  height: 100%;
+  margin-left: 10px;
 }
 
 .pseudo {
-  padding-top: 5px;
-  padding-bottom: 2px;
+  width: 100%;
+  display:block;
+  white-space: nowrap;
 }
 
 .tags {
+  display:block;
   font-size: small;
-  opacity: 0.5;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 230px;
 }
-
+.tags li {
+  list-style-type: none;
+}
 .tag-value {
   font-style: italic;
 }
+
+.color {
+  display: flex;
+  align-items: center;
+  float:right;
+}
+.color .dot {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  display: block;
+  cursor: pointer;
+  border: 1px solid grey;
+}
+
+.order {
+  display: flex;
+  align-items: center;
+  float:right;
+}
+
+/* --------------------- list container -------------- */
 
 .background-player {
   position: relative;
@@ -130,26 +164,12 @@ ul {
   padding: 0;
 }
 
-.dot {
-  height: 30px;
-  width: 30px;
-  border-radius: 100%;
-  display: inline-block;
-  vertical-align: middle;
-  cursor: pointer;
-  margin-bottom: 15px;
-  border: 1px solid grey;
-}
-
-.color {
-  float:right;
-}
-
 .game-category {
   opacity: 0.7;
-  padding-bottom: 10px;
   padding-left: 20px;
   padding-top: 5px;
+  cursor: pointer;
+  padding-bottom: 10px;
 }
 
 .game-category .value {

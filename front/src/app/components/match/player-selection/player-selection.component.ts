@@ -10,24 +10,24 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
+import { Component, OnInit, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core'
 import { Select, Store } from '@ngxs/store'
-import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
-import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
-import { AddPlayer, CancelMatchCreation, LaunchMatch, RemovePlayer, SwapPlayerPosition } from 'src/app/core/state/match/match.action'
+import { AddTeam, CancelMatchCreation, LaunchMatch, RemoveTeam, SwapTeamPosition } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { environment } from 'src/environments/environment'
 import { MatSelect } from '@angular/material/select'
-import { Observable, Subscription, first, map } from 'rxjs'
-import { Player } from 'src/app/core/model/player.model'
+import { Observable, Subscription, first } from 'rxjs'
 import { Navigate } from '@ngxs/router-plugin'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/color-tag.model'
-import { MatchService } from 'src/app/core/services/match/match.service'
 import { MatDialog } from '@angular/material/dialog'
-import { PlayerDetailComponent } from '../player-detail/player-detail.component'
-import { MatchStateModel } from 'src/app/core/state/match/match.model'
+import { TeamDetailComponent as TeamDetailComponent } from '../team-detail/team-detail.component'
 import { Game } from 'src/app/core/model/game.model'
+import { ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
+import { ChoosenTag, MatchModel, Team, TeamPlayer } from 'src/app/core/model/match.model'
+import { Player } from 'src/app/core/model/player.model'
+import { PlayerService } from 'src/app/core/services/player/player.service'
+import { GameDetailComponent } from '../game-detail/game-detail.component'
+import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -39,37 +39,42 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   @ViewChild('playerSelector') public playerSelector!: MatSelect
 
-  @Select(MatchState) matchState!: Observable<MatchStateModel>
+  @Select(MatchState.match) matchState!: Observable<MatchModel>
   private matchChangeSubscription!: Subscription
 
   public loading: boolean = true
   public saving: boolean = false
   public canContinue: boolean = false
-  public canAddPlayer: boolean = false
-  public lessThan2Players: boolean = true
+  public canAddTeam: boolean = false
+  public lessThan2Teams: boolean = true
   public currentSwapOrderIsDownward: boolean = true
 
   public choosableColors: ColorTag[] = []
-  public choosablePlayers!: PlayerEntity[]
-  public numberOfPlayers: number = 0
+  public choosablePlayers!: Player[]
+  public numberOfTeams: number = 0
 
-  constructor(private store: Store, private playerCrudService: PlayerCrudService, private snackBar: MatSnackBar, private matchService: MatchService, private dialog: MatDialog) {
+  constructor(private store: Store, private playerService: PlayerService, private snackBar: MatSnackBar, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
 
-    this.playerCrudService.findAll().subscribe(allPlayers => {
+    this.playerService.listAllPlayers().subscribe(allPlayers => {
       this.loading = false
 
-     this.matchChangeSubscription = this.matchState.subscribe(matchState => {
-        this.canContinue = matchState.players.length >= matchState.game?.minPlayers!
-        this.canAddPlayer = matchState.players.length < matchState.game?.maxPlayers!
-        this.numberOfPlayers = matchState.players.length
-        this.lessThan2Players = matchState.players.length < 2
-        const ids = matchState.players.map(player => player.id)
-        this.choosablePlayers = allPlayers.filter(x => !ids.includes(x.id))
-        if (matchState.game?.playerColors != null) {
-          this.choosableColors = matchState.game?.playerColors.filter(color => !matchState.players.map(p => p.color.name).includes(color.name))       
+      this.matchChangeSubscription = this.matchState.subscribe(match => {
+
+        if (!match) {
+          console.debug("Match has been erased")
+          return
+        }
+        this.canContinue = match.teams.length >= match.game?.minPlayers!
+        this.canAddTeam = match.teams.length < match.game?.maxPlayers!
+        this.numberOfTeams = match.teams.length
+        this.lessThan2Teams = match.teams.length < 2
+        const ids = match.teams.flatMap(team => team.teamPlayers.map((teampPlayer: TeamPlayer) => teampPlayer.player.id))
+        this.choosablePlayers = allPlayers.filter((player: Player) => !ids.includes(player.id))
+        if (match.game?.playerColors != null) {
+          this.choosableColors = match.game.playerColors.filter(color => !match.teams.map(team => team.color.name).includes(color.name))
         }
       })
     })
@@ -81,37 +86,51 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     }
   }
 
+  public selectPlayer(event: string | Player) {
 
-  public selectPlayer(event: string | PlayerEntity) {
     if (event === 'search') {
-      console.log("Recherche")
+      console.debug("Search player")
+
     } else if (event === 'team') {
-      console.log("Equipe")
+      console.debug("Team")
+
     } else {
-      const player = event as PlayerEntity
       this.loading = true
-      this.chooseColor(player).subscribe(color => {
-        console.log("Couleur choisie", color)
-        this.store.dispatch(new AddPlayer(player.id, player.pseudo, player.gravatar, color)).pipe(first()).subscribe(() => {
-          if (this.playerSelector != null) {
-            this.playerSelector.value = ""
-          }
-        })
-        this.loading = false
+
+      const player = event as Player
+      const teamPlayer: TeamPlayer = {
+        id: undefined,
+        player: player
+      }
+
+      const team: Team = {
+        id: undefined,
+        name: player.pseudo,
+        choosenTags: [],
+        color: this.chooseColor(player),
+        score: undefined,
+        teamPlayers: [teamPlayer]
+      }
+
+      this.store.dispatch(new AddTeam(team)).pipe(first()).subscribe(() => {
+        if (this.playerSelector != null) {
+          this.playerSelector.value = ""
+          this.loading = false
+        }
       })
     }
   }
 
-  public swapPlayerPosition(firstPlayerIndex: number, secondPlayerIndex: number, isDownward: boolean) {
-    let players: Player[] = this.store.selectSnapshot<Player[]>(MatchState.players)
+  public swapTeamPosition(firstTeamIndex: number, secondTeamIndex: number, isDownward: boolean) {
+    const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
     this.currentSwapOrderIsDownward = isDownward
-    this.store.dispatch(new SwapPlayerPosition(players[firstPlayerIndex], players[secondPlayerIndex]))
+    this.store.dispatch(new SwapTeamPosition(teams[firstTeamIndex], teams[secondTeamIndex]))
   }
 
   public isDownwardArrowHidden(index: number): boolean {
     if (index == 0) {
       return false
-    } else if (index === this.numberOfPlayers - 1) {
+    } else if (index === this.numberOfTeams - 1) {
       return true
     } else if (this.currentSwapOrderIsDownward) {
       return false
@@ -119,54 +138,42 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     return true
   }
 
-  private chooseColor(player: PlayerEntity): Observable<ColorTag> {
-    const game: Game = this.store.selectSnapshot<MatchStateModel>(MatchState).game!
-    console.log("Game", game)
-    return this.matchService.getPreviousMatchOfPlayer(player.id, game.id).pipe(map(e => {
+  private chooseColor(player: Player): ColorTag {
+    const game: Game = this.store.selectSnapshot<MatchModel>(MatchState.match).game!
 
-      if (this.choosableColors.length === 0) {
-        console.log("Aucune couleur disponible")
-        return NO_COLOR
-      }
+    if (this.choosableColors.length === 0) {
+      console.debug("Aucune couleur disponible")
+      return NO_COLOR
+    }
 
-      console.log("couleur encore disponible:",this.choosableColors)
+    console.debug("Colors not yet selected:", this.choosableColors)
 
-      let colorFromPreviousMatch
-      if (e.color != null) {
-        colorFromPreviousMatch = COLORS.filter(color => color.name === e.color)[0]
-      }
+    let preferedColor
+    let foundPreferedColor = game.playerColors.filter(color => color.name === player.preferedColor.name)
+    console.debug("Prefered color of first player of the team:", player.preferedColor)
+    if (foundPreferedColor.length > 0) {
+      preferedColor = foundPreferedColor[0]
+    }
 
-      let preferedColor
-      let foundPreferedColor = game.playerColors.filter((color: ColorTag) => color.name === player.preferedColor)
-      console.log("couleur préféré du joueur:", player.preferedColor)
-      if (foundPreferedColor.length > 0) {
-        preferedColor = foundPreferedColor[0]
-      }
+    if (preferedColor != null && this.choosableColors.includes(preferedColor)) {
+      console.debug("Choose prefered color because it is available", preferedColor)
+      return preferedColor
+    }
 
-      if (colorFromPreviousMatch != null && !this.choosableColors.includes(colorFromPreviousMatch)) {
-        console.log("Prend la couleur de l'ancienne partie car disponible", colorFromPreviousMatch)
-        return colorFromPreviousMatch
-      } else if (preferedColor != null && this.choosableColors.includes(preferedColor)) {
-        console.log("Prend la couleur préférée car disponible", preferedColor)
-        return preferedColor
-      }
-
-      console.log("Prend une couleur aléatoire parmis celle restante")
-      return this.choosableColors[Math.floor(Math.random() * this.choosableColors.length)]
-    }))
+    console.debug("Choose a random color among colors that have not been chosen yet")
+    return this.choosableColors[Math.floor(Math.random() * this.choosableColors.length)]
   }
 
-
-  public deleteAction(player: Player) {
-    this.store.dispatch(new RemovePlayer(player.id))
+  public deleteAction(team: Team) {
+    this.store.dispatch(new RemoveTeam(team))
   }
 
-  public cancelMatchCreation() {
-    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['/'])))
+  public formatTagName(names: string[]): string {
+    return names.filter(name => name != undefined).join(", ")
   }
 
-  public cancelGameSelection() {
-    this.store.dispatch(new CancelMatchCreation()).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
+  public categoryOrder(tag: ChoosenTag[]): ChoosenTag[] {
+    return [...tag].sort((a: ChoosenTag, b: ChoosenTag) => a.category.localeCompare(b.category))
   }
 
   public launchMatch() {
@@ -187,11 +194,39 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     this.store.dispatch(new Navigate(['/wheel']))
   }
 
-  public goToPlayerDetail(player: Player) {
-    this.dialog.open(PlayerDetailComponent, { 
-      data: player,
-      width: '100%',
-      maxWidth: '90vw',
+  public goToTeamDetail(team: Team) {
+    const game: Game = this.store.selectSnapshot<MatchModel>(MatchState.match).game!
+    if (game.playerTags.length > 0 || game.playerColors.length > 0) {
+      this.dialog.open(TeamDetailComponent, {
+        data: team,
+        width: '90%',
+        maxWidth: '100%'
+      })
+    }
+  }
+
+  public goToGameDetail() {
+    const game: Game = this.store.selectSnapshot<MatchModel>(MatchState.match).game!
+    if (game.matchTags.length > 0) {
+      this.dialog.open(GameDetailComponent, {
+        width: '90%',
+        maxWidth: '100%'
+      })
+    }
+  }
+
+  public cancelGameSelection() {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        message: "Ceci mettra fin à la création de la partie, toutes les données seront perdues."
+      }
     })
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.store.dispatch(new CancelMatchCreation()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
+      }
+    });
+    
   }
 }

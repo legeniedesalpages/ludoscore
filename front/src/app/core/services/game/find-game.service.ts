@@ -14,8 +14,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { map, Observable, tap } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { GameSearchResult } from '../../model/game-search.model'
-import { GameSearchDetail } from '../../model/game-search-detail.model'
+import { GameSearchResult, GameSearchDetail } from '../../model/game-search.model'
 
 
 @Injectable({ providedIn: 'root' })

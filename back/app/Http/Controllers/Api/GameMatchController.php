@@ -55,10 +55,10 @@ class GameMatchController extends Controller
                 Log::debug("Ajout joueur " . print_r($player, true));
 
                 $team = new Team();
-                $team->tags = "{}";
                 $team->position = $position;
                 $team->match_id = $gameMatch->id;
                 $team->tags = $player->tags;
+                $team->color = $player->color;
                 $team->save();
                 
                 $teamPlayer = new TeamPlayer();
@@ -112,6 +112,22 @@ class GameMatchController extends Controller
             ->join('team_players', 'teams.id', '=', 'team_players.team_id')
             ->where('team_players.player_id', $id)
             ->update(['score' => $request->score]);
+
+        return Player::find($id);
+    }
+
+    public function updatePlayerMatch(Request $request) {       
+        $id = $request->id; 
+        Log::info("Mise à jour du joueur d'id : " . $id. " et de macthId : " . $request->match_id);
+        Log::debug($request);
+        
+        $matchId = $request->match_id;
+
+        DB::table('teams')
+            ->where('match_id', $matchId)
+            ->join('team_players', 'teams.id', '=', 'team_players.team_id')
+            ->where('team_players.player_id', $id)
+            ->update(['tags' => $request->tags, "color" => $request->color]);
 
         return Player::find($id);
     }

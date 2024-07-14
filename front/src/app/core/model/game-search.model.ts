@@ -11,10 +11,19 @@
     * - Modification    : 
 **/
 export interface GameSearchResult {
-    id: number,
-    thumbnailUrlFromBgg: string,
-    name: string,
-    year: number,
-    popularity: number,
+    id: number
+    thumbnailUrlFromBgg: string
+    name: string
+    year: number
+    popularity: number
     owned: boolean
+}
+
+export interface GameSearchDetail {
+    id: number
+    name: string
+    imageUrlFromBgg: string
+    thumbnailUrlFromBgg: string
+    minplayers: number
+    maxplayers: number
 }

@@ -1,0 +1,41 @@
+svg {
+  height: 30px;
+  width: 30px;
+}
+
+.tag-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tag-group {
+  width: 100%;
+}
+
+.category {
+  border-bottom:1px solid lightgrey;
+  margin-bottom: 10px;
+}
+
+.tag {
+  display: flex;
+}
+
+.tag-selector {
+  flex-grow: 1;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.actions button {
+  margin-left: 8px;
+}
+
+.mat-mdc-dialog-content {
+  padding: 0px !important;
+}

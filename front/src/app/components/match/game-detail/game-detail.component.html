@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ (match | async)!.game.title! }}</h2>
+
+<mat-dialog-content class="dialog row">
+    <fieldset>
+        <game-tags-selection [saving]="saving"/>
+    </fieldset>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close color="warn">Annuler</button>
+    <button mat-button mat-dialog-close (click)="save()">Enregistrer</button>
+</mat-dialog-actions>

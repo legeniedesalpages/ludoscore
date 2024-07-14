@@ -1,17 +1,17 @@
-<app-layout [withBackButton]="true" (backButtonAction)="returnToScore()">
+<app-layout [withBackButton]="true" (backButtonAction)="returnToMatchEnd()">
     <ng-container role="header">
         <span class="title">Fin de partie</span>
     </ng-container>
 
     <ng-container role="body">
-        <div class="score">{{ (player | async)?.name }}</div>
+        <div class="score">{{ team.name }}</div>
 
-        <form [formGroup]="playerScore" (ngSubmit)="onSubmit()" class="buttons">
+        <form [formGroup]="teamScore" (ngSubmit)="onSubmit()" class="buttons">
             <mat-form-field appearance="fill">
               <mat-label>Score (uniquement des chiffres)</mat-label>
               <input matInput formControlName="score" type="number" autofocus>
             </mat-form-field>
-            <button mat-raised-button color="primary" [disabled]="!playerScore.valid">
+            <button mat-raised-button color="primary" [disabled]="!teamScore.valid">
               Enregistrer le score
             </button>
           </form>

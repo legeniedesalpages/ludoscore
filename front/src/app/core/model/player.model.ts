@@ -1,5 +1,6 @@
-import { ChoosenTag } from "./choosen-tag.model";
-import { ColorTag } from "./color-tag.model";
+import { Color } from "@angular-material-components/color-picker"
+import { ColorTag } from "./tag.model"
+
 /**
     * @description      : 
     * @author           : renau
@@ -13,10 +14,10 @@ import { ColorTag } from "./color-tag.model";
     * - Modification    : 
 **/
 export interface Player {
-    id: number,
-    name: string,
-    avatar: string,
-    choosenTags: ChoosenTag[],
-    color: ColorTag,
-    score: number | undefined
+    id: number
+    pseudo: string
+    lastName: string
+    firstName: string
+    preferedColor: ColorTag
+    gravatarUrl: string
 }

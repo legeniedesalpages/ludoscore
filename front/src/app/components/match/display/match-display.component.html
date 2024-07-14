@@ -6,11 +6,11 @@
     <ng-container role="body">
 
         <div class="game"
-            [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + (matchState | async)?.game?.imageUrl + ') no-repeat top / cover'}">
-            <div class="heading">{{ (matchState | async)?.game?.title }}</div>
+            [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + (matchState | async)?.match!.game.imageUrl + ') no-repeat top / cover'}">
+            <div class="heading">{{ (matchState | async)?.match!.game.title }}</div>
 
             <ul class="game-category">
-                <li *ngFor="let matchCategory of (matchState | async)?.choosenTags; let i = index">
+                <li *ngFor="let matchCategory of (matchState | async)?.match!.choosenTags; let i = index">
                     {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
                 </li>
             </ul>
@@ -21,25 +21,25 @@
             </div>
 
             <div class="player-list">
-                <div *ngFor="let player of (matchState | async)?.players; let i = index" (click)="goToPlayerDetail(player)">
+                <div *ngFor="let team of (matchState | async)?.match!.teams; let i = index" (click)="goToTeamDetail(team)">
                     <div class="row">
                         <div class="column">
                             <div class="player">
                                 <div class="avatar">
-                                    <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg">
+                                    <img src="{{team.teamPlayers[0].player.gravatarUrl}}">
                                 </div>
                                 <div class="line">
                                     <div class="pseudo">
-                                        {{player.name}}
+                                        {{team.name}}
                                         <div class="color">
-                                            <span [hidden]="player.color.name == 'Aucune'">
+                                            <span [hidden]="team.color.name == 'Aucune'">
                                                 <span class="dot"
-                                                    [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
+                                                    [ngStyle]="{'background-color': team.color.code, 'color': team.color.invert}"></span>
                                             </span>
                                         </div>
                                     </div>
                                     <div class="tags">
-                                        <ul *ngFor="let tag of player.choosenTags">
+                                        <ul *ngFor="let tag of team.choosenTags">
                                             <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
                                         </ul>
                                     </div>

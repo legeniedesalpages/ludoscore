@@ -15,11 +15,11 @@ import { MatDialog } from '@angular/material/dialog'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
 import { Observable } from 'rxjs'
-import { Player } from 'src/app/core/model/player.model'
 import { MatchEnded } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
-import { PlayerDetailComponent } from '../player-detail/player-detail.component'
+import { TeamDetailComponent } from '../team-detail/team-detail.component'
+import { MatchModel, Team } from 'src/app/core/model/match.model'
 
 @Component({
   templateUrl: './match-display.component.html',
@@ -41,7 +41,7 @@ export class MatchDisplayComponent implements OnInit {
     this.actions.pipe(ofActionSuccessful(MatchEnded)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
 
     setInterval(() => {
-      const startDate = this.store.selectSnapshot<MatchStateModel>(MatchState).startedAt
+      const startDate = this.store.selectSnapshot<MatchModel>(MatchState.match).startedAt
       if (startDate) {
         let t = new Date().getTime() - new Date(startDate).getTime()
         let seconds = "" + Math.floor((t / 1000) % 60)
@@ -56,9 +56,9 @@ export class MatchDisplayComponent implements OnInit {
     this.store.dispatch(new MatchEnded(new Date()))
   }
 
-  public goToPlayerDetail(player: Player) {
-    this.dialog.open(PlayerDetailComponent, { 
-      data: player,
+  public goToTeamDetail(team: Team) {
+    this.dialog.open(TeamDetailComponent, { 
+      data: team,
       width: '100%',
       maxWidth: '90vw',
     })

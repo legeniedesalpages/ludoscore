@@ -29,8 +29,10 @@ import { PlayerSelectionComponent } from './player-selection.component';
 import { MatSelectModule } from '@angular/material/select';
 import { SwipeableModule } from '../../layout/swipeable/swipeable.module';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { PlayerDetailModule } from '../player-detail/player-detail.module';
-import { MatDialogModule } from '@angular/material/dialog';
+import { TeamDetailModule } from '../team-detail/team-detail.module';
+import { GameDetailModule } from '../game-detail/game-detail.module';
+import {  MatDialogModule } from '@angular/material/dialog';
+import { ConfirmationDialogModule } from '../../layout/dialogue/confirmation.module';
 
 const routes: Routes = [{ path: '', component: PlayerSelectionComponent, canActivate: [AuthGuardService] }];
 
@@ -53,7 +55,8 @@ const routes: Routes = [{ path: '', component: PlayerSelectionComponent, canActi
     MatSelectModule,
     SwipeableModule,
     ScrollingModule,
-    MatDialogModule
+    MatDialogModule,
+    ConfirmationDialogModule
   ]
 })
 export class PlayerSelectionModule { }

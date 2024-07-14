@@ -18,7 +18,7 @@ import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
 import { UserEntity } from 'src/app/core/entity/user-entity.model'
-import { COLORS } from 'src/app/core/model/color-tag.model'
+import { COLORS } from 'src/app/core/model/tag.model'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
 import { AuthStateModel } from 'src/app/core/state/auth/auth.model'
@@ -49,7 +49,7 @@ export class EditPlayerComponent implements OnInit {
       nom: new FormControl(''),
       couleur: new FormControl(''),
       user: new FormControl({value: '', disabled: true})
-    });
+    })
   }
 
   ngOnInit(): void {
@@ -93,10 +93,8 @@ export class EditPlayerComponent implements OnInit {
           })
         } else {
           this.isEditable = true
-          console.debug("On est en train de créer un joueur, on vérifie si l'utilisateur connecté a déjà été connecté à un joueur: ", loggedUserId)
           
           if (!this.users.find(user => user.id === loggedUserId)?.playerId) {
-            console.debug("L'utilisateur connecté n'a pas de joueur associé, on le prend: ", loggedUserId)
             this.playerEditorForm.get('user')?.setValue(loggedUserId)
           }
           
@@ -122,11 +120,8 @@ export class EditPlayerComponent implements OnInit {
         id: this.playerEditorForm.get('user')?.value,
         email: ''
       },
-      initials: '',
       gravatar: '',
-      score: undefined,
-      matchId: 0,
-      createdAt: new Date()
+      createdAt: undefined
     }
 
     if (this.creating) {

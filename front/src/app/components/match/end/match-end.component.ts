@@ -14,7 +14,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subscription, } from 'rxjs'
-import { Player } from 'src/app/core/model/player.model'
+import { Team } from 'src/app/core/model/match.model'
 import { MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
@@ -34,7 +34,7 @@ export class MatchEndComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription = this.matchState.subscribe(matchState => {
-      if (matchState.started == false) {
+      if (!matchState.match) {
         this.store.dispatch(new Navigate(['']))
       }
     })
@@ -44,12 +44,12 @@ export class MatchEndComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe()
   }
 
-  public selectWiningPlayer(player: Player) {
-    console.log("choose wining player", player)
+  public selectWiningTeam(team: Team) {
+    console.log("choose wining team", team)
   }
 
-  public setPlayerScore(player: Player) {
-    this.store.dispatch(new Navigate(['/player-score'], { "id": player.id }))
+  public setTeamScore(team: Team) {
+    this.store.dispatch(new Navigate(['/team-score'], { "id": team.id }))
   }
 
   public endMatch() {

@@ -10,18 +10,18 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { CrudService } from './abstract-crud.service';
-import { MatchEntity, MatchPlayerEntity } from '../../entity/match-entity.model';
-import { Observable, tap } from 'rxjs';
-import { PlayerEntity } from '../../entity/player-entity.model';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { CrudService } from './abstract-crud.service'
+import { MatchEntity, MatchTeamEntity, MatchTeamPlayerEntity } from '../../entity/match-entity.model'
+import { Observable, tap } from 'rxjs'
+import { Team } from '../../model/match.model'
 
 @Injectable({ providedIn: 'root' })
 export class MatchCrudService extends CrudService<MatchEntity, number> {
 
     constructor(protected override http: HttpClient) {
-        super(http, '/game-match');
+        super(http, '/game-match')
     }
 
     findRunningMatch(): Observable<MatchEntity> {
@@ -29,14 +29,14 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         return this.http.get<MatchEntity>(url).pipe(tap(res => console.debug("find running " + url + " => ", res)))
     }
 
-    getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchPlayerEntity> {
+    getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchTeamPlayerEntity> {
         var url = `${this.apiUrl}/previous-match/${playerId}/${gameId}`
-        return this.http.get<MatchPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
+        return this.http.get<MatchTeamPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
     }
 
-    updatePlayerScore(playerEntity: PlayerEntity): Observable<PlayerEntity> {
+    updateTeamScore(team: Team): Observable<MatchTeamEntity> {
         var url = `${this.apiUrl}/game-match/update-score`
-        return this.http.put<PlayerEntity>(url, playerEntity).pipe(tap(res => console.debug("update player score " + url + " => ", res)))
+        return this.http.put<MatchTeamEntity>(url, team).pipe(tap(res => console.debug("update player score " + url + " => ", res)))
     }
 
 }

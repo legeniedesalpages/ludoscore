@@ -1,6 +1,4 @@
-import { ChoosenTag } from "../../model/choosen-tag.model"
-import { Game } from "../../model/game.model"
-import { Player } from "../../model/player.model"
+import { MatchModel } from "../../model/match.model"
 
 /**
     * @description      : 
@@ -15,13 +13,5 @@ import { Player } from "../../model/player.model"
     * - Modification    : 
 **/
 export interface MatchStateModel {
-    matchId: number,
-    game: Game | undefined,
-    creating: boolean,
-    started: boolean,
-    startedAt: Date | undefined,
-    endedAt: Date | undefined,
-    players: Player[],
-    choosenTags: ChoosenTag[],
-    winnigPlayer: Player | undefined
+    match?: MatchModel
 }

@@ -41,27 +41,22 @@ export class GameSelectionComponent implements OnInit {
     this.loading = true
     this.searching = false
 
-    this.matchState.subscribe((matchState) => {
-      if (matchState.game != null) {
-        console.debug("Game already selected")
-        this.store.dispatch(new Navigate(['player-selection']))
-      } else {
-        console.debug("Game not selected, fetch game list")
-        this.gameList = this.gameService.listAllGames().pipe(tap(() => this.loading = false))
-      }
-    })
+    const matchState = this.store.selectSnapshot<MatchStateModel>(MatchState)
+    if (matchState.match) {
+      console.debug("Game already selected", matchState.match.game)
+      this.store.dispatch(new Navigate(['player-selection']))
+    } else {
+      console.debug("Game not selected, fetch game list")
+      this.gameList = this.gameService.listAllGames().pipe(tap(_ => this.loading = false))
+    }
   }
 
   public gameSelection(game: Game) {
     this.loading = true
-    this.store.dispatch(new CreateMatch(game)).subscribe((e) =>
-      {
-        console.debug("Tags du match", e.match.matchTags)
-        console.debug("Tags des joueurs", e.match.playerTags)
-        console.debug("Couleur des joueurs", e.match.playerColors)
-        this.store.dispatch(new Navigate(['player-selection']))
-      }
-    )
+    this.store.dispatch(new CreateMatch(game)).subscribe(_ => {
+      // TODO : ajouter ici le joueur correspondant à l'utilisateur connecté
+      this.store.dispatch(new Navigate(['player-selection']))
+    })
   }
 
   public cancelMatchCreation() {

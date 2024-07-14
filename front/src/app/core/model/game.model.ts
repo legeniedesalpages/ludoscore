@@ -1,5 +1,4 @@
-import { ColorTag } from "./color-tag.model";
-import { Tag } from "./tag.model";
+import { ColorTag, Tag } from "./tag.model"
 
 /**
     * @description      :
@@ -42,6 +41,11 @@ export interface GameDetail {
 }
 
 export interface DrawBreaker {
+    name: string
+    withValue: boolean
+}
+
+export interface CancelReason {
     name: string
     withValue: boolean
 }

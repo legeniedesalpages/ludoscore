@@ -58,7 +58,7 @@ export class HomeComponent implements OnInit {
         runningMatch: this.matchService.findRunningMatch()
       }).pipe(first()).subscribe(actions => {
         this.notAssociated = actions.user.playerId === null
-        console.log("player id of the user:", actions.user.playerId, this.notAssociated)
+        console.info("Player id of the user:", actions.user.playerId, this.notAssociated)
 
         if (actions.user.firstConnection) {
           this.dialog.open(WelcomeDialogComponent)
