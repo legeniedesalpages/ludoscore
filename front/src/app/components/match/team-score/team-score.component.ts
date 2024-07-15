@@ -41,12 +41,12 @@ export class TeamScoreComponent implements OnInit {
     activatedRoute.queryParams.pipe(first()).subscribe(params => {
       const teamId = params['id']
       const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
-
-      let team = teams.find(team => team.id == teamId)!
-      console.debug("Team found", team)
-      if (team.score != undefined) {
+      
+      this.team = teams.find(team => team.id == teamId)!
+      console.debug("Team found", this.team)
+      if (this.team.score != undefined) {
         this.teamScore.setValue({
-          score: team.score,
+          score: this.team.score,
         })
       }
     })

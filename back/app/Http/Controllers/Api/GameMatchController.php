@@ -20,8 +20,8 @@ class GameMatchController extends Controller
     }
 
     public function update(Request $request, $id)
-    {        
-        Log::info("Mise à jour du match d'id : " . $id);
+    {
+        Log::info("Update match id : " . $id);
         Log::debug($request);
 
         $gameMatch = GameMatch::find($id);
@@ -35,44 +35,66 @@ class GameMatchController extends Controller
 
     public function store(Request $request)
     {
-        Log::info("Enregistrement du match");
+        Log::info("Request");
         Log::debug($request);
-        
-        $gameMatch = new GameMatch();        
-        DB::transaction(function () use(&$gameMatch, $request) {
-            
-            $gameMatch->game_id = $request->game_id;
+        $match = $request->match;
+
+        Log::info("Match");
+        Log::debug($match);
+
+        $returnedteams = [];
+        $gameMatch = new GameMatch();
+        DB::transaction(function () use (&$gameMatch, $match, $request, $returnedteams) {
+
+            Log::debug("Game Id:" . $match['gameId']);
+            $gameMatch->game_id = $match['gameId'];
             $gameMatch->canceled = false;
             $gameMatch->running = true;
             $gameMatch->started_at = now();
-            $gameMatch->tags = $request->tags;
+            $gameMatch->tags = $match['tags'];
             $gameMatch->save();
 
-            $position = 0;
-            foreach ($request->players as $p) {
-                $player = (object)$p;
-                Log::debug("Ajout joueur " . print_r($p, true));
-                Log::debug("Ajout joueur " . print_r($player, true));
+
+            $position_equipe = 0;
+            foreach ($request->teams as $t) {
+                $team_request = (object)$t;
+                Log::debug("Add team " . print_r($team_request, true));
 
                 $team = new Team();
-                $team->position = $position;
+                $team->color = $team_request->color;
+                $team->tags = $team_request->tags;
+                $team->position = $position_equipe;
                 $team->match_id = $gameMatch->id;
-                $team->tags = $player->tags;
-                $team->color = $player->color;
+                $team->name = $team_request->name;
                 $team->save();
-                
-                $teamPlayer = new TeamPlayer();
-                $teamPlayer->position = 0;            
-                $teamPlayer->team_id = $team->id;
-                $teamPlayer->player_id = $player->id;
-                $teamPlayer->save();
 
-                $position++;
+
+                $returnPlayers = [];
+                $position_joueur = 0;
+                foreach ($team_request->players as $p) {
+
+                    $player = (object)$p;
+                    $teamPlayer = new TeamPlayer();
+                    $teamPlayer->position = $position_joueur;
+                    $teamPlayer->team_id = $team->id;
+                    $teamPlayer->player_id = $player->playerId;
+                    $teamPlayer->save();
+                    $position_joueur++;
+
+                    array_push($returnPlayers, $teamPlayer->id);
+                }
+                $position_equipe++;
+
+                array_push($returnedteams, [$team->id, $returnPlayers]);
+                Log::debug($returnedteams);
             }
+
+            $gameMatch->teams = $returnedteams;
         });
 
         $gameMatchId = $gameMatch->id;
-        Log::debug("Game match ID : " . $gameMatchId);
+        Log::debug("Newly created match id : " . $gameMatchId);
+        Log::debug($returnedteams);
         return $gameMatch;
     }
 
@@ -82,8 +104,9 @@ class GameMatchController extends Controller
         return GameMatch::where('running', true)->first();
     }
 
-    public function previousMatch($playerid, $gameid) {
-        Log::debug("Get previousMatch, player : ".$playerid." game : ".$gameid);
+    public function previousMatch($playerid, $gameid)
+    {
+        Log::debug("Get previousMatch, player : " . $playerid . " game : " . $gameid);
         return DB::table('teams')
             ->join('matches', 'matches.id', '=', 'teams.match_id')
             ->where('matches.game_id', $gameid)
@@ -100,11 +123,12 @@ class GameMatchController extends Controller
         return GameMatch::find($id);
     }
 
-    public function updatePlayerScore(Request $request) {       
-        $id = $request->id; 
-        Log::info("Mise à jour du joueur d'id : " . $id. " et de macthId : " . $request->match_id);
+    public function updatePlayerScore(Request $request)
+    {
+        $id = $request->id;
+        Log::info("Mise à jour du joueur d'id : " . $id . " et de macthId : " . $request->match_id);
         Log::debug($request);
-        
+
         $matchId = $request->match_id;
 
         DB::table('teams')
@@ -116,11 +140,12 @@ class GameMatchController extends Controller
         return Player::find($id);
     }
 
-    public function updatePlayerMatch(Request $request) {       
-        $id = $request->id; 
-        Log::info("Mise à jour du joueur d'id : " . $id. " et de macthId : " . $request->match_id);
+    public function updatePlayerMatch(Request $request)
+    {
+        $id = $request->id;
+        Log::info("Mise à jour du joueur d'id : " . $id . " et de macthId : " . $request->match_id);
         Log::debug($request);
-        
+
         $matchId = $request->match_id;
 
         DB::table('teams')

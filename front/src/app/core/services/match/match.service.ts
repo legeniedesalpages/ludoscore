@@ -11,9 +11,9 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core'
-import { Observable, forkJoin, mergeMap,  tap } from 'rxjs'
+import { Observable, forkJoin, mergeMap } from 'rxjs'
 import { MatchCrudService } from '../crud/match-crud.service'
-import { MatchEntity, MatchTeamPlayerEntity } from '../../entity/match-entity.model'
+import { MatchEntity } from '../../entity/match-entity.model'
 import { MatchModel } from '../../model/match.model'
 
 @Injectable({ providedIn: 'root' })
@@ -23,22 +23,27 @@ export class MatchService {
     }
 
     public findRunningMatch(): Observable<MatchEntity> {
-        return this.matchCrudService.findRunningMatch().pipe(tap(console.log))
+        return this.matchCrudService.findRunningMatch()
     }
 
-    public createMatch(match: MatchModel): Observable<MatchEntity> {
-        const matchEntity: MatchEntity = {
-            gameId: match.game.id,
-            startedAt: undefined,
-            finishedAt: undefined,
-            canceled: false,
-            running: true,
-            winnerTeamId: undefined,
-            drawBreaker: undefined,
-            cancelReason: undefined,
-            tags: JSON.stringify(match.choosenTags)
+    public createMatch(matchModel: MatchModel): Observable<MatchEntity> {
+        const aggregatedMatchEntity = { 
+            match: {
+                gameId: matchModel.game.id,
+                canceled: false,
+                running: true,
+                tags: JSON.stringify(matchModel.choosenTags)
+            }, 
+            teams: matchModel.teams.map(team => ({ 
+                color: team.color.name,
+                tags: JSON.stringify(team.choosenTags),
+                name: team.name,
+                players: team.teamPlayers.map(teamPlayer => ({ 
+                    playerId: teamPlayer.player.id
+                }))
+            }))
         }
-        return this.matchCrudService.save(matchEntity)
+        return this.matchCrudService.save(aggregatedMatchEntity as unknown as MatchEntity)
     }
 
     public cancelMatch(matchId: number, endedAt: Date): Observable<MatchEntity> {

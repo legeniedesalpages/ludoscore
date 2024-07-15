@@ -14,28 +14,28 @@
 export interface MatchEntity {
     id?: number
     gameId: number
-    startedAt: Date | undefined
-    finishedAt: Date | undefined
+    startedAt?: Date
+    finishedAt?: Date
     canceled: boolean
     running: boolean
     tags: string
-    winnerTeamId: number | undefined
-    drawBreaker: string | undefined
-    cancelReason: string | undefined
+    winnerTeamId?: number
+    drawBreaker?: string
+    cancelReason?: string
 }
 
 export interface MatchTeamEntity {
-    id: number
+    id?: number
     tags: string
     color: string
     score?: number,
     matchId: number,
-    scoreDetails: string | undefined
+    scoreDetails?: string
 }
 
 export interface MatchTeamPlayerEntity {
-    id: number
-    position: number
-    teamId: number
+    id?: number
+    position?: number
+    teamId?: number
     playerId: number
 }

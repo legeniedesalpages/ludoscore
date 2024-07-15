@@ -60,7 +60,7 @@ export class MatchEndComponent implements OnInit, OnDestroy {
     this.store.dispatch(new MatchAborted())
   }
 
-  public returnToGame() {
-    this.store.dispatch(new Navigate(['/match-display']))
+  public returnToHome() {
+    this.store.dispatch(new Navigate(['/']))
   }
 }

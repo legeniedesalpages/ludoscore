@@ -16,7 +16,8 @@ import { Injectable } from '@angular/core'
 import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { tap } from 'rxjs/operators'
-import { ChoosenTag, MatchModel, Team } from "../../model/match.model"
+import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
+import { MatchEntity } from "../../entity/match-entity.model"
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 
@@ -93,10 +94,38 @@ export class MatchState {
 
         console.info("Launch match")
         return this.matchService.createMatch(getState().match!).pipe(tap(matchEntity => {
+
+            let value: any = matchEntity["teams" as keyof MatchEntity];
+
+            const newTeams: Team[] = []
+            const teams = getState().match!.teams
+            for (let i = 0; i < teams.length; i++) {
+
+                const newTeamPlayers: TeamPlayer[] = []
+                const teamPlayer = teams[i].teamPlayers
+                for (let j = 0; j < teamPlayer.length; j++) {
+
+                    newTeamPlayers.push({
+                        ...teamPlayer[j],
+                        id: value[i][1][j]
+                    })
+                }
+
+                newTeams.push({
+                    ...teams[i],
+                    id: value[i][0],
+                    teamPlayers: newTeamPlayers
+                })
+            }
+
             setState({
                 match: {
                     ...getState().match!,
                     matchId: matchEntity.id,
+                    started: true,
+                    creating: false,
+                    startedAt: matchEntity.startedAt,
+                    teams: newTeams
                 }
             })
         }))
@@ -120,7 +149,8 @@ export class MatchState {
         setState({
             match: {
                 ...getState().match!,
-                endedAt: matchEnded.endDate
+                endedAt: matchEnded.endDate,
+                started: false
             }
         })
     }
@@ -166,7 +196,7 @@ export class MatchState {
             })
         }
     }
-    
+
     @Action(RemoveGameTags)
     removeGameTags({ setState, getState }: StateContext<MatchStateModel>, removeGameTags: RemoveGameTags) {
 
@@ -320,7 +350,7 @@ export class MatchState {
         }
 
         let modifiedChoosenTags = this.up(updateTeamTags.team.choosenTags, updateTeamTags.tagsToAdd, updateTeamTags.tagsToRemove)
-       
+
         const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
             if (team != updateTeamTags.team) {
                 return team
@@ -351,7 +381,7 @@ export class MatchState {
     }
 
     private up(modifiedChoosenTags: ChoosenTag[], tagsToAdd: [category: string, name: string, index: number][], tagsToRemove: [category: string, index: number][]): ChoosenTag[] {
-        
+
         tagsToAdd.forEach(tag => {
             const category = tag[0]
             const choosenCategoryTagName = modifiedChoosenTags.find(tags => tags.category == category)?.names
@@ -366,7 +396,7 @@ export class MatchState {
                 const choosenCategoryTagName = names.map(name => name)
                 choosenCategoryTagName?.splice(tag[1], 1, undefined!)
                 modifiedChoosenTags = Object.assign([], modifiedChoosenTags.filter(tags => tags.category != category))
-                if (choosenCategoryTagName.find(name => name != undefined)) {                    
+                if (choosenCategoryTagName.find(name => name != undefined)) {
                     modifiedChoosenTags.push({ category: category, names: choosenCategoryTagName })
                 }
             }

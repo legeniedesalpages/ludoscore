@@ -178,13 +178,25 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public launchMatch() {
     this.saving = true
-    this.store.dispatch(new LaunchMatch()).subscribe(() => {
-      this.store.dispatch(new Navigate(['/match-display']))
-      this.snackBar.open("Partie créée", 'Fermer', {
-        duration: 5000
-      })
+    this.store.dispatch(new LaunchMatch()).subscribe({
+
+      next: _ => {
+        this.store.dispatch(new Navigate(['/match-display']))
+        this.saving = false
+        this.snackBar.open("Partie créée", 'Fermer', {
+          duration: 5000
+        })
+      },
+
+      error: (error) => {
+        this.snackBar.open("Erreur lors de la création du match:" + error, 'Fermer', {
+          duration: 15000
+        })
+        this.saving = false
+      }
     })
   }
+
 
   public showRandomToolbox() {
     this.store.dispatch(new Navigate(['/random-toolbox']))

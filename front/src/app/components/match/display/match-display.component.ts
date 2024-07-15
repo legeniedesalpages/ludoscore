@@ -10,11 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
-import { Observable } from 'rxjs'
+import { first, Observable } from 'rxjs'
 import { MatchEnded } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
@@ -25,22 +25,26 @@ import { MatchModel, Team } from 'src/app/core/model/match.model'
   templateUrl: './match-display.component.html',
   styleUrls: ['./match-display.component.css'],
 })
-export class MatchDisplayComponent implements OnInit {
+export class MatchDisplayComponent implements OnInit, OnDestroy {
 
   @Select(MatchState) matchState!: Observable<MatchStateModel>
 
   public elapsedTime: String
+  public timer!: NodeJS.Timer
 
   constructor(private store: Store, private actions: Actions, private dialog: MatDialog) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
     this.dialog.closeAll()
   }
+  ngOnDestroy(): void {
+    clearInterval(this.timer)
+  }
 
   ngOnInit(): void {
 
-    this.actions.pipe(ofActionSuccessful(MatchEnded)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
+    this.actions.pipe(ofActionSuccessful(MatchEnded)).pipe(first()).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
 
-    setInterval(() => {
+    this.timer = setInterval(() => {
       const startDate = this.store.selectSnapshot<MatchModel>(MatchState.match).startedAt
       if (startDate) {
         let t = new Date().getTime() - new Date(startDate).getTime()
@@ -59,11 +63,10 @@ export class MatchDisplayComponent implements OnInit {
   public goToTeamDetail(team: Team) {
     this.dialog.open(TeamDetailComponent, { 
       data: team,
-      width: '100%',
-      maxWidth: '90vw',
+      width: '90%',
+      maxWidth: '100%'
     })
   }
-
 
   public returnToHome() {
     this.store.dispatch(new Navigate(['/']))
