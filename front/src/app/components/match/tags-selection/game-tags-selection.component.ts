@@ -10,9 +10,9 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core'
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { Select, Store } from '@ngxs/store'
-import { Observable, Subject } from 'rxjs'
+import { Observable, Subject, Subscription } from 'rxjs'
 import { ChoosenTag, MatchModel } from 'src/app/core/model/match.model'
 import { Tag } from 'src/app/core/model/tag.model'
 import { AddGameTags, RemoveGameTags } from 'src/app/core/state/match/match.action'
@@ -23,11 +23,13 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   templateUrl: './tags-selection.component.html',
   styleUrls: ['./tags-selection.component.css'],
 })
-export class GameTagsSelectionComponent implements OnInit {
+export class GameTagsSelectionComponent implements OnInit, OnDestroy {
 
   @Select(MatchState.match) match!: Observable<MatchModel>
+  private randomizeSubscription! : Subscription
 
   @Input() saving!: Subject<boolean>;
+  @Input() randomize!: Subject<boolean>;
 
   public tags: Tag[]
   public choosenTags: ChoosenTag[] = []
@@ -49,6 +51,18 @@ export class GameTagsSelectionComponent implements OnInit {
     this.saving.subscribe(_ => {
        this.store.dispatch(this.actions) 
     })
+
+    if (this.randomize) {
+      this.randomizeSubscription = this.randomize.subscribe(_ => {
+        this.randomizeAllTags()
+      })
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.randomizeSubscription) {
+      this.randomizeSubscription.unsubscribe()
+    }
   }
 
 
@@ -101,5 +115,13 @@ export class GameTagsSelectionComponent implements OnInit {
     if (name != undefined) {
       this.selectTag(name, teamTag.category, index)
     }
+  }
+
+  public randomizeAllTags() {
+    this.tags.forEach(tag => {
+      for (let i = 0; i < tag.maxOcurrences; i++) {
+        this.randomizeTag(tag, i)
+      }
+    })
   }
 }

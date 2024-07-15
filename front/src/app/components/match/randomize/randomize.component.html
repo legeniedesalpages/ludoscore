@@ -15,7 +15,7 @@
             <h2>
                 <span class="text-header">Categories du match</span>
                 <span class="button-header">
-                    <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllMatchTag()">
+                    <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllMatchTagObservable.next(true)">
                         <div>
                             <span class="text-all-random">Tout au hasard</span>
                             <span class="icon-all-random">
@@ -32,7 +32,7 @@
                 </span>
             </h2>
             <div class="list-tag-container">
-                <game-tags-selection [saving]="saving" />
+                <game-tags-selection [saving]="saving" [randomize]="randomizeAllMatchTagObservable"/>
             </div>
         </div>
 

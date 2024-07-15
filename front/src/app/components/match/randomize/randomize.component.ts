@@ -28,6 +28,7 @@ export class RandomizeComponent {
 
   public saving: Subject<boolean> = new Subject();
   public randomizeAllTeamTagObservable: Subject<boolean> = new Subject();
+  public randomizeAllMatchTagObservable: Subject<boolean> = new Subject();
   public teamChoosenTags: ChoosenTag[][];
 
   constructor(private store: Store) {
@@ -42,9 +43,5 @@ export class RandomizeComponent {
   public save() {
     this.saving.next(true)
     this.store.dispatch(new Navigate(['/player-selection']))
-  }
-
-  public randomizeAllMatchTag() {
-
   }
 }
