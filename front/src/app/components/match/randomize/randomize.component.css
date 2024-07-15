@@ -26,6 +26,19 @@ svg {
 
 h2 {
   font-size: medium;
+  background-color: lightgrey;
+  padding:5px;
+  margin: 0px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+h3 {
+  background-color: rgb(234, 234, 234);
+  padding: 5px;
+  margin: 0;
+  text-align: center;
 }
 
 hr {
@@ -50,9 +63,15 @@ hr {
 }
 
 .validate-div {
-  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .validate-button {
-  width: 100%;  
+  width: 80%;
+}
+
+.list-tag-container {
+  padding: 10px;
 }

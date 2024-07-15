@@ -11,18 +11,15 @@
     * - Modification    : 
 **/
 export interface PlayerEntity {
-    id: number,
-    pseudo: string,
-    lastName: string,
-    firstName: string,
-    initials: string,
-    preferedColor: string,
-    gravatar: string,
-    score: number | undefined,
-    matchId: number,
-    createdAt: Date,
+    id: number
+    pseudo: string
+    lastName: string
+    firstName: string
+    preferedColor: string
+    gravatar: string
+    createdAt: Date | undefined
     user: {
-        email: string,
+        email: string
         id: number
     }
 }

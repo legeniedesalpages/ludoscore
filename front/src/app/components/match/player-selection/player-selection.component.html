@@ -8,19 +8,22 @@
 
     <ng-container role="footer">
         <div class="footer row">
-            <button mat-mini-fab [disabled]="!canContinue" [hidden]="saving" color="primary" class="lead" (click)="showRandomToolbox()">
+            <button mat-mini-fab [hidden]="saving" color="primary" class="lead"
+                (click)="showRandomToolbox()">
                 <svg viewBox="0 0 512 512">
                     <g transform="translate(0,0)">
-                      <path 
-                        d="M255.76 44.764c-6.176 0-12.353 1.384-17.137 4.152L85.87 137.276c-9.57 5.536-9.57 14.29 0 19.826l152.753 88.36c9.57 5.536 24.703 5.536 34.272 0l152.753-88.36c9.57-5.535 9.57-14.29 0-19.825l-152.753-88.36c-4.785-2.77-10.96-4.153-17.135-4.153zm.926 82.855a31.953 18.96 0 0 1 22.127 32.362 31.953 18.96 0 1 1-45.188-26.812 31.953 18.96 0 0 1 23.06-5.55zM75.67 173.84c-5.753-.155-9.664 4.336-9.664 12.28v157.696c0 11.052 7.57 24.163 17.14 29.69l146.93 84.848c9.57 5.526 17.14 1.156 17.14-9.895V290.76c0-11.052-7.57-24.16-17.14-29.688l-146.93-84.847c-2.69-1.555-5.225-2.327-7.476-2.387zm360.773.002c-2.25.06-4.783.83-7.474 2.385l-146.935 84.847c-9.57 5.527-17.14 18.638-17.14 29.69v157.7c0 11.05 7.57 15.418 17.14 9.89L428.97 373.51c9.57-5.527 17.137-18.636 17.137-29.688v-157.7c0-7.942-3.91-12.432-9.664-12.278zM89.297 195.77a31.236 18.008 58.094 0 1 33.818 41.183 31.236 18.008 58.094 1 1-45-25.98 31.236 18.008 58.094 0 1 11.182-15.203zm221.52 64.664A18.008 31.236 31.906 0 1 322 275.637a18.008 31.236 31.906 0 1-45 25.98 18.008 31.236 31.906 0 1 33.818-41.183zM145.296 289.1a31.236 18.008 58.094 0 1 33.818 41.183 31.236 18.008 58.094 0 1-45-25.98 31.236 18.008 58.094 0 1 11.182-15.203zm277.523 29.38A18.008 31.236 31.906 0 1 434 333.684a18.008 31.236 31.906 0 1-45 25.98 18.008 31.236 31.906 0 1 33.818-41.184zm-221.52 64.663a31.236 18.008 58.094 0 1 33.817 41.183 31.236 18.008 58.094 1 1-45-25.98 31.236 18.008 58.094 0 1 11.182-15.203z">
-                      </path>
+                        <path
+                            d="M255.76 44.764c-6.176 0-12.353 1.384-17.137 4.152L85.87 137.276c-9.57 5.536-9.57 14.29 0 19.826l152.753 88.36c9.57 5.536 24.703 5.536 34.272 0l152.753-88.36c9.57-5.535 9.57-14.29 0-19.825l-152.753-88.36c-4.785-2.77-10.96-4.153-17.135-4.153zm.926 82.855a31.953 18.96 0 0 1 22.127 32.362 31.953 18.96 0 1 1-45.188-26.812 31.953 18.96 0 0 1 23.06-5.55zM75.67 173.84c-5.753-.155-9.664 4.336-9.664 12.28v157.696c0 11.052 7.57 24.163 17.14 29.69l146.93 84.848c9.57 5.526 17.14 1.156 17.14-9.895V290.76c0-11.052-7.57-24.16-17.14-29.688l-146.93-84.847c-2.69-1.555-5.225-2.327-7.476-2.387zm360.773.002c-2.25.06-4.783.83-7.474 2.385l-146.935 84.847c-9.57 5.527-17.14 18.638-17.14 29.69v157.7c0 11.05 7.57 15.418 17.14 9.89L428.97 373.51c9.57-5.527 17.137-18.636 17.137-29.688v-157.7c0-7.942-3.91-12.432-9.664-12.278zM89.297 195.77a31.236 18.008 58.094 0 1 33.818 41.183 31.236 18.008 58.094 1 1-45-25.98 31.236 18.008 58.094 0 1 11.182-15.203zm221.52 64.664A18.008 31.236 31.906 0 1 322 275.637a18.008 31.236 31.906 0 1-45 25.98 18.008 31.236 31.906 0 1 33.818-41.183zM145.296 289.1a31.236 18.008 58.094 0 1 33.818 41.183 31.236 18.008 58.094 0 1-45-25.98 31.236 18.008 58.094 0 1 11.182-15.203zm277.523 29.38A18.008 31.236 31.906 0 1 434 333.684a18.008 31.236 31.906 0 1-45 25.98 18.008 31.236 31.906 0 1 33.818-41.184zm-221.52 64.663a31.236 18.008 58.094 0 1 33.817 41.183 31.236 18.008 58.094 1 1-45-25.98 31.236 18.008 58.094 0 1 11.182-15.203z">
+                        </path>
                     </g>
-                  </svg>
+                </svg>
             </button>
-            <button mat-mini-fab [disabled]="lessThan2Players" [hidden]="saving" color="primary" class="lead2" (click)="showWheel()">
+            <button mat-mini-fab [disabled]="lessThan2Teams" [hidden]="saving" color="primary" class="lead2"
+                (click)="showWheel()">
                 <mat-icon>group</mat-icon>
             </button>
-            <button mat-flat-button [disabled]="!canContinue" [hidden]="saving" color="primary" (click)="launchMatch()" class="end">
+            <button mat-flat-button [disabled]="!canContinue" [hidden]="saving" color="primary" (click)="launchMatch()"
+                class="end">
                 Lancer la partie
             </button>
             <loading-spinner [loading]="saving" caption="Lancement de la partie..."></loading-spinner>
@@ -32,18 +35,15 @@
 
         <div *ngIf="!loading">
 
-            <div class="headline">
-                <span class="choice">{{ (matchState | async)?.game?.title }}</span>
-                <span class="menu-spacer"></span>
-                <!--<button mat-icon-button>
-                   <mat-icon>edit</mat-icon>
-                </button>-->
+            <div class="headline" (click)="goToGameDetail()">
+                <span class="choice">{{ (matchState | async)!.game.title }}<mat-icon *ngIf="(matchState | async)!.game.matchTags.length > 0"
+                        class="edit-game-icon">edit</mat-icon></span>
             </div>
 
-            <div class="game-category">
+            <div class="game-category" (click)="goToGameDetail()">
                 <ul>
-                    <li *ngFor="let matchCategory of (matchState | async)?.choosenTags; let i = index">
-                        {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
+                    <li *ngFor="let matchCategory of categoryOrder((matchState | async)!.choosenTags)">
+                        {{matchCategory.category}}: <span class="value">{{ formatTagName(matchCategory.names)}}</span>
                     </li>
                 </ul>
             </div>
@@ -55,7 +55,8 @@
                     <div class="column">
                         <mat-form-field appearance="fill">
                             <mat-label>Ajouter un joueur</mat-label>
-                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector [disabled]="!canAddPlayer || saving">
+                            <mat-select (selectionChange)="selectPlayer($event.value)" #playerSelector
+                                [disabled]="!canAddTeam || saving">
                                 <!--<mat-option value="search"><mat-icon>search</mat-icon>Chercher un joueur...</mat-option>
                                 <mat-option value="team"><mat-icon>groups</mat-icon>Créer un groupe...</mat-option>
                                 <mat-divider></mat-divider>-->
@@ -73,50 +74,57 @@
 
             <div>
                 <div class="background-player background-player-minimum"
-                    [ngStyle]="{'height': ((matchState | async)?.game?.minPlayers! * 65) + 'px'}">
-                    {{(matchState | async)?.game?.minPlayers!}} joueur{{(matchState | async)?.game?.minPlayers! > 1 ? 's' : ''}} minimum
+                    [ngStyle]="{'height': ((matchState | async)!.game.minPlayers! * 65) + 'px'}">
+                    {{(matchState | async)!.game.minPlayers!}} joueur{{(matchState | async)!.game.minPlayers! > 1 ? 's'
+                    : ''}} minimum
                 </div>
-                <div class="background-player background-player-maximum" *ngIf="(matchState | async)?.game?.maxPlayers! > (matchState | async)?.game?.minPlayers!"
-                    [ngStyle]="{'height': (((matchState | async)?.game?.maxPlayers! - (matchState | async)?.game?.minPlayers!) * 65) + 'px'}">
-                    {{(matchState | async)?.game?.maxPlayers!}} joueurs maximum
+                <div class="background-player background-player-maximum"
+                    *ngIf="(matchState | async)!.game?.maxPlayers! > (matchState | async)!.game?.minPlayers!"
+                    [ngStyle]="{'height': (((matchState | async)!.game.maxPlayers! - (matchState | async)!.game.minPlayers!) * 65) + 'px'}">
+                    {{(matchState | async)!.game.maxPlayers!}} joueurs maximum
                 </div>
             </div>
 
-            <div class="player-container" [ngStyle]="{'margin-top': (((matchState | async)?.game?.maxPlayers!) * -65) + 'px'}"
+            <div class="player-container"
+                [ngStyle]="{'margin-top': (((matchState | async)!.game.maxPlayers!) * -65) + 'px'}"
                 style="position: relative">
-                <div *ngFor="let player of (matchState | async)?.players!; let i = index" (click)="goToPlayerDetail(player)">
+                <div *ngFor="let team of (matchState | async)!.teams; let i = index">
                     <div class="row">
                         <div class="column">
                             <swipeable-element
                                 [rightWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
+                                QD
                                 [leftWipeStyle]='{backgroundColor: "lightcoral", icon: "delete_outline", text: "Supprimer"}'
-                                (rightSwipeEvent)="deleteAction(player)" (leftSwipeEvent)="deleteAction(player)">
-                                <div class="player">
+                                (rightSwipeEvent)="deleteAction(team)" (leftSwipeEvent)="deleteAction(team)">
+                                <div class="team" (click)="goToTeamDetail(team)">
                                     <div class="avatar">
-                                        <img src="https://www.gravatar.com/avatar/{{player.avatar}}?d=identicon&r=pg">
+                                        <img src="{{team.teamPlayers[0].player.gravatarUrl}}">
                                     </div>
-                                    <div class="line">
-                                        <div class="pseudo">
-                                            {{player.name}}
-                                            <div class="color">
-                                                <span [hidden]="player.color.name == 'Aucune'">
-                                                    <span class="dot" [ngStyle]="{'background-color': player.color.code, 'color': player.color.invert}"></span>
-                                                </span>
-                                                <button mat-icon-button [hidden]="isDownwardArrowHidden(i)" (click)="swapPlayerPosition(i, i+1, true)">
-                                                    <mat-icon>arrow_downward</mat-icon>
-                                                </button>
-                                                <button mat-icon-button [hidden]="! isDownwardArrowHidden(i)" (click)="swapPlayerPosition(i, i-1, false)">
-                                                    <mat-icon>arrow_upward</mat-icon>
-                                                </button>
-                                            </div>
-                                        </div>
+                                    <div class="detail">
+                                        <div class="pseudo">{{team.name}}</div>
                                         <div class="tags">
-                                            <ul *ngFor="let tag of player.choosenTags">
-                                                <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
+                                            <ul *ngFor="let tag of categoryOrder(team.choosenTags); let i = index">
+                                                <li *ngIf="i < 3">{{tag.category}}: <span class="tag-value">{{
+                                                        formatTagName(tag.names) }}</span></li>
                                             </ul>
                                         </div>
-                                        
                                     </div>
+                                </div>
+                                <div class="color">
+                                    <span [hidden]="team.color.name == 'Aucune'">
+                                        <span class="dot"
+                                            [ngStyle]="{'background-color': team.color.code, 'color': team.color.invert}"></span>
+                                    </span>
+                                </div>
+                                <div class="order">
+                                    <button mat-icon-button [hidden]="isDownwardArrowHidden(i)"
+                                        (click)="swapTeamPosition(i, i+1, true)">
+                                        <mat-icon>arrow_downward</mat-icon>
+                                    </button>
+                                    <button mat-icon-button [hidden]="! isDownwardArrowHidden(i)"
+                                        (click)="swapTeamPosition(i, i-1, false)">
+                                        <mat-icon>arrow_upward</mat-icon>
+                                    </button>
                                 </div>
                             </swipeable-element>
                         </div>

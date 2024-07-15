@@ -13,32 +13,24 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddPlayer, AddScoreToPlayer, AddTagToMatch, AddTagToPlayer, CancelMatchCreation, ChangeFirstPlayer, ChangePlayerColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemovePlayer, SaveMatchResult, SwapPlayerPosition } from "./match.action"
-import { Player } from "../../model/player.model"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { tap } from 'rxjs/operators'
-import { ChoosenTag } from "../../model/choosen-tag.model"
-import { ColorTag } from "../../model/color-tag.model"
+import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
+import { MatchEntity } from "../../entity/match-entity.model"
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 
 export enum MatchStateEnum {
     CREATING,
     STARTED,
-    FINISHED
+    FINISHED,
+    NONE
 }
 
 const defaultMatchModel = {
-    matchId: 0,
-    game: undefined,
-    creating: false,
-    started: false,
-    startedAt: undefined,
-    endedAt: undefined,
-    players: [],
-    choosenTags: [],
-    winnigPlayer: undefined,
-};
+    match: undefined
+}
 
 @State<MatchStateModel>({
     name: MATCH_STATE_TOKEN,
@@ -48,255 +40,125 @@ const defaultMatchModel = {
 export class MatchState {
 
     @Selector()
-    static players(state: MatchStateModel): Player[] {
-        return state.players
+    static match(state: MatchStateModel): MatchModel {
+        return state.match!
     }
 
     @Selector()
-    static matchTags(state: MatchStateModel): ChoosenTag[] {
-        return state.choosenTags
+    static teams(state: MatchStateModel): Team[] {
+        return state.match?.teams!
     }
 
     @Selector()
     static state(state: MatchStateModel): MatchStateEnum {
-        return state.creating ? MatchStateEnum.CREATING : state.started ? MatchStateEnum.STARTED : MatchStateEnum.FINISHED
+        if (state.match === undefined) {
+            return MatchStateEnum.NONE
+        }
+        return state.match.creating ? MatchStateEnum.CREATING : state.match.started ? MatchStateEnum.STARTED : MatchStateEnum.FINISHED
     }
 
     constructor(private matchService: MatchService) { }
 
+    /* MATCH */
+
     @Action(CreateMatch)
-    createMatch({ setState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
+    createMatch({ setState, getState }: StateContext<MatchStateModel>, createMatch: CreateMatch) {
+
+        if (getState().match !== undefined) {
+            console.error("A match was already created, can't create a new match")
+            return
+        }
+
+        console.info("Create match")
         setState({
-            matchId: 0,
-            game: createMatch.game,
-            creating: true,
-            started: false,
-            startedAt: undefined,
-            endedAt: undefined,
-            players: [],
-            choosenTags: [],
-            winnigPlayer: undefined
+            match: {
+                game: createMatch.game,
+                teams: [],
+                started: false,
+                creating: true,
+                choosenTags: [],
+            }
         })
     }
 
     @Action(LaunchMatch)
-    launchMatch({ patchState, getState }: StateContext<MatchStateModel>) {
-        return this.matchService.createMatch(getState().game?.id!, getState().players, getState().choosenTags).pipe(tap((entity) =>
-            patchState({
-                matchId: entity.id,
-                creating: false,
-                started: true,
-                startedAt: entity.startedAt
-            })))
+    launchMatch({ setState, getState }: StateContext<MatchStateModel>) {
+
+        // TODO : check if all teams have players
+        // TODO : check if match exists
+        // TODO : check if match is not already started
+        // TODO : check if match is not already ended
+        // TODO : check if match is not already canceled
+        // TODO : check if match has at least the minimum number of teams
+        // TODO : check if match has not more teams than the maximum number of teams
+
+        console.info("Launch match")
+        return this.matchService.createMatch(getState().match!).pipe(tap(matchEntity => {
+
+            let value: any = matchEntity["teams" as keyof MatchEntity];
+
+            const newTeams: Team[] = []
+            const teams = getState().match!.teams
+            for (let i = 0; i < teams.length; i++) {
+
+                const newTeamPlayers: TeamPlayer[] = []
+                const teamPlayer = teams[i].teamPlayers
+                for (let j = 0; j < teamPlayer.length; j++) {
+
+                    newTeamPlayers.push({
+                        ...teamPlayer[j],
+                        id: value[i][1][j]
+                    })
+                }
+
+                newTeams.push({
+                    ...teams[i],
+                    id: value[i][0],
+                    teamPlayers: newTeamPlayers
+                })
+            }
+
+            setState({
+                match: {
+                    ...getState().match!,
+                    matchId: matchEntity.id,
+                    started: true,
+                    creating: false,
+                    startedAt: matchEntity.startedAt,
+                    teams: newTeams
+                }
+            })
+        }))
     }
 
     @Action(CancelMatchCreation)
-    cancelMatchCreation({ setState }: StateContext<MatchStateModel>) {
+    cancelMatchCreation({ getState, setState }: StateContext<MatchStateModel>) {
+
+        if (getState().match === undefined) {
+            console.warn("No match to cancel")
+            return
+        }
+
+        console.info("Cancel match creation")
         setState(defaultMatchModel)
-    }
-
-    @Action(AddPlayer)
-    addPlayer({ setState, getState }: StateContext<MatchStateModel>, addedPlayer: AddPlayer) {
-
-        if (getState().players.find(p => p.id === addedPlayer.playerId)) {
-            console.warn("Player already added")
-            return
-        }
-
-        const newPlayerList = Object.assign([], getState().players)
-        newPlayerList.push({
-            id: addedPlayer.playerId,
-            avatar: addedPlayer.avatar,
-            name: addedPlayer.playerName,
-            choosenTags: [],
-            color: addedPlayer.color,
-            score: undefined
-        })
-        setState({
-            ...getState(),
-            players: newPlayerList
-        })
-    }
-
-    @Action(ChangeFirstPlayer)
-    changeFirstPlayer({ setState, getState }: StateContext<MatchStateModel>, firstPlayer: ChangeFirstPlayer) {
-        console.info("Player order change")
-        let newOrderPlayers: Player[] = []
-        newOrderPlayers.push(firstPlayer.player)
-        getState().players.forEach(player => {
-            if (player.id != firstPlayer.player.id) {
-                newOrderPlayers.push(player)
-            }
-        })
-        setState({
-            ...getState(),
-            players: newOrderPlayers
-        })
-    }
-
-    @Action(ChangePlayerColor)
-    changePlayerColor({ setState, getState }: StateContext<MatchStateModel>, playerWithColorToChange: ChangePlayerColor) {
-
-        const oldColor: ColorTag = getState().players.find(p => p.id == playerWithColorToChange.playerId)!.color
-
-        const modifiedPlayerList: Player[] = getState().players.map(player => {
-            let pp : Player = player
-            if (player.id == playerWithColorToChange.playerId) {
-                pp = { ...player, color: playerWithColorToChange.color }
-            }
-            if (player.id != playerWithColorToChange.playerId && player.color.name == playerWithColorToChange.color.name) {
-                pp = { ...player, color: oldColor }
-            }
-            return pp
-        })
-
-        setState({
-            ...getState(),
-            players: modifiedPlayerList
-        })
-    }
-
-    @Action(SwapPlayerPosition)
-    swapPlayerPosition({ setState, getState }: StateContext<MatchStateModel>, playersToSwap: SwapPlayerPosition) {
-        console.info("Player order swap")
-        let newOrderPlayers: Player[] = []
-        
-        getState().players.forEach(player => {
-            if (player.id == playersToSwap.firstPlayer.id) {
-                newOrderPlayers.push(playersToSwap.secondPlayer)
-            } else if (player.id == playersToSwap.secondPlayer.id) {
-                newOrderPlayers.push(playersToSwap.firstPlayer)
-            } else {
-                newOrderPlayers.push(player)
-            }
-        })
-        setState({
-            ...getState(),
-            players: newOrderPlayers
-        })
-    }
-
-    @Action(RemovePlayer)
-    removePlayer({ setState, getState }: StateContext<MatchStateModel>, removedPlayer: RemovePlayer) {
-        setState({
-            ...getState(),
-            players: getState().players.filter(p => p.id !== removedPlayer.playerId)
-        })
-    }
-
-    @Action(AddTagToPlayer)
-    addTagToPlayer({ setState, getState }: StateContext<MatchStateModel>, tagAddedToPlayer: AddTagToPlayer) {
-
-        console.log("Ajout d'un tag de joueur: ", tagAddedToPlayer.playerId, tagAddedToPlayer.category, tagAddedToPlayer.name, tagAddedToPlayer.index)
-
-        const player: Player | undefined = getState().players.find(p => p.id === tagAddedToPlayer.playerId)
-        if (player === undefined) {
-            console.warn("Cannot add tag to player because player is undefined")
-            return
-        }
-
-        const categoryTag = player.choosenTags.filter(tags => tags.category == tagAddedToPlayer.category)[0]
-        const length = getState().game!.playerTags.filter(tag => tag.category == tagAddedToPlayer.category)[0].maxOcurrences
-        let names: string[] = []
-        for (let i = 0; i < length; i++) {
-            if (i == tagAddedToPlayer.index) {
-                names.push(tagAddedToPlayer.name)
-            } else {
-                if (categoryTag != undefined) {
-                    names.push(categoryTag.names[i])
-                } else {
-                    names.push(categoryTag)
-                }
-            }
-        }
-        console.log("Nouvelle liste de tags: ", tagAddedToPlayer.category, names)
-
-        const modifiedChoosenTags: ChoosenTag[] = Object.assign([], player.choosenTags.filter(tags => tags.category != tagAddedToPlayer.category))
-        modifiedChoosenTags.push({ category: tagAddedToPlayer.category, names: names })
-
-        const modifiedPlayerList = getState().players.map(unmodifiedPlayer => {
-            if (unmodifiedPlayer.id != tagAddedToPlayer.playerId) {
-                return unmodifiedPlayer
-            } else {
-                return { ...player, choosenTags: modifiedChoosenTags }
-            }
-        })
-
-        setState({
-            ...getState(),
-            players: modifiedPlayerList
-        })
-    }
-
-    @Action(AddTagToMatch)
-    addTagToMatch({ setState, getState }: StateContext<MatchStateModel>, tagAddedToMatch: AddTagToMatch) {
-
-        console.log("Ajout d'un tag de match: ", tagAddedToMatch.category, tagAddedToMatch.name, tagAddedToMatch.index)
-
-        const categoryTag = getState().choosenTags.filter(tags => tags.category == tagAddedToMatch.category)[0]
-        const length = getState().game!.matchTags.filter(tag => tag.category == tagAddedToMatch.category)[0].maxOcurrences
-        let names: string[] = []
-        for (let i = 0; i < length; i++) {
-            if (i == tagAddedToMatch.index) {
-                names.push(tagAddedToMatch.name)
-            } else {
-                if (categoryTag != undefined) {
-                    names.push(categoryTag.names[i])
-                } else {
-                    names.push(categoryTag)
-                }
-            }
-        }
-        console.log("Nouvelle liste de tags: ", tagAddedToMatch.category, names)
-
-        const modifiedChoosenTags: ChoosenTag[] = Object.assign([], getState().choosenTags.filter(tags => tags.category != tagAddedToMatch.category))
-        modifiedChoosenTags.push({ category: tagAddedToMatch.category, names: names })
-
-        setState({
-            ...getState(),
-            choosenTags: modifiedChoosenTags
-        })
-    }
-
-    @Action(AddScoreToPlayer)
-    addScoreToPlayer({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToPlayer: AddScoreToPlayer) {
-        const player: Player | undefined = getState().players.find(p => p.id == scoreAddedToPlayer.playerId)
-        if (player === undefined) {
-            console.warn("Cannot add tag to player because player is undefined => ", scoreAddedToPlayer.playerId)
-            return
-        }
-
-        const modifiedPlayerList: Player[] = getState().players.map(player => {
-            if (player.id == scoreAddedToPlayer.playerId) {
-                return { ...player, score: scoreAddedToPlayer.score }
-            }
-            return player
-        })
-
-        let winnigPlayer: Player | undefined = undefined
-        if (modifiedPlayerList.filter(player => player.score == undefined).length == 0) {
-            winnigPlayer = modifiedPlayerList.reduce((prev, current) => (prev.score! > current.score!) ? prev : current)
-        }
-
-        setState({
-            ...getState(),
-            players: modifiedPlayerList,
-            winnigPlayer: winnigPlayer
-        })
     }
 
     @Action(MatchEnded)
     matchEnded({ setState, getState }: StateContext<MatchStateModel>, matchEnded: MatchEnded) {
+        console.info("Ending match")
         setState({
-            ...getState(),
-            endedAt: matchEnded.endDate
+            match: {
+                ...getState().match!,
+                endedAt: matchEnded.endDate,
+                started: false
+            }
         })
     }
 
     @Action(MatchAborted)
     matchAborted({ setState, getState }: StateContext<MatchStateModel>) {
-        this.matchService.cancelMatch(getState().matchId, getState().endedAt!).subscribe((canceledMatch) => {
-            console.log("Match canceled", canceledMatch)
+        console.info("Aborting match")
+        this.matchService.cancelMatch(getState().match!.matchId!, getState().match!.endedAt!).subscribe(_ => {
             setState(defaultMatchModel)
         })
 
@@ -304,9 +166,293 @@ export class MatchState {
 
     @Action(SaveMatchResult)
     saveMatchResult({ setState, getState }: StateContext<MatchStateModel>) {
-        this.matchService.saveMatchResult(getState().matchId, getState().players, getState().endedAt!).subscribe((savedMatch) => {
-            console.log("Match and scores saved", savedMatch)
+        console.info("Saving match")
+        this.matchService.saveMatchResult(getState().match!).subscribe((savedMatch) => {
+            console.debug("Match and scores saved", savedMatch)
             setState(defaultMatchModel)
         })
+    }
+
+    @Action(AddGameTags)
+    addGameTags({ setState, getState }: StateContext<MatchStateModel>, addGameTags: AddGameTags) {
+
+        const alreadyChoosenTags = getState().match!.choosenTags.find(tag => tag.category == addGameTags.category)
+        if (alreadyChoosenTags == undefined) {
+            console.info("Category not found, creating new one")
+            setState({
+                match: {
+                    ...getState().match!,
+                    choosenTags: [...getState().match!.choosenTags, { category: addGameTags.category, names: [addGameTags.name] }]
+                }
+            })
+        } else {
+            const names = alreadyChoosenTags.names.map(name => name)
+            names[addGameTags.index] = addGameTags.name
+            setState({
+                match: {
+                    ...getState().match!,
+                    choosenTags: getState().match!.choosenTags.map(tag => tag.category == addGameTags.category ? { category: tag.category, names: names } : tag)
+                }
+            })
+        }
+    }
+
+    @Action(RemoveGameTags)
+    removeGameTags({ setState, getState }: StateContext<MatchStateModel>, removeGameTags: RemoveGameTags) {
+
+        const alreadyChoosenTags = getState().match!.choosenTags.find(tag => tag.category == removeGameTags.category)!
+        const modifiedNames = alreadyChoosenTags.names.map(name => name)
+        modifiedNames[removeGameTags.index] = undefined!
+        if (modifiedNames.find(name => name != undefined) == undefined) {
+            setState({
+                match: {
+                    ...getState().match!,
+                    choosenTags: getState().match!.choosenTags.filter(tag => tag.category != removeGameTags.category)
+                }
+            })
+        } else {
+            setState({
+                match: {
+                    ...getState().match!,
+                    choosenTags: getState().match!.choosenTags.map(tag => tag.category == removeGameTags.category ? { category: tag.category, names: modifiedNames } : tag)
+                }
+            })
+        }
+
+    }
+
+
+    /* TEAM */
+
+    @Action(AddTeam)
+    addTeam({ setState, getState }: StateContext<MatchStateModel>, addedTeam: AddTeam) {
+
+        const newPlayersIds = addedTeam.team.teamPlayers.map(teamPlayer => teamPlayer.player.id)
+        const existingPlayersIds = getState().match!.teams.flatMap(team => team.teamPlayers.map(teamPlayer => teamPlayer.player.id))
+
+        if (newPlayersIds.some(playerId => existingPlayersIds.includes(playerId))) {
+            console.warn("At least, a player in the new team already exist in antother team")
+            return
+        }
+
+        console.info("Add team:", addedTeam.team.name)
+        setState({
+            match: {
+                ...getState().match!,
+                teams: [...getState().match!.teams, addedTeam.team]
+            }
+        })
+    }
+
+    @Action(ChangeFirstTeam)
+    changeFirstTeam({ setState, getState }: StateContext<MatchStateModel>, firstTeam: ChangeFirstTeam) {
+        console.info("Team order change: first team is now", firstTeam.team.name, "and was", getState().match!.teams[0].name, "before")
+        if (!this.checkIntegrityOfTeam(getState(), firstTeam.team)) {
+            return
+        }
+
+        const newlyOrderedTeams: Team[] = [firstTeam.team]
+        getState().match!.teams.forEach(team => {
+            if (team != firstTeam.team) {
+                newlyOrderedTeams.push(team)
+            }
+        })
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: newlyOrderedTeams
+            }
+        })
+    }
+
+    @Action(ChangeTeamColor)
+    changeTeamColor({ setState, getState }: StateContext<MatchStateModel>, changeColorEvent: ChangeTeamColor) {
+
+        const oldColor = changeColorEvent.team.color
+        const teamToChangeColor = changeColorEvent.team
+        const newColor = changeColorEvent.color
+        if (oldColor.name === newColor.name) {
+            return
+        }
+        console.info("Changing color of team:", teamToChangeColor.name, "from", oldColor.name, "to", newColor.name)
+        if (!this.checkIntegrityOfTeam(getState(), changeColorEvent.team)) {
+            return
+        }
+
+        const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
+            if (team == teamToChangeColor) {
+                return { ...team, color: newColor }
+            } else if (team.color.name === newColor.name) {
+                return { ...team, color: oldColor }
+            } else {
+                return team
+            }
+        })
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: modifiedTeamList
+            }
+        })
+    }
+
+    @Action(SwapTeamPosition)
+    swapTeamPosition({ setState, getState }: StateContext<MatchStateModel>, teamsToSwap: SwapTeamPosition) {
+        console.info("Team order swap:", teamsToSwap.firstTeam.name, "and", teamsToSwap.secondTeam.name)
+        if (!this.checkIntegrityOfTeam(getState(), teamsToSwap.firstTeam) || !this.checkIntegrityOfTeam(getState(), teamsToSwap.secondTeam)) {
+            return
+        }
+
+        let newlyOrderedTeams: Team[] = []
+
+        getState().match!.teams.forEach(team => {
+            if (team == teamsToSwap.firstTeam) {
+                newlyOrderedTeams.push(teamsToSwap.secondTeam)
+            } else if (team == teamsToSwap.secondTeam) {
+                newlyOrderedTeams.push(teamsToSwap.firstTeam)
+            } else {
+                newlyOrderedTeams.push(team)
+            }
+        })
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: newlyOrderedTeams
+            }
+        })
+    }
+
+    @Action(RemoveTeam)
+    removeTeam({ setState, getState }: StateContext<MatchStateModel>, removedTeam: RemoveTeam) {
+
+        console.info("Remove Team:", removedTeam.team.name)
+        if (!this.checkIntegrityOfTeam(getState(), removedTeam.team)) {
+            return
+        }
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: getState().match!.teams.filter(team => team != removedTeam.team)
+            }
+        })
+    }
+
+    @Action(UpdateTeamTags)
+    addTagToTeam({ setState, getState }: StateContext<MatchStateModel>, updateTeamTags: UpdateTeamTags) {
+
+        console.info("Update tags of team:", updateTeamTags.team.name)
+        if (!this.checkIntegrityOfTeam(getState(), updateTeamTags.team)) {
+            return
+        }
+
+        let modifiedChoosenTags = this.up(updateTeamTags.team.choosenTags, updateTeamTags.tagsToAdd, updateTeamTags.tagsToRemove)
+
+        const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
+            if (team != updateTeamTags.team) {
+                return team
+            }
+            return { ...team, choosenTags: modifiedChoosenTags }
+        })
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: modifiedTeamList
+            }
+        })
+    }
+
+    @Action(UpdateGameTags)
+    updateGameTags({ setState, getState }: StateContext<MatchStateModel>, updateGameTags: UpdateGameTags) {
+        console.info("Update tags of game")
+
+        let modifiedChoosenTags = this.up(getState().match!.choosenTags, updateGameTags.tagsToAdd, updateGameTags.tagsToRemove)
+
+        setState({
+            match: {
+                ...getState().match!,
+                choosenTags: modifiedChoosenTags
+            }
+        })
+    }
+
+    private up(modifiedChoosenTags: ChoosenTag[], tagsToAdd: [category: string, name: string, index: number][], tagsToRemove: [category: string, index: number][]): ChoosenTag[] {
+
+        tagsToAdd.forEach(tag => {
+            const category = tag[0]
+            const choosenCategoryTagName = modifiedChoosenTags.find(tags => tags.category == category)?.names
+            const names = this.createNewNameListForCategory(category, tag[1], tag[2], choosenCategoryTagName)
+            modifiedChoosenTags = Object.assign([], modifiedChoosenTags.filter(tags => tags.category != category))
+            modifiedChoosenTags.push({ category: category, names: names })
+        })
+        tagsToRemove.forEach(tag => {
+            const category = tag[0]
+            const names = modifiedChoosenTags.find(tags => tags.category == category)?.names
+            if (names != undefined) {
+                const choosenCategoryTagName = names.map(name => name)
+                choosenCategoryTagName?.splice(tag[1], 1, undefined!)
+                modifiedChoosenTags = Object.assign([], modifiedChoosenTags.filter(tags => tags.category != category))
+                if (choosenCategoryTagName.find(name => name != undefined)) {
+                    modifiedChoosenTags.push({ category: category, names: choosenCategoryTagName })
+                }
+            }
+        })
+
+        return modifiedChoosenTags
+    }
+
+    private createNewNameListForCategory(category: string, name: string, index: number, choosenCategoryTagName?: string[]): string[] {
+        let names: string[] = []
+        if (choosenCategoryTagName == undefined) {
+            names = []
+        } else {
+            names = Object.assign([], choosenCategoryTagName)
+        }
+        names[index] = name
+        console.debug("For category", category, ", new tag list:", names)
+        return names
+    }
+
+    @Action(AddScoreToTeam)
+    addScoreToTeam({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToTeam: AddScoreToTeam) {
+        // TODO : check
+
+        console.info("Adding score to player")
+        if (!this.checkIntegrityOfTeam(getState(), scoreAddedToTeam.team)) {
+            return
+        }
+
+        const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
+            if (team == scoreAddedToTeam.team) {
+                return { ...team, score: scoreAddedToTeam.score }
+            }
+            return team
+        })
+
+        let winnigTeam: Team | undefined = undefined
+        if (modifiedTeamList.filter(team => team.score == undefined).length == 0) {
+            winnigTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
+        }
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: modifiedTeamList,
+                winnigTeam: winnigTeam
+            }
+        })
+    }
+
+    private checkIntegrityOfTeam(state: MatchStateModel, teamToCheck: Team): boolean {
+        const team: Team | undefined = state.match?.teams.find(team => team === teamToCheck)
+        if (team === undefined) {
+            console.error("Cannot perform task because team is not found")
+            return false
+        }
+        return true;
     }
 }

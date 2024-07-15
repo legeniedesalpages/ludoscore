@@ -10,9 +10,9 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ColorTag, COLORS } from 'src/app/core/model/color-tag.model';
+import { Component, Inject, Input, OnInit } from '@angular/core'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { COLORS, ColorTag } from 'src/app/core/model/tag.model'
 
 @Component({
     selector: 'color-tag-editor',
@@ -22,10 +22,10 @@ import { ColorTag, COLORS } from 'src/app/core/model/color-tag.model';
 export class ColorTagEditorComponent implements OnInit {
 
     @Input()
-    public tags: ColorTag[] = [];
+    public tags: ColorTag[] = []
 
     @Input()
-    public title: string = '';
+    public title: string = ''
 
     constructor(private dialog: MatDialog) { }
 
@@ -33,9 +33,9 @@ export class ColorTagEditorComponent implements OnInit {
     }
 
     public removeTag(tag: ColorTag): void {
-        const index = this.tags.indexOf(tag);
+        const index = this.tags.indexOf(tag)
         if (index >= 0) {
-            this.tags.splice(index, 1);
+            this.tags.splice(index, 1)
         }
     }
 
@@ -55,20 +55,20 @@ export class ColorTagEditorComponent implements OnInit {
 })
 export class DialogColorTagEditorComponent {
 
-    public tags: ColorTag[];
+    public tags: ColorTag[]
 
     constructor(public dialogRef: MatDialogRef<DialogColorTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-        this.tags = this.data.colorTags;
+        this.tags = this.data.colorTags
         console.log(this.tags)
     }
 
     public chooseColor(colorTag: ColorTag) {
-        this.tags.push(colorTag);
+        this.tags.push(colorTag)
     }
 
     public filteredColors(): ColorTag[] {
         return COLORS.filter(x => {
             return !this.tags.map(c => c.code).includes(x.code)
-        });
+        })
     }
 }

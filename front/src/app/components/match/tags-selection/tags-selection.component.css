@@ -1,0 +1,41 @@
+svg {
+  height: 30px;
+  width: 30px;
+}
+
+.tag-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tag-group {
+  width: 100%;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.tag-selector {
+  flex-grow: 3;
+  flex-shrink: 1;
+  flex-basis: 0;
+}
+
+button {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  margin-left: 8px;
+  margin-bottom: 18px;
+}
+
+
+.category {
+  border-bottom:1px solid lightgrey;
+  margin-bottom: 10px;
+}

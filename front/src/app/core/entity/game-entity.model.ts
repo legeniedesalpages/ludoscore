@@ -1,3 +1,4 @@
+import { Time } from "@angular/common";
 import { Tag } from "../model/tag.model";
 
 /**
@@ -29,4 +30,6 @@ export interface GameEntity {
     drawBreaker: string
     quantifiableScore: boolean
     highestScoreWin: boolean
+    estimatedDuration: string
+    scoreTemplate: string
 }

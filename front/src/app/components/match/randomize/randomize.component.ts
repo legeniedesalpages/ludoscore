@@ -13,11 +13,8 @@
 import { Component } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Select, Store } from '@ngxs/store'
-import { Observable } from 'rxjs'
-import { ChoosenTag } from 'src/app/core/model/choosen-tag.model'
-import { Player } from 'src/app/core/model/player.model'
-import { Tag } from 'src/app/core/model/tag.model'
-import { AddTagToMatch, AddTagToPlayer } from 'src/app/core/state/match/match.action'
+import { Observable, Subject } from 'rxjs'
+import { ChoosenTag, Team } from 'src/app/core/model/match.model'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
 
@@ -29,99 +26,22 @@ export class RandomizeComponent {
 
   @Select(MatchState) matchState!: Observable<MatchStateModel>
 
-  constructor(private store: Store) {
-  }
+  public saving: Subject<boolean> = new Subject();
+  public randomizeAllTeamTagObservable: Subject<boolean> = new Subject();
+  public randomizeAllMatchTagObservable: Subject<boolean> = new Subject();
+  public teamChoosenTags: ChoosenTag[][];
 
+  constructor(private store: Store) {
+    const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
+    this.teamChoosenTags = teams.map(team => team.choosenTags)
+  }
 
   public returnToPlayerSelection() {
     this.store.dispatch(new Navigate(['/player-selection']))
   }
 
-  /** Player */
-
-  public selectPlayerTag(player: Player, name: string, category: string, index: number) {
-    this.store.dispatch(new AddTagToPlayer(player.id, category, name, index))
-  }
-
-  public alreadySelectedPlayerTag(category: string, player: Player, index: number): string {
-    return player.choosenTags.filter(tag => tag.category == category)[0]?.names[index]
-  }
-
-  public playerTagAvailable(playerTag: Tag, player: Player, index: number): string[] {
-    if (!playerTag.unique) {
-      return playerTag.names
-    }
-
-    const players = this.store.selectSnapshot<Player[]>(MatchState.players)
-    const alreadySelectedName: string[] = players.flatMap(player => player.choosenTags.filter(tag => tag.category == playerTag.category)[0]?.names)
-    const availableTagName = playerTag.names.filter(name => !alreadySelectedName.includes(name))
-
-    const nameSelectedForThisTag = this.alreadySelectedPlayerTag(playerTag.category, player, index)
-    if (nameSelectedForThisTag != undefined) {
-      availableTagName.unshift(nameSelectedForThisTag)
-    }
-    return availableTagName
-  }
-
-  public randomizePlayerTag(playerTag: Tag, player: Player, index: number) {
-    const availableTagName = this.playerTagAvailable(playerTag, player, index)
-    const tagName: string = availableTagName[Math.floor(Math.random() * availableTagName.length)]
-    this.store.dispatch(new AddTagToPlayer(player.id, playerTag.category, tagName, index))
-  }
-
-  public randomizeAllPlayerTag() {
-    const matchState = this.store.selectSnapshot<MatchStateModel>(MatchState)
-    const players: Player[] = matchState.players
-    players.forEach(player => {
-      const playerTags: Tag[] = matchState.game?.playerTags!
-      playerTags.forEach(tag => {
-        for (let i = 0; i < tag.maxOcurrences; i++) {
-          this.randomizePlayerTag(tag, player, i)
-        }
-      })
-    })
-  }
-
-  /** Match */
-
-  public selectMatchTag(name: string, category: string, index: number) {
-    this.store.dispatch(new AddTagToMatch(category, name, index))
-  }
-
-  public alreadySelectedMatchTag(matchTag: Tag, index: number): string {
-    const matchState = this.store.selectSnapshot<MatchStateModel>(MatchState)
-    const choosenMatchTags: ChoosenTag[] = matchState.choosenTags
-    return choosenMatchTags.filter(tag => tag.category == matchTag.category)[0]?.names[index]
-  }  
-
-  public matchTagAvailable(matchTag: Tag, index: number): string[] {
-    if (!matchTag.unique) {
-      return matchTag.names
-    }
-
-    const matchState: MatchStateModel = this.store.selectSnapshot<MatchStateModel>(MatchState)
-    const alreadySelectedNameByAll: string[] = matchState.choosenTags.filter(tag => tag.category == matchTag.category).flatMap(tag => tag.names)
-    const availableTagName = matchTag.names.filter(name => !alreadySelectedNameByAll.includes(name))
-
-    const nameSelectedForThisTag = this.alreadySelectedMatchTag(matchTag, index)
-    if (nameSelectedForThisTag != undefined) {
-      availableTagName.unshift(nameSelectedForThisTag)
-    }
-    return availableTagName
-  }
-
-  public randomizeMatchTag(matchTag: Tag, index: number) {
-    const availableTagName = this.matchTagAvailable(matchTag, index)
-    const tagName: string = availableTagName[Math.floor(Math.random() * availableTagName.length)]
-    this.store.dispatch(new AddTagToMatch(matchTag.category, tagName, index))
-  }
-
-  public randomizeAllMatchTag() {
-    const matchTags: Tag[] = this.store.selectSnapshot<MatchStateModel>(MatchState).game?.matchTags!
-    matchTags.forEach(tag => {
-      for (let i = 0; i < tag.maxOcurrences; i++) {
-        this.randomizeMatchTag(tag, i)
-      }
-    })
+  public save() {
+    this.saving.next(true)
+    this.store.dispatch(new Navigate(['/player-selection']))
   }
 }

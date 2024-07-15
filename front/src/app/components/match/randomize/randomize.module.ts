@@ -27,6 +27,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { RandomizeComponent } from './randomize.component';
 import { MatSelectModule } from '@angular/material/select';
+import { TagsSelectionModule } from '../tags-selection/tags-selection.module';
 
 const routes: Routes = [ { path: '', component: RandomizeComponent, canActivate: [AuthGuardService] }];
 
@@ -46,7 +47,8 @@ const routes: Routes = [ { path: '', component: RandomizeComponent, canActivate:
     MatCheckboxModule,
     MatDividerModule,
     MatSelectModule,
-    SidenavModule
-  ]
+    SidenavModule,
+    TagsSelectionModule
+  ]  
 })
 export class RandomizeModule { }

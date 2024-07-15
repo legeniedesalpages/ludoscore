@@ -1,18 +1,18 @@
-<app-layout [withBackButton]="true" (backButtonAction)="returnToGame()">
+<app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
     <ng-container role="header">
         <span class="title">Fin de partie</span>
     </ng-container>
 
     <ng-container role="body">
         <div class="score">Saisie des scores</div>
-        <ul class="player-list" *ngIf="(matchState | async)?.game?.quantifiableScore">
-            <div *ngFor="let player of (matchState | async)?.players" class="result-list">
-                <li class="player" (click)="setPlayerScore(player)">
+        <ul class="player-list" *ngIf="(matchState | async)?.match!.game.quantifiableScore">
+            <div *ngFor="let team of (matchState | async)?.match!.teams" class="result-list">
+                <li class="player" (click)="setTeamScore(team)">
                     <div class="player-name">
-                        <div *ngIf="player.score != undefined"><mat-icon class="check">done</mat-icon></div>
-                        <div *ngIf="player.score == undefined"><mat-icon class="cancel">cancel</mat-icon></div>
-                        {{ player.name }}
-                        <span *ngIf="player.score">(score: {{ player.score }})</span>
+                        <div *ngIf="team.score != undefined"><mat-icon class="check">done</mat-icon></div>
+                        <div *ngIf="team.score == undefined"><mat-icon class="cancel">cancel</mat-icon></div>
+                        {{ team.name }}
+                        <span *ngIf="team.score">(score: {{ team.score }})</span>
                     </div>
                 </li>
             </div>
@@ -20,9 +20,9 @@
 
         <mat-form-field appearance="fill" class="winner">
             <mat-label>Et le vainqueur est...</mat-label>
-            <mat-select (valueChange)="selectWiningPlayer($event.value)" [value]="(matchState | async)?.winnigPlayer">
-                <mat-option *ngFor="let winningPlayer of (matchState | async)?.players" [value]="winningPlayer">
-                    {{winningPlayer.name}}
+            <mat-select (valueChange)="selectWiningTeam($event.value)" [value]="(matchState | async)?.match!.winnigTeam">
+                <mat-option *ngFor="let winningTeam of (matchState | async)?.match!.teams" [value]="winningTeam">
+                    {{winningTeam.name}}
                 </mat-option>
             </mat-select>
         </mat-form-field>

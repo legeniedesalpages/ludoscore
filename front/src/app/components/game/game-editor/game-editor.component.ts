@@ -14,9 +14,7 @@ import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { GameSearchDetail } from 'src/app/core/model/game-search-detail.model'
-import { Tag } from 'src/app/core/model/tag.model'
-import { ColorTag } from 'src/app/core/model/color-tag.model'
+import { ColorTag, Tag } from 'src/app/core/model/tag.model'
 import { Game, GameToSave } from 'src/app/core/model/game.model'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { DateValidator } from 'src/app/core/services/misc/date.validator'
@@ -24,6 +22,7 @@ import { GameService } from 'src/app/core/services/game/game.service'
 import { environment } from 'src/environments/environment'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
+import { GameSearchDetail } from 'src/app/core/model/game-search.model'
 
 @Component({
   selector: 'game-editor',

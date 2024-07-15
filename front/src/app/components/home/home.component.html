@@ -43,6 +43,9 @@
           <button mat-raised-button routerLink="/match-display">Voir le match en cours</button>
         </div>
         <div *ngIf="(matchState | async) === matchStateEnum.FINISHED">
+          <button mat-raised-button routerLink="/match-end">Enregistrer le score du match</button>
+        </div>        
+        <div *ngIf="(matchState | async) === matchStateEnum.NONE">
           <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
         </div>
       </div>
@@ -52,12 +55,12 @@
 
     <div class="action-list" [hidden]="loading">
 
-      <div class="action associate" (click)="associatePlayer()" *ngIf="notAssociated">        
+      <div class="action associate" (click)="associatePlayer()" *ngIf="notAssociated">
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
       </div>
 
-      <div class="action" (click)="navigateToFindGame()">        
+      <div class="action" (click)="navigateToFindGame()">
         <mat-icon>manage_search</mat-icon>
         <div class="caption">Rechercher un jeu</div>
       </div>

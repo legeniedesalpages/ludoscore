@@ -10,78 +10,61 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { Observable, forkJoin, map, mergeMap,  tap } from 'rxjs';
-import { MatchCrudService } from '../crud/match-crud.service';
-import { MatchEntity, MatchPlayerEntity } from '../../entity/match-entity.model';
-import { Player } from '../../model/player.model';
-import { PlayerCrudService } from '../crud/player-crud.service';
-import { PlayerEntity } from '../../entity/player-entity.model';
-import { ChoosenTag } from '../../model/choosen-tag.model';
+import { Injectable } from '@angular/core'
+import { Observable, forkJoin, mergeMap } from 'rxjs'
+import { MatchCrudService } from '../crud/match-crud.service'
+import { MatchEntity } from '../../entity/match-entity.model'
+import { MatchModel } from '../../model/match.model'
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
 
-    constructor(private matchCrudService: MatchCrudService, private playerCrudService: PlayerCrudService) {
+    constructor(private matchCrudService: MatchCrudService) {
     }
 
     public findRunningMatch(): Observable<MatchEntity> {
-        return this.matchCrudService.findRunningMatch().pipe(tap(console.log))
+        return this.matchCrudService.findRunningMatch()
     }
 
-    public createMatch(gameId: number, players: Player[], choosenMatchTags: ChoosenTag[]): Observable<MatchEntity> {
-        const matchEntity: MatchEntity = {
-            gameId: gameId,
-            startedAt: undefined,
-            finishedAt: undefined,
-            players: players.map(p => {return {id: p.id, tags: JSON.stringify(p.choosenTags), color: p.color.name}}),
-            canceled: false,
-            running: true,
-            tags: JSON.stringify(choosenMatchTags)
+    public createMatch(matchModel: MatchModel): Observable<MatchEntity> {
+        const aggregatedMatchEntity = { 
+            match: {
+                gameId: matchModel.game.id,
+                canceled: false,
+                running: true,
+                tags: JSON.stringify(matchModel.choosenTags)
+            }, 
+            teams: matchModel.teams.map(team => ({ 
+                color: team.color.name,
+                tags: JSON.stringify(team.choosenTags),
+                name: team.name,
+                players: team.teamPlayers.map(teamPlayer => ({ 
+                    playerId: teamPlayer.player.id
+                }))
+            }))
         }
-        return this.matchCrudService.save(matchEntity).pipe(tap(console.log))
+        return this.matchCrudService.save(aggregatedMatchEntity as unknown as MatchEntity)
     }
 
     public cancelMatch(matchId: number, endedAt: Date): Observable<MatchEntity> {
         return this.matchCrudService.findOne(matchId).pipe(
             mergeMap((match) => {
-                match.canceled = true;
-                match.running = false;
-                match.finishedAt = endedAt;
+                match.canceled = true
+                match.running = false
+                match.finishedAt = endedAt
                 return this.matchCrudService.update(matchId, match)
             }))
     }
 
-    public saveMatchResult(matchId: number, players: Player[], endedAt: Date): Observable<MatchEntity> {
-        return this.matchCrudService.findOne(matchId).pipe(
-            map((match) => {
-                console.info('match', match)
-                forkJoin(players.map(player => this.savePlayerScore(player, matchId)))
-                return match
-            }),
-            mergeMap((match) => {
-                match.canceled = false;
-                match.running = false;
-                match.finishedAt = endedAt;
-                return this.matchCrudService.update(matchId, match)
+    public saveMatchResult(match: MatchModel): Observable<MatchEntity> {
+        return this.matchCrudService.findOne(match.matchId!).pipe(
+            mergeMap(matchEntity => {
+                forkJoin(match.teams.map(team => this.matchCrudService.updateTeamScore(team)))
+                matchEntity.canceled = false
+                matchEntity.running = false
+                matchEntity.finishedAt = match.endedAt
+                return this.matchCrudService.update(match.matchId!, matchEntity)
             })
         )
-    }
-
-    public savePlayerScore(player: Player, matchId: number): Observable<PlayerEntity> {
-        console.info('player, match', player, matchId)
-        let ret = this.playerCrudService.findOne(player.id).pipe(
-            mergeMap((playerEntity) => {
-                console.info('playerEntity, match', playerEntity, matchId)
-                playerEntity.score = player.score;
-                playerEntity.matchId = matchId;
-                return this.matchCrudService.updatePlayerScore(playerEntity)
-            }))
-        return ret
-    }
-
-    public getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchPlayerEntity> {
-        console.log('get Previous Match Of Player, for game', playerId, gameId)
-        return this.matchCrudService.getPreviousMatchOfPlayer(playerId, gameId)
     }
 }

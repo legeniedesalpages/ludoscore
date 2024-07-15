@@ -4,11 +4,11 @@
     </ng-container>
 
     <ng-container role="body">
-        <div class="find-game">
+        <div class="find-game" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
             <form class="find-game-form">
                 <mat-form-field class="find-game-search-field">
                     <mat-label>Rechercher un jeu</mat-label>
-                    <input autofocus matInput (keydown.enter)="search($event.target)" (blur)="search($event.target)" [value]="findGameService.searchString">
+                    <input matInput (keydown.enter)="search($event.target)" (blur)="search($event.target)" [value]="findGameService.searchString" cdkFocusInitial>
                     <mat-icon matSuffix *ngIf="!searching">search</mat-icon>
                     <mat-spinner [diameter]=25 [strokeWidth]="4" *ngIf="searching"></mat-spinner>
                 </mat-form-field>
