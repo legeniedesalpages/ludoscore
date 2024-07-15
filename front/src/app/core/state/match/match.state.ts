@@ -15,9 +15,10 @@ import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
 import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
-import { tap } from 'rxjs/operators'
+import { catchError, first, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
 import { MatchEntity } from "../../entity/match-entity.model"
+import { forkJoin, lastValueFrom } from "rxjs"
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 
@@ -165,12 +166,10 @@ export class MatchState {
     }
 
     @Action(SaveMatchResult)
-    saveMatchResult({ setState, getState }: StateContext<MatchStateModel>) {
+    async saveMatchResult({ setState, getState }: StateContext<MatchStateModel>) {
         console.info("Saving match")
-        this.matchService.saveMatchResult(getState().match!).subscribe((savedMatch) => {
-            console.debug("Match and scores saved", savedMatch)
-            setState(defaultMatchModel)
-        })
+        const matchEntity: MatchEntity = await lastValueFrom(this.matchService.saveMatchResult(getState().match!).pipe(catchError(error => { console.warn(error.message); throw error.message })))
+        console.debug("Match saved", matchEntity)
     }
 
     @Action(AddGameTags)
@@ -419,7 +418,6 @@ export class MatchState {
 
     @Action(AddScoreToTeam)
     addScoreToTeam({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToTeam: AddScoreToTeam) {
-        // TODO : check
 
         console.info("Adding score to player")
         if (!this.checkIntegrityOfTeam(getState(), scoreAddedToTeam.team)) {
@@ -428,7 +426,10 @@ export class MatchState {
 
         const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
             if (team == scoreAddedToTeam.team) {
-                return { ...team, score: scoreAddedToTeam.score }
+                return { 
+                    ...team,
+                    score: scoreAddedToTeam.score 
+                }
             }
             return team
         })

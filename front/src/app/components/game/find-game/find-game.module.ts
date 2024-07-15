@@ -25,7 +25,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { FindGameComponent } from './find-game.component';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { LayoutModule } from '../../layout/layout.module';
-import { AutoFocus } from 'src/app/core/directives/auto-focus.directive';
 import {A11yModule} from '@angular/cdk/a11y';
 
 const routes: Routes = [
@@ -51,7 +50,6 @@ const routes: Routes = [
     MatGridListModule,
     MatDividerModule,
     LayoutModule,
-/*    AutoFocus,*/
     A11yModule
   ],
   exports: [FindGameComponent],

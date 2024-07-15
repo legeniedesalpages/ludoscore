@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\GameMatchController;
 use App\Http\Controllers\Api\GameSearchController;
 use App\Http\Controllers\Api\PlayerController;
+use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UserController;
 
 /*
@@ -46,9 +47,6 @@ Route::middleware('auth:sanctum')->get('/running-match', [GameMatchController::c
 
 Route::middleware('auth:sanctum')->get('/previous-match/{playerid}/{gameid}', [GameMatchController::class, 'previousMatch']);
 
-Route::middleware('auth:sanctum')->put('/game-match/update-score', [GameMatchController::class, 'updatePlayerScore']);
-Route::middleware('auth:sanctum')->put('/game-match/update-player', [GameMatchController::class, 'updatePlayerMatch']);
-
 Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +54,13 @@ Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::c
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create']]);
+
+/*
+|--------------------------------------------------------------------------
+| Player
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->resource('team', TeamController::class, ['except' => ['edit', 'create']]);
 
 /*
 |--------------------------------------------------------------------------

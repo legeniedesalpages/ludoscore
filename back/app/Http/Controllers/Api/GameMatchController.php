@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\GameMatch;
 use App\Models\Team;
 use App\Models\TeamPlayer;
-use App\Models\Player;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +26,8 @@ class GameMatchController extends Controller
         $gameMatch = GameMatch::find($id);
         $gameMatch->running = $request->running;
         $gameMatch->canceled = $request->canceled;
+        $gameMatch->winner_team_id = $request->winner_team_id;
+        Log::info("winner_team_id : " . $gameMatch->winner_team_id);
         $gameMatch->finished_at = Carbon::createFromFormat('Y-m-d\TH:i:s+', $request->finished_at);
         $gameMatch->save();
 
@@ -121,39 +122,5 @@ class GameMatchController extends Controller
     {
         Log::debug("Recherche le match d'id : " . $id);
         return GameMatch::find($id);
-    }
-
-    public function updatePlayerScore(Request $request)
-    {
-        $id = $request->id;
-        Log::info("Mise à jour du joueur d'id : " . $id . " et de macthId : " . $request->match_id);
-        Log::debug($request);
-
-        $matchId = $request->match_id;
-
-        DB::table('teams')
-            ->where('match_id', $matchId)
-            ->join('team_players', 'teams.id', '=', 'team_players.team_id')
-            ->where('team_players.player_id', $id)
-            ->update(['score' => $request->score]);
-
-        return Player::find($id);
-    }
-
-    public function updatePlayerMatch(Request $request)
-    {
-        $id = $request->id;
-        Log::info("Mise à jour du joueur d'id : " . $id . " et de macthId : " . $request->match_id);
-        Log::debug($request);
-
-        $matchId = $request->match_id;
-
-        DB::table('teams')
-            ->where('match_id', $matchId)
-            ->join('team_players', 'teams.id', '=', 'team_players.team_id')
-            ->where('team_players.player_id', $id)
-            ->update(['tags' => $request->tags, "color" => $request->color]);
-
-        return Player::find($id);
     }
 }

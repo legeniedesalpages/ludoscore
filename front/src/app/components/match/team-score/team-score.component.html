@@ -1,20 +1,22 @@
 <app-layout [withBackButton]="true" (backButtonAction)="returnToMatchEnd()">
-    <ng-container role="header">
-        <span class="title">Fin de partie</span>
-    </ng-container>
+  <ng-container role="header">
+    <span class="title">Fin de partie</span>
+  </ng-container>
 
-    <ng-container role="body">
-        <div class="score">{{ team.name }}</div>
+  <ng-container role="body">
+    <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+      <div class="score">{{ team.name }}</div>
 
-        <form [formGroup]="teamScore" (ngSubmit)="onSubmit()" class="buttons">
-            <mat-form-field appearance="fill">
-              <mat-label>Score (uniquement des chiffres)</mat-label>
-              <input matInput formControlName="score" type="number" autofocus>
-            </mat-form-field>
-            <button mat-raised-button color="primary" [disabled]="!teamScore.valid">
-              Enregistrer le score
-            </button>
-          </form>
-    </ng-container>
+      <form [formGroup]="teamScore" (ngSubmit)="onSubmit()" class="buttons">
+        <mat-form-field appearance="fill">
+          <mat-label>Score (uniquement des chiffres)</mat-label>
+          <input matInput formControlName="score" type="number" cdkFocusInitial>
+        </mat-form-field>
+        <button mat-raised-button color="primary" [disabled]="!teamScore.valid">
+          Enregistrer le score
+        </button>
+      </form>
+    </div>
+  </ng-container>
 
 </app-layout>

@@ -31,7 +31,7 @@ import { SwipeableModule } from '../../layout/swipeable/swipeable.module';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TeamDetailModule } from '../team-detail/team-detail.module';
 import { GameDetailModule } from '../game-detail/game-detail.module';
-import {  MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationDialogModule } from '../../layout/dialogue/confirmation.module';
 
 const routes: Routes = [{ path: '', component: PlayerSelectionComponent, canActivate: [AuthGuardService] }];
@@ -56,7 +56,9 @@ const routes: Routes = [{ path: '', component: PlayerSelectionComponent, canActi
     SwipeableModule,
     ScrollingModule,
     MatDialogModule,
-    ConfirmationDialogModule
+    ConfirmationDialogModule,
+    TeamDetailModule,
+    GameDetailModule
   ]
 })
 export class PlayerSelectionModule { }
