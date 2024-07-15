@@ -1,6 +1,6 @@
 <div class="tag-container">
     <div *ngFor="let tag of tags" class="tag-group">
-        <div class="category">Categorie: {{ tag.category }}</div>
+        <div class="category" *ngIf="tags.length > 1">Categorie: {{ tag.category }}</div>
         <div *ngFor="let occurence of [].constructor(tag.maxOcurrences); let i = index;" class="tag">
             <mat-form-field appearance="fill" class="tag-selector">
                 <mat-label>{{ tag.category }}</mat-label>

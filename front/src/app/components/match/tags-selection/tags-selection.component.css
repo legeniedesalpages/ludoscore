@@ -13,29 +13,29 @@ svg {
   width: 100%;
 }
 
-.category {
-  border-bottom:1px solid lightgrey;
-  margin-bottom: 10px;
-}
-
 .tag {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .tag-selector {
+  flex-grow: 3;
+  flex-shrink: 1;
+  flex-basis: 0;
+}
+
+button {
   flex-grow: 1;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  padding-bottom: 20px;
-}
-
-.actions button {
+  flex-shrink: 1;
+  flex-basis: 0;
   margin-left: 8px;
+  margin-bottom: 18px;
 }
 
-.mat-mdc-dialog-content {
-  padding: 0px !important;
+
+.category {
+  border-bottom:1px solid lightgrey;
+  margin-bottom: 10px;
 }

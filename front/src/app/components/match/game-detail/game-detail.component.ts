@@ -20,7 +20,6 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 @Component({
   templateUrl: './game-detail.component.html',
   styleUrls: ['./game-detail.component.css'],
-  encapsulation: ViewEncapsulation.None
 })
 export class GameDetailComponent {
 

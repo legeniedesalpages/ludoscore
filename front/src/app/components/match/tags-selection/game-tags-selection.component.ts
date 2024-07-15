@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core'
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subject } from 'rxjs'
 import { ChoosenTag, MatchModel } from 'src/app/core/model/match.model'
@@ -21,7 +21,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 @Component({
   selector: 'game-tags-selection',
   templateUrl: './tags-selection.component.html',
-  styleUrls: ['./tags-selection.component.css']
+  styleUrls: ['./tags-selection.component.css'],
 })
 export class GameTagsSelectionComponent implements OnInit {
 

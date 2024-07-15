@@ -29,6 +29,9 @@ h2 {
   background-color: lightgrey;
   padding:5px;
   margin: 0px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
 h3 {
@@ -60,9 +63,9 @@ hr {
 }
 
 .validate-div {
-  width: 100%;
   text-align: center;
   margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .validate-button {

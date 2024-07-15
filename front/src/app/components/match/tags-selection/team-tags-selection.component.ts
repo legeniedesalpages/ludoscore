@@ -22,16 +22,19 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   selector: 'team-tags-selection',
   templateUrl: './tags-selection.component.html',
   styleUrls: ['./tags-selection.component.css'],
-  encapsulation: ViewEncapsulation.None
 })
 export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
 
   @Select(MatchState.teams) teams!: Observable<Team[]>
   @Select(MatchState.match) match!: Observable<MatchModel>
   private teamSubscription!: Subscription
+  private randomizeSubscription! : Subscription
 
   @Input() teamIndex!: number
+  @Input() teamChoosenTags!: ChoosenTag[][];
   @Input() saving!: Subject<boolean>;
+  @Input() randomize!: Subject<boolean>;
+  
 
   public tags: Tag[]
   public team!: Team
@@ -44,6 +47,13 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    if (this.teamChoosenTags == undefined) {
+      const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
+      this.teamChoosenTags = teams.map(team => team.choosenTags)
+    } else {
+      console.log(this.teamChoosenTags)
+    }
 
     this.teamSubscription = this.teams.subscribe(teams => {
       this.team = teams[this.teamIndex]
@@ -64,10 +74,19 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
         Array.from(this.tagRemoved.values())
       ))
     })
+
+    if (this.randomize) {
+      this.randomizeSubscription = this.randomize.subscribe(_ => {
+        this.randomizeAllTeamTags()
+      })
+    }
   }
 
   ngOnDestroy(): void {
     this.teamSubscription.unsubscribe()
+    if (this.randomizeSubscription) {
+      this.randomizeSubscription.unsubscribe()
+    }
   }
 
   public alreadySelectedTag(category: string, index: number): string {
@@ -79,19 +98,14 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
       return teamTag.names
     }
 
-    const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
-    const alreadySelectedName: string[] = teams.filter(team => team != this.team)
-      .flatMap(team => team.choosenTags.find(tag => tag.category == teamTag.category)?.names!)
+    
+    const alreadySelectedName: string[] = this.teamChoosenTags.flatMap(team => team.find(tag => tag.category == teamTag.category)?.names!)
     const names = this.choosenTags.find(tag => tag.category == teamTag.category)?.names
     if (names != undefined) {
       alreadySelectedName.push(...names)
     }
 
-    const selectedNameInThisDialog = Array.from(this.tagSelected.values())
-      .filter((tagSelectedInThisDialog: [string, string, number]) => tagSelectedInThisDialog[0] == teamTag.category && tagSelectedInThisDialog[2] != index)
-      .map(tagSelectedInThisDialog => tagSelectedInThisDialog[1])
-
-    const availableTagName = teamTag.names.filter(name => !alreadySelectedName.includes(name) && !selectedNameInThisDialog.includes(name))
+    const availableTagName = teamTag.names.filter(name => !alreadySelectedName.includes(name))
 
     const nameSelectedForThisTag = this.alreadySelectedTag(teamTag.category, index)
     if (nameSelectedForThisTag != undefined) {
@@ -116,12 +130,14 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
         names: names
       })
     }
+    this.teamChoosenTags[this.teamIndex] = [...this.choosenTags]
   }
 
   public cancelSelection(category: string, index: number) {
     this.tagSelected.delete(category + "__" + index)
     this.tagRemoved.set(category + "__" + index, [category, index])
     this.choosenTags.find(tag => tag.category == category)?.names.splice(index, 1, undefined!)
+    this.teamChoosenTags[this.teamIndex] = [...this.choosenTags]
   }
 
   public randomizeTag(teamTag: Tag, index: number) {
@@ -130,5 +146,13 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
     if (name != undefined) {
       this.selectTag(name, teamTag.category, index)
     }
+  }
+
+  public randomizeAllTeamTags() {
+    this.tags.forEach(tag => {
+      for (let i = 0; i < tag.maxOcurrences; i++) {
+        this.randomizeTag(tag, i)
+      }
+    })
   }
 }

@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject } from '@angular/core'
+import { Component, Inject, ViewEncapsulation } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 
 @Component({
@@ -25,7 +25,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
             <button mat-button mat-dialog-close color="warn" (click)="dialogRef.close(false)">Annuler</button>
             <button mat-button mat-dialog-close (click)="dialogRef.close(true)">Continuer</button>
         </mat-dialog-actions>
-  `,
+  `
 })
 export class ConfirmationDialogComponent {
     constructor(public dialogRef: MatDialogRef<ConfirmationDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
