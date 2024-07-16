@@ -84,18 +84,20 @@ hr {
   background-color: lightgrey;
   height: 110px;
   border-top: 1px solid black;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .key {
-  font-weight: bold;
+  font-size: large;
   cursor: pointer;
-  width: 100%;
   border: 1px solid black;
   border-radius: 4px;
   background-color: white;
   flex: 1 1 0;  
   margin-top: 4px;
   margin-bottom: 4px;
+  color:black
 }
 
 .mat-icon {
@@ -107,7 +109,7 @@ hr {
   flex-direction: row;
   justify-content: center;
   flex-wrap: nowrap;
-  justify-content: space-around;
+  justify-content: space-between;
   height: 50%;
   gap: 4px;
 }
@@ -126,6 +128,5 @@ hr {
 }
 
 .grey {
-  background-color: gray;
-  color: white;
+  background-color: lightgrey;
 }
