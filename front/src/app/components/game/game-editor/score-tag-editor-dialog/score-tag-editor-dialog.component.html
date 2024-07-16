@@ -1,0 +1,60 @@
+<mat-dialog-content class="dialog row">
+    <form [formGroup]="tagEditorForm">
+        <div class="row">
+            <div class="column">
+                <mat-form-field appearance="fill">
+                    <mat-label>Catégorie</mat-label>
+                    <input matInput formControlName="category" />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="column">
+                <mat-checkbox formControlName="negatif">Retranche sa valeur</mat-checkbox>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <mat-checkbox formControlName="complex">Affiche une calculatrice</mat-checkbox>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <mat-form-field appearance="fill">
+                    <mat-label>Valeur minimum</mat-label>
+                    <input matInput formControlName="min" type="number" size="2" />
+                </mat-form-field>
+            </div>
+            <div class="column">
+                <mat-form-field appearance="fill">
+                    <mat-label>Valeur maximum</mat-label>
+                    <input matInput formControlName="max" type="number" size="2" />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="column">
+                <mat-form-field appearance="fill">
+                    <mat-label [style.background]="newColor.code" [style.color]="newColor.invert">Couleur de la
+                        categorie</mat-label>
+                    <mat-select [(value)]="newColor" formControlName="color">
+                        <mat-option *ngFor="let color of colors" [value]="color">
+                            <div [style.background]="color.code" [style.color]="color.invert" class="couleur">
+                                {{color.name}}
+                            </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button (click)="cancelTagDialog()" mat-button [mat-dialog-close]="false" color="warn">abandonner</button>
+    <button (click)="closeTagDialog()" mat-button [mat-dialog-close]="false"
+        [disabled]="!tagEditorForm.valid">Ok</button>
+</mat-dialog-actions>

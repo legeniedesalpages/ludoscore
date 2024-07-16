@@ -68,6 +68,7 @@ export class MatchService {
                 color: team.color.name,
                 matchId: match.matchId!,
                 score: team.score,
+                scoreDetails: JSON.stringify(team.scoreDetails),
                 tags: JSON.stringify(team.choosenTags)
             })
         })).pipe(

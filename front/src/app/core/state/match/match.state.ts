@@ -429,7 +429,8 @@ export class MatchState {
             if (team == scoreAddedToTeam.team) {
                 return { 
                     ...team,
-                    score: scoreAddedToTeam.score 
+                    score: scoreAddedToTeam.score,
+                    scoreDetails: scoreAddedToTeam.scoreDetail
                 }
             }
             return team

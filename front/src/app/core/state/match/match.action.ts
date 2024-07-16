@@ -1,5 +1,6 @@
 import { Game } from "../../model/game.model"
 import { Team } from "../../model/match.model"
+import { Score } from "../../model/score.model"
 import { ColorTag } from "../../model/tag.model"
 
 /**
@@ -91,5 +92,5 @@ export class UpdateTeamTags {
 
 export class AddScoreToTeam {
     static readonly type: string = '[Match] AddScoreToTeam'
-    constructor(public team: Team, public score: number) { }
+    constructor(public team: Team, public score: number, public scoreDetail: Score[]) { }
 }

@@ -23,6 +23,7 @@ import { environment } from 'src/environments/environment'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { GameSearchDetail } from 'src/app/core/model/game-search.model'
+import { ScoreTag } from 'src/app/core/model/score.model'
 
 @Component({
   selector: 'game-editor',
@@ -45,6 +46,7 @@ export class GameEditorComponent implements OnInit {
   public tagsGame: Tag[] = []
   public tagsPlayer: Tag[] = []
   public tagsColor: ColorTag[] = []
+  public tagsScore: ScoreTag[] = []
 
   constructor(private store: Store, private route: ActivatedRoute, private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService) {
 
@@ -99,6 +101,7 @@ export class GameEditorComponent implements OnInit {
         this.tagsGame = game.matchTags
         this.tagsPlayer = game.playerTags
         this.tagsColor = game.playerColors
+        this.tagsScore = game.scoreTags
       },
       complete: () => {
         this.loading = false
@@ -148,6 +151,7 @@ export class GameEditorComponent implements OnInit {
       matchTags: this.tagsGame,
       playerTags: this.tagsPlayer,
       playerColors: this.tagsColor,
+      scoreTags: this.tagsScore,
       bggId: this.bggId!,
       drawAllowed: true,
       drawBreaker: [],

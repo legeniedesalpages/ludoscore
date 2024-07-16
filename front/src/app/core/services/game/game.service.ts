@@ -19,6 +19,7 @@ import { DrawBreaker, Game, GameToSave } from '../../model/game.model'
 import { ColorTag, Tag } from '../../model/tag.model'
 import { GameCrudService } from '../crud/game-crud.service'
 import { GameEntity } from '../../entity/game-entity.model'
+import { ScoreTag } from '../../model/score.model'
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
@@ -43,6 +44,7 @@ export class GameService {
             matchTags: JSON.stringify(gameToSave.matchTags),
             playerTags: JSON.stringify(gameToSave.playerTags),
             playerColors: JSON.stringify(gameToSave.playerColors),
+            scoreTemplate: JSON.stringify(gameToSave.scoreTags),
             bggId: gameToSave.bggId,
             drawAllowed: gameToSave.drawAllowed,
             drawBreaker: JSON.stringify(gameToSave.drawBreaker),
@@ -88,6 +90,7 @@ export class GameService {
             matchTags: gameEntity.matchTags ? JSON.parse(gameEntity.matchTags) : [] as Tag[],
             playerTags: gameEntity.playerTags ? JSON.parse(gameEntity.playerTags) : [] as Tag[],
             playerColors: gameEntity.playerColors ? JSON.parse(gameEntity.playerColors) : [] as ColorTag[],
+            scoreTags: gameEntity.scoreTemplate ? JSON.parse(gameEntity.scoreTemplate) : [] as ScoreTag[],
             bggId: gameEntity.bggId,
             drawAllowed: gameEntity.drawAllowed,
             drawBreaker: gameEntity.drawBreaker ? JSON.parse(gameEntity.drawBreaker) : [] as DrawBreaker[],

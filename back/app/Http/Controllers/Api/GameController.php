@@ -83,6 +83,7 @@ class GameController extends Controller
             $existingGame->player_tags = $request->player_tags;
             $existingGame->player_colors = $request->player_colors;
             $existingGame->bgg_id = $request->bgg_id;
+            $existingGame->score_template = $request->score_template;
 
             $existingGame->save();
             Log::info("Game updated : ".$existingGame);
@@ -102,6 +103,7 @@ class GameController extends Controller
             $game->player_tags = $request->player_tags;
             $game->player_colors = $request->player_colors;
             $game->bgg_id = $request->bgg_id;
+            $game->score_template = $request->score_template;
 
             $game->save();
             Log::info("Game created : ".$game);

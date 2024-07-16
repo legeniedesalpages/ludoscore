@@ -39,6 +39,7 @@ class TeamController extends Controller
             $team->position = $request->position;
         }
         $team->score = $request->score;
+        $team->score_details = $request->score_details;
         $team->save();
         return $team;
     }

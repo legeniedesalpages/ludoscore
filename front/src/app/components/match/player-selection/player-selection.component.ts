@@ -109,6 +109,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         choosenTags: [],
         color: this.chooseColor(player),
         score: undefined,
+        scoreDetails: [],
         teamPlayers: [teamPlayer]
       }
 

@@ -5,17 +5,33 @@
 
   <ng-container role="body">
     <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
-      <div class="score">{{ team.name }}</div>
+      <div class="score">Score pour <b>{{ team.name }}</b></div>
 
-      <form [formGroup]="teamScore" (ngSubmit)="onSubmit()" class="buttons">
+      <form [formGroup]="teamScore" (ngSubmit)="onSubmit()">
+
+        <div *ngFor="let scoreCategory of scoreTemplate" class="complex-group">
+          <div [ngClass]="scoreCategory.complex ? 'complex-field-compute complex-field' : 'complex-field'" [ngStyle]="{'background-color': scoreCategory.color.code, 'color': scoreCategory.color.invert}">
+              <span class="category-name">
+                {{ scoreCategory.category }}
+                <br/><span *ngIf="scoreCategory.complex"><mat-icon>arrow_right</mat-icon>Total: {{ calc(scoreCategory.category) }}</span>
+              </span>
+              <input [formControlName]="scoreCategory.category" type="number" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)"/>
+              <textarea [formControlName]="scoreCategory.category" rows="3" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)"></textarea>
+          </div>
+        </div>
+
+        <hr *ngIf="complexScoreTemplate" />
+
         <mat-form-field appearance="fill">
-          <mat-label>Score (uniquement des chiffres)</mat-label>
+          <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
           <input matInput formControlName="score" type="number" cdkFocusInitial>
         </mat-form-field>
+
         <button mat-raised-button color="primary" [disabled]="!teamScore.valid">
           Enregistrer le score
         </button>
       </form>
+
     </div>
   </ng-container>
 

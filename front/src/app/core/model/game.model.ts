@@ -1,3 +1,4 @@
+import { ScoreTag } from "./score.model"
 import { ColorTag, Tag } from "./tag.model"
 
 /**
@@ -33,6 +34,7 @@ export interface GameDetail {
     matchTags: Tag[]
     playerTags: Tag[]
     playerColors: ColorTag[]
+    scoreTags: ScoreTag[]
     bggId: number
     drawAllowed: boolean
     drawBreaker: DrawBreaker[]

@@ -1,0 +1,18 @@
+<mat-form-field appearance="fill">
+    <mat-label>{{ title }}</mat-label>
+    <mat-chip-grid #chipGridTag aria-label="Ajouter des categorie de score">
+        <mat-chip-row *ngFor="let tag of tags" (removed)="removeTag(tag)" [editable]="false" (click)="editTag(tag)">
+            {{tag.category}}
+            <button matChipRemove [attr.aria-label]="'remove ' + tag">
+                <mat-icon>cancel</mat-icon>
+            </button>
+        </mat-chip-row>
+
+        <input [matChipInputFor]="chipGridTag" disabled="true" />
+
+    </mat-chip-grid>
+</mat-form-field>
+
+<button mat-mini-fab color="primary" class="tag-add" (click)="addTag()">
+    <mat-icon>add</mat-icon>
+</button>

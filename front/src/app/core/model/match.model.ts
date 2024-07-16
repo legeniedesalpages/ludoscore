@@ -13,6 +13,7 @@
 
 import { CancelReason, DrawBreaker, Game } from "./game.model"
 import { Player } from "./player.model"
+import { Score } from "./score.model"
 import { ColorTag } from "./tag.model"
 
 export interface MatchModel {
@@ -35,6 +36,7 @@ export interface Team {
     choosenTags: ChoosenTag[]
     color: ColorTag
     score: number | undefined
+    scoreDetails: Score[]
     teamPlayers: TeamPlayer[]
 }
 
