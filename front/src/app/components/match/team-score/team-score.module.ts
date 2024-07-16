@@ -26,7 +26,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatDividerModule } from '@angular/material/divider'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { TeamScoreComponent } from './team-score.component'
-import { NgxTouchKeyboardModule }  from 'ngx-touch-keyboard';
 
 const routes: Routes = [ { path: '', component: TeamScoreComponent, canActivate: [AuthGuardService] }]
 
@@ -46,8 +45,7 @@ const routes: Routes = [ { path: '', component: TeamScoreComponent, canActivate:
     MatCheckboxModule,
     MatDividerModule,
     SidenavModule,
-    ReactiveFormsModule,
-    NgxTouchKeyboardModule
+    ReactiveFormsModule
   ]
 })
 export class TeamScoreModule { }
