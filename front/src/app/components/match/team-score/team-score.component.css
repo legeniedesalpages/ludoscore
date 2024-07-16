@@ -9,13 +9,13 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding:0px;
+  padding: 0px;
 }
 
 .score {
   width: 100;
   text-align: center;
-  padding:10px;
+  padding: 10px;
   font-size: 1.2em;
 }
 
@@ -34,13 +34,13 @@ hr {
 }
 
 .complex-field {
-  padding:10px;
+  padding: 10px;
   height: 45px;
-  border-top:1px solid lightgrey;
+  border-top: 1px solid lightgrey;
 }
 
 .complex-field-compute {
-  padding:10px;
+  padding: 10px;
   height: 50px;
 }
 
@@ -48,19 +48,19 @@ hr {
   border: 1px solid lightgrey;
   height: 30px;
   float: right;
-  width:200px;
+  width: 200px;
 }
 
 .complex-field textarea {
   border: 1px solid lightgrey;
   float: right;
-  width:200px;
+  width: 200px;
   opacity: 1;
 }
 
 .category-name {
   height: 30px;
-  float:left;
+  float: left;
 }
 
 .negative-score {
@@ -70,11 +70,49 @@ hr {
 .complex-field input.ng-invalid {
   background-color: red;
 }
+
 .complex-field textarea.ng-invalid {
   background-color: red;
 }
 
 .mat-icon {
   vertical-align: middle;
-  padding-left:20px;
+  padding-left: 20px;
+}
+
+.key {
+  font-weight: bold;
+  margin: 2px;
+  cursor: pointer;
+  height: 30px;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.mat-icon {
+  padding-left: 0px;
+}
+
+.keyboard {
+  background-color: lightgrey;
+  padding: 10px;
+  max-width: 450px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+  justify-content: space-between
+}
+
+.mid {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.large {
+  padding-left: 30px;
+  padding-right: 30px;
 }

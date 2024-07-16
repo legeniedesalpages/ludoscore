@@ -3,6 +3,34 @@
     <span class="title">Fin de partie</span>
   </ng-container>
 
+  <ng-container role="footer">
+    <div class="keyboard">
+      <div class="row">
+        <button class="key">0</button>
+        <button class="key">1</button>
+        <button class="key">2</button>
+        <button class="key">3</button>
+        <button class="key">4</button>
+        <button class="key">5</button>
+        <button class="key">6</button>
+        <button class="key">7</button>
+        <button class="key">8</button>
+        <button class="key">9</button>
+        <button class="key primary"><mat-icon>backspace</mat-icon></button>
+      </div>
+      <div class="row">
+        <button class="key mid">+</button>
+        <button class="key mid">-</button>
+        <button class="key mid">(</button>
+        <button class="key large">espace</button>
+        <button class="key mid">)</button>
+        <button class="key mid">*</button>
+        <button class="key primary mid"><mat-icon>subdirectory_arrow_left</mat-icon></button>
+        
+      </div>
+    </div>
+  </ng-container>
+
   <ng-container role="body">
     <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
       <div class="score">Score pour <b>{{ team.name }}</b></div>
@@ -10,13 +38,18 @@
       <form [formGroup]="teamScore" (ngSubmit)="onSubmit()">
 
         <div *ngFor="let scoreCategory of scoreTemplate" class="complex-group">
-          <div [ngClass]="scoreCategory.complex ? 'complex-field-compute complex-field' : 'complex-field'" [ngStyle]="{'background-color': scoreCategory.color.code, 'color': scoreCategory.color.invert}">
-              <span class="category-name">
-                {{ scoreCategory.category }}
-                <br/><span *ngIf="scoreCategory.complex"><mat-icon>arrow_right</mat-icon>Total: {{ calc(scoreCategory.category) }}</span>
-              </span>
-              <input cdkFocusInitial [formControlName]="scoreCategory.category" inputmode="numeric" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)"/>
-              <textarea cdkFocusInitial [formControlName]="scoreCategory.category" rows="3" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)"></textarea>
+          <div [ngClass]="scoreCategory.complex ? 'complex-field-compute complex-field' : 'complex-field'"
+            [ngStyle]="{'background-color': scoreCategory.color.code, 'color': scoreCategory.color.invert}">
+            <span class="category-name">
+              {{ scoreCategory.category }}
+              <br /><span *ngIf="scoreCategory.complex"><mat-icon>arrow_right</mat-icon>Total: {{
+                calc(scoreCategory.category) }}</span>
+            </span>
+            <input cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" inputmode="numeric"
+              [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" *ngIf="!scoreCategory.complex"
+              (ngModelChange)="valuechange($event)" />
+            <textarea cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" rows="3" pattern="[0-9+-]*"
+              *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)"></textarea>
           </div>
         </div>
 
@@ -24,7 +57,7 @@
 
         <mat-form-field appearance="fill">
           <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
-          <input matInput formControlName="score" type="number">
+          <input matInput formControlName="score" inputmode='none'>
         </mat-form-field>
 
         <button mat-raised-button color="primary" [disabled]="!teamScore.valid">

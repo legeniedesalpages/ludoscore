@@ -30,6 +30,7 @@
     "matter-js": "^0.20.0",
     "moment": "2.29.4",
     "ng-recaptcha": "^11.0.0",
+    "ngx-touch-keyboard": "^2.0.0",
     "pusher-js": "^8.0.1",
     "rxjs": "~7.5.0",
     "zone.js": "~0.12.0"
