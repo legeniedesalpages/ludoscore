@@ -170,6 +170,7 @@ export class MatchState {
         console.info("Saving match")
         const matchEntity: MatchEntity = await lastValueFrom(this.matchService.saveMatchResult(getState().match!).pipe(catchError(error => { console.warn(error.message); throw error.message })))
         console.debug("Match saved", matchEntity)
+        setState(defaultMatchModel)
     }
 
     @Action(AddGameTags)

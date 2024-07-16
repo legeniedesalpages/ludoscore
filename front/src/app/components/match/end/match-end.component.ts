@@ -10,11 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, ofActionCompleted, ofActionErrored, Select, Store } from '@ngxs/store'
-import { Observable, Subscription, } from 'rxjs'
+import { Observable } from 'rxjs'
 import { Team } from 'src/app/core/model/match.model'
 import { MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
@@ -24,11 +24,10 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   templateUrl: './match-end.component.html',
   styleUrls: ['./match-end.component.css'],
 })
-export class MatchEndComponent implements OnInit, OnDestroy {
+export class MatchEndComponent implements OnInit {
 
   @Select(MatchState) matchState!: Observable<MatchStateModel>
 
-  private subscription!: Subscription
   public saving: boolean = false
 
   constructor(private store: Store, private actions: Actions, private snackBar: MatSnackBar) {
@@ -43,19 +42,11 @@ export class MatchEndComponent implements OnInit, OnDestroy {
 
     this.actions.pipe(ofActionCompleted(SaveMatchResult)).subscribe(() => {
       this.saving = false
+      this.snackBar.open("Match enregistré ! à bientôt sur Ludoscore ;-)", 'Fermer', {
+        duration: 5000
+      })
+      this.store.dispatch(new Navigate(['/']))
     })
-
-
-    this.subscription = this.matchState.subscribe(matchState => {
-      if (!matchState.match) {
-        this.store.dispatch(new Navigate(['']))
-
-      }
-    })
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe()
   }
 
   public selectWiningTeam(team: Team) {

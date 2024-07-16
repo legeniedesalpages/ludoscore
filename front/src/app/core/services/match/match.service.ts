@@ -64,6 +64,7 @@ export class MatchService {
 
             return this.teamCrudService.update(team.id!, {
                 id: team.id,
+                name: team.name,
                 color: team.color.name,
                 matchId: match.matchId!,
                 score: team.score,
@@ -78,7 +79,6 @@ export class MatchService {
                     running: false,
                     tags: JSON.stringify(match.choosenTags),
                     winnerTeamId: match.winnigTeam?.id,
-                    finishedAt: match.endedAt
                 })
             })
         )

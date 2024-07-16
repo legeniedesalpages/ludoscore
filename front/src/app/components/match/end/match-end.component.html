@@ -4,41 +4,44 @@
     </ng-container>
 
     <ng-container role="body">
-        <div class="score">Saisie des scores</div>
-        <ul class="player-list" *ngIf="(matchState | async)?.match!.game.quantifiableScore">
-            <div *ngFor="let team of (matchState | async)?.match!.teams" class="result-list">
-                <li class="player" (click)="setTeamScore(team)">
-                    <div class="player-name">
-                        <div *ngIf="team.score != undefined"><mat-icon class="check">done</mat-icon></div>
-                        <div *ngIf="team.score == undefined"><mat-icon class="cancel">cancel</mat-icon></div>
-                        {{ team.name }}
-                        <span *ngIf="team.score">(score: {{ team.score }})</span>
-                    </div>
-                </li>
-            </div>
-        </ul>
+        <div *ngIf="(matchState | async)?.match!">
+            <div class="score">Saisie des scores</div>
+            <ul class="player-list" *ngIf="(matchState | async)?.match!.game.quantifiableScore">
+                <div *ngFor="let team of (matchState | async)?.match?.teams" class="result-list">
+                    <li class="player" (click)="setTeamScore(team)">
+                        <div class="player-name">
+                            <div *ngIf="team.score != undefined"><mat-icon class="check">done</mat-icon></div>
+                            <div *ngIf="team.score == undefined"><mat-icon class="cancel">cancel</mat-icon></div>
+                            {{ team.name }}
+                            <span *ngIf="team.score">(score: {{ team.score }})</span>
+                        </div>
+                    </li>
+                </div>
+            </ul>
 
-        <fieldset [disabled]="saving">
-            <mat-form-field appearance="fill" class="winner">
-                <mat-label>Et le vainqueur est...r</mat-label>
-                <mat-select (valueChange)="selectWiningTeam($event.value)" [disabled]="saving"
-                    [value]="(matchState | async)?.match!.winnigTeam">
-                    <mat-option *ngFor="let winningTeam of (matchState | async)?.match!.teams" [value]="winningTeam">
-                        {{winningTeam.name}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+            <fieldset [disabled]="saving">
+                <mat-form-field appearance="fill" class="winner">
+                    <mat-label>Et le vainqueur est...r</mat-label>
+                    <mat-select (valueChange)="selectWiningTeam($event.value)" [disabled]="saving"
+                        [value]="(matchState | async)?.match?.winnigTeam">
+                        <mat-option *ngFor="let winningTeam of (matchState | async)?.match?.teams"
+                            [value]="winningTeam">
+                            {{winningTeam.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
 
-            
-            <div class="buttons" [hidden]="saving">
-                <button mat-raised-button color="primary" (click)="endMatch()">
-                    Enregistrer et mettre fin à la partie
-                </button>
-                <button mat-raised-button color="warn" (click)="abortMatch()">
-                    Le match est abandonné
-                </button>
-            </div>
-        </fieldset>
+
+                <div class="buttons" [hidden]="saving">
+                    <button mat-raised-button color="primary" (click)="endMatch()">
+                        Enregistrer et mettre fin à la partie
+                    </button>
+                    <button mat-raised-button color="warn" (click)="abortMatch()">
+                        Le match est abandonné
+                    </button>
+                </div>
+            </fieldset>
+        </div>
 
         <loading-spinner [loading]="saving" caption="Enregistrement de la partie..." />
 
