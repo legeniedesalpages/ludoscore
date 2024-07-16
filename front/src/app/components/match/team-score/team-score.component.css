@@ -80,39 +80,52 @@ hr {
   padding-left: 20px;
 }
 
+.keyboard {
+  background-color: lightgrey;
+  height: 110px;
+  border-top: 1px solid black;
+}
+
 .key {
   font-weight: bold;
-  margin: 2px;
   cursor: pointer;
-  height: 30px;
-  padding-left: 7px;
-  padding-right: 7px;
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: white;
+  flex: 1 1 0;  
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .mat-icon {
   padding-left: 0px;
 }
 
-.keyboard {
-  background-color: lightgrey;
-  padding: 10px;
-  max-width: 450px;
-}
-
-.row {
+.keyboard .row {
   display: flex;
   flex-direction: row;
   justify-content: center;
   flex-wrap: nowrap;
-  justify-content: space-between
+  justify-content: space-around;
+  height: 50%;
+  gap: 4px;
 }
 
-.mid {
-  padding-left: 10px;
-  padding-right: 10px;
+.primary {
+  background-color: #2196f3;
+  color:white
 }
 
 .large {
-  padding-left: 30px;
-  padding-right: 30px;
+  flex: 3 1 0;
+}
+
+.mid {
+  flex: 2 1 0;
+}
+
+.grey {
+  background-color: gray;
+  color: white;
 }

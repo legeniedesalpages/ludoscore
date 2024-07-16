@@ -16,15 +16,15 @@
         <button class="key">7</button>
         <button class="key">8</button>
         <button class="key">9</button>
-        <button class="key primary"><mat-icon>backspace</mat-icon></button>
+        <button class="key grey"><mat-icon>backspace</mat-icon></button>
       </div>
       <div class="row">
-        <button class="key mid">+</button>
-        <button class="key mid">-</button>
-        <button class="key mid">(</button>
+        <button class="key grey">+</button>
+        <button class="key grey">-</button>
+        <button class="key grey">(</button>
         <button class="key large">espace</button>
-        <button class="key mid">)</button>
-        <button class="key mid">*</button>
+        <button class="key grey">)</button>
+        <button class="key grey">*</button>
         <button class="key primary mid"><mat-icon>subdirectory_arrow_left</mat-icon></button>
         
       </div>
@@ -45,11 +45,8 @@
               <br /><span *ngIf="scoreCategory.complex"><mat-icon>arrow_right</mat-icon>Total: {{
                 calc(scoreCategory.category) }}</span>
             </span>
-            <input cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" inputmode="numeric"
-              [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" *ngIf="!scoreCategory.complex"
-              (ngModelChange)="valuechange($event)" />
-            <textarea cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" rows="3" pattern="[0-9+-]*"
-              *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)"></textarea>
+            <input cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''"/>
+            <textarea cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)" rows="3"></textarea>
           </div>
         </div>
 
