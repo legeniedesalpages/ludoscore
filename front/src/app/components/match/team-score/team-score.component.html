@@ -15,8 +15,8 @@
                 {{ scoreCategory.category }}
                 <br/><span *ngIf="scoreCategory.complex"><mat-icon>arrow_right</mat-icon>Total: {{ calc(scoreCategory.category) }}</span>
               </span>
-              <input [formControlName]="scoreCategory.category" type="number" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)"/>
-              <textarea [formControlName]="scoreCategory.category" rows="3" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)"></textarea>
+              <input cdkFocusInitial [formControlName]="scoreCategory.category" inputmode="numeric" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)"/>
+              <textarea cdkFocusInitial [formControlName]="scoreCategory.category" rows="3" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)"></textarea>
           </div>
         </div>
 
@@ -24,7 +24,7 @@
 
         <mat-form-field appearance="fill">
           <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
-          <input matInput formControlName="score" type="number" cdkFocusInitial>
+          <input matInput formControlName="score" type="number">
         </mat-form-field>
 
         <button mat-raised-button color="primary" [disabled]="!teamScore.valid">

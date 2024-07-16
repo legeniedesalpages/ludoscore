@@ -67,10 +67,10 @@ hr {
   background-color: pink;
 }
 
-input.ng-invalid {
+.complex-field input.ng-invalid {
   background-color: red;
 }
-textarea.ng-invalid {
+.complex-field textarea.ng-invalid {
   background-color: red;
 }
 
