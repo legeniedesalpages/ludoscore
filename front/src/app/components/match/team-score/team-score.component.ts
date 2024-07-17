@@ -141,6 +141,10 @@ export class TeamScoreComponent implements OnInit {
     return ""
   }
 
+  public onKeydown(event: any){
+    event.preventDefault();
+  }
+
   ngOnInit(): void {
     this.actions.pipe(ofActionSuccessful(AddScoreToTeam)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
   }

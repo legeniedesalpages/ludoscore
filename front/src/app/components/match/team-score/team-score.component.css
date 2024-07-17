@@ -82,7 +82,7 @@ hr {
 
 .keyboard {
   background-color: lightgrey;
-  height: 110px;
+  height: 180px;
   border-top: 1px solid black;
   padding-bottom: 10px;
   padding-top: 10px;
@@ -110,12 +110,17 @@ hr {
   justify-content: center;
   flex-wrap: nowrap;
   justify-content: space-between;
-  height: 50%;
+  height: 33%;
   gap: 4px;
 }
 
 .primary {
   background-color: #2196f3;
+  color:white
+}
+
+.accent {
+  background-color: #009688;
   color:white
 }
 

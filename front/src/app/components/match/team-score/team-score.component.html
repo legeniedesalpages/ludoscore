@@ -11,18 +11,20 @@
         <button class="key">2</button>
         <button class="key">3</button>
         <button class="key">4</button>
+        <button class="key grey"><mat-icon>backspace</mat-icon></button>
+      </div>
+      <div class="row">  
         <button class="key">5</button>
         <button class="key">6</button>
         <button class="key">7</button>
         <button class="key">8</button>
         <button class="key">9</button>
-        <button class="key grey"><mat-icon>backspace</mat-icon></button>
+        <button class="key accent">+</button>
       </div>
       <div class="row">
-        <button class="key grey">+</button>
         <button class="key grey">-</button>
         <button class="key grey">(</button>
-        <button class="key large">espace</button>
+        <button class="key mid">&nbsp;</button>
         <button class="key grey">)</button>
         <button class="key grey">*</button>
         <button class="key primary mid"><mat-icon>subdirectory_arrow_left</mat-icon></button>
@@ -46,7 +48,7 @@
                 calc(scoreCategory.category) }}</span>
             </span>
             <input cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''"/>
-            <textarea cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)" rows="3"></textarea>
+            <textarea cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)" rows="3" (keydown.enter)="onKeydown($event)"></textarea>
           </div>
         </div>
 

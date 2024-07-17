@@ -8,7 +8,7 @@
 
         <div class="manage-player" *ngIf="!loading">
             <div class="actions">
-                <button mat-raised-button color="primary" (click)="createPlayer()">Ajouter un joueur</button>
+                <button mat-raised-button color="accent" (click)="createPlayer()">Ajouter un joueur</button>
             </div>
 
             <div *ngFor="let player of playerEntities" class="result-list" (click)="editPlayer(player.id)">
