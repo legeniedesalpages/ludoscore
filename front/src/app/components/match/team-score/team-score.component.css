@@ -75,6 +75,10 @@ hr {
   background-color: red;
 }
 
+.sub-total {
+  overflow: hidden;
+}
+
 .mat-icon {
   vertical-align: middle;
   padding-left: 20px;

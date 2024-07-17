@@ -15,7 +15,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
-import { Observable, first } from 'rxjs'
+import { Observable, first, timeout } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { Score, ScoreTag } from 'src/app/core/model/score.model'
 import { ArithmeticExpressionEvaluator } from 'src/app/core/services/misc/arithmetic'
@@ -37,6 +37,8 @@ export class TeamScoreComponent implements OnInit {
   public readonly teamScore: FormGroup
   public readonly scoreTemplate: ScoreTag[]
   public readonly complexScoreTemplate: boolean
+  public event!: any
+  public timeout!: NodeJS.Timeout
 
   constructor(private store: Store, activatedRoute: ActivatedRoute, private actions: Actions) {
 
@@ -141,7 +143,7 @@ export class TeamScoreComponent implements OnInit {
     return ""
   }
 
-  public onKeydown(event: any){
+  public onKeydown(event: any) {
     event.preventDefault();
   }
 
@@ -158,4 +160,36 @@ export class TeamScoreComponent implements OnInit {
   public returnToMatchEnd() {
     this.store.dispatch(new Navigate(['/match-end']))
   }
+
+  public key(car: any) {
+    if (this.event) {
+      const cursor = this.event.selectionStart
+      if (car == "Backspace") {
+        if (cursor > 0) {
+          this.event.value = this.event.value.substring(0, cursor - 1) + this.event.value.substring(cursor)
+          this.event.selectionStart = cursor - 1
+          this.event.selectionEnd = cursor - 1
+        }
+
+      } else {
+        this.event.value = this.event.value.substring(0, cursor) + car + this.event.value.substring(cursor)
+        this.event.selectionStart = cursor + 1
+        this.event.selectionEnd = cursor + 1
+      }
+      this.event.focus()
+      this.event = undefined
+    }
+  }
+
+  public blur(event: any) {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
+
+    this.event = event
+    
+    this.timeout = setTimeout(() => {
+      this.event = undefined
+    }, 300)
+   }
 }

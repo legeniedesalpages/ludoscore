@@ -6,27 +6,27 @@
   <ng-container role="footer">
     <div class="keyboard">
       <div class="row">
-        <button class="key">0</button>
-        <button class="key">1</button>
-        <button class="key">2</button>
-        <button class="key">3</button>
-        <button class="key">4</button>
-        <button class="key grey"><mat-icon>backspace</mat-icon></button>
+        <button class="key" matRipple (click)="key('0')">0</button>
+        <button class="key" (click)="key('1')">1</button>
+        <button class="key" (click)="key('2')">2</button>
+        <button class="key" (click)="key('3')">3</button>
+        <button class="key" (click)="key('4')">4</button>
+        <button class="key grey" (click)="key('Backspace')"><mat-icon>backspace</mat-icon></button>
       </div>
       <div class="row">  
-        <button class="key">5</button>
-        <button class="key">6</button>
-        <button class="key">7</button>
-        <button class="key">8</button>
-        <button class="key">9</button>
-        <button class="key accent">+</button>
+        <button class="key" (click)="key('5')">5</button>
+        <button class="key" (click)="key('6')">6</button>
+        <button class="key" (click)="key('7')">7</button>
+        <button class="key" (click)="key('8')">8</button>
+        <button class="key" (click)="key('9')">9</button>
+        <button class="key accent" (click)="key('+')">+</button>
       </div>
       <div class="row">
-        <button class="key grey">-</button>
-        <button class="key grey">(</button>
-        <button class="key mid">&nbsp;</button>
-        <button class="key grey">)</button>
-        <button class="key grey">*</button>
+        <button class="key grey" (click)="key('-')">-</button>
+        <button class="key grey" (click)="key('(')">(</button>
+        <button class="key mid" (click)="key(' ')">&nbsp;</button>
+        <button class="key grey" (click)="key(')')">)</button>
+        <button class="key grey" (click)="key('*')">*</button>
         <button class="key primary mid"><mat-icon>subdirectory_arrow_left</mat-icon></button>
         
       </div>
@@ -44,11 +44,10 @@
             [ngStyle]="{'background-color': scoreCategory.color.code, 'color': scoreCategory.color.invert}">
             <span class="category-name">
               {{ scoreCategory.category }}
-              <br /><span *ngIf="scoreCategory.complex"><mat-icon>arrow_right</mat-icon>Total: {{
-                calc(scoreCategory.category) }}</span>
+              <br /><span *ngIf="scoreCategory.complex" class="sub-total"><mat-icon>arrow_right</mat-icon>{{ calc(scoreCategory.category) }}</span>
             </span>
             <input cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''"/>
-            <textarea cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)" rows="3" (keydown.enter)="onKeydown($event)"></textarea>
+            <textarea (blur)="blur($event.target)" cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex" (ngModelChange)="valuechange($event)" rows="3" (keydown.enter)="onKeydown($event)"></textarea>
           </div>
         </div>
 
