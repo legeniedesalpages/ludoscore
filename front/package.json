@@ -27,6 +27,7 @@
     "@ngxs/storage-plugin": "^3.7.6",
     "@ngxs/store": "^3.7.6",
     "dayjs": "^1.11.10",
+    "emulate-tab": "^1.2.1",
     "matter-js": "^0.20.0",
     "moment": "2.29.4",
     "ng-recaptcha": "^11.0.0",

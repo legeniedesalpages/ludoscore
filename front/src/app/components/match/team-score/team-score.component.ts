@@ -10,8 +10,8 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit } from '@angular/core'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { Component, Directive, OnInit } from '@angular/core'
+import { AbstractControl, FormControl, FormControlDirective, FormControlName, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
@@ -23,9 +23,10 @@ import { AddScoreToTeam } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
 
+
 @Component({
   templateUrl: './team-score.component.html',
-  styleUrls: ['./team-score.component.css'],
+  styleUrls: ['./team-score.component.css']
 })
 export class TeamScoreComponent implements OnInit {
 
@@ -34,17 +35,17 @@ export class TeamScoreComponent implements OnInit {
   public team!: Team
   public scoreDetails: Score[] = []
 
-  public readonly teamScore: FormGroup
+  public readonly teamScoreFormGroup: FormGroup
   public readonly scoreTemplate: ScoreTag[]
   public readonly complexScoreTemplate: boolean
-  public event!: any
+  public inputElement!: HTMLInputElement
   public timeout!: NodeJS.Timeout
 
   constructor(private store: Store, activatedRoute: ActivatedRoute, private actions: Actions) {
 
     this.scoreTemplate = this.store.selectSnapshot<MatchModel>(MatchState.match).game.scoreTags
 
-    this.teamScore = new FormGroup({
+    this.teamScoreFormGroup = new FormGroup({
       score: new FormControl('', [Validators.required, Validators.pattern("^[0-9\-]*$"), Validators.minLength(1)])
     })
     this.scoreTemplate.forEach(scoreTag => {
@@ -61,7 +62,7 @@ export class TeamScoreComponent implements OnInit {
       } else {
         validators.push(Validators.pattern("^[0-9\-]*$"))
       }
-      this.teamScore.addControl(scoreTag.category, new FormControl('', validators))
+      this.teamScoreFormGroup.addControl(scoreTag.category, new FormControl('', validators))
     })
 
     console.debug("Score template", this.scoreTemplate)
@@ -78,25 +79,62 @@ export class TeamScoreComponent implements OnInit {
       this.team = teams.find(team => team.id == teamId)!
       console.debug("Team found, fill form with previous score data", this.team)
 
-      this.teamScore.get("score")!.setValue(this.team.score)
+      this.teamScoreFormGroup.get("score")!.setValue(this.team.score)
       this.scoreTemplate.forEach(scoreTag => {
-        this.teamScore.get(scoreTag.category)!.setValue(this.team.scoreDetails.find(score => score.categoryName == scoreTag.category)?.inputString)
+        this.teamScoreFormGroup.get(scoreTag.category)!.setValue(this.team.scoreDetails.find(score => score.categoryName == scoreTag.category)?.inputString)
       })
       this.valuechange(null)
     })
   }
 
+  public key(car: any) {
+    if (this.inputElement) {
+      const cursor = this.inputElement.selectionStart!
+      if (car == "Backspace") {
+        if (cursor > 0) {
+          this.inputElement.value = this.inputElement.value.substring(0, cursor - 1) + this.inputElement.value.substring(cursor)
+          this.inputElement.selectionStart = cursor - 1
+          this.inputElement.selectionEnd = cursor - 1
+        }
+
+      } else if (car == "Enter") {
+        
+
+
+      } else {
+        this.inputElement.value = this.inputElement.value.substring(0, cursor) + car + this.inputElement.value.substring(cursor)
+        this.inputElement.selectionStart = cursor + 1
+        this.inputElement.selectionEnd = cursor + 1
+      }
+      this.inputElement.focus()
+      this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+      this.inputElement = undefined!
+    }
+  }
+
+  public blur(event: any) {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
+
+    this.inputElement = event
+    
+    this.timeout = setTimeout(() => {
+      this.inputElement = undefined!
+    }, 300)
+   }
+
   public valuechange(_: any) {
-    this.teamScore.get("score")!
+    this.teamScoreFormGroup.get("score")!
       .setValue(
-        Object.keys(this.teamScore.controls).map(key => {
+        Object.keys(this.teamScoreFormGroup.controls).map(key => {
 
           let result
           const scoreTag = this.scoreTemplate.find(scoreTag => scoreTag.category == key)!
           if (key == "score") {
             result = 0
           } else {
-            const value = this.teamScore.get(key)!.value
+            const value = this.teamScoreFormGroup.get(key)!.value
             if (scoreTag.complex) {
               try {
                 result = new ArithmeticExpressionEvaluator().evaluateAll(value, true)
@@ -117,12 +155,12 @@ export class TeamScoreComponent implements OnInit {
             scoreDetails = {
               categoryName: key,
               value: result,
-              inputString: this.teamScore.get(key)!.value
+              inputString: this.teamScoreFormGroup.get(key)!.value
             }
             this.scoreDetails.push(scoreDetails)
           } else {
             scoreDetails.value = result
-            scoreDetails.inputString = this.teamScore.get(key)!.value
+            scoreDetails.inputString = this.teamScoreFormGroup.get(key)!.value
           }
           return result
 
@@ -131,7 +169,7 @@ export class TeamScoreComponent implements OnInit {
   }
 
   public calc(category: string): string {
-    const val = this.teamScore.get(category)!.value
+    const val = this.teamScoreFormGroup.get(category)!.value
     if (val) {
       try {
         const result = new ArithmeticExpressionEvaluator().evaluateAll(val, true)
@@ -154,42 +192,10 @@ export class TeamScoreComponent implements OnInit {
   public onSubmit() {
     console.info("Submitting team score form")
     console.log(this.scoreDetails)
-    this.store.dispatch(new AddScoreToTeam(this.team, this.teamScore.value.score, this.scoreDetails))
+    this.store.dispatch(new AddScoreToTeam(this.team, this.teamScoreFormGroup.value.score, this.scoreDetails))
   }
 
   public returnToMatchEnd() {
     this.store.dispatch(new Navigate(['/match-end']))
   }
-
-  public key(car: any) {
-    if (this.event) {
-      const cursor = this.event.selectionStart
-      if (car == "Backspace") {
-        if (cursor > 0) {
-          this.event.value = this.event.value.substring(0, cursor - 1) + this.event.value.substring(cursor)
-          this.event.selectionStart = cursor - 1
-          this.event.selectionEnd = cursor - 1
-        }
-
-      } else {
-        this.event.value = this.event.value.substring(0, cursor) + car + this.event.value.substring(cursor)
-        this.event.selectionStart = cursor + 1
-        this.event.selectionEnd = cursor + 1
-      }
-      this.event.focus()
-      this.event = undefined
-    }
-  }
-
-  public blur(event: any) {
-    if (this.timeout) {
-      clearTimeout(this.timeout)
-    }
-
-    this.event = event
-    
-    this.timeout = setTimeout(() => {
-      this.event = undefined
-    }, 300)
-   }
 }
