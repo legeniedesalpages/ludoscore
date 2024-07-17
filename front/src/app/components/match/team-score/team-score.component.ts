@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, Directive, OnInit } from '@angular/core'
+import { Component, Directive, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { AbstractControl, FormControl, FormControlDirective, FormControlName, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
@@ -31,6 +31,8 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 export class TeamScoreComponent implements OnInit {
 
   @Select(MatchState) matchState!: Observable<MatchStateModel>
+
+  @ViewChildren('aa') aa!: QueryList<any>;
 
   public team!: Team
   public scoreDetails: Score[] = []
@@ -95,20 +97,36 @@ export class TeamScoreComponent implements OnInit {
           this.inputElement.value = this.inputElement.value.substring(0, cursor - 1) + this.inputElement.value.substring(cursor)
           this.inputElement.selectionStart = cursor - 1
           this.inputElement.selectionEnd = cursor - 1
+          this.inputElement.focus()
+          this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
       } else if (car == "Enter") {
-        
 
+
+
+        for (let i = 0; i < this.aa.length; i++) {
+          if (this.aa.toArray()[i].nativeElement == this.inputElement) {
+            if (i+2 < this.aa.length) {
+              this.aa.toArray()[i + 1].nativeElement.focus()
+            } else {
+              this.onSubmit()              
+              console.error("validation !")
+              if (this.timeout) {
+                clearTimeout(this.timeout)
+              }
+            }
+          }
+        }
 
       } else {
         this.inputElement.value = this.inputElement.value.substring(0, cursor) + car + this.inputElement.value.substring(cursor)
         this.inputElement.selectionStart = cursor + 1
         this.inputElement.selectionEnd = cursor + 1
+        this.inputElement.focus()
+        this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
       }
-      this.inputElement.focus()
-      this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-      this.inputElement = undefined!
+
     }
   }
 
@@ -118,11 +136,11 @@ export class TeamScoreComponent implements OnInit {
     }
 
     this.inputElement = event
-    
+
     this.timeout = setTimeout(() => {
       this.inputElement = undefined!
     }, 300)
-   }
+  }
 
   public valuechange(_: any) {
     this.teamScoreFormGroup.get("score")!
@@ -143,6 +161,9 @@ export class TeamScoreComponent implements OnInit {
               }
             } else {
               result = Number(value)
+              if (Number.isNaN(result)) {
+                result = 0
+              }
             }
 
             if (scoreTag.negatif) {

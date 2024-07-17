@@ -46,8 +46,8 @@
               {{ scoreCategory.category }}
               <br /><span *ngIf="scoreCategory.complex" class="sub-total"><mat-icon>arrow_right</mat-icon>{{ calc(scoreCategory.category) }}</span>
             </span>
-            <input    [tabindex]="i+5" [ngModel] cdkFocusInitial (blur)="blur($event.target)" inputmode='none' [formControlName]="scoreCategory.category" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''"/>
-            <textarea [tabindex]="i+5" [ngModel] cdkFocusInitial (blur)="blur($event.target)" inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex"  (ngModelChange)="valuechange($event)" rows="3" (keydown.enter)="onKeydown($event)"></textarea>
+            <input    #aa [ngModel] cdkFocusInitial (blur)="blur($event.target)" inputmode='none' [formControlName]="scoreCategory.category" *ngIf="!scoreCategory.complex" (ngModelChange)="valuechange($event)" [ngClass]="scoreCategory.negatif ? 'negative-score' : ''"/>
+            <textarea #aa [ngModel] cdkFocusInitial (blur)="blur($event.target)" inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex"  (ngModelChange)="valuechange($event)" rows="3" (keydown.enter)="onKeydown($event)"></textarea>
           </div>
         </div>
 
@@ -55,10 +55,10 @@
 
         <mat-form-field appearance="fill">
           <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
-          <input matInput tabindex="50" formControlName="score" (blur)="blur($event.target)" inputmode='none'>
+          <input #aa matInput formControlName="score" (blur)="blur($event.target)" inputmode='none'>
         </mat-form-field>
 
-        <button tabindex="60" mat-raised-button color="primary" [disabled]="!teamScoreFormGroup.valid">
+        <button #aa tabindex="60" mat-raised-button color="primary" [disabled]="!teamScoreFormGroup.valid">
           Enregistrer le score
         </button>
       </form>
