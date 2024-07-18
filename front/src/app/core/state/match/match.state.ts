@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags } from "./match.action"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { catchError, first, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
@@ -171,6 +171,17 @@ export class MatchState {
         const matchEntity: MatchEntity = await lastValueFrom(this.matchService.saveMatchResult(getState().match!).pipe(catchError(error => { console.warn(error.message); throw error.message })))
         console.debug("Match saved", matchEntity)
         setState(defaultMatchModel)
+    }
+
+    @Action(SetWinningTeam)
+    setWinningTeam({ setState, getState }: StateContext<MatchStateModel>, winningTeamEvent: SetWinningTeam) {
+        console.info("Set winning team")
+        setState({
+            match: {
+                ...getState().match!,
+                winnigTeam: winningTeamEvent.team
+            }
+        })
     }
 
     @Action(AddGameTags)
@@ -438,7 +449,11 @@ export class MatchState {
 
         let winnigTeam: Team | undefined = undefined
         if (modifiedTeamList.filter(team => team.score == undefined).length == 0) {
-            winnigTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
+            if (getState().match!.game.highestScoreWin ?? true) {
+                winnigTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
+            } else {
+                winnigTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
+            }
         }
 
         setState({

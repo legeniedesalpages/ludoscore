@@ -58,6 +58,11 @@ export class MatchAborted {
     static readonly type: string = '[Match] MatchAborted'
 }
 
+export class SetWinningTeam {
+    static readonly type: string = '[Match] SetWinningTeam'
+    constructor(public team: Team) { }
+}
+
 
 /* TEAM */
 export class AddTeam {

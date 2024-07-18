@@ -16,7 +16,7 @@ import { Navigate } from '@ngxs/router-plugin'
 import { Actions, ofActionCompleted, ofActionErrored, Select, Store } from '@ngxs/store'
 import { Observable } from 'rxjs'
 import { Team } from 'src/app/core/model/match.model'
-import { MatchAborted, SaveMatchResult } from 'src/app/core/state/match/match.action'
+import { MatchAborted, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
 
@@ -51,6 +51,8 @@ export class MatchEndComponent implements OnInit {
 
   public selectWiningTeam(team: Team) {
     console.log("choose wining team", team)
+    this.saving = true
+    this.store.dispatch(new SetWinningTeam(team)).subscribe(_ => this.saving = false)
   }
 
   public setTeamScore(team: Team) {
