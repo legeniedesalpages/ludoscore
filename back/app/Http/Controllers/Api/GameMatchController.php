@@ -144,6 +144,18 @@ class GameMatchController extends Controller
     public function show($id)
     {
         Log::debug("Recherche le match d'id : " . $id);
-        return GameMatch::find($id);
+
+        $returnedMatch = DB::table('matches')
+        ->select('matches.*', 'games.*', 'matches.id as id_match')
+        ->join('games', 'games.id', '=', 'matches.game_id')
+        ->where('matches.id', $id)
+        ->first();
+
+        $returnedMatch->teams = DB::table('teams')
+                ->where('teams.match_id', $returnedMatch->id_match)
+                ->get();
+            
+
+        return $returnedMatch;
     }
 }

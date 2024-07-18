@@ -28,7 +28,7 @@ export class MatchHistoryComponent implements OnInit {
 
   public loading: boolean = true
   public ds!: Observable<MatchDataSource>;
-  public pageSize: number = 20
+  public pageSize: number = 10
 
   constructor(private store: Store, private matchService: MatchService, private datePipe: DatePipe) {
     this.ds = this.matchService.getAllMatchesCount().pipe(
@@ -63,6 +63,10 @@ export class MatchHistoryComponent implements OnInit {
       let minutes = "" + Math.floor((t / (1000 * 60)) % 60)
       let hours = "" + Math.floor((t / (1000 * 60 * 60)) % 24)
       return hours + " heures et " + minutes + " mn"
+  }
+
+  public gotToHistoryDetail(match: MatchModel) {
+    this.store.dispatch(new Navigate(['/match-history-detail', match.matchId]))
   }
 
   public returnToHome() {

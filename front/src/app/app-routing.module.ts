@@ -37,6 +37,7 @@ const routes: Routes = [
   { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } },
 
   { path: 'match-history', loadChildren: () => import('./components/stats/match-history/match-history.module').then(m => m.MatchHistoryModule), data: { animation: 'match-history' } },
+  { path: 'match-history-detail/:id', loadChildren: () => import('./components/stats/match-history-detail/match-history-detail.module').then(m => m.MatchHistoryDetailModule), data: { animation: 'match-history-detail' } },
   
   {path: '**', component: PagenotfoundComponent}
 ];

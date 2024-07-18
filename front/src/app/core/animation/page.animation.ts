@@ -87,6 +87,12 @@ export const slideRight = animation(
 export const pageAnimation = trigger('routeAnimations', [
   transition('* => home', useAnimation(slideLeft)),
   transition('home => *', useAnimation(slideRight)),
+
   transition('game-selection => player-selection', useAnimation(slideRight)),
+  transition('player-selection => match-display', useAnimation(slideRight)),
+  transition('match-display => match-end', useAnimation(slideRight)),
+
   transition('player-selection => game-selection', useAnimation(slideLeft)),
+  transition('match-history => match-history-detail', useAnimation(slideRight)),
+  transition('match-history-detail => match-history', useAnimation(slideLeft)),
 ]);

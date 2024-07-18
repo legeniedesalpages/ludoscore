@@ -1,0 +1,58 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToMatchHistory()">
+    <ng-container role="header">
+        <span class="title">Historique d'une partie</span>
+    </ng-container>
+
+    <ng-container role="body">
+        <loading-spinner [loading]="loading" caption="Chargement de la partie"></loading-spinner>
+
+        <div *ngIf="match | async as match" class="container">
+
+            <div class="game" [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
+                <div class="heading">{{ match.game.title }}</div>
+
+                <ul class="game-category">
+                    <li *ngFor="let matchCategory of match.choosenTags; let i = index">
+                        {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
+                    </li>
+                </ul>
+
+                <div class="elapsedtime">
+                    Temps écoulé :<br />
+                    <span class="bold"></span>
+                </div>
+
+                <div class="player-list">
+                    <div *ngFor="let team of match.teams; let i = index">
+                        <div class="row">
+                            <div class="column">
+                                <div class="player">
+                                    <div class="avatar">
+                                        <img src="{{team.teamPlayers[0]?.player?.gravatarUrl}}">
+                                    </div>
+                                    <div class="line">
+                                        <div class="pseudo">
+                                            {{team.name}}
+                                            <div class="color">
+                                                <span [hidden]="team.color.name == 'Aucune'">
+                                                    <span class="dot"
+                                                        [ngStyle]="{'background-color': team.color.code, 'color': team.color.invert}"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="tags">
+                                            <ul *ngFor="let tag of team.choosenTags">
+                                                <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</app-layout>
