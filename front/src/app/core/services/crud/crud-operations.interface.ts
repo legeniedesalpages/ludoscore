@@ -17,5 +17,6 @@ export interface CrudOperations<T, ID> {
     update(id: ID, t: T): Observable<T>;
     findOne(id: ID): Observable<T>;
     findAll(): Observable<T[]>;
+    findAllPaginated(page: number, size: number): Observable<T[]>;
     delete(id: ID): Observable<any>;
 }

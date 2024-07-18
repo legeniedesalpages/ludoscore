@@ -33,4 +33,9 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         var url = `${this.apiUrl}/previous-match/${playerId}/${gameId}`
         return this.http.get<MatchTeamPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
     }
+
+    findAllCount(): Observable<number> {
+        var url = `${this.apiUrl}/game-match-count`
+        return this.http.get<number>(url).pipe(tap(res => console.debug("find all count " + url + " => ", res)))
+    }
 }

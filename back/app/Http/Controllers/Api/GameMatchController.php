@@ -12,13 +12,18 @@ use Illuminate\Support\Facades\Log;
 
 class GameMatchController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $page = $request->query('page');
+        $size = $request->query('size');
+        Log::info("Liste des match, page : " . $page . " size : " . $size);
+
         $matches = DB::table('matches')
             ->select('matches.*', 'games.*', 'matches.id as id_match')
             ->join('games', 'games.id', '=', 'matches.game_id')
             ->orderBy('matches.started_at', 'desc')
-            ->limit(50)
+            ->offset($page * $size)
+            ->limit($size)
             ->get();
 
         $matches->each(function ($match) {
@@ -28,16 +33,12 @@ class GameMatchController extends Controller
                 ->get();
         });
 
-        Log::debug($matches);
         return $matches;
+    }
 
-
-            /*->crossJoin('teams', 'teams.match_id', '=', 'matches.id')
-            ->crossJoin('team_players', 'team_players.team_id', '=', 'teams.id')
-            ->join('players', 'players.id', '=', 'team_players.player_id')
-            ->orderBy('matches.started_at', 'desc')
-            ->limit(10)
-            ->get();*/
+    public function matchCount()
+    {
+        return GameMatch::count();
     }
 
     public function update(Request $request, $id)

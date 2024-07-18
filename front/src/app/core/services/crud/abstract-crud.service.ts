@@ -39,6 +39,10 @@ export abstract class CrudService<T, ID> implements CrudOperations<T, ID> {
         return this.http.get<T[]>(`${this.apiUrl}${this.base}`).pipe(tap(res => console.debug("find all " + this.base + " => ", res)))
     }
 
+    findAllPaginated(page: number, size: number): Observable<T[]> {
+        return this.http.get<T[]>(`${this.apiUrl}${this.base}?page=${page}&size=${size}`).pipe(tap(res => console.debug("find all " + this.base + " => ", res)))
+    }
+
     delete(id: ID): Observable<T> {
         return this.http.delete<T>(`${this.apiUrl}${this.base}/${id}`).pipe(tap(res => console.debug("delete " + this.base + " => ", res)))
     }

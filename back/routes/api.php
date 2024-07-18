@@ -47,6 +47,9 @@ Route::middleware('auth:sanctum')->get('/running-match', [GameMatchController::c
 
 Route::middleware('auth:sanctum')->get('/previous-match/{playerid}/{gameid}', [GameMatchController::class, 'previousMatch']);
 
+Route::middleware('auth:sanctum')->get('/game-match-count', [GameMatchController::class, 'matchCount']);
+
+
 Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 /*
 |--------------------------------------------------------------------------

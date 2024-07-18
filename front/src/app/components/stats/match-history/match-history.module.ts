@@ -27,6 +27,7 @@ import { LayoutModule } from '../../layout/layout.module';
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatchHistoryComponent } from './match-history.component';
+import { CdkScrollableModule, ScrollingModule } from '@angular/cdk/scrolling';
 
 const routes: Routes = [
   {
@@ -52,7 +53,9 @@ const routes: Routes = [
     MatDividerModule,
     LayoutModule,
     LoadingSpinnerModule,
-    MatChipsModule
+    MatChipsModule,
+    CdkScrollableModule,
+    ScrollingModule
   ],
   exports: [MatchHistoryComponent],
   providers: [DatePipe]

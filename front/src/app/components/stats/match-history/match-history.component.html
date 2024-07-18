@@ -6,17 +6,18 @@
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la liste des parties"></loading-spinner>
 
-        <div class="match-history">
-            <div *ngFor="let match of (matches | async)" class="result-list">
-                <div class="visual">
+        <cdk-virtual-scroll-viewport (itemSize)="pageSize" class="match-history" style="width: 100%; height: 100%;">
+            <div *cdkVirtualFor="let match of (ds | async)" class="result-list">
+                <div class="visual" *ngIf="match">
                     <img src="{{ match.game.thumbnailUrl }}">
                 </div>
-                <div class="content">
+                <div class="content" *ngIf="match">
                     <div class="heading">{{ match.game.title }}</div>
                     <div class="supporting" [innerHTML]="line(match)">
                     </div>
                 </div>
+                <loading-spinner [loading]="match == undefined" caption="Chargement..."></loading-spinner>
             </div>
-        </div>
+        </cdk-virtual-scroll-viewport>
     </ng-container>
 </app-layout>

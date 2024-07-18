@@ -89,8 +89,12 @@ export class MatchService {
         )
     }
 
-    public getAllMatches(): Observable<MatchModel[]> {
-        return this.matchCrudService.findAll().pipe(map((matchEntities: any[]) => {
+    public getAllMatchesCount(): Observable<number> {
+        return this.matchCrudService.findAllCount()
+    }
+
+    public getAllMatches(page: number, size: number): Observable<MatchModel[]> {
+        return this.matchCrudService.findAllPaginated(page, size).pipe(map((matchEntities: any[]) => {
             return matchEntities.map((matchEntity: any) => {
                 const matchModel: MatchModel = {
                     matchId: matchEntity.idMatch,
