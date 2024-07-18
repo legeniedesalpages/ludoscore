@@ -55,19 +55,24 @@
 
     <div class="action-list" [hidden]="loading">
 
-      <div class="action associate" (click)="associatePlayer()" *ngIf="notAssociated">
+      <div class="action associate" matRipple (click)="associatePlayer()" *ngIf="notAssociated">
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
       </div>
 
-      <div class="action" (click)="navigateToFindGame()">
+      <div class="action" matRipple (click)="navigateToFindGame()">
         <mat-icon>manage_search</mat-icon>
         <div class="caption">Rechercher un jeu</div>
       </div>
 
-      <div class="action" (click)="navigateToManagePlayer()">
+      <div class="action" matRipple (click)="navigateToManagePlayer()">
         <mat-icon>group</mat-icon>
         <div class="caption">Voir les joueurs</div>
+      </div>
+
+      <div class="action" matRipple (click)="navigateToMatchHistory()">
+        <mat-icon>update</mat-icon>
+        <div class="caption">Voir l'historique des parties</div>
       </div>
     </div>
 

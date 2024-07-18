@@ -1,0 +1,22 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
+    <ng-container role="header">
+        <span class="title">Historique des parties</span>
+    </ng-container>
+
+    <ng-container role="body">
+        <loading-spinner [loading]="loading" caption="Chargement de la liste des parties"></loading-spinner>
+
+        <div class="match-history">
+            <div *ngFor="let match of (matches | async)" class="result-list">
+                <div class="visual">
+                    <img src="{{ match.game.thumbnailUrl }}">
+                </div>
+                <div class="content">
+                    <div class="heading">{{ match.game.title }}</div>
+                    <div class="supporting" [innerHTML]="line(match)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</app-layout>

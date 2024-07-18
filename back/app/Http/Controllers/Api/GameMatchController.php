@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\GameMatch;
 use App\Models\Team;
 use App\Models\TeamPlayer;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +14,30 @@ class GameMatchController extends Controller
 {
     public function index()
     {
-        return GameMatch::get();
+        $matches = DB::table('matches')
+            ->select('matches.*', 'games.*', 'matches.id as id_match')
+            ->join('games', 'games.id', '=', 'matches.game_id')
+            ->orderBy('matches.started_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        $matches->each(function ($match) {
+            $match->match_id = $match->id;
+            $match->teams = DB::table('teams')
+                ->where('teams.match_id', $match->id_match)
+                ->get();
+        });
+
+        Log::debug($matches);
+        return $matches;
+
+
+            /*->crossJoin('teams', 'teams.match_id', '=', 'matches.id')
+            ->crossJoin('team_players', 'team_players.team_id', '=', 'teams.id')
+            ->join('players', 'players.id', '=', 'team_players.player_id')
+            ->orderBy('matches.started_at', 'desc')
+            ->limit(10)
+            ->get();*/
     }
 
     public function update(Request $request, $id)

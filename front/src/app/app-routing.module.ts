@@ -35,6 +35,8 @@ const routes: Routes = [
 
   { path: 'manage-player', loadChildren: () => import('./components/player/manage-player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },
   { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } },
+
+  { path: 'match-history', loadChildren: () => import('./components/stats/match-history/match-history.module').then(m => m.MatchHistoryModule), data: { animation: 'match-history' } },
   
   {path: '**', component: PagenotfoundComponent}
 ];

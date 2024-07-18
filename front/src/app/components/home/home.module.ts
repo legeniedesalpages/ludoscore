@@ -23,6 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LayoutModule } from '../layout/layout.module';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatRippleModule } from '@angular/material/core';
 
 const routes: Routes = [
   {
@@ -44,6 +45,7 @@ const routes: Routes = [
     LayoutModule,
     MatProgressSpinnerModule,
     LoadingSpinnerModule,
+    MatRippleModule,
     MatDialogModule,
   ]
 })

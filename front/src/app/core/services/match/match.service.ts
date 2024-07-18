@@ -11,11 +11,15 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core'
-import { Observable, forkJoin, mergeMap, switchMap } from 'rxjs'
+import { Observable, forkJoin, map, mergeMap, switchMap } from 'rxjs'
 import { MatchCrudService } from '../crud/match-crud.service'
 import { MatchEntity } from '../../entity/match-entity.model'
-import { MatchModel } from '../../model/match.model'
+import { MatchModel, Team } from '../../model/match.model'
 import { TeamCrudService } from '../crud/team-crud.service'
+import { environment } from 'src/environments/environment'
+import { ColorTag, NO_COLOR, Tag } from '../../model/tag.model'
+import { ScoreTag } from '../../model/score.model'
+import { DrawBreaker } from '../../model/game.model'
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -83,5 +87,62 @@ export class MatchService {
                 })
             })
         )
+    }
+
+    public getAllMatches(): Observable<MatchModel[]> {
+        return this.matchCrudService.findAll().pipe(map((matchEntities: any[]) => {
+            return matchEntities.map((matchEntity: any) => {
+                const matchModel: MatchModel = {
+                    matchId: matchEntity.idMatch,
+                    canceled: matchEntity.canceled,
+                    game: {
+                        id: matchEntity.gameId,
+                        title: matchEntity.title,
+                        imageUrl: environment.imagesURL + '/' + matchEntity.imageId,
+                        thumbnailUrl: environment.imagesURL + '/' + matchEntity.thumbnailId,
+                        isOnlyCooperative: matchEntity.isOnlyCooperative,
+                        minPlayers: matchEntity.minPlayers,
+                        maxPlayers: matchEntity.maxPlayers,
+                        ownershipDate: matchEntity.ownershipDate,
+                        matchTags: matchEntity.matchTags ? JSON.parse(matchEntity.matchTags) : [] as Tag[],
+                        playerTags: matchEntity.playerTags ? JSON.parse(matchEntity.playerTags) : [] as Tag[],
+                        playerColors: matchEntity.playerColors ? JSON.parse(matchEntity.playerColors) : [] as ColorTag[],
+                        scoreTags: matchEntity.scoreTemplate ? JSON.parse(matchEntity.scoreTemplate) : [] as ScoreTag[],
+                        bggId: matchEntity.bggId,
+                        drawAllowed: matchEntity.drawAllowed,
+                        drawBreaker: matchEntity.drawBreaker ? JSON.parse(matchEntity.drawBreaker) : [] as DrawBreaker[],
+                        quantifiableScore: matchEntity.quantifiableScore,
+                        highestScoreWin: matchEntity.highestScoreWin
+                    },
+                    choosenTags: JSON.parse(matchEntity.tags),
+                    teams: matchEntity.teams.map((teamEntity: any) => {
+                        const team: Team = {
+                            id: teamEntity.id,
+                            name: teamEntity.name,
+                            choosenTags: teamEntity.tags ? JSON.parse(teamEntity.tags) : [] as Tag[],
+                            color: NO_COLOR,
+                            score: teamEntity.score,
+                            scoreDetails: [],
+                            teamPlayers: []
+                        }
+                        return team
+                    }),
+                    creating: matchEntity.createdAt ? false : true,
+                    endedAt: matchEntity.finishedAt,
+                    started: matchEntity.startedAt ? true : false,
+                    startedAt: matchEntity.startedAt,
+                    winnigTeam: matchEntity.winnerTeamId ? { 
+                        id: matchEntity.winnerTeamId,
+                        name: '',
+                        choosenTags: [],
+                        color: NO_COLOR,
+                        score: undefined,
+                        scoreDetails: [],
+                        teamPlayers: []
+                    } : undefined,
+                }
+                return matchModel
+            })
+        }))
     }
 }

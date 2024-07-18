@@ -27,6 +27,7 @@ export interface MatchModel {
     choosenTags: ChoosenTag[]
     winnigTeam?: Team
     drawBreaker?: ChoosedDrawBreaker
+    canceled?: boolean
     cancelReason?: string
 }
 
