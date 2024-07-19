@@ -154,6 +154,13 @@ class GameMatchController extends Controller
         $returnedMatch->teams = DB::table('teams')
                 ->where('teams.match_id', $returnedMatch->id_match)
                 ->get();
+
+        $returnedMatch->teams->each(function ($team) {
+            $team->players = DB::table('players')
+                ->join('team_players', 'team_players.player_id', '=', 'players.id')
+                ->where('team_players.team_id', $team->id)
+                ->get();
+        });
             
 
         return $returnedMatch;

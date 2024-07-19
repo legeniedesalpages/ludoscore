@@ -8,7 +8,8 @@
 
         <div *ngIf="match | async as match" class="container">
 
-            <div class="game" [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
+            <div class="game"
+                [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
                 <div class="heading">{{ match.game.title }}</div>
 
                 <ul class="game-category">
@@ -22,16 +23,20 @@
                     <span class="bold"></span>
                 </div>
 
-                <div class="player-list">
-                    <div *ngFor="let team of match.teams; let i = index">
+                <div class="team-list">
+                    <div *ngFor="let team of match.teams">
                         <div class="row">
                             <div class="column">
-                                <div class="player">
-                                    <div class="avatar">
-                                        <img src="{{team.teamPlayers[0]?.player?.gravatarUrl}}">
+                                <div class="team">
+                                    <div *ngFor="let teamPlayer of team.teamPlayers">
+                                        <div class="player">
+                                            <div class="avatar">
+                                                <img src="{{teamPlayer.player.gravatarUrl}}">
+                                            </div>                                            
+                                        </div>
                                     </div>
                                     <div class="line">
-                                        <div class="pseudo">
+                                        <div class="team-name">
                                             {{team.name}}
                                             <div class="color">
                                                 <span [hidden]="team.color.name == 'Aucune'">
@@ -42,10 +47,14 @@
                                         </div>
                                         <div class="tags">
                                             <ul *ngFor="let tag of team.choosenTags">
-                                                <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
+                                                <li>{{tag.category}}: <span
+                                                        class="tag-value">{{tag.names}}</span>
+                                                </li>
                                             </ul>
                                         </div>
-
+                                        <div class="score">
+                                            Score: {{ team.score }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

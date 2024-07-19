@@ -44,7 +44,7 @@
   font-style: italic;
 }
 
-.player-list {
+team-list {
   margin: 0;
   padding: 0;
   border-top: 1px solid lightgray;
@@ -52,7 +52,7 @@
   margin-bottom: 20px;
 }
 
-.player {
+.team {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -87,7 +87,7 @@
   align-items: center;
 }
 
-.pseudo {
+.team-name {
   padding-top: 0;
   padding-bottom: 2px;
 }
@@ -95,6 +95,7 @@
 .tags {
   font-size: small;
   opacity: 0.5;
+  padding-left: 16px;
 }
 
 .tag-value {
