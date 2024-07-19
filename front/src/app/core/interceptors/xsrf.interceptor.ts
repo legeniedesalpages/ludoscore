@@ -48,7 +48,6 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
             if (err.status == 401 && !req.url.includes('api/auth')) {
                 console.warn("No more authenticated, redirect to login page")
                 this.authService.logout().subscribe(() => {
-                    //this.store.dispatch(new Navigate(['/login']))
                     this.router.navigate(['/login'])
                 })
             }

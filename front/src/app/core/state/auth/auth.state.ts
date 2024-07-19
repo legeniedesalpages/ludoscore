@@ -21,7 +21,6 @@ import { DoLogin, DoLogout } from "./auth.actions"
     name: 'auth',
     defaults: {
         id: 0,
-        name: "",
         email: ""
     }
 })
@@ -33,7 +32,7 @@ export class AuthState {
     }
 
     @Selector() static userName(state: AuthStateModel): string {
-        return (state.name == undefined || state.name === "")  ? state.email : state.name
+        return state.email
     }
 
     @Selector() static userId(state: AuthStateModel): number {
@@ -49,7 +48,6 @@ export class AuthState {
                 console.log("returnData", returnData)
                 patchState({
                     id: returnData.id,
-                    name: returnData.name,
                     email: returnData.email,
                 })
             })
@@ -62,7 +60,6 @@ export class AuthState {
             tap(() => {
                 patchState({
                     id: 0,
-                    name: "",
                     email: ""
                 })
             })

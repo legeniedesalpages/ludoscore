@@ -27,6 +27,7 @@ export interface MatchEntity {
 export interface MatchTeamEntity {
     id?: number
     name: string
+    position?: number
     tags: string
     color: string
     score?: number,

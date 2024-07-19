@@ -11,11 +11,10 @@
     * - Modification    : 
 **/
 export interface UserEntity {
-    id: number,
-    name: string,
-    email: string,
-    createdAt: Date,
-    playerId: number,
-    firstConnection: boolean,
+    id: number
+    email: string
+    createdAt: Date
+    playerId: number
+    firstConnection: boolean
     isAdmin: boolean
 }
