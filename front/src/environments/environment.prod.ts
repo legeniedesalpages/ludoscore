@@ -17,4 +17,4 @@ export const environment = {
     imagesURL: 'https://www.lgda.fr/ludoscoreimages',
     recaptchaV2SiteKey:'SECRET_RECAPTCHA_SITE_KEY',
     pusherApiKey: 'SECRET_PUSHER_APP_KEY'
-};
+}

@@ -10,22 +10,22 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { mergeMap, tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { User } from '../../model/user.model';
-import { UserCrudService } from '../crud/user-crud.service';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { mergeMap, tap } from 'rxjs/operators'
+import { Observable } from 'rxjs'
+import { environment } from 'src/environments/environment'
+import { User } from '../../model/user.model'
+import { UserCrudService } from '../crud/user-crud.service'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
   private readonly csrfUrl = environment.apiURL + '/sanctum/csrf-cookie'
-  private readonly loginUrl = environment.apiURL + '/api/auth/login';
-  private readonly logoutUrl = environment.apiURL + '/api/auth/logout';
-  private readonly registerUrl = environment.apiURL + '/api/auth/register';
-  private readonly confirmrUrl = environment.apiURL + '/api/auth/confirm';
+  private readonly loginUrl = environment.apiURL + '/api/auth/login'
+  private readonly logoutUrl = environment.apiURL + '/api/auth/logout'
+  private readonly registerUrl = environment.apiURL + '/api/auth/register'
+  private readonly confirmrUrl = environment.apiURL + '/api/auth/confirm'
 
 
   constructor(private http: HttpClient, private userCrudService: UserCrudService) {

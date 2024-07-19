@@ -20,7 +20,7 @@ import {
   animation,
   useAnimation,
   animateChild
-} from '@angular/animations';
+} from '@angular/animations'
 
 export const slideLeft = animation(
   [
@@ -51,7 +51,7 @@ export const slideLeft = animation(
       query('@*', animateChild(), { optional: true })
     ]),
   ]
-);
+)
 
 export const slideRight = animation(
   [
@@ -82,7 +82,7 @@ export const slideRight = animation(
       query('@*', animateChild(), { optional: true })
     ]),
   ]
-);
+)
 
 export const pageAnimation = trigger('routeAnimations', [
   transition('* => home', useAnimation(slideLeft)),
@@ -95,4 +95,4 @@ export const pageAnimation = trigger('routeAnimations', [
   transition('player-selection => game-selection', useAnimation(slideLeft)),
   transition('match-history => match-history-detail', useAnimation(slideRight)),
   transition('match-history-detail => match-history', useAnimation(slideLeft)),
-]);
+])

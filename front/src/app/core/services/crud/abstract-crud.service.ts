@@ -10,14 +10,14 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Observable, tap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { CrudOperations } from './crud-operations.interface';
-import { environment } from 'src/environments/environment';
+import { Observable, tap } from 'rxjs'
+import { HttpClient } from '@angular/common/http'
+import { CrudOperations } from './crud-operations.interface'
+import { environment } from 'src/environments/environment'
 
 export abstract class CrudService<T, ID> implements CrudOperations<T, ID> {
 
-    protected readonly apiUrl = `${environment.apiURL}/api`;
+    protected readonly apiUrl = `${environment.apiURL}/api`
 
     constructor(protected http: HttpClient, protected base: string) { 
         console.debug("Init crud: " + base)

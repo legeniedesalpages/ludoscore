@@ -96,7 +96,7 @@ export class MatchState {
         console.info("Launch match")
         return this.matchService.createMatch(getState().match!).pipe(tap(matchEntity => {
 
-            let value: any = matchEntity["teams" as keyof MatchEntity];
+            let value: any = matchEntity["teams" as keyof MatchEntity]
 
             const newTeams: Team[] = []
             const teams = getState().match!.teams
@@ -168,7 +168,10 @@ export class MatchState {
     @Action(SaveMatchResult)
     async saveMatchResult({ setState, getState }: StateContext<MatchStateModel>) {
         console.info("Saving match")
-        const matchEntity: MatchEntity = await lastValueFrom(this.matchService.saveMatchResult(getState().match!).pipe(catchError(error => { console.warn(error.message); throw error.message })))
+        const matchEntity: MatchEntity = await lastValueFrom(this.matchService.saveMatchResult(getState().match!).pipe(catchError(error => { 
+            console.warn(error.message)
+            throw error.message 
+        })))
         console.debug("Match saved", matchEntity)
         setState(defaultMatchModel)
     }
@@ -471,6 +474,6 @@ export class MatchState {
             console.error("Cannot perform task because team is not found")
             return false
         }
-        return true;
+        return true
     }
 }

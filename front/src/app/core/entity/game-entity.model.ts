@@ -1,6 +1,3 @@
-import { Time } from "@angular/common";
-import { Tag } from "../model/tag.model";
-
 /**
     * @description      : 
     * @author           : renau

@@ -10,12 +10,12 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
-import { AuthService } from '../services/auth/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Injectable } from '@angular/core'
+import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpXsrfTokenExtractor } from '@angular/common/http'
+import { catchError, Observable, throwError } from 'rxjs'
+import { AuthService } from '../services/auth/auth.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { Router } from '@angular/router'
 
 @Injectable()
 export class HttpXSRFInterceptor implements HttpInterceptor {
@@ -25,21 +25,21 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-        let token = this.tokenExtractor.getToken() as string;
+        let token = this.tokenExtractor.getToken() as string
         if (token !== null && !req.headers.has('X-CSRFTOKEN')) {
             req = req.clone({
                 withCredentials: true,
                 headers: new HttpHeaders({
                     Accept: 'application/json'
                 }).append('X-XSRF-TOKEN', token)
-            });
+            })
         } else {
             req = req.clone({
                 withCredentials: true,
                 headers: new HttpHeaders({
                     Accept: 'application/json'
                 })
-            });
+            })
         }
 
         return next.handle(req).pipe(catchError(err => {
@@ -59,8 +59,8 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
                 })
             }
 
-            return throwError(() => new Error(err.error.message));
-        }));
+            return throwError(() => new Error(err.error.message))
+        }))
 
     }
 

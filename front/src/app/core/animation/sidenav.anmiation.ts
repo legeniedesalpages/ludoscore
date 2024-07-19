@@ -16,7 +16,7 @@ import {
     animate,
     transition,
     state
-} from '@angular/animations';
+} from '@angular/animations'
 
 
 export const slideInOut = trigger('slideInOut', [

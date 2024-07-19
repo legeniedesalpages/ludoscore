@@ -10,20 +10,20 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { CrudService } from './abstract-crud.service';
-import { UserEntity } from '../../entity/user-entity.model';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { CrudService } from './abstract-crud.service'
+import { UserEntity } from '../../entity/user-entity.model'
 
 @Injectable({ providedIn: 'root' })
 export class UserCrudService extends CrudService<UserEntity, number> {
 
     constructor(protected override http: HttpClient) {
-        super(http, '/user');
+        super(http, '/user')
     }
 
     public updateFirstConnection(id: number) {
         var url = `${this.apiUrl}/user/${id}/first-connection`
-        return this.http.post<void>(`${url}`, null);
+        return this.http.post<void>(`${url}`, null)
     }
 }

@@ -11,10 +11,10 @@
     * - Modification    : 
 **/
 export class DoLogin {
-  static readonly type = '[Auth] DoLogin';
+  static readonly type = '[Auth] DoLogin'
   constructor(public email: string, public password: string) { }
 }
 
 export class DoLogout {
-  static readonly type = '[Auth] DoLogout';
+  static readonly type = '[Auth] DoLogout'
 }

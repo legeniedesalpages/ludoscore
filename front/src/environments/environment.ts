@@ -17,4 +17,4 @@ export const environment = {
     imagesURL: 'http://localhost:8000/images',
     recaptchaV2SiteKey:'6LdpRPcjAAAAAJoT5EM4BaIoPwlviqnhT1gfH9aw',
     pusherApiKey: '38b8aa27d92ef96861d1'
-};
+}

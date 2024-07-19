@@ -74,8 +74,8 @@ export class UserCreateComponent implements OnInit {
 
   matchValidator(controlName: string, matchingControlName: string): ValidatorFn {
     return (abstractControl: AbstractControl) => {
-        const control = abstractControl.get(controlName);
-        const matchingControl = abstractControl.get(matchingControlName);
+        const control = abstractControl.get(controlName)
+        const matchingControl = abstractControl.get(matchingControlName)
 
         if (matchingControl!.errors && !matchingControl!.errors?.['confirmedValidator']) {
             return null

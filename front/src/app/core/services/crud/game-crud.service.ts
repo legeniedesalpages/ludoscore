@@ -10,16 +10,16 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { CrudService } from './abstract-crud.service';
-import { GameEntity } from '../../entity/game-entity.model';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { CrudService } from './abstract-crud.service'
+import { GameEntity } from '../../entity/game-entity.model'
 
 @Injectable({ providedIn: 'root' })
 export class GameCrudService extends CrudService<GameEntity, number> {
 
     constructor(protected override http: HttpClient) {
-        super(http, '/game');
+        super(http, '/game')
     }
 
 }

@@ -10,9 +10,9 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AuthService } from 'src/app/core/services/auth/auth.service'
 
 @Component({
   templateUrl: './user-confirmation.component.html',
@@ -30,7 +30,7 @@ export class UserConfirmationComponent implements OnInit {
     console.debug('Show registration confirmation page')
 
     this.route.queryParamMap.subscribe((params) => {  
-      let confirmationKey = params.get('key');
+      let confirmationKey = params.get('key')
       console.info('Confirmation key: ', confirmationKey)
 
       if (confirmationKey) {
@@ -45,12 +45,12 @@ export class UserConfirmationComponent implements OnInit {
             this.loading = false
             this.confirmed = false
           }
-        });
+        })
       } else {
         console.error('Pas de clef de confirmation')
         this.loading = false
         this.confirmed = false
       }
-    });
+    })
   }
 }

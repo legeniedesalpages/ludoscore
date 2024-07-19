@@ -14,10 +14,10 @@ import { Component, OnInit } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { MatchService } from 'src/app/core/services/match/match.service'
-import { DatePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, switchMap, tap } from 'rxjs';
-import { MatchModel } from 'src/app/core/model/match.model';
+import { DatePipe } from '@angular/common'
+import { ActivatedRoute } from '@angular/router'
+import { Observable, switchMap, tap } from 'rxjs'
+import { MatchModel } from 'src/app/core/model/match.model'
 
 
 @Component({
