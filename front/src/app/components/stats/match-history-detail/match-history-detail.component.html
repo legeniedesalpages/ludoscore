@@ -3,6 +3,12 @@
         <span class="title">Historique d'une partie</span>
     </ng-container>
 
+    <ng-container role="footer">
+        <div class="validate-div">
+            <button mat-raised-button color="warn" class="validate-button" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
+        </div>
+    </ng-container>
+
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la partie"></loading-spinner>
 
@@ -19,8 +25,7 @@
                 </ul>
 
                 <div class="elapsedtime">
-                    Temps écoulé :<br />
-                    <span class="bold"></span>
+                    {{ line(match)}}
                 </div>
 
                 <div class="team-list">

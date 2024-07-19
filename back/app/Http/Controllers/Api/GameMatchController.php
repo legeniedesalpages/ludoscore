@@ -12,6 +12,32 @@ use Illuminate\Support\Facades\Log;
 
 class GameMatchController extends Controller
 {
+    public function destroy ($id)
+    {
+        Log::info("Suppression du match id : " . $id);
+        DB::transaction(function () use ($id) {
+            DB::table('matches')
+                ->where('id', $id)
+                ->update(['winner_team_id' => null]);
+
+            DB::table('team_players')
+                ->whereIn('team_id', function ($query) use ($id) {
+                    $query->select('id')
+                        ->from('teams')
+                        ->where('match_id', $id);
+                })
+                ->delete();
+
+            DB::table('teams')
+                ->where('match_id', $id)
+                ->delete();
+
+            DB::table('matches')
+                ->where('id', $id)
+                ->delete();
+        });
+    }
+
     public function index(Request $request)
     {
         $page = $request->query('page');

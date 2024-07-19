@@ -31,6 +31,10 @@ export class MatchService {
         return this.matchCrudService.findRunningMatch()
     }
 
+    public deleteMatch(matchId: number): Observable<void> {
+        return this.matchCrudService.delete(matchId).pipe(map(_ => { }))
+    }
+
     public createMatch(matchModel: MatchModel): Observable<MatchEntity> {
         const aggregatedMatchEntity = {
             match: {
