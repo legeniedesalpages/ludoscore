@@ -47,9 +47,9 @@ export class MatchHistoryDetailComponent implements OnInit {
 
     let headline: string
     if (match.canceled) {
-      headline = "<span class='accent'>Annulé</span> le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' à ' + this.datePipe.transform(match.endedAt, 'HH:mm')
+      headline = "Annulé le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' à ' + this.datePipe.transform(match.endedAt, 'HH:mm')
     } else if (!match.endedAt) {
-      headline = "<span class='emphase'>En cours</span> depuis " + this.elapsedTime(match.startedAt!, new Date())
+      headline = "En cours depuis " + this.elapsedTime(match.startedAt!, new Date())
     } else {
       headline = "Jouée le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' en ' + this.elapsedTime(match.startedAt!, new Date(match.endedAt))
     }
