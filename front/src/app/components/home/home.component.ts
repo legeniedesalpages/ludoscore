@@ -22,12 +22,15 @@ import { Navigate } from '@ngxs/router-plugin';
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FindGameService } from 'src/app/core/services/game/find-game.service';
+import { environment } from 'src/environments/environment'
 
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
+
+  public env = environment
 
   @Select(AuthState.userName) loggedUser!: Observable<any>;
   @Select(AuthState.userId) loggedUserId!: Observable<number>;
