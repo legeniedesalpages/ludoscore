@@ -1,8 +1,8 @@
-FROM node:18.13
+FROM node:latest
 
 WORKDIR /usr/src/app
 
-RUN npm install -g @angular/cli
+RUN npm install -g @angular/core@18 @angular/cli@18
 
 EXPOSE 5000 49153
 

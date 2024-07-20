@@ -24,6 +24,7 @@ import { LayoutModule } from '../layout/layout.module';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatRippleModule } from '@angular/material/core';
+import { MatCardModule } from '@angular/material/card';
 
 const routes: Routes = [
   {
@@ -47,6 +48,7 @@ const routes: Routes = [
     LoadingSpinnerModule,
     MatRippleModule,
     MatDialogModule,
+    MatCardModule
   ]
 })
 export class HomeModule { }

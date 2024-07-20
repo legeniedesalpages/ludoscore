@@ -58,7 +58,7 @@
           <input #aa matInput formControlName="score" (blur)="blur($event.target)" inputmode='none'>
         </mat-form-field>
 
-        <button #aa tabindex="60" mat-raised-button color="primary" [disabled]="!teamScoreFormGroup.valid">
+        <button #aa tabindex="60" mat-raised-button [disabled]="!teamScoreFormGroup.valid">
           Enregistrer le score
         </button>
       </form>

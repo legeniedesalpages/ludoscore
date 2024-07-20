@@ -1,4 +1,3 @@
-import { Color } from "@angular-material-components/color-picker"
 import { ColorTag } from "./tag.model"
 
 /**

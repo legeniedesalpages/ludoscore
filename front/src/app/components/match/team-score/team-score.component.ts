@@ -10,12 +10,12 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, Directive, OnInit, QueryList, ViewChildren } from '@angular/core'
-import { AbstractControl, FormControl, FormControlDirective, FormControlName, FormGroup, Validators } from '@angular/forms'
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
-import { Observable, first, timeout } from 'rxjs'
+import { Observable, first } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { Score, ScoreTag } from 'src/app/core/model/score.model'
 import { ArithmeticExpressionEvaluator } from 'src/app/core/services/misc/arithmetic'
@@ -41,7 +41,7 @@ export class TeamScoreComponent implements OnInit {
   public readonly scoreTemplate: ScoreTag[]
   public readonly complexScoreTemplate: boolean
   public inputElement!: HTMLInputElement
-  public timeout!: NodeJS.Timeout
+  public timeout!: any
 
   constructor(private store: Store, activatedRoute: ActivatedRoute, private actions: Actions) {
 

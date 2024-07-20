@@ -58,7 +58,7 @@ export class EditPlayerComponent implements OnInit {
       console.debug("Id: ", this.currentPlayerId)
       this.creating = (this.currentPlayerId === 0)
       console.debug("Creating: ", this.creating)
-      let loggedUserId: number = this.store.selectSnapshot<AuthStateModel>(AuthState).id
+      let loggedUserId: number = this.store.selectSnapshot<number>(AuthState.userId)
 
       this.userCrudService.findAll().subscribe(users => {
         this.users = users

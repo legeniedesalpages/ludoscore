@@ -15,6 +15,7 @@ import { Navigate } from '@ngxs/router-plugin'
 import { Select, Store } from '@ngxs/store'
 import { Observable, tap } from 'rxjs'
 import { Game } from 'src/app/core/model/game.model'
+import { MatchModel } from 'src/app/core/model/match.model'
 import { GameService } from 'src/app/core/services/game/game.service'
 import { CreateMatch } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
@@ -41,9 +42,9 @@ export class GameSelectionComponent implements OnInit {
     this.loading = true
     this.searching = false
 
-    const matchState = this.store.selectSnapshot<MatchStateModel>(MatchState)
-    if (matchState.match) {
-      console.debug("Game already selected", matchState.match.game)
+    const match = this.store.selectSnapshot<MatchModel>(MatchState.match)
+    if (match) {
+      console.debug("Game already selected", match.game)
       this.store.dispatch(new Navigate(['player-selection']))
     } else {
       console.debug("Game not selected, fetch game list")

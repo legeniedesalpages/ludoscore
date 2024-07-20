@@ -47,7 +47,7 @@ export class SwipeableComponent implements OnInit {
     this.timeout = setTimeout(() => { this.scroll = false; }, 300);
   }
   private scroll: boolean = false;
-  private timeout: NodeJS.Timeout = setTimeout(() => { this.scroll = false; }, 1);
+  private timeout = setTimeout(() => { this.scroll = false; }, 1);
 
   public icon: string = "";
   public text: string = "";

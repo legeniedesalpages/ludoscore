@@ -50,7 +50,7 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
     // NgXs    
     NgxsModule.forRoot([AuthState, MatchState], { developmentMode: !environment.production }),
-    NgxsStoragePluginModule.forRoot({ key: [AuthState, MatchState] }),
+    NgxsStoragePluginModule.forRoot({ keys: [AuthState, MatchState] }),
     NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production }),
     NgxsRouterPluginModule.forRoot(),
   ],
