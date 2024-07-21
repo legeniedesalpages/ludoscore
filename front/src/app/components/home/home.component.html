@@ -19,7 +19,6 @@
 
   <ng-container role="body">
     <div class="banner background-primary">
-      
       <div class="dice">
         <svg viewBox="0 0 512 512">
           <g transform="translate(0,0)">
@@ -47,34 +46,36 @@
         <div *ngIf="(matchState | async) === matchStateEnum.NONE" [hidden]="loading">
           <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
         </div>
+
+        <loading-spinner [loading]="loading" caption="Chargement..." class="secondary-progress-spinner"></loading-spinner>
       </div>
 
-      <loading-spinner [loading]="loading" caption="Chargement..." class="secondary-progress-spinner"></loading-spinner>
+      
     </div>
 
     <div class="alert-actions">
-      <button mat-flat-button class="associate" matRipple (click)="associatePlayer()" *ngIf="notAssociated">
+      <button mat-flat-button class="associate" (click)="associatePlayer()" *ngIf="notAssociated">
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
       </button>
     </div>
 
     <div class="actions">
-      <div class="ludo-card" matRipple (click)="navigateToFindGame()">
-        <img [src]="env.assetsURL + '/images/games.jpg'" />
+      <div class="ludo-card" (click)="navigateToFindGame()">
+        <img [src]="env.assetsURL + 'images/games.jpg'" />
         <span class="ludo-card-title">Chercher un jeu</span>
         <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu à
           ajouter</span>
       </div>
 
-      <div class="ludo-card" matRipple (click)="navigateToMatchHistory()">
-        <img [src]="env.assetsURL + '/images/history.jpg'" />
+      <div class="ludo-card" (click)="navigateToMatchHistory()">
+        <img [src]="env.assetsURL + 'images/history.jpg'" />
         <span class="ludo-card-title">Historique des partie</span>
         <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours</span>
       </div>
 
-      <div class="ludo-card" matRipple (click)="navigateToManagePlayer()">
-        <img [src]="env.assetsURL + '/images/players.jpg'" />
+      <div class="ludo-card" (click)="navigateToManagePlayer()">
+        <img [src]="env.assetsURL + 'images/players.jpg'" />
         <span class="ludo-card-title">Voir les joueurs</span>
         <span class="ludo-card-content">Parcourir et rechercher parmi les joueurs enregistrés dans l'application</span>
       </div>
