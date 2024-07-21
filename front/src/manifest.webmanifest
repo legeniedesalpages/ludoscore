@@ -1,7 +1,7 @@
 {
   "name": "Ludo Score",
   "short_name": "Ludoscore",
-  "theme_color": "#2196f3",
+  "theme_color": "#005cbb",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./",

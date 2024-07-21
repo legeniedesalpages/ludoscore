@@ -60,20 +60,20 @@
 
     <div class="actions">
       <div class="ludo-card" matRipple (click)="navigateToFindGame()">
-        <img [src]="env.imagesURL.substring(0, env.imagesURL.length - 7) + '/assets/games.jpg'" />
+        <img [src]="env.assetsURL + '/images/assets/games.jpg'" />
         <span class="ludo-card-title">Chercher un jeu</span>
         <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu à
           ajouter</span>
       </div>
 
       <div class="ludo-card" matRipple (click)="navigateToMatchHistory()">
-        <img [src]="env.imagesURL.substring(0, env.imagesURL.length - 7) + '/assets/history.jpg'" />
+        <img [src]="env.assetsURL + '/images/assets/history.jpg'" />
         <span class="ludo-card-title">Historique des partie</span>
         <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours</span>
       </div>
 
       <div class="ludo-card" matRipple (click)="navigateToManagePlayer()">
-        <img [src]="env.imagesURL.substring(0, env.imagesURL.length - 7) + '/assets/players.jpg'" />
+        <img [src]="env.assetsURL + '/images/assets/players.jpg'" />
         <span class="ludo-card-title">Voir les joueurs</span>
         <span class="ludo-card-content">Parcourir et rechercher parmi les joueurs enregistrés dans l'application</span>
       </div>
