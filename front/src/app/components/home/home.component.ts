@@ -10,8 +10,8 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject, OnInit } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { Component, inject, Inject, OnInit } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { DoLogout } from 'src/app/core/state/auth/auth.actions';
 import { AuthState } from 'src/app/core/state/auth/auth.state';
 import { first, forkJoin, Observable } from 'rxjs';
@@ -30,14 +30,13 @@ import { environment } from 'src/environments/environment'
 })
 export class HomeComponent implements OnInit {
 
+  public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
   public env = environment
 
-  @Select(AuthState.userName) loggedUser!: Observable<any>;
-  @Select(AuthState.userId) loggedUserId!: Observable<number>;
+  loggedUser$: Observable<string> = inject(Store).select(AuthState.userName);
+  loggedUserId$: Observable<number> = inject(Store).select(AuthState.userId);
+  MatchStateEnum$: Observable<MatchStateEnum> = inject(Store).select(MatchState.state);
 
-  @Select(MatchState.state) matchState!: Observable<MatchStateEnum>;
-
-  public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
   public loggingOut: boolean = false
   public loading: boolean
   public notAssociated: boolean
@@ -55,7 +54,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.loggedUserId.subscribe(id => {
+    this.loggedUserId$.subscribe(id => {
       forkJoin({
         user: this.userService.findOne(id),
         runningMatch: this.matchService.findRunningMatch()

@@ -5,7 +5,7 @@
     </div>
 
     <button mat-flat-button [matMenuTriggerFor]="login" *ngIf="!loggingOut">
-      <span>{{ loggedUser | async }}</span>
+      <span>{{ loggedUser$ | async }}</span>
       <mat-icon>person</mat-icon>
     </button>
 
@@ -34,16 +34,16 @@
       <span class="description">Comptabilisateur de score</span>
 
       <div class="match-state">
-        <div *ngIf="(matchState | async) === matchStateEnum.CREATING" [hidden]="loading">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.CREATING" [hidden]="loading">
           <button mat-raised-button routerLink="/game-selection">Reprendre la création du match</button>
         </div>
-        <div *ngIf="(matchState | async) === matchStateEnum.STARTED" [hidden]="loading">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.STARTED" [hidden]="loading">
           <button mat-raised-button routerLink="/match-display">Voir le match en cours</button>
         </div>
-        <div *ngIf="(matchState | async) === matchStateEnum.FINISHED" [hidden]="loading">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.FINISHED" [hidden]="loading">
           <button mat-raised-button routerLink="/match-end">Enregistrer le score du match</button>
         </div>
-        <div *ngIf="(matchState | async) === matchStateEnum.NONE" [hidden]="loading">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.NONE" [hidden]="loading">
           <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
         </div>
 

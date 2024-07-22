@@ -1,3 +1,9 @@
+.logout-spinner {
+  padding-right: 10px;
+}
+
+/* BANNER */
+
 .banner {
   height: 185px;
   width: 100%;
@@ -34,12 +40,7 @@ svg {
   font-size: 18px;
   font-weight: 300;
   line-height: 28px;
-  padding-bottom: 20px;
   z-index: 1;
-}
-
-.logout-spinner {
-  padding-right: 10px;
 }
 
 .match-state button {
@@ -52,6 +53,8 @@ svg {
   flex-direction: column;
   align-items: center;
 }
+
+/* BANNER */
 
 .alert-actions {
   display: flex;

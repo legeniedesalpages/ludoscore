@@ -15,7 +15,7 @@ import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule, HttpClientXsrfModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration } from "@angular/common/http";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { HttpXSRFInterceptor } from './core/interceptors/xsrf.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -41,10 +41,6 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
     MatSnackBarModule,
     AppRoutingModule,
 
-    // HTTP
-    HttpClientModule,
-    HttpClientXsrfModule.withOptions({ cookieName: 'XSRF-TOKEN', headerName: 'X-CSRF-TOKEN' }),
-
     // PWA
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: !isDevMode(), registrationStrategy: 'registerWhenStable:30000' }),
 
@@ -57,7 +53,11 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
-    PusherService
+    PusherService,
+    provideHttpClient(
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-CSRF-TOKEN' }),
+      withInterceptorsFromDi()
+    )
   ],
 
   bootstrap: [AppComponent]
