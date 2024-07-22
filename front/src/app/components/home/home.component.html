@@ -44,7 +44,7 @@
           <button mat-raised-button routerLink="/match-end">Enregistrer le score du match</button>
         </div>
         <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.NONE" [hidden]="loading">
-          <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
+          <button mat-raised-button routerLink="/game-selection"><mat-icon>star</mat-icon>Démarrer une partie</button>
         </div>
 
         <loading-spinner [loading]="loading" caption="Chargement..." class="secondary-progress-spinner"></loading-spinner>
@@ -62,20 +62,42 @@
 
     <div class="actions">
       <div class="ludo-card" (click)="navigateToFindGame()">
-        <img [src]="env.assetsURL + 'images/games.jpg'" />
+        <span class="green image-icon">          
+          <div class="circle">
+            <mat-icon>image_search</mat-icon>
+          </div>
+        </span>
         <span class="ludo-card-title">Chercher un jeu</span>
         <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu à
           ajouter</span>
       </div>
 
       <div class="ludo-card" (click)="navigateToMatchHistory()">
-        <img [src]="env.assetsURL + 'images/history.jpg'" />
+        <span class="yellow image-icon">          
+          <div class="circle">
+            <mat-icon>rebase_edit</mat-icon>
+          </div>
+        </span>
         <span class="ludo-card-title">Historique des partie</span>
         <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours</span>
       </div>
 
       <div class="ludo-card" (click)="navigateToManagePlayer()">
-        <img [src]="env.assetsURL + 'images/players.jpg'" />
+        <span class="red image-icon">          
+          <div class="circle">
+            <mat-icon>diversity_3</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">Voir les joueurs</span>
+        <span class="ludo-card-content">Parcourir et rechercher parmi les joueurs enregistrés dans l'application</span>
+      </div>
+
+      <div class="ludo-card" (click)="navigateToManagePlayer()">
+        <span class="blue image-icon">          
+          <div class="circle">
+            <mat-icon>library_books</mat-icon>
+          </div>
+        </span>
         <span class="ludo-card-title">Voir les joueurs</span>
         <span class="ludo-card-content">Parcourir et rechercher parmi les joueurs enregistrés dans l'application</span>
       </div>
