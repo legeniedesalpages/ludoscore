@@ -75,6 +75,7 @@ svg {
     justify-content: center;
     gap: 10px;
     overflow: hidden;
+    margin-top:8px;
   }
 
   .action {

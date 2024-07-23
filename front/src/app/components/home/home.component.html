@@ -112,20 +112,22 @@
         </span>
         <span class="ludo-card-content">Parcourir la bibliotheque des jeux déjà enregistré dans ludoscore, permet des les éditer à partir de là</span>
       </div>
+
+      <div class="ludo-card" (click)="navigateToMatchHistory()">
+        <span class="yellow image-icon">          
+          <div class="circle">
+            <mat-icon>query_stats</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Statistiques</span>
+          <span class="card-short">C'est qui le meilleur ?</span>
+        </span>
+        <span class="ludo-card-content">C'est qui le meilleur ?</span>
+      </div>
     </div>
 
-    <div class="ludo-card" (click)="navigateToMatchHistory()">
-      <span class="yellow image-icon">          
-        <div class="circle">
-          <mat-icon>query_stats</mat-icon>
-        </div>
-      </span>
-      <span class="ludo-card-title">
-        <span class="card-title">Statistiques</span>
-        <span class="card-short">C'est qui le meilleur ?</span>
-      </span>
-      <span class="ludo-card-content">C'est qui le meilleur ?</span>
-    </div>
+    
 
   </ng-container>
 </app-layout>
