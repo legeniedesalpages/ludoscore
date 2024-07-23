@@ -46,7 +46,7 @@ export class FindGameComponent {
     console.debug("Search value: ", this.findGameService.searchString)
     this.searching = true
 
-    this.findGameService.search(this.findGameService.searchString).subscribe({
+    this.findGameService.search().subscribe({
       next: (_) => {
         console.info("Number of found game: " + this.findGameService.searchResult.length)
         if (this.findGameService.searchResult.length === 0) {

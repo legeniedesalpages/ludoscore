@@ -21,7 +21,7 @@ import { fromEvent } from "rxjs";
     <div class="container">
       <div class="header background-primary" #headerDiv>
         <!--<button mat-icon-button *ngIf="!withBackButton" (click)="reset()"><mat-icon>menu</mat-icon></button>-->
-        <button mat-icon-button *ngIf="withBackButton" (click)="back()"><mat-icon>keyboard_backspace</mat-icon></button>
+        <button mat-icon-button class="header-button" *ngIf="withBackButton" (click)="back()"><mat-icon>keyboard_backspace</mat-icon></button>
         <span class="menu-spacer" *ngIf="!withBackButton"></span>
         <ng-content select="ng-container[role=header]"></ng-content>
       </div>
@@ -70,6 +70,10 @@ import { fromEvent } from "rxjs";
       text-align: center;
       width:100%;
       text-transform: uppercase;
+    }
+
+    .header-button {
+      color: white;
     }
   `]
 })

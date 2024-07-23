@@ -20,5 +20,10 @@
 }
 
 .owned {
-  opacity: 0.4;
+  opacity: 0.6;
+}
+
+.owned .detail {
+  display: flex;
+  align-items: center;
 }

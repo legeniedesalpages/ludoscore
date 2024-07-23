@@ -14,8 +14,8 @@
                 </mat-form-field>
             </form>
 
-            <div *ngFor="let gameFound of findGameService.searchResult" (click)="goToGameDetail(gameFound)"
-                class="result-list">
+            <!-- (click)="goToGameDetail(gameFound)" -->
+            <div *ngFor="let gameFound of findGameService.searchResult"class="result-list">
                 <div class="visual">
                     <img src={{gameFound.thumbnailUrlFromBgg}} />
                 </div>
@@ -23,14 +23,15 @@
                 <div [class]="gameFound.owned ? 'owned content' : 'content'">
                     <div class="heading">{{gameFound.name}}</div>
                     <div class="supporting">
-                        <div class="detail">
+                        <div class="detail" *ngIf="!gameFound.owned">
                             Année: <span class="emphasis">{{gameFound.year}}</span>
                         </div>
-                        <div class="detail">
+                        <div class="detail" *ngIf="!gameFound.owned">
                             Popularité: <span class="emphasis">{{gameFound.popularity}}</span>
                         </div>
                         <div class="detail" *ngIf="gameFound.owned">
-                            <span class="emphasis">Jeu déjà dans la liste</span>
+                            <div class="emphasis">Jeu déjà dans la liste</div>
+                            <mat-icon>star</mat-icon>
                         </div>
                     </div>
                 </div>
