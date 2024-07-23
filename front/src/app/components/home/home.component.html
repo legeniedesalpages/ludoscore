@@ -53,8 +53,7 @@
       
     </div>
 
-    <div class="alert-actions">
-      <!--*ngIf="notAssociated"-->
+    <div class="alert-actions" *ngIf="notAssociated">
       <button mat-flat-button class="associate" (click)="associatePlayer()">
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
@@ -70,18 +69,21 @@
         </span>
         <span class="ludo-card-title">
           <span class="card-title">Chercher un jeu</span>
-          <span class="card-short">Parcours la base de données "Board Game Geek"</span>
+          <span class="card-short">Parcours la base de données "Board Game Geek".</span>
         </span>
         <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu. Le jeu peut ensuite être ajouté à la bibliothèque et personnalisé.</span>
       </div>
 
       <div class="ludo-card" (click)="navigateToMatchHistory()">
-        <span class="yellow image-icon">          
+        <span class="orange image-icon">          
           <div class="circle">
             <mat-icon>rebase_edit</mat-icon>
           </div>
         </span>
-        <span class="ludo-card-title">Historique des partie</span>
+        <span class="ludo-card-title">
+          <span class="card-title">Historique des partie</span>
+          <span class="card-short">Voir les parties jouées, abandonnées ou en cours.</span>
+        </span>
         <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours. Les scores sont également visible.</span>
       </div>
 
@@ -91,7 +93,10 @@
             <mat-icon>diversity_3</mat-icon>
           </div>
         </span>
-        <span class="ludo-card-title">Voir les joueurs</span>
+        <span class="ludo-card-title">
+          <span class="card-title">Voir les joueurs</span>
+          <span class="card-short">Parcourir et rechercher parmi les joueurs enregistrés dans l'application.</span>
+        </span>
         <span class="ludo-card-content">Parcourir et rechercher parmi les joueurs enregistrés dans l'application</span>
       </div>
 
@@ -101,9 +106,25 @@
             <mat-icon>library_books</mat-icon>
           </div>
         </span>
-        <span class="ludo-card-title">Bibliotheque de jeu</span>
+        <span class="ludo-card-title">
+          <span class="card-title">Bibliotheque de jeu</span>
+          <span class="card-short">Parcourir la bibliotheque des jeux déjà enregistré dans ludoscore.</span>
+        </span>
         <span class="ludo-card-content">Parcourir la bibliotheque des jeux déjà enregistré dans ludoscore, permet des les éditer à partir de là</span>
       </div>
+    </div>
+
+    <div class="ludo-card" (click)="navigateToMatchHistory()">
+      <span class="yellow image-icon">          
+        <div class="circle">
+          <mat-icon>query_stats</mat-icon>
+        </div>
+      </span>
+      <span class="ludo-card-title">
+        <span class="card-title">Statistiques</span>
+        <span class="card-short">C'est qui le meilleur ?</span>
+      </span>
+      <span class="ludo-card-content">C'est qui le meilleur ?</span>
     </div>
 
   </ng-container>

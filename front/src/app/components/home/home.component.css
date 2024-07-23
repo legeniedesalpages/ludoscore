@@ -70,7 +70,6 @@ svg {
   /* ACTIONS */
 
   .actions {
-    padding-top: 10px;
     display: grid;
     grid-template-columns: repeat(auto-fit, 160px);
     justify-content: center;
@@ -176,6 +175,7 @@ svg {
     border: 1px solid #ccc;
     cursor: pointer;
     margin: 8px;
+    margin-top: 0px;
   }
 
   .ludo-card-title {
@@ -183,16 +183,17 @@ svg {
     display: flex;
     flex-direction: column;
     padding:5px;
+    padding-left: 10px;
   }
 
   .card-title {
     font-size: 17px;
-    padding-bottom: 2px;
+    padding-bottom: 6px;
   }
 
   .card-short {
-    font-size: 14px;
-    opacity: 0.7;
+    font-size: 12px;
+    opacity: 0.6;
   }
 
   .ludo-card-content {
@@ -224,7 +225,7 @@ svg {
     font-size: 40px;
     width: 100px;
     height: 100px;
-    padding-top: 58px;
+    padding-top: 64px;
     padding-left: 17px;
     overflow: hidden;
   }

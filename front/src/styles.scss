@@ -97,14 +97,14 @@ fieldset {
 }
 
 .yellow .circle {
-  background-color: #ffc115;
+  background-color: #e9de0f;
 }
 .yellow .mat-icon {
-  background-color: #ffc115;
+  background-color: #e9de0f;
   text-shadow: long-shadow(
     $direction: 50deg,
     $length: 60px,
-    $color: #b4880f,
+    $color: #cbc20c,
     $fade: false,
     $shadow-count: 50
   );  
@@ -125,10 +125,10 @@ fieldset {
 }
 
 .red .circle {
-  background-color: #f66455;
+  background-color: #fd5d4b;
 }
 .red .mat-icon {
-  background-color: #f66455;
+  background-color: #fd5d4b;
   text-shadow: long-shadow(
     $direction: 50deg,
     $length: 60px,
@@ -147,6 +147,20 @@ fieldset {
     $direction: 50deg,
     $length: 60px,
     $color: #1463ac,
+    $fade: false,
+    $shadow-count: 50
+  );  
+}
+
+.orange .circle {
+  background-color: #f58a27;
+}
+.orange .mat-icon {
+  background-color: #f58a27;
+  text-shadow: long-shadow(
+    $direction: 50deg,
+    $length: 60px,
+    $color: #d7761c,
     $fade: false,
     $shadow-count: 50
   );  
