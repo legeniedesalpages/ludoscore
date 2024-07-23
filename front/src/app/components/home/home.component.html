@@ -54,7 +54,8 @@
     </div>
 
     <div class="alert-actions">
-      <button mat-flat-button class="associate" (click)="associatePlayer()" *ngIf="notAssociated">
+      <!--*ngIf="notAssociated"-->
+      <button mat-flat-button class="associate" (click)="associatePlayer()">
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
       </button>
@@ -67,9 +68,11 @@
             <mat-icon>image_search</mat-icon>
           </div>
         </span>
-        <span class="ludo-card-title">Chercher un jeu</span>
-        <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu à
-          ajouter</span>
+        <span class="ludo-card-title">
+          <span class="card-title">Chercher un jeu</span>
+          <span class="card-short">Parcours la base de données "Board Game Geek"</span>
+        </span>
+        <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu. Le jeu peut ensuite être ajouté à la bibliothèque et personnalisé.</span>
       </div>
 
       <div class="ludo-card" (click)="navigateToMatchHistory()">
@@ -79,7 +82,7 @@
           </div>
         </span>
         <span class="ludo-card-title">Historique des partie</span>
-        <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours</span>
+        <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours. Les scores sont également visible.</span>
       </div>
 
       <div class="ludo-card" (click)="navigateToManagePlayer()">
