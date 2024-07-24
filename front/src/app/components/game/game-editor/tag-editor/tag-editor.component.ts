@@ -10,12 +10,12 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, Input, Inject } from '@angular/core';
-import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Tag } from 'src/app/core/model/tag.model';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Input, Inject } from '@angular/core'
+import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
+import { COMMA, ENTER } from '@angular/cdk/keycodes'
+import { Tag } from 'src/app/core/model/tag.model'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 
 
 @Component({
@@ -25,29 +25,29 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class TagEditorComponent implements OnInit {
 
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const
 
   @Input()
-  public tags: Tag[] = [];
+  public tags: Tag[] = []
 
   @Input()
-  public title: string = '';
+  public title: string = ''
 
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    console.log("tags", this.tags);
+    console.log("tags", this.tags)
   }
 
   public removeTag(tag: Tag): void {
-    const index = this.tags.indexOf(tag);
+    const index = this.tags.indexOf(tag)
     if (index >= 0) {
-      this.tags.splice(index, 1);
+      this.tags.splice(index, 1)
     }
   }
 
   public editTag(tag: Tag) {
-    this.openDialog(tag, this.tags.indexOf(tag));
+    this.openDialog(tag, this.tags.indexOf(tag))
   }
 
   public addTag(): void {
@@ -58,7 +58,7 @@ export class TagEditorComponent implements OnInit {
       minOcurrences: 1,
       maxOcurrences: 1
     }
-    this.openDialog(tag, -1);
+    this.openDialog(tag, -1)
   }
 
   private openDialog(tag: Tag, index: number) {
@@ -66,16 +66,16 @@ export class TagEditorComponent implements OnInit {
       disableClose: true,
       data: tag
     }).afterClosed().subscribe((result: Tag) => {
-      console.log("tag", result, index);
+      console.log("tag", result, index)
       if (!result) {
-        return;
+        return
       }
       if (index === -1) {
-        this.tags.push(result);
+        this.tags.push(result)
       } else {
-        this.tags[index] = result;
+        this.tags[index] = result
       }
-    });
+    })
   }
 }
 
@@ -147,7 +147,7 @@ export class DialogTagEditorComponent {
       unique: new FormControl(data.unique, Validators.required),
       minOcurrences: new FormControl(data.minOcurrences, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxOcurrences: new FormControl(data.maxOcurrences, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)])
-    });
+    })
     data.names.forEach(name => {
       this.values.push(name)
     })

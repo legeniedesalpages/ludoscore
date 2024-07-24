@@ -44,11 +44,11 @@ export interface GameDetail {
 }
 
 export interface DrawBreaker {
-    name: string
+    reason: string
     withValue: boolean
 }
 
 export interface CancelReason {
-    name: string
+    reason: string
     withValue: boolean
 }

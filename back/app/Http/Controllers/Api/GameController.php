@@ -85,6 +85,9 @@ class GameController extends Controller
             $existingGame->bgg_id = $request->bgg_id;
             $existingGame->score_template = $request->score_template;
             $existingGame->estimated_duration_in_minutes = $request->estimated_duration_in_minutes;
+            $existingGame->quantifiable_score = $request->quantifiable_score;
+            $existingGame->draw_allowed = $request->draw_allowed;
+            $existingGame->draw_breaker = $request->draw_breaker;
 
             $existingGame->save();
             Log::info("Game updated : ".$existingGame);
@@ -106,6 +109,10 @@ class GameController extends Controller
             $game->bgg_id = $request->bgg_id;
             $game->score_template = $request->score_template;
             $game->estimated_duration_in_minutes = $request->estimated_duration_in_minutes;
+            $game->quantifiable_score = $request->quantifiable_score;
+            $game->highest_score_win = $request->highest_score_win;
+            $game->draw_allowed = $request->draw_allowed;
+            $game->draw_breaker = $request->draw_breaker;
 
             $game->save();
             Log::info("Game created : ".$game);

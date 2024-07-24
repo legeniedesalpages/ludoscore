@@ -52,7 +52,7 @@ class GameSearchController extends Controller
 
         
         
-        $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&id=' . implode(',', array_slice($idList, 0, 50));
+        $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&id=' . implode(',', array_slice($idList, 0, 20));
         $jsonDetailData = $this->requester($detailRequest);
 
         $returnList = array();

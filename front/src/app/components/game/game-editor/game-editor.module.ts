@@ -36,8 +36,9 @@ import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { GameService } from 'src/app/core/services/game/game.service'
 import { LayoutModule } from '../../layout/layout.module'
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { DialogScoreTagEditorComponent, ScoreTagEditorComponent } from './score-tag-editor/score-tag-editor.component'
+import { DialogDrawEditorComponent, DrawEditorComponent } from './draw-editor/draw-editor.component'
 
 const routes: Routes = [
   {
@@ -45,10 +46,10 @@ const routes: Routes = [
     component: GameEditorComponent,
     canActivate: [AuthGuardService]
   }
-];
+]
 
 @NgModule({
-  declarations: [GameEditorComponent, TagEditorComponent, ColorTagEditorComponent, ScoreTagEditorComponent, DialogColorTagEditorComponent, DialogTagEditorComponent, DialogScoreTagEditorComponent],
+  declarations: [GameEditorComponent, TagEditorComponent, ColorTagEditorComponent, ScoreTagEditorComponent, DialogColorTagEditorComponent, DialogTagEditorComponent, DialogScoreTagEditorComponent, DrawEditorComponent, DialogDrawEditorComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
