@@ -52,6 +52,7 @@ export class GameService {
             highestScoreWin: gameToSave.highestScoreWin,
             imageUrlFromBgg: gameToSave.imageUrlFromBgg,
             thumbnailUrlFromBgg: gameToSave.thumbnailUrlFromBgg,
+            estimatedDurationInMinutes: gameToSave.estimatedDurationInMinutes
         }).pipe(
             map(gameEntity => this.gameEntityToGame(gameEntity))
         )
@@ -95,7 +96,8 @@ export class GameService {
             drawAllowed: gameEntity.drawAllowed,
             drawBreaker: gameEntity.drawBreaker ? JSON.parse(gameEntity.drawBreaker) : [] as DrawBreaker[],
             quantifiableScore: gameEntity.quantifiableScore,
-            highestScoreWin: gameEntity.highestScoreWin
+            highestScoreWin: gameEntity.highestScoreWin,
+            estimatedDurationInMinutes: gameEntity.estimatedDurationInMinutes
         }
     }
 }

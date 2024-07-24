@@ -40,6 +40,7 @@ export interface GameDetail {
     drawBreaker: DrawBreaker[]
     quantifiableScore: boolean
     highestScoreWin: boolean
+    estimatedDurationInMinutes: number
 }
 
 export interface DrawBreaker {

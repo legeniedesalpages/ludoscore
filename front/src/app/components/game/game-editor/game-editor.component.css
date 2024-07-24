@@ -26,6 +26,15 @@ form {
   padding-right: 5px;
 }
 
+.divide {
+  width: 100%;
+  background-color: grey;
+  padding:8px;
+  padding-right: 0px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .mat-mdc-form-field {
   opacity: 0.9;
 }
@@ -36,4 +45,20 @@ form {
 
 fieldset {
   border:0 none;
+}
+
+.date {
+  max-width: 200px;
+}
+
+.number {
+  max-width: 150px;
+}
+
+.boolean {
+  max-width: 159px;
+}
+
+.duration {
+  max-width: 250px;
 }

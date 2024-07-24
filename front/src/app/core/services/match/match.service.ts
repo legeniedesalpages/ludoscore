@@ -132,7 +132,8 @@ export class MatchService {
                 drawAllowed: matchEntity.drawAllowed,
                 drawBreaker: matchEntity.drawBreaker ? JSON.parse(matchEntity.drawBreaker) : [] as DrawBreaker[],
                 quantifiableScore: matchEntity.quantifiableScore,
-                highestScoreWin: matchEntity.highestScoreWin
+                highestScoreWin: matchEntity.highestScoreWin,
+                estimatedDurationInMinutes: matchEntity.estimatedDurationInMinutes
             },
             choosenTags: matchEntity.tags ? JSON.parse(matchEntity.tags) : [] as Tag[],
             teams: matchEntity.teams?.map((teamEntity: any) => {

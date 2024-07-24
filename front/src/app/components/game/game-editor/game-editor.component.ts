@@ -55,6 +55,7 @@ export class GameEditorComponent implements OnInit {
 
     this.gameEditorForm = new FormGroup({
       name: new FormControl('', Validators.required),
+      estimatedDurationInMinutes: new FormControl(0, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       cooperative: new FormControl('', Validators.required),
       minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
@@ -95,8 +96,11 @@ export class GameEditorComponent implements OnInit {
           minPlayer: game.minPlayers,
           maxPlayer: game.maxPlayers,
           cooperative: game.isOnlyCooperative ? "true" : "false",
-          ownership: game.ownershipDate
+          ownership: game.ownershipDate,
+          estimatedDurationInMinutes: game.estimatedDurationInMinutes
         })
+
+        console.info("ii", this.gameEditorForm.get('estimatedDurationInMinutes')?.value)
 
         this.tagsGame = game.matchTags
         this.tagsPlayer = game.playerTags
@@ -125,7 +129,8 @@ export class GameEditorComponent implements OnInit {
           minPlayer: gameSearchDetail.minplayers,
           maxPlayer: gameSearchDetail.maxplayers,
           cooperative: "false",
-          ownership: null
+          ownership: null,
+          estimatedDurationInMinutes: 0
         })
 
         this.imageUrlFromBgg = gameSearchDetail.imageUrlFromBgg
@@ -158,7 +163,8 @@ export class GameEditorComponent implements OnInit {
       quantifiableScore: true,
       highestScoreWin: true,
       imageUrlFromBgg: this.imageUrlFromBgg,
-      thumbnailUrlFromBgg: this.thumbnailUrlFromBgg
+      thumbnailUrlFromBgg: this.thumbnailUrlFromBgg,
+      estimatedDurationInMinutes: this.gameEditorForm.get('estimatedDurationInMinutes')?.value
     }
 
     this.gameService.save(gameToSave).subscribe({
@@ -168,7 +174,7 @@ export class GameEditorComponent implements OnInit {
         this.snackBar.open("Jeu enregistré", 'Fermer', {
           duration: 5000
         })        
-        this.store.dispatch(new Navigate(['/']))
+        //this.store.dispatch(new Navigate(['/']))
       },
 
       error: (err) => {
