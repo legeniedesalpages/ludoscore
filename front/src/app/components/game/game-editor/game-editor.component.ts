@@ -85,7 +85,7 @@ export class GameEditorComponent implements OnInit {
   }
 
   private initFromLibrary() {
-    
+
     console.info('Fill from game library, bgg id: ', this.bggId)
     this.gameService.getFromBgg(this.bggId!).subscribe({
 
@@ -182,9 +182,9 @@ export class GameEditorComponent implements OnInit {
         console.debug("Game id :" + game.id)
         this.snackBar.open("Jeu enregistré", 'Fermer', {
           duration: 5000
-        })        
-        //this.store.dispatch(new Navigate(['/']))
+        })
         this.saving = false
+        this.store.dispatch(new Navigate(['/']))
       },
 
       error: (err) => {
@@ -200,5 +200,5 @@ export class GameEditorComponent implements OnInit {
   public returnToGameList() {
     this.store.dispatch(new Navigate(['/find-game']))
   }
-  
+
 }

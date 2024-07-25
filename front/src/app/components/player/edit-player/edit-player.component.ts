@@ -21,7 +21,6 @@ import { UserEntity } from 'src/app/core/entity/user-entity.model'
 import { COLORS } from 'src/app/core/model/tag.model'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
-import { AuthStateModel } from 'src/app/core/state/auth/auth.model'
 import { AuthState } from 'src/app/core/state/auth/auth.state'
 
 @Component({

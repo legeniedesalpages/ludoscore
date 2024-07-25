@@ -10,10 +10,10 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Location } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { Store } from '@ngxs/store';
-import { fromEvent } from "rxjs";
+import { Location } from '@angular/common'
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
+import { Store } from '@ngxs/store'
+import { fromEvent } from "rxjs"
 
 @Component({
   selector: 'app-layout',
@@ -21,7 +21,7 @@ import { fromEvent } from "rxjs";
     <div class="container">
       <div class="header background-primary" #headerDiv>
         <!--<button mat-icon-button *ngIf="!withBackButton" (click)="reset()"><mat-icon>menu</mat-icon></button>-->
-        <button mat-icon-button class="header-button" *ngIf="withBackButton" (click)="back()"><mat-icon>keyboard_backspace</mat-icon></button>
+        <button mat-icon-button *ngIf="withBackButton" (click)="back()"><mat-icon>keyboard_backspace</mat-icon></button>
         <span class="menu-spacer" *ngIf="!withBackButton"></span>
         <ng-content select="ng-container[role=header]"></ng-content>
       </div>
@@ -42,6 +42,7 @@ import { fromEvent } from "rxjs";
       height:100%;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .header {
@@ -51,6 +52,7 @@ import { fromEvent } from "rxjs";
       flex-direction: row;
       align-items: center;
       z-index:999;
+      overflow: hidden;
     }
 
     .scrolling {
@@ -70,10 +72,6 @@ import { fromEvent } from "rxjs";
       text-align: center;
       width:100%;
       text-transform: uppercase;
-    }
-
-    .header-button {
-      color: white;
     }
   `]
 })
@@ -95,7 +93,7 @@ export class LayoutComponent implements OnInit {
       } else {
         this.headerDiv.nativeElement.classList.add('scrolling')
       }
-    });
+    })
   }
 
   public back(): void {

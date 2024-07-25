@@ -1,17 +1,14 @@
 <app-layout [withBackButton]="true" (backButtonAction)="cancelMatchCreation()">
     <ng-container role="header">
         <span class="title" *ngIf="!searching">Créer une partie</span>
-        <button mat-icon-button (click)="searching = !searching" *ngIf="!searching">
+        <button mat-icon-button (click)="searching = !searching" *ngIf="!searching" class="header-button">
             <mat-icon>search</mat-icon>
         </button>
 
         <input placeholder="Rechercher un jeu" class="search-input" [cdkTrapFocusAutoCapture]="true"
             [cdkTrapFocus]="true" *ngIf="searching" [(ngModel)]="searchText">
-        <button mat-icon-button (click)="searching = !searching; searchText=''" *ngIf="searching">
+        <button mat-icon-button (click)="searching = !searching; searchText=''" *ngIf="searching" class="header-button">
             <mat-icon>cancel</mat-icon>
-        </button>
-        <button mat-icon-button>
-            <mat-icon>more_vert</mat-icon>
         </button>
     </ng-container>
 

@@ -96,6 +96,10 @@ fieldset {
   @return $shadows;
 }
 
+.header button {
+  color: mat.get-theme-color($ludoscore-theme, on-primary);
+}
+
 .yellow .circle {
   background-color: #e9de0f;
 }

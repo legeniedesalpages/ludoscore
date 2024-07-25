@@ -10,18 +10,18 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, inject, Inject, OnInit } from '@angular/core';
-import { Store } from '@ngxs/store';
-import { DoLogout } from 'src/app/core/state/auth/auth.actions';
-import { AuthState } from 'src/app/core/state/auth/auth.state';
-import { first, forkJoin, Observable } from 'rxjs';
-import { Dispatch } from '@ngxs-labs/dispatch-decorator';
-import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
-import { MatchService } from 'src/app/core/services/match/match.service';
-import { Navigate } from '@ngxs/router-plugin';
-import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FindGameService } from 'src/app/core/services/game/find-game.service';
+import { Component, inject, Inject, OnInit } from '@angular/core'
+import { Store } from '@ngxs/store'
+import { DoLogout } from 'src/app/core/state/auth/auth.actions'
+import { AuthState } from 'src/app/core/state/auth/auth.state'
+import { first, forkJoin, Observable } from 'rxjs'
+import { Dispatch } from '@ngxs-labs/dispatch-decorator'
+import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state'
+import { MatchService } from 'src/app/core/services/match/match.service'
+import { Navigate } from '@ngxs/router-plugin'
+import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { environment } from 'src/environments/environment'
 
 @Component({
@@ -30,12 +30,12 @@ import { environment } from 'src/environments/environment'
 })
 export class HomeComponent implements OnInit {
 
-  public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
+  public matchStateEnum: typeof MatchStateEnum = MatchStateEnum
   public env = environment
 
-  loggedUser$: Observable<string> = inject(Store).select(AuthState.userName);
-  loggedUserId$: Observable<number> = inject(Store).select(AuthState.userId);
-  MatchStateEnum$: Observable<MatchStateEnum> = inject(Store).select(MatchState.state);
+  loggedUser$: Observable<string> = inject(Store).select(AuthState.userName)
+  loggedUserId$: Observable<number> = inject(Store).select(AuthState.userId)
+  MatchStateEnum$: Observable<MatchStateEnum> = inject(Store).select(MatchState.state)
 
   public loggingOut: boolean = false
   public loading: boolean
