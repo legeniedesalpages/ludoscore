@@ -17,7 +17,6 @@ import { first, forkJoin } from 'rxjs'
 import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
-import { AuthStateModel } from 'src/app/core/state/auth/auth.model'
 import { AuthState } from 'src/app/core/state/auth/auth.state'
 
 @Component({
@@ -26,7 +25,7 @@ import { AuthState } from 'src/app/core/state/auth/auth.state'
   styleUrls: ['./manage-player.component.css', '../../../core/css/list.css']
 })
 export class ManagePlayerComponent implements OnInit {
-  
+
   public playerEntities: PlayerEntity[]
   public loading: boolean = true
   public isAdmin: boolean = false
@@ -36,17 +35,17 @@ export class ManagePlayerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-      forkJoin({
-        user: this.userService.findOne(this.store.selectSnapshot<AuthStateModel>(AuthState).id),
-        playerEntities: this.playerService.findAll()
-      }).pipe(first()).subscribe(actions => {
-        this.playerEntities = actions.playerEntities
-        this.loading = false
-        this.isAdmin = actions.user.isAdmin
-      })
+    forkJoin({
+      user: this.userService.findOne(this.store.selectSnapshot<number>(AuthState.userId)),
+      playerEntities: this.playerService.findAll()
+    }).pipe(first()).subscribe(actions => {
+      this.playerEntities = actions.playerEntities
+      this.loading = false
+      this.isAdmin = actions.user.isAdmin
+    })
   }
 
-  public returnToHome() { 
+  public returnToHome() {
     this.store.dispatch(new Navigate(['/']))
   }
 

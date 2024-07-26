@@ -30,7 +30,7 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
   @Select(MatchState) matchState!: Observable<MatchStateModel>
 
   public elapsedTime: String
-  public timer!: NodeJS.Timer
+  public timer!: any
 
   constructor(private store: Store, private actions: Actions, private dialog: MatDialog) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"

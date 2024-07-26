@@ -1,0 +1,24 @@
+<mat-dialog-content class="dialog row">
+  <form [formGroup]="drawEditorForm">
+    <div class="row">
+      <div class="column">
+        <mat-form-field appearance="fill">
+          <mat-label>Raison de la victoire</mat-label>
+          <input matInput formControlName="reason" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column">
+        <mat-checkbox formControlName="withValue">Avec une valeur</mat-checkbox>
+      </div>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button (click)="cancelTagDialog()" mat-button [mat-dialog-close]="false">abandonner</button>
+  <button (click)="closeTagDialog()" mat-button [mat-dialog-close]="false" [disabled]="!drawEditorForm.valid">Ok</button>
+</mat-dialog-actions>

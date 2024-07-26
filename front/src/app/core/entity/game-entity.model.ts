@@ -28,5 +28,6 @@ export interface GameEntity {
     quantifiableScore: boolean
     highestScoreWin: boolean
     estimatedDuration: string
-    scoreTemplate: string
+    scoreTemplate: string,
+    estimatedDurationInMinutes: number
 }

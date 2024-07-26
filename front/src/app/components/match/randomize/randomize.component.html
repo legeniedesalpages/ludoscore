@@ -5,7 +5,7 @@
 
     <ng-container role="footer">
         <div class="validate-div">
-            <button mat-raised-button color="accent" (click)="save()" class="validate-button">Valider</button>
+            <button mat-raised-button (click)="save()" class="validate-button">Valider</button>
         </div>
     </ng-container>
 
@@ -15,7 +15,7 @@
             <h2>
                 <span class="text-header">Categories du match</span>
                 <span class="button-header">
-                    <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllMatchTagObservable.next(true)">
+                    <button mat-flat-button class="all-random" (click)="randomizeAllMatchTagObservable.next(true)">
                         <div>
                             <span class="text-all-random">Tout au hasard</span>
                             <span class="icon-all-random">
@@ -39,7 +39,7 @@
         <div
             *ngIf="((matchState | async)?.match!.game?.playerTags?.length ?? 0) > 0 && ((matchState | async)?.match!.teams.length ?? 0) > 0">
             <h2>Categories joueurs
-                <button mat-flat-button color="primary" class="all-random" (click)="randomizeAllTeamTagObservable.next(true)">
+                <button mat-flat-button class="all-random" (click)="randomizeAllTeamTagObservable.next(true)">
                     <div>
                         <span class="text-all-random">Tout au hasard</span>
                         <span class="icon-all-random">

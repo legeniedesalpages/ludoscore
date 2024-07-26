@@ -10,26 +10,26 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core'
+import { CommonModule } from '@angular/common'
 
-import { Routes, RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatDividerModule } from '@angular/material/divider';
-import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
-import { LayoutModule } from '../../layout/layout.module';
-import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service';
-import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
-import { MatChipsModule } from '@angular/material/chips';
-import { EditPlayerComponent } from './edit-player.component';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { Routes, RouterModule } from '@angular/router'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatIconModule } from '@angular/material/icon'
+import { MatInputModule } from '@angular/material/input'
+import { MatGridListModule } from '@angular/material/grid-list'
+import { MatDividerModule } from '@angular/material/divider'
+import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
+import { LayoutModule } from '../../layout/layout.module'
+import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
+import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
+import { MatChipsModule } from '@angular/material/chips'
+import { EditPlayerComponent } from './edit-player.component'
+import { MatSelectModule } from '@angular/material/select'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 
 const routes: Routes = [
   {

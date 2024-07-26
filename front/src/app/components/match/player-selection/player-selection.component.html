@@ -8,7 +8,7 @@
 
     <ng-container role="footer">
         <div class="footer row">
-            <button mat-mini-fab [hidden]="saving" color="primary" class="lead"
+            <button mat-mini-fab [hidden]="saving" class="lead"
                 (click)="showRandomToolbox()">
                 <svg viewBox="0 0 512 512">
                     <g transform="translate(0,0)">
@@ -18,11 +18,11 @@
                     </g>
                 </svg>
             </button>
-            <button mat-mini-fab [disabled]="lessThan2Teams" [hidden]="saving" color="primary" class="lead2"
+            <button mat-mini-fab [disabled]="lessThan2Teams" [hidden]="saving" class="lead2"
                 (click)="showWheel()">
                 <mat-icon>group</mat-icon>
             </button>
-            <button mat-flat-button [disabled]="!canContinue" [hidden]="saving" color="primary" (click)="launchMatch()"
+            <button mat-flat-button [disabled]="!canContinue" [hidden]="saving" (click)="launchMatch()"
                 class="end">
                 Lancer la partie
             </button>

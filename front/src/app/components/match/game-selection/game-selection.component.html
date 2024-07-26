@@ -1,17 +1,14 @@
 <app-layout [withBackButton]="true" (backButtonAction)="cancelMatchCreation()">
     <ng-container role="header">
         <span class="title" *ngIf="!searching">Créer une partie</span>
-        <button mat-icon-button (click)="searching = !searching" *ngIf="!searching">
+        <button mat-icon-button (click)="searching = !searching" *ngIf="!searching" class="header-button">
             <mat-icon>search</mat-icon>
         </button>
 
         <input placeholder="Rechercher un jeu" class="search-input" [cdkTrapFocusAutoCapture]="true"
             [cdkTrapFocus]="true" *ngIf="searching" [(ngModel)]="searchText">
-        <button mat-icon-button (click)="searching = !searching; searchText=''" *ngIf="searching">
+        <button mat-icon-button (click)="searching = !searching; searchText=''" *ngIf="searching" class="header-button">
             <mat-icon>cancel</mat-icon>
-        </button>
-        <button mat-icon-button>
-            <mat-icon>more_vert</mat-icon>
         </button>
     </ng-container>
 
@@ -33,20 +30,20 @@
             </div>
             <div class="content">
                 <div class="heading">{{ game.title }}</div>
-                <div class="supporting"></div>
+                <div class="supporting" [innerHTML]="line(game)"></div>
             </div>
         </div>
 
         <app-sidenav [(isOpen)]="isFilterMenuOpen">
             <div class="filter-section">
-                <p><mat-checkbox color="primary">Uniquement coopératif</mat-checkbox></p>
-                <p><mat-checkbox color="primary">Pour 2 joueurs exclusivement</mat-checkbox></p>
-                <p><mat-checkbox color="primary">Plus que 4 joueurs</mat-checkbox></p>
+                <p><mat-checkbox [checked]="onlyCooperativeFilter">Uniquement coopératif</mat-checkbox></p>
+                <p><mat-checkbox>Pour 2 joueurs exclusivement</mat-checkbox></p>
+                <p><mat-checkbox>Plus que 4 joueurs</mat-checkbox></p>
             </div>
             <mat-divider></mat-divider>
             <div class="filter-section">
-                <p><mat-checkbox color="primary">Moins de 30 minutes</mat-checkbox></p>
-                <p><mat-checkbox color="primary">Plus que 1h30</mat-checkbox></p>
+                <p><mat-checkbox>Moins de 30 minutes</mat-checkbox></p>
+                <p><mat-checkbox>Plus que 1h30</mat-checkbox></p>
             </div>
         </app-sidenav>
 

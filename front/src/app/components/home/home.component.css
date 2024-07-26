@@ -1,5 +1,11 @@
+.logout-spinner {
+  padding-right: 10px;
+}
+
+/* BANNER */
+
 .banner {
-  height: 200px;
+  height: 185px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -16,9 +22,9 @@ svg {
 
 .dice {
   position: absolute;
-  bottom: -130px;
+  bottom: -180px;
   right: -80px;
-  opacity: 0.1;
+  opacity: 0.2;
   overflow: hidden;
 }
 
@@ -34,12 +40,11 @@ svg {
   font-size: 18px;
   font-weight: 300;
   line-height: 28px;
-  padding-bottom: 20px;
   z-index: 1;
 }
 
-.spinner {
-  padding-right: 10px;
+.match-state button {
+  margin-top: 26px;
 }
 
 .loading {
@@ -49,25 +54,184 @@ svg {
   align-items: center;
 }
 
-.action-list {
-  width: 100%;
-}
-
-.action {
+.alert-actions {
   display: flex;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-  border: 1px solid #ccc;
-  margin: 20px;
-  border-radius: 4px;
-  cursor: pointer;
+  justify-content: center;
+  margin-top: 10px;
 }
 
-.associate {
-  border: 1px solid transparent;
+::ng-deep.associate.mdc-button {
+  background-color: red !important;
 }
 
-.caption {
-  padding-left: 15px;
+/* MEDIUM SCREENS */
+@media screen and (min-width: 700px) {
+
+  /* ACTIONS */
+
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 160px);
+    justify-content: center;
+    gap: 10px;
+    overflow: hidden;
+    margin-top:8px;
+  }
+
+  .action {
+    display: flex;
+    align-items: center;
+  }
+
+  /* CARDS */
+
+  .ludo-card img {
+    width: 158px;
+    height: 120px;
+    border-radius: 8px;
+  }
+
+  .ludo-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    border-radius: 8px;
+    border-radius: 8px;
+    background-color: white;
+    border: 1px solid #ccc;
+    transition: all 0.3s;
+    cursor: pointer;
+    margin-bottom: 5px;
+  }
+
+  .ludo-card-title {
+    font-size: 18px;
+    font-weight: 400;
+    padding: 10px;
+    text-align: left;
+    padding-bottom: 0px;
+  }
+
+  .ludo-card-content {
+    font-size: 14px;
+    padding: 10px;
+    opacity: 0.8;
+    text-align:justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    word-spacing: -0.05em;
+  }
+
+
+  /* ICON */
+
+  .image-icon {
+    width: 158px;
+    height: 120px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid #ccc;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-icon .mat-icon {
+    color: white;
+    font-size: 52px;
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+  }
+
+  .circle {
+    border-radius: 100%;
+    padding: 15px;
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    box-shadow: 2px 2px 3px 1px #666;
+  }
+
+  .card-short {
+    display: none;
+  }
+}
+
+
+/* SMALL SCREENS */
+@media screen and (max-width: 700px) {
+
+
+  /* CARDS */
+
+  .ludo-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: top;
+    border-radius: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    margin: 8px;
+    margin-top: 0px;
+    background-color: #f5f5f5;
+  }
+
+  .ludo-card-title {
+    height: 20px;    
+    display: flex;
+    flex-direction: column;
+    padding:5px;
+    padding-left: 10px;
+  }
+
+  .card-title {
+    font-size: 17px;
+    padding-bottom: 6px;
+  }
+
+  .card-short {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  .ludo-card-content {
+    display: none;
+  }
+
+  .actions {
+    padding-top: 10px;
+  }
+
+  /* ICON */
+
+  .image-icon {
+    width: 70px;
+    min-width: 70px;
+    height: 70px;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+    border-right: 1px solid #ccc;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .image-icon .mat-icon {
+    color: white;
+    font-size: 40px;
+    width: 100px;
+    height: 100px;
+    padding-top: 64px;
+    padding-left: 17px;
+    overflow: hidden;
+  }
+
+  .circle {
+    overflow: hidden;
+  }
 }

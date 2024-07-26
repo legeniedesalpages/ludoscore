@@ -1,13 +1,11 @@
 <app-layout [withBackButton]="false">
   <ng-container role="header">
-    <div *ngIf="loggingOut">
-      <div class="spinner">
-        <mat-spinner color="warn" [diameter]=36 [strokeWidth]="7"></mat-spinner>
-      </div>
+    <div class="logout-spinner" *ngIf="loggingOut">
+      <mat-spinner [diameter]=36 [strokeWidth]="7" class="secondary-progress-spinner"></mat-spinner>
     </div>
 
-    <button mat-flat-button color="primary" [matMenuTriggerFor]="login" *ngIf="!loggingOut">
-      <span>{{ loggedUser | async }}</span>
+    <button mat-flat-button [matMenuTriggerFor]="login" *ngIf="!loggingOut">
+      <span>{{ loggedUser$ | async }}</span>
       <mat-icon>person</mat-icon>
     </button>
 
@@ -20,7 +18,7 @@
   </ng-container>
 
   <ng-container role="body">
-    <div class="banner">
+    <div class="banner background-primary">
       <div class="dice">
         <svg viewBox="0 0 512 512">
           <g transform="translate(0,0)">
@@ -35,46 +33,101 @@
 
       <span class="description">Comptabilisateur de score</span>
 
-      <div class="match-state" [hidden]="loading">
-        <div *ngIf="(matchState | async) === matchStateEnum.CREATING">
+      <div class="match-state">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.CREATING" [hidden]="loading">
           <button mat-raised-button routerLink="/game-selection">Reprendre la création du match</button>
         </div>
-        <div *ngIf="(matchState | async) === matchStateEnum.STARTED">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.STARTED" [hidden]="loading">
           <button mat-raised-button routerLink="/match-display">Voir le match en cours</button>
         </div>
-        <div *ngIf="(matchState | async) === matchStateEnum.FINISHED">
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.FINISHED" [hidden]="loading">
           <button mat-raised-button routerLink="/match-end">Enregistrer le score du match</button>
-        </div>        
-        <div *ngIf="(matchState | async) === matchStateEnum.NONE">
-          <button mat-raised-button routerLink="/game-selection">Démarrer une partie</button>
         </div>
+        <div *ngIf="(MatchStateEnum$ | async) === matchStateEnum.NONE" [hidden]="loading">
+          <button mat-raised-button routerLink="/game-selection"><mat-icon>star</mat-icon>Démarrer une partie</button>
+        </div>
+
+        <loading-spinner [loading]="loading" caption="Chargement..." class="secondary-progress-spinner"></loading-spinner>
       </div>
+
+      
     </div>
 
-    <loading-spinner [loading]="loading" caption="Chargement..."></loading-spinner>
-
-    <div class="action-list" [hidden]="loading">
-
-      <div class="action associate" matRipple (click)="associatePlayer()" *ngIf="notAssociated">
+    <div class="alert-actions" *ngIf="notAssociated">
+      <button mat-flat-button class="associate" (click)="associatePlayer()">
         <mat-icon>person</mat-icon>
         <div class="caption">Associer votre compte à un joueur</div>
+      </button>
+    </div>
+
+    <div class="actions">
+      <div class="ludo-card" (click)="navigateToFindGame()">
+        <span class="green image-icon">          
+          <div class="circle">
+            <mat-icon>image_search</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Chercher un jeu</span>
+          <span class="card-short">Parcours la base de données "Board Game Geek".</span>
+        </span>
+        <span class="ludo-card-content">Parcours la base de données "Board Game Geek" pour trouver un jeu. Le jeu peut ensuite être ajouté à la bibliothèque et personnalisé.</span>
       </div>
 
-      <div class="action" matRipple (click)="navigateToFindGame()">
-        <mat-icon>manage_search</mat-icon>
-        <div class="caption">Rechercher un jeu</div>
+      <div class="ludo-card" (click)="navigateToMatchHistory()">
+        <span class="orange image-icon">          
+          <div class="circle">
+            <mat-icon>rebase_edit</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Historique des partie</span>
+          <span class="card-short">Voir les parties jouées, abandonnées ou en cours.</span>
+        </span>
+        <span class="ludo-card-content">Voir les parties jouées, abandonnées ou en cours. Les scores sont également visible.</span>
       </div>
 
-      <div class="action" matRipple (click)="navigateToManagePlayer()">
-        <mat-icon>group</mat-icon>
-        <div class="caption">Voir les joueurs</div>
+      <div class="ludo-card" (click)="navigateToManagePlayer()">
+        <span class="red image-icon">          
+          <div class="circle">
+            <mat-icon>diversity_3</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Voir les joueurs</span>
+          <span class="card-short">Parcourir et rechercher parmi les joueurs enregistrés dans l'application.</span>
+        </span>
+        <span class="ludo-card-content">Parcourir et rechercher parmi les joueurs enregistrés dans l'application</span>
       </div>
 
-      <div class="action" matRipple (click)="navigateToMatchHistory()">
-        <mat-icon>update</mat-icon>
-        <div class="caption">Voir l'historique des parties</div>
+      <div class="ludo-card" (click)="navigateToFindGame()">
+        <span class="blue image-icon">          
+          <div class="circle">
+            <mat-icon>library_books</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Bibliotheque de jeu</span>
+          <span class="card-short">Parcourir la bibliotheque des jeux déjà enregistré dans ludoscore.</span>
+        </span>
+        <span class="ludo-card-content">Parcourir la bibliotheque des jeux déjà enregistré dans ludoscore, permet des les éditer à partir de là</span>
+      </div>
+
+      <div class="ludo-card" (click)="navigateToMatchHistory()">
+        <span class="yellow image-icon">          
+          <div class="circle">
+            <mat-icon>query_stats</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Statistiques</span>
+          <span class="card-short">C'est qui le meilleur ?</span>
+        </span>
+        <span class="ludo-card-content">C'est qui le meilleur ?</span>
       </div>
     </div>
+
+    
 
   </ng-container>
 </app-layout>

@@ -15,10 +15,10 @@ import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
 import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
-import { catchError, first, tap } from 'rxjs/operators'
+import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
 import { MatchEntity } from "../../entity/match-entity.model"
-import { forkJoin, lastValueFrom } from "rxjs"
+import { lastValueFrom } from "rxjs"
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 

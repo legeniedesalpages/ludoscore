@@ -13,12 +13,12 @@
                 </mat-select>
             </mat-form-field>
             <div class="actions">
-                <button mat-mini-fab color="none"
+                <button mat-mini-fab 
                     (click)="cancelSelection(tag.category, i)"
                     [disabled]="tagAvailable(tag, i).length == 0 || alreadySelectedTag(tag.category, i) == undefined">
                     <mat-icon>close</mat-icon>
                 </button>
-                <button mat-mini-fab color="primary" (click)="randomizeTag(tag, i)"
+                <button mat-mini-fab (click)="randomizeTag(tag, i)"
                     [disabled]="tagAvailable(tag, i).length == 0">
                     <svg viewBox="0 0 512 512">
                         <g transform="translate(0,20)">

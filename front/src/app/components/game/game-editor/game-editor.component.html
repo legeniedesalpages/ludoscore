@@ -25,37 +25,21 @@
                                 <input matInput formControlName="name">
                             </mat-form-field>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="column">
+                        <div class="column duration">
                             <mat-form-field appearance="fill">
-                                <mat-label>Uniquement coopérarif</mat-label>
-                                <mat-select formControlName="cooperative">
-                                    <mat-option value="true">Oui</mat-option>
-                                    <mat-option value="false">Non</mat-option>
+                                <mat-label>Temps de jeu estimé</mat-label>
+                                <mat-select formControlName="estimatedDurationInMinutes">
+                                    <mat-option [value]=0>Pas d'estimation</mat-option>
+                                    <mat-option [value]=30>moins de 30 minutes</mat-option>
+                                    <mat-option [value]=60>30 minutes à 1h</mat-option>
+                                    <mat-option [value]=90>1h à 1h30</mat-option>
+                                    <mat-option [value]=240>plus de 1h30</mat-option>
                                 </mat-select>
                             </mat-form-field>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="column">
-                            <mat-form-field appearance="fill">
-                                <mat-label>Joueurs minimum</mat-label>
-                                <input matInput formControlName="minPlayer">
-                            </mat-form-field>
-                        </div>
-                        <div class="column">
-                            <mat-form-field appearance="fill">
-                                <mat-label>Joueurs maximum</mat-label>
-                                <input matInput formControlName="maxPlayer">
-                            </mat-form-field>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="column">
+                        <div class="column date">
                             <mat-form-field appearance="fill">
                                 <mat-label>Date d'obtention</mat-label>
                                 <input matInput formControlName="ownership" [matDatepicker]="ownership">
@@ -65,31 +49,92 @@
                         </div>
                     </div>
 
+                    <div class="divide">Joueurs</div>
+
                     <div class="row">
-                        <div class="column">
-                            <score-tag-editor [tags]="tagsScore" [title]="'Categorie de score'"></score-tag-editor>
+
+                        <div class="column number">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Joueurs minimum</mat-label>
+                                <input matInput formControlName="minPlayer">
+                            </mat-form-field>
                         </div>
-                        <div class="column">
-                            <tag-editor [tags]="tagsGame" [title]="'Tags du jeu'"></tag-editor>
+
+                        <div class="column number">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Joueurs maximum</mat-label>
+                                <input matInput formControlName="maxPlayer">
+                            </mat-form-field>
                         </div>
-                        <div class="column">
-                            <tag-editor [tags]="tagsPlayer" [title]="'Tags des joueurs'"></tag-editor>
+
+                        <div class="column boolean">
+                            <mat-slide-toggle formControlName="cooperative">Uniquement coopérarif</mat-slide-toggle>
                         </div>
+                    </div>
+
+                    <div class="row">
                         <div class="column">
                             <color-tag-editor [tags]="tagsColor" [title]="'Couleurs'"></color-tag-editor>
                         </div>
                     </div>
 
-                    <div class="row button_row">
+                    <div class="row">
                         <div class="column">
-                            <button mat-raised-button [disabled]="saving" color="primary"
-                                (click)="saveGame()">Enregistrer le jeu</button>
+                            <tag-editor [tags]="tagsPlayer" [title]="'Tags des joueurs'"></tag-editor>
+                        </div>
+                    </div>
+
+                    <div class="divide">Gestion des scores</div>
+
+                    <div class="row">
+                        <div class="column boolean">
+                            <mat-slide-toggle formControlName="quantifiableScore">Score chiffré</mat-slide-toggle>
+                        </div>
+                        <div class="column boolean" *ngIf="gameEditorForm.get('quantifiableScore')!.value">
+                            <mat-slide-toggle formControlName="highestScoreWin">Le plus haut score
+                                gagne</mat-slide-toggle>
+                        </div>
+                    </div>
+
+
+                    <div class="row" *ngIf="gameEditorForm.get('quantifiableScore')!.value">
+                        <div class="column">
+                            <score-tag-editor [tags]="tagsScore" [title]="'Categorie de score'"></score-tag-editor>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="column boolean">
+                            <mat-slide-toggle formControlName="drawAllowed"><span style="text-wrap: nowrap;">Match
+                                    nul</span> autorisé</mat-slide-toggle>
+                        </div>
+
+                        <div class="column" *ngIf="gameEditorForm.get('drawAllowed')!.value">
+                            <draw-editor [drawBreakerList]="tagsDraw" [title]="'Choix du vainqueur'"></draw-editor>
+                        </div>
+                    </div>
+
+                    <div class="divide">Propriétés du jeu</div>
+
+                    <div class="row">
+                        <div class="column">
+                            <tag-editor [tags]="tagsGame" [title]="'Tags du jeu'"></tag-editor>
                         </div>
                     </div>
 
                     <div class="row button_row">
                         <div class="column">
-                            <button mat-raised-button [disabled]="saving" (click)="returnToGameList()">Annuler</button>
+                            <button mat-flat-button [hidden]="saving" (click)="saveGame()">Enregistrer le jeu</button>
+                            <div class="spinner searching" [hidden]="!saving">
+                                <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row button_row">
+                        <div class="column">
+                            <button mat-button [disabled]="saving" (click)="returnToGameList()">Annuler</button>
                         </div>
                     </div>
                 </fieldset>

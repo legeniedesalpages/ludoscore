@@ -15,6 +15,7 @@ export const environment = {
     title: 'Ludoscore Dev',
     apiURL: 'http://localhost:8000',
     imagesURL: 'http://localhost:8000/images',
+    assetsURL: 'http://localhost:5000/',
     recaptchaV2SiteKey:'6LdpRPcjAAAAAJoT5EM4BaIoPwlviqnhT1gfH9aw',
     pusherApiKey: '38b8aa27d92ef96861d1'
 }
