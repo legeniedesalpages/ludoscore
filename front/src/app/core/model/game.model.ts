@@ -19,6 +19,11 @@ export interface Game extends GameDetail {
     thumbnailUrl: string
 }
 
+export interface SelectingGame extends Game {
+    lastPlayed: Date
+    lastWinner: string
+}
+
 export interface GameToSave extends GameDetail {
     id?: number
     imageUrlFromBgg?: string

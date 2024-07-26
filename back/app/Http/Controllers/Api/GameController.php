@@ -8,6 +8,7 @@ use App\Models\Game;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
 {
@@ -19,7 +20,28 @@ class GameController extends Controller
     public function index()
     {
         Log::debug("Get list of all games");
-        return Game::orderBy('created_at', 'desc')->get();
+
+        $result = DB::table('games')
+            ->select('games.*')
+            ->selectSub(function($query) {
+                $query->select('teams.name')
+                    ->from('teams')
+                    ->leftJoin('matches', 'matches.winner_team_id', '=', 'teams.id')
+                    ->whereColumn('matches.game_id', 'games.id')
+                    ->orderByDesc('matches.started_at')
+                    ->limit(1);
+            }, 'last_winner')
+            ->selectSub(function($query) {
+                $query->select('matches.started_at')
+                    ->from('matches')
+                    ->whereColumn('matches.game_id', 'games.id')
+                    ->orderByDesc('matches.started_at')
+                    ->limit(1);
+            }, 'last_played')
+            ->orderBy('games.created_at', 'desc')
+            ->get();
+
+        return $result;
     }
 
     private function clean($string) {

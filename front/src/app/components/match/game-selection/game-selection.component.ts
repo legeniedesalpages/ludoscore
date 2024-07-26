@@ -12,14 +12,15 @@
 **/
 import { Component, OnInit } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
-import { Select, Store } from '@ngxs/store'
+import { Store } from '@ngxs/store'
 import { Observable, tap } from 'rxjs'
-import { Game } from 'src/app/core/model/game.model'
+import { Game, SelectingGame } from 'src/app/core/model/game.model'
 import { MatchModel } from 'src/app/core/model/match.model'
 import { GameService } from 'src/app/core/services/game/game.service'
 import { CreateMatch } from 'src/app/core/state/match/match.action'
-import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
+import { DateTime } from 'luxon';
+import dayjs from 'dayjs'
 
 @Component({
   templateUrl: './game-selection.component.html',
@@ -27,13 +28,13 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 })
 export class GameSelectionComponent implements OnInit {
 
-  @Select(MatchState) matchState!: Observable<MatchStateModel>
-
   public loading: boolean = true
   public searching: boolean = false
   public searchText: string = ""
   public isFilterMenuOpen: boolean = false
-  public gameList!: Observable<Game[]>
+  public gameList!: Observable<SelectingGame[]>
+
+  public onlyCooperativeFilter: boolean = true
 
   constructor(private gameService: GameService, private store: Store) {
   }
@@ -58,6 +59,82 @@ export class GameSelectionComponent implements OnInit {
       // TODO : ajouter ici le joueur correspondant à l'utilisateur connecté
       this.store.dispatch(new Navigate(['player-selection']))
     })
+  }
+
+  public line(game: SelectingGame): string {
+    return this.line1(game) + "<br/>" + this.line2(game)
+  }
+
+  public line1(game: SelectingGame): string {
+    let line1
+    if (game.minPlayers === game.maxPlayers) {
+      line1 = `${game.minPlayers} joueur${game.minPlayers > 1 ? 's' : ''}`
+    } else {
+      line1 = `${game.minPlayers} à ${game.maxPlayers} joueurs`
+    }
+
+    if (game.isOnlyCooperative) {
+      line1 += " - Coopératif"
+    }
+
+    if (game.estimatedDurationInMinutes > 0) {
+      if (game.estimatedDurationInMinutes > 59) {
+        line1 += ` - ${Math.floor(game.estimatedDurationInMinutes / 60)}h${game.estimatedDurationInMinutes % 60}`
+      } else {
+        line1 += ` - ${game.estimatedDurationInMinutes} minutes`
+      }
+    }
+
+    return line1
+  }
+
+  public line2(game: SelectingGame): string {
+    let line2 = ""
+
+    if (game.lastPlayed) {
+      if (game.lastWinner) {
+        line2 = `Dernier gagnant : <b>${game.lastWinner}</b>`
+      } else {
+        line2 = "Dernière partie"
+      }
+
+      if (game.lastPlayed) {
+        line2 += " " + this.getTimeDifference(game.lastPlayed)
+      }
+    } else {
+      line2 = "Pas encore joué"
+    }
+
+    return line2
+  }
+
+  private getTimeDifference(date: Date): string {
+    const now = dayjs()
+    const inputDate = dayjs(date)
+
+    const diffInYears = now.diff(inputDate, 'year')
+    if (diffInYears >= 1) {
+      return "il y a plus d'un an"
+    }
+
+    const diffInMonths = now.diff(inputDate, 'month')
+    if (diffInMonths >= 1) {
+      return `il y a ${diffInMonths} mois`
+    }
+
+    const diffInWeeks = now.diff(inputDate, 'week')
+    if (diffInWeeks >= 1) {
+      return `il y a ${diffInWeeks} semaine${diffInWeeks > 1 ? 's' : ''}`
+    }
+
+    const diffInDays = now.diff(inputDate, 'day')
+    if (diffInDays > 1) {
+      return `il y a ${diffInDays} jours`
+    } else if (diffInDays === 1) {
+      return "hier"
+    }
+
+    return "aujourd'hui"
   }
 
   public cancelMatchCreation() {

@@ -30,13 +30,13 @@
             </div>
             <div class="content">
                 <div class="heading">{{ game.title }}</div>
-                <div class="supporting"></div>
+                <div class="supporting" [innerHTML]="line(game)"></div>
             </div>
         </div>
 
         <app-sidenav [(isOpen)]="isFilterMenuOpen">
             <div class="filter-section">
-                <p><mat-checkbox>Uniquement coopératif</mat-checkbox></p>
+                <p><mat-checkbox [checked]="onlyCooperativeFilter">Uniquement coopératif</mat-checkbox></p>
                 <p><mat-checkbox>Pour 2 joueurs exclusivement</mat-checkbox></p>
                 <p><mat-checkbox>Plus que 4 joueurs</mat-checkbox></p>
             </div>
