@@ -24,7 +24,7 @@
 
         <loading-spinner [loading]="loading" [caption]="'Chargement de la liste des jeux'"></loading-spinner>
 
-        <div *ngFor="let game of gameList | async" class="result-list" (click)="gameSelection(game)">
+        <div *ngFor="let game of gameList$ | async" class="result-list" (click)="gameSelection(game)">
             <div class="visual">
                 <img src="{{ game.thumbnailUrl }}">
             </div>
@@ -37,13 +37,13 @@
         <app-sidenav [(isOpen)]="isFilterMenuOpen">
             <div class="filter-section">
                 <p><mat-checkbox [checked]="onlyCooperativeFilter">Uniquement coopératif</mat-checkbox></p>
-                <p><mat-checkbox>Pour 2 joueurs exclusivement</mat-checkbox></p>
-                <p><mat-checkbox>Plus que 4 joueurs</mat-checkbox></p>
+                <p><mat-checkbox [checked]="twoPlayerOnlyFilter">Pour 2 joueurs exclusivement</mat-checkbox></p>
+                <p><mat-checkbox [checked]="moreThanFourPlayersFilter">Plus que 4 joueurs</mat-checkbox></p>
             </div>
             <mat-divider></mat-divider>
             <div class="filter-section">
-                <p><mat-checkbox>Moins de 30 minutes</mat-checkbox></p>
-                <p><mat-checkbox>Plus que 1h30</mat-checkbox></p>
+                <p><mat-checkbox [checked]="lessThanThirtyMinutes">Moins de 30 minutes</mat-checkbox></p>
+                <p><mat-checkbox [checked]="moreThanOneHourAndAHalfFilter">Plus que 1h30</mat-checkbox></p>
             </div>
         </app-sidenav>
 

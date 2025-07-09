@@ -19,12 +19,6 @@ form {
   font-size: 1.2em;
 }
 
-.buttons {
-  width: 100%;
-  text-align: center;
-  margin-top: 10px;
-}
-
 hr {
   width: 90%;
 }
@@ -81,61 +75,58 @@ hr {
 
 .mat-icon {
   vertical-align: middle;
-  padding-left: 20px;
 }
 
+/* KEYBOARD */
+
+
 .keyboard {
-  background-color: lightgrey;
-  height: 180px;
-  border-top: 1px solid black;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  max-width: 600px;
+  box-shadow: 0px 2px 5px 2px #a9a9a9;
+  padding-top:5px;
+  padding-bottom:5px;
 }
+
+@media (hover: hover) and (pointer: fine) {
+  .keyboard {
+    display: none;
+  }
+}
+
 
 .key {
   font-size: large;
-  cursor: pointer;
-  border: 1px solid black;
-  border-radius: 4px;
-  background-color: white;
-  flex: 1 1 0;  
-  margin-top: 4px;
-  margin-bottom: 4px;
-  color:black
+  flex: 1 1 0;
+  text-align: center;
 }
 
-.mat-icon {
-  padding-left: 0px;
+.visual {
+  margin: 2px;
 }
 
-.keyboard .row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  height: 33%;
-  gap: 4px;
+.visual {
+  padding-left:5px;
+  padding-right:5px;
+}
+
+.visual .mat-icon {
+  padding-left:12px;
+  padding-top:3px;
+  padding-right:0px;
 }
 
 .primary {
   background-color: #2196f3;
-  color:white
+  color:white;
+  border-color: #2196f3;
 }
 
 .accent {
   background-color: #009688;
-  color:white
-}
-
-.large {
-  flex: 3 1 0;
-}
-
-.mid {
-  flex: 2 1 0;
+  color:white;
+  border-color: #009688;
 }
 
 .grey {
-  background-color: lightgrey;
+  background-color: rgb(183, 183, 183);
 }

@@ -51,9 +51,9 @@ export class MatchHistoryComponent implements OnInit {
       headline = "Joué le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' en ' + this.elapsedTime(match.startedAt!, new Date(match.endedAt))
     }
 
-    headline += "<br/><span class='players'>Avec: "
+    headline += "<br/>Avecqsdqsdqqsdqsdqsdqsdqsdqsdqsdqsdqsqsd: "
     headline += match.teams.map(team => team.id == match.winnigTeam?.id ? '<b>' + team.name + '</b>' : team.name ).join(', ')
-    headline += "</span>"
+    headline += ""
 
     return headline
   }

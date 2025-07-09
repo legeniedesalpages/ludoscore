@@ -32,7 +32,7 @@ export class TeamScoreComponent implements OnInit {
 
   @Select(MatchState) matchState!: Observable<MatchStateModel>
 
-  @ViewChildren('aa') aa!: QueryList<any>;
+  @ViewChildren('inputScore') listOfInputScore!: QueryList<any>;
 
   public team!: Team
   public scoreDetails: Score[] = []
@@ -40,8 +40,6 @@ export class TeamScoreComponent implements OnInit {
   public readonly teamScoreFormGroup: FormGroup
   public readonly scoreTemplate: ScoreTag[]
   public readonly complexScoreTemplate: boolean
-  public inputElement!: HTMLInputElement
-  public timeout!: any
 
   constructor(private store: Store, activatedRoute: ActivatedRoute, private actions: Actions) {
 
@@ -85,64 +83,47 @@ export class TeamScoreComponent implements OnInit {
       this.scoreTemplate.forEach(scoreTag => {
         this.teamScoreFormGroup.get(scoreTag.category)!.setValue(this.team.scoreDetails.find(score => score.categoryName == scoreTag.category)?.inputString)
       })
-      this.valuechange(null)
+      //this.valuechange(null)
     })
   }
 
-  public key(car: any) {
-    if (this.inputElement) {
-      const cursor = this.inputElement.selectionStart!
-      if (car == "Backspace") {
-        if (cursor > 0) {
-          this.inputElement.value = this.inputElement.value.substring(0, cursor - 1) + this.inputElement.value.substring(cursor)
-          this.inputElement.selectionStart = cursor - 1
-          this.inputElement.selectionEnd = cursor - 1
-          this.inputElement.focus()
-          this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+  private key(caracter: any, inputElement: HTMLInputElement) {
 
-      } else if (car == "Enter") {
-
-
-
-        for (let i = 0; i < this.aa.length; i++) {
-          if (this.aa.toArray()[i].nativeElement == this.inputElement) {
-            if (i+2 < this.aa.length) {
-              this.aa.toArray()[i + 1].nativeElement.focus()
-            } else {
-              this.onSubmit()              
-              console.error("validation !")
-              if (this.timeout) {
-                clearTimeout(this.timeout)
-              }
-            }
-          }
-        }
-
-      } else {
-        this.inputElement.value = this.inputElement.value.substring(0, cursor) + car + this.inputElement.value.substring(cursor)
-        this.inputElement.selectionStart = cursor + 1
-        this.inputElement.selectionEnd = cursor + 1
-        this.inputElement.focus()
-        this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+    const cursor = inputElement.selectionStart!
+    if (caracter == "Backspace") {
+      if (cursor > 0) {
+        inputElement.value = inputElement.value.substring(0, cursor - 1) + inputElement.value.substring(cursor)
+        inputElement.selectionStart = cursor - 1
+        inputElement.selectionEnd = cursor - 1
       }
 
+    } else if (caracter == "Enter") {
+
+      for (let i = 0; i < this.listOfInputScore.length; i++) {
+        if (this.listOfInputScore.toArray()[i].nativeElement == inputElement) {
+          if (i + 2 < this.listOfInputScore.length) {
+            this.listOfInputScore.toArray()[i + 1].nativeElement.focus()
+          } else {
+            this.onSubmit()
+          }
+        }
+      }
+
+    } else {
+      inputElement.value = inputElement.value.substring(0, cursor) + caracter + inputElement.value.substring(cursor)
+      inputElement.selectionStart = cursor + 1
+      inputElement.selectionEnd = cursor + 1
     }
   }
 
-  public blur(event: any) {
-    if (this.timeout) {
-      clearTimeout(this.timeout)
+  public handleKey(event: any, key: any) {
+    if (document.activeElement instanceof HTMLInputElement) {
+      this.key(key, document.activeElement as HTMLInputElement)
     }
-
-    this.inputElement = event
-
-    this.timeout = setTimeout(() => {
-      this.inputElement = undefined!
-    }, 300)
+    event.preventDefault()
   }
 
-  public valuechange(_: any) {
+  /*public valuechange(_: any) {
     this.teamScoreFormGroup.get("score")!
       .setValue(
         Object.keys(this.teamScoreFormGroup.controls).map(key => {
@@ -187,9 +168,9 @@ export class TeamScoreComponent implements OnInit {
 
         }).reduce((acc: number, val: number) => acc + val, 0)
       )
-  }
+  }*/
 
-  public calc(category: string): string {
+  /*public calc(category: string): string {
     const val = this.teamScoreFormGroup.get(category)!.value
     if (val) {
       try {
@@ -200,11 +181,11 @@ export class TeamScoreComponent implements OnInit {
       }
     }
     return ""
-  }
+  }*/
 
-  public onKeydown(event: any) {
-    event.preventDefault();
-  }
+  /*  public onKeydown(event: any) {
+      event.preventDefault();
+    }*/
 
   ngOnInit(): void {
     this.actions.pipe(ofActionSuccessful(AddScoreToTeam)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))

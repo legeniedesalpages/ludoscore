@@ -19,8 +19,7 @@ import { MatchModel } from 'src/app/core/model/match.model'
 import { GameService } from 'src/app/core/services/game/game.service'
 import { CreateMatch } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
-import { DateTime } from 'luxon';
-import dayjs from 'dayjs'
+import { formatTimeDifference } from 'src/app/core/services/misc/date.format'
 
 @Component({
   templateUrl: './game-selection.component.html',
@@ -32,9 +31,13 @@ export class GameSelectionComponent implements OnInit {
   public searching: boolean = false
   public searchText: string = ""
   public isFilterMenuOpen: boolean = false
-  public gameList!: Observable<SelectingGame[]>
+  public gameList$!: Observable<SelectingGame[]>
 
-  public onlyCooperativeFilter: boolean = true
+  public onlyCooperativeFilter: boolean = false
+  public twoPlayerOnlyFilter: boolean = false
+  public moreThanFourPlayersFilter: boolean = false
+  public lessThanThirtyMinutes: boolean = false
+  public moreThanOneHourAndAHalfFilter: boolean = false
 
   constructor(private gameService: GameService, private store: Store) {
   }
@@ -49,7 +52,7 @@ export class GameSelectionComponent implements OnInit {
       this.store.dispatch(new Navigate(['player-selection']))
     } else {
       console.debug("Game not selected, fetch game list")
-      this.gameList = this.gameService.listAllGames().pipe(tap(_ => this.loading = false))
+      this.gameList$ = this.gameService.listAllGames().pipe(tap(_ => this.loading = false))
     }
   }
 
@@ -99,7 +102,7 @@ export class GameSelectionComponent implements OnInit {
       }
 
       if (game.lastPlayed) {
-        line2 += " " + this.getTimeDifference(game.lastPlayed)
+        line2 += " " + formatTimeDifference(game.lastPlayed)
       }
     } else {
       line2 = "Pas encore joué"
@@ -108,34 +111,7 @@ export class GameSelectionComponent implements OnInit {
     return line2
   }
 
-  private getTimeDifference(date: Date): string {
-    const now = dayjs()
-    const inputDate = dayjs(date)
-
-    const diffInYears = now.diff(inputDate, 'year')
-    if (diffInYears >= 1) {
-      return "il y a plus d'un an"
-    }
-
-    const diffInMonths = now.diff(inputDate, 'month')
-    if (diffInMonths >= 1) {
-      return `il y a ${diffInMonths} mois`
-    }
-
-    const diffInWeeks = now.diff(inputDate, 'week')
-    if (diffInWeeks >= 1) {
-      return `il y a ${diffInWeeks} semaine${diffInWeeks > 1 ? 's' : ''}`
-    }
-
-    const diffInDays = now.diff(inputDate, 'day')
-    if (diffInDays > 1) {
-      return `il y a ${diffInDays} jours`
-    } else if (diffInDays === 1) {
-      return "hier"
-    }
-
-    return "aujourd'hui"
-  }
+  
 
   public cancelMatchCreation() {
     this.store.dispatch(new Navigate(['/']))
