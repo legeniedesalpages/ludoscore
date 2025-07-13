@@ -25,10 +25,8 @@
       </div>
       <div class="row">
         <div class="key" matRipple (mousedown)="handleKey($event, '()')"><button mat-raised-button class="visual grey">(</button></div>
-        <!--<div class="key triple" matRipple (mousedown)="handleKey($event, ' ')"><button mat-raised-button class="visual">&nbsp;</button></div>-->
         <div class="key" matRipple (mousedown)="handleKey($event, '0')"><button mat-raised-button class="visual">0</button></div>
         <div class="key" matRipple (mousedown)="handleKey($event, ')')"><button mat-raised-button class="visual grey">)</button></div>
-        <!--<div class="key" matRipple (mousedown)="handleKey($event, '*')"><button mat-raised-button class="visual grey">*</button></div>-->
         <div class="key double" matRipple (mousedown)="handleKey($event, 'Enter')"><button mat-flat-button class="visual primary"><mat-icon>subdirectory_arrow_left</mat-icon></button></div>
       </div>
     </div>
@@ -43,17 +41,24 @@
         <div *ngFor="let scoreCategory of scoreTemplate; let i = index;" class="complex-group">
           <div [ngClass]="scoreCategory.complex ? 'complex-field-compute complex-field' : 'complex-field'"
             [ngStyle]="{'background-color': scoreCategory.color.code, 'color': scoreCategory.color.invert}">
+
             <span class="category-name">
               {{ scoreCategory.category }}
-              <br /><span *ngIf="scoreCategory.complex" class="sub-total"><mat-icon>arrow_right</mat-icon><!--{{ calc(scoreCategory.category) }}--></span>
+
+              <br /><span *ngIf="scoreCategory.complex" class="sub-total"><mat-icon>arrow_right</mat-icon>{{ getScoreDetail(scoreCategory.category) }}</span>
             </span>
-            <!--(blur)="blur($event.target)"-->
-            <!--(ngModelChange)="valuechange($event)"-->
-            <input    #inputScore [ngModel] cdkFocusInitial  inputmode='none' [formControlName]="scoreCategory.category" *ngIf="!scoreCategory.complex"  [ngClass]="scoreCategory.negatif ? 'negative-score' : ''"/>
-            <!--(blur)="blur($event.target)"-->
-            <!--(keydown.enter)="onKeydown($event)"-->
-            <!--(ngModelChange)="valuechange($event)"-->
-            <textarea #inputScore [ngModel] cdkFocusInitial  inputmode='none' [formControlName]="scoreCategory.category" *ngIf="scoreCategory.complex" rows="3" ></textarea>
+
+            <input    #inputScore [ngModel] cdkFocusInitial  inputmode='none' [formControlName]="scoreCategory.category" 
+                *ngIf="!scoreCategory.complex"  [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" 
+                [attr.data-category]="scoreCategory.category"
+                (ngModelChange)="categoryValuechange(scoreCategory.category, $event)"/>
+
+            <textarea #inputScore [ngModel] cdkFocusInitial  inputmode='none' [formControlName]="scoreCategory.category" 
+                *ngIf="scoreCategory.complex" rows="3" 
+                [attr.data-category]="scoreCategory.category"
+                (keydown.enter)="$event.preventDefault()" 
+                (ngModelChange)="categoryValuechange(scoreCategory.category, $event)">
+            </textarea>
           </div>
         </div>
 
@@ -61,7 +66,7 @@
 
         <mat-form-field appearance="fill">
           <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
-          <!--(blur)="blur($event.target)"-->
+
           <input #inputScore matInput formControlName="score" inputmode='none'>
         </mat-form-field>
 

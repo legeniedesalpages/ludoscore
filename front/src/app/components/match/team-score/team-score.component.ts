@@ -14,7 +14,7 @@ import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
-import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
+import { Actions, Store, ofActionSuccessful } from '@ngxs/store'
 import { Observable, first } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { Score, ScoreTag } from 'src/app/core/model/score.model'
@@ -30,12 +30,10 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 })
 export class TeamScoreComponent implements OnInit {
 
-  @Select(MatchState) matchState!: Observable<MatchStateModel>
-
   @ViewChildren('inputScore') listOfInputScore!: QueryList<any>;
 
   public team!: Team
-  public scoreDetails: Score[] = []
+  public localMutableScoreDetails: Score[] = []
 
   public readonly teamScoreFormGroup: FormGroup
   public readonly scoreTemplate: ScoreTag[]
@@ -83,11 +81,10 @@ export class TeamScoreComponent implements OnInit {
       this.scoreTemplate.forEach(scoreTag => {
         this.teamScoreFormGroup.get(scoreTag.category)!.setValue(this.team.scoreDetails.find(score => score.categoryName == scoreTag.category)?.inputString)
       })
-      //this.valuechange(null)
     })
   }
 
-  private key(caracter: any, inputElement: HTMLInputElement) {
+  private key(caracter: any, inputElement: HTMLInputElement | HTMLTextAreaElement) {
 
     const cursor = inputElement.selectionStart!
     if (caracter == "Backspace") {
@@ -95,6 +92,8 @@ export class TeamScoreComponent implements OnInit {
         inputElement.value = inputElement.value.substring(0, cursor - 1) + inputElement.value.substring(cursor)
         inputElement.selectionStart = cursor - 1
         inputElement.selectionEnd = cursor - 1
+        // Déclencher la mise à jour après suppression
+        this.triggerValueChangeFromActiveElement()
       }
 
     } else if (caracter == "Enter") {
@@ -113,79 +112,82 @@ export class TeamScoreComponent implements OnInit {
       inputElement.value = inputElement.value.substring(0, cursor) + caracter + inputElement.value.substring(cursor)
       inputElement.selectionStart = cursor + 1
       inputElement.selectionEnd = cursor + 1
+      // Déclencher la mise à jour après ajout de caractère
+      this.triggerValueChangeFromActiveElement()
+    }
+  }
+
+  private triggerValueChangeFromActiveElement() {
+    const activeElement = document.activeElement;
+    
+    if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
+      // Récupérer le nom de la catégorie depuis l'attribut data-category
+      const categoryName = activeElement.getAttribute('data-category');
+      
+      if (categoryName) {
+        console.debug("Triggering value change from active element", categoryName, activeElement.value);
+        this.categoryValuechange(categoryName, activeElement.value);
+      } else {
+        console.debug("No data-category attribute found on active element", activeElement);
+      }
     }
   }
 
   public handleKey(event: any, key: any) {
     if (document.activeElement instanceof HTMLInputElement) {
       this.key(key, document.activeElement as HTMLInputElement)
+    } else if (document.activeElement instanceof HTMLTextAreaElement) {
+        this.key(key, document.activeElement as HTMLTextAreaElement)
     }
     event.preventDefault()
   }
 
-  /*public valuechange(_: any) {
-    this.teamScoreFormGroup.get("score")!
-      .setValue(
-        Object.keys(this.teamScoreFormGroup.controls).map(key => {
-
-          let result
-          const scoreTag = this.scoreTemplate.find(scoreTag => scoreTag.category == key)!
-          if (key == "score") {
-            result = 0
-          } else {
-            const value = this.teamScoreFormGroup.get(key)!.value
-            if (scoreTag.complex) {
-              try {
-                result = new ArithmeticExpressionEvaluator().evaluateAll(value, true)
-              } catch (e) {
-                result = 0
-              }
-            } else {
-              result = Number(value)
-              if (Number.isNaN(result)) {
-                result = 0
-              }
-            }
-
-            if (scoreTag.negatif) {
-              result = result * -1
-            }
-          }
-
-          let scoreDetails = this.scoreDetails.find(score => score.categoryName == key)
-          if (!scoreDetails) {
-            scoreDetails = {
-              categoryName: key,
-              value: result,
-              inputString: this.teamScoreFormGroup.get(key)!.value
-            }
-            this.scoreDetails.push(scoreDetails)
-          } else {
-            scoreDetails.value = result
-            scoreDetails.inputString = this.teamScoreFormGroup.get(key)!.value
-          }
-          return result
-
-        }).reduce((acc: number, val: number) => acc + val, 0)
-      )
-  }*/
-
-  /*public calc(category: string): string {
-    const val = this.teamScoreFormGroup.get(category)!.value
-    if (val) {
-      try {
-        const result = new ArithmeticExpressionEvaluator().evaluateAll(val, true)
-        return result.toString()
-      } catch (e) {
-        return "..."
+  public categoryValuechange(categoryName: string, newValue: any) {
+    console.debug("Value change", categoryName, newValue)
+    
+    // Chercher la catégorie dans scoreDetails
+    let scoreDetail = this.localMutableScoreDetails.find(score => score.categoryName == categoryName)
+    
+    // Si la catégorie n'existe pas, la créer
+    if (!scoreDetail) {
+      scoreDetail = {
+        categoryName: categoryName,
+        value: 0,
+        inputString: ''
+      }
+      this.localMutableScoreDetails.push(scoreDetail)
+    }
+    
+    // Assigner la nouvelle valeur
+    scoreDetail.inputString = newValue
+    
+    // Calculer la valeur numérique
+    const scoreTag = this.scoreTemplate.find(tag => tag.category == categoryName)
+    if (scoreTag) {
+      if (scoreTag.complex) {
+        try {
+          scoreDetail.value = new ArithmeticExpressionEvaluator().evaluateAll(newValue, true)
+        } catch (e) {
+          scoreDetail.value = 0
+        }
+      } else {
+        scoreDetail.value = Number(newValue)
+        if (Number.isNaN(scoreDetail.value)) {
+          scoreDetail.value = 0
+        }
+      }
+      
+      // Appliquer la négation si nécessaire
+      if (scoreTag.negatif) {
+        scoreDetail.value = scoreDetail.value * -1
       }
     }
-    return ""
-  }*/
+  }
 
-  /*  public onKeydown(event: any) {
-      event.preventDefault();
-    }*/
+  public getScoreDetail(category: string): number {
+    const scoreDetail = this.localMutableScoreDetails.find(score => score.categoryName === category);
+    return scoreDetail ? scoreDetail.value : 0;
+  }
 
   ngOnInit(): void {
     this.actions.pipe(ofActionSuccessful(AddScoreToTeam)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
@@ -193,8 +195,8 @@ export class TeamScoreComponent implements OnInit {
 
   public onSubmit() {
     console.info("Submitting team score form")
-    console.log(this.scoreDetails)
-    this.store.dispatch(new AddScoreToTeam(this.team, this.teamScoreFormGroup.value.score, this.scoreDetails))
+    console.log(this.team.scoreDetails)
+    this.store.dispatch(new AddScoreToTeam(this.team, this.teamScoreFormGroup.value.score, this.localMutableScoreDetails))
   }
 
   public returnToMatchEnd() {
