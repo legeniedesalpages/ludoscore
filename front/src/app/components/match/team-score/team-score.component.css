@@ -53,13 +53,23 @@ hr {
 }
 
 .category-name {
-  height: 30px;
+  height: 36px;
   float: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .negative-score {
   background-color: pink;
 }
+
+.total-score-text {
+  margin: 15px 0;
+  display: block;
+  text-align: center;
+}
+
 
 .complex-field input.ng-invalid {
   background-color: red;
@@ -75,6 +85,12 @@ hr {
 
 .mat-icon {
   vertical-align: middle;
+}
+
+.total-score-text {
+  text-align: center;
+  width: 100%;
+  padding: 10px;
 }
 
 /* KEYBOARD */
@@ -102,9 +118,6 @@ hr {
 
 .visual {
   margin: 2px;
-}
-
-.visual {
   padding-left:5px;
   padding-right:5px;
 }

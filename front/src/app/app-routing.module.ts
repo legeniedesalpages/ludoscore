@@ -11,8 +11,9 @@
     * - Modification    :
 **/
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { PagenotfoundComponent } from './components/misc/page-not-found.component';
+import { AuthGuardService } from './core/services/auth/auth-guard.service';
 
 const routes: Routes = [
   { path: '', loadChildren: () => import('./components/home/home.module').then(m => m.HomeModule), data: { animation: 'home' } },
@@ -27,7 +28,7 @@ const routes: Routes = [
 
   { path: 'match-display', loadChildren: () => import('./components/match/display/match-display.module').then(m => m.MatchDisplayModule), data: { animation: 'match-display' } },
   { path: 'match-end', loadChildren: () => import('./components/match/end/match-end.module').then(m => m.MatchEndModule), data: { animation: 'match-end' } },
-  { path: 'team-score', loadChildren: () => import('./components/match/team-score/team-score.module').then(m => m.TeamScoreModule), data: { animation: 'team-score' } },
+  { path: 'team-score', loadComponent: () => import('./components/match/team-score/team-score.component').then(c => c.TeamScoreComponent), canActivate: [AuthGuardService], data: { animation: 'team-score' } },
   { path: 'wheel', loadChildren: () => import('./components/match/wheel/wheel.module').then(m => m.WheelModule), data: { animation: 'wheel' } },
 
   { path: 'find-game', loadChildren: () => import('./components/game/find-game/find-game.module').then(m => m.FindGameModule), data: { animation: 'find-game' } },
@@ -38,8 +39,8 @@ const routes: Routes = [
 
   { path: 'match-history', loadChildren: () => import('./components/stats/match-history/match-history.module').then(m => m.MatchHistoryModule), data: { animation: 'match-history' } },
   { path: 'match-history-detail/:id', loadChildren: () => import('./components/stats/match-history-detail/match-history-detail.module').then(m => m.MatchHistoryDetailModule), data: { animation: 'match-history-detail' } },
-  
-  {path: '**', component: PagenotfoundComponent}
+
+  { path: '**', component: PagenotfoundComponent }
 ];
 
 @NgModule({
