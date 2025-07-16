@@ -20,7 +20,8 @@ import { DoLogin } from 'src/app/core/state/auth/auth.actions'
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
+  standalone: false
 })
 export class LoginComponent implements OnInit {
 
@@ -34,8 +35,8 @@ export class LoginComponent implements OnInit {
   constructor(private store: Store, private router: Router) {
    
     this.loginForm = new FormGroup({
-      email: new FormControl('', [Validators.email, Validators.required]),
-      password: new FormControl('', Validators.required),
+      email: new FormControl('renaud_balu@hotmail.com', [Validators.email, Validators.required]),
+      password: new FormControl('Renaud21', Validators.required),
     });
 
     this.hidePassword = true

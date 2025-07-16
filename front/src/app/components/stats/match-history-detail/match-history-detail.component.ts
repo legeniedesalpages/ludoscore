@@ -23,6 +23,7 @@ import { MatchModel } from 'src/app/core/model/match.model'
 @Component({
   templateUrl: './match-history-detail.component.html',
   styleUrls: ['./match-history-detail.component.css', '../../../core/css/list.css'],
+  standalone: false
 })
 export class MatchHistoryDetailComponent implements OnInit {
 

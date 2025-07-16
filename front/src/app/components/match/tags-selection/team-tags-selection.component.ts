@@ -22,6 +22,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   selector: 'team-tags-selection',
   templateUrl: './tags-selection.component.html',
   styleUrls: ['./tags-selection.component.css'],
+  standalone: false
 })
 export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
 
@@ -115,7 +116,7 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
     return availableTagName
   }
 
-  public selectTag(name: string, category: string, index: number) {
+  public selectTag(name: any, category: string, index: number) {
     this.tagSelected.set(category + "__" + index, [category, name, index])
     this.tagRemoved.delete(category + "__" + index)
 

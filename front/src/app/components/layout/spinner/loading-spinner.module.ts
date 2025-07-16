@@ -21,7 +21,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
     CommonModule,
     MatProgressSpinnerModule
   ],
-  exports: [LoadingSpinnerComponent]
+  exports: [LoadingSpinnerComponent, MatProgressSpinnerModule]
 })
 
 export class LoadingSpinnerModule { }

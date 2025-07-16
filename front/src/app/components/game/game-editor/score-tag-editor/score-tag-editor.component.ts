@@ -22,7 +22,8 @@ import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
 @Component({
   selector: 'score-tag-editor',
   templateUrl: './score-tag-editor.component.html',
-  styleUrls: ['./score-tag-editor.component.css']
+  styleUrls: ['./score-tag-editor.component.css'],
+  standalone: false
 })
 export class ScoreTagEditorComponent implements OnInit {
 
@@ -84,7 +85,8 @@ export class ScoreTagEditorComponent implements OnInit {
 @Component({
   selector: 'dialog-score-tag-editor',
   templateUrl: '../score-tag-editor-dialog/score-tag-editor-dialog.component.html',
-  styleUrls: ['../score-tag-editor-dialog/score-tag-editor-dialog.component.css']
+  styleUrls: ['../score-tag-editor-dialog/score-tag-editor-dialog.component.css'],
+  standalone: false
 })
 export class DialogScoreTagEditorComponent {
 

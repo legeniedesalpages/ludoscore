@@ -12,22 +12,21 @@
 **/
 import { Location } from '@angular/common'
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
-import { Store } from '@ngxs/store'
 import { fromEvent } from "rxjs"
 
 @Component({
   selector: 'app-layout',
+  standalone: false,
   template: `
     <div class="container">
       <div class="header background-primary" #headerDiv>
-        <!--<button mat-icon-button *ngIf="!withBackButton" (click)="reset()"><mat-icon>menu</mat-icon></button>-->
         <button mat-icon-button *ngIf="withBackButton" (click)="back()"><mat-icon>keyboard_backspace</mat-icon></button>
         <span class="menu-spacer" *ngIf="!withBackButton"></span>
         <ng-content select="ng-container[role=header]"></ng-content>
       </div>
       
       <div class="content" #contentDiv>
-        <ng-content select="ng-container[role=body]" (scrollPosition)="scrollChanged($event)"></ng-content>
+        <ng-content select="ng-container[role=body]"></ng-content>
       </div>
       
       <div class="bottom">
@@ -83,7 +82,7 @@ export class LayoutComponent implements OnInit {
   @Input() public withBackButton!: boolean
   @Output() public backButtonAction = new EventEmitter<void>
 
-  constructor(private location: Location, private store: Store) { }
+  constructor(private location: Location) { }
 
   ngOnInit(): void {
     fromEvent(this.contentDiv.nativeElement, "scroll").subscribe(() => {
@@ -102,9 +101,5 @@ export class LayoutComponent implements OnInit {
     } else {
       this.location.back()
     }
-  }
-
-  public reset(): void {
-    this.store.reset({})
   }
 }

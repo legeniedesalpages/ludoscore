@@ -36,7 +36,8 @@ export interface WipeActionStyle {
         </div>
       </div>  
     `,
-  styleUrls: ['./swipeable.component.css']
+  styleUrls: ['./swipeable.component.css'],
+  standalone: false
 })
 export class SwipeableComponent implements OnInit {
 

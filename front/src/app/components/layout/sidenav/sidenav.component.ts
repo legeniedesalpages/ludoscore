@@ -18,7 +18,8 @@ import { fromEvent } from "rxjs"
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.css'],
-  animations: [slideInOut, fadeInOut]
+  animations: [slideInOut, fadeInOut],
+  standalone: false
 })
 export class SidenavComponent implements OnInit {
 

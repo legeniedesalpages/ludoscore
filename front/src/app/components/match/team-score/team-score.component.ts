@@ -26,7 +26,8 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 
 @Component({
   templateUrl: './team-score.component.html',
-  styleUrls: ['./team-score.component.css']
+  styleUrls: ['./team-score.component.css'],
+  standalone: false
 })
 export class TeamScoreComponent implements OnInit {
 

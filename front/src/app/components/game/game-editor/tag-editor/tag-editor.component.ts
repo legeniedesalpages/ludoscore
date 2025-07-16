@@ -21,7 +21,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
 @Component({
   selector: 'tag-editor',
   templateUrl: './tag-editor.component.html',
-  styleUrls: ['./tag-editor.component.css']
+  styleUrls: ['./tag-editor.component.css'],
+  standalone: false
 })
 export class TagEditorComponent implements OnInit {
 
@@ -82,7 +83,8 @@ export class TagEditorComponent implements OnInit {
 @Component({
   selector: 'dialog-tag-editor',
   templateUrl: '../tag-editor-dialog/tag-editor-dialog.component.html',
-  styleUrls: ['../tag-editor-dialog/tag-editor-dialog.component.css']
+  styleUrls: ['../tag-editor-dialog/tag-editor-dialog.component.css'],
+  standalone: false
 })
 export class DialogTagEditorComponent {
 

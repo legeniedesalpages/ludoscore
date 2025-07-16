@@ -20,7 +20,8 @@ import { DrawBreaker } from 'src/app/core/model/game.model'
 @Component({
   selector: 'draw-editor',
   templateUrl: './draw-editor.component.html',
-  styleUrls: ['./draw-editor.component.css']
+  styleUrls: ['./draw-editor.component.css'],
+  standalone: false
 })
 export class DrawEditorComponent {
 
@@ -73,7 +74,8 @@ export class DrawEditorComponent {
 @Component({
   selector: 'dialog-draw-editor',
   templateUrl: '../draw-editor-dialog/draw-editor-dialog.component.html',
-  styleUrls: ['../draw-editor-dialog/draw-editor-dialog.component.css']
+  styleUrls: ['../draw-editor-dialog/draw-editor-dialog.component.css'],
+  standalone: false
 })
 export class DialogDrawEditorComponent {
 

@@ -26,7 +26,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { MatchDisplayComponent } from './match-display.component';
-import { TeamDetailModule } from '../team-detail/team-detail.module';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 

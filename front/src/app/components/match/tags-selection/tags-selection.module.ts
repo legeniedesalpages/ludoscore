@@ -50,7 +50,7 @@ import { GameTagsSelectionComponent } from './game-tags-selection.component'
     MatSnackBarModule,
     MatDialogModule
   ],
-  exports: [TeamTagsSelectionComponent, GameTagsSelectionComponent]
+  exports: [TeamTagsSelectionComponent, GameTagsSelectionComponent, MatSelectModule]
 })
 
 export class TagsSelectionModule { }

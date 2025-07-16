@@ -15,7 +15,7 @@ import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi, withXsrfConfiguration } from "@angular/common/http";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { HttpXSRFInterceptor } from './core/interceptors/xsrf.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -55,6 +55,7 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
     { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
     PusherService,
     provideHttpClient(
+      withFetch(),
       withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-CSRF-TOKEN' }),
       withInterceptorsFromDi()
     )

@@ -31,7 +31,8 @@ import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.
 
 @Component({
   templateUrl: './player-selection.component.html',
-  styleUrls: ['./player-selection.component.css']
+  styleUrls: ['./player-selection.component.css'],
+  standalone: false
 })
 export class PlayerSelectionComponent implements OnInit, OnDestroy {
 

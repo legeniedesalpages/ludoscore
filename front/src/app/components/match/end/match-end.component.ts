@@ -23,6 +23,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 @Component({
   templateUrl: './match-end.component.html',
   styleUrls: ['./match-end.component.css'],
+  standalone: false
 })
 export class MatchEndComponent implements OnInit {
 

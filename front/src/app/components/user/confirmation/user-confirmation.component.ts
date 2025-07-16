@@ -17,6 +17,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service'
 @Component({
   templateUrl: './user-confirmation.component.html',
   styleUrls: ['./user-confirmation.component.css'],
+  standalone: false
 })
 export class UserConfirmationComponent implements OnInit {
 

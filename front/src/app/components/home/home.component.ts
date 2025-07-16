@@ -27,6 +27,7 @@ import { environment } from 'src/environments/environment'
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  standalone: false
 })
 export class HomeComponent implements OnInit {
 
@@ -94,7 +95,8 @@ export class HomeComponent implements OnInit {
 @Component({
   selector: 'welcome-dialog',
   templateUrl: './welcome-dialog/welcome-dialog.component.html',
-  styleUrls: ['./welcome-dialog/welcome-dialog.component.css']
+  styleUrls: ['./welcome-dialog/welcome-dialog.component.css'],
+  standalone: false
 })
 export class WelcomeDialogComponent {
 

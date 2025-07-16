@@ -24,6 +24,7 @@ import { MatchModel, Team } from 'src/app/core/model/match.model'
 @Component({
   templateUrl: './match-display.component.html',
   styleUrls: ['./match-display.component.css'],
+  standalone: false
 })
 export class MatchDisplayComponent implements OnInit, OnDestroy {
 

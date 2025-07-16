@@ -20,6 +20,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatDividerModule } from '@angular/material/divider'
+import { MatFormFieldModule } from '@angular/material/form-field'
 import { LayoutModule } from '../layout.module'
 import { LoadingSpinnerModule } from '../spinner/loading-spinner.module'
 import { MatChipsModule } from '@angular/material/chips'
@@ -40,6 +41,7 @@ import { ConfirmationDialogComponent } from './confirmation.component'
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
+    MatFormFieldModule,
     LayoutModule,
     LoadingSpinnerModule,
     MatChipsModule,

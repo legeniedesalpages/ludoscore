@@ -21,6 +21,7 @@ import { FindGameService } from 'src/app/core/services/game/find-game.service'
   selector: 'find-game',
   templateUrl: './find-game.component.html',
   styleUrls: ['./find-game.component.css', '../../../core/css/list.css'],
+  standalone: false
 })
 export class FindGameComponent {
 

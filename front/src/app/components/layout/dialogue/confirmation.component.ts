@@ -22,10 +22,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
         </mat-dialog-content>
 
         <mat-dialog-actions align="end">
-            <button mat-button mat-dialog-close (click)="dialogRef.close(false)">Annuler</button>
-            <button mat-button mat-dialog-close (click)="dialogRef.close(true)">Continuer</button>
+            <button mat-button (click)="dialogRef.close(false)">Annuler</button>
+            <button mat-button (click)="dialogRef.close(true)">Continuer</button>
         </mat-dialog-actions>
-  `
+  `,
+  standalone: false
 })
 export class ConfirmationDialogComponent {
     constructor(public dialogRef: MatDialogRef<ConfirmationDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }

@@ -33,7 +33,8 @@ import { Component, Input } from '@angular/core'
       opacity: 0.6;
       margin-left: 10px;
     }
-  `]
+  `],
+  standalone: false
 })
 export class LoadingSpinnerComponent {
 

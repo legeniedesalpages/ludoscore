@@ -22,7 +22,8 @@ import { AuthState } from 'src/app/core/state/auth/auth.state'
 @Component({
   selector: 'manage-player',
   templateUrl: './manage-player.component.html',
-  styleUrls: ['./manage-player.component.css', '../../../core/css/list.css']
+  styleUrls: ['./manage-player.component.css', '../../../core/css/list.css'],
+  standalone: false
 })
 export class ManagePlayerComponent implements OnInit {
 

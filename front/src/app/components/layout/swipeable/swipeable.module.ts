@@ -23,6 +23,6 @@ import { MatButtonModule } from '@angular/material/button'
         MatIconModule,
         MatButtonModule
     ],
-    exports: [SwipeableComponent]
+    exports: [SwipeableComponent, MatIconModule]
 })
 export class SwipeableModule { }

@@ -28,7 +28,8 @@ import { ScoreTag } from 'src/app/core/model/score.model'
 @Component({
   selector: 'game-editor',
   templateUrl: './game-editor.component.html',
-  styleUrls: ['./game-editor.component.css']
+  styleUrls: ['./game-editor.component.css'],
+  standalone: false
 })
 export class GameEditorComponent implements OnInit {
 

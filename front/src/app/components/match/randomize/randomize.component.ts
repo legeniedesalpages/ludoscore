@@ -21,6 +21,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 @Component({
   templateUrl: './randomize.component.html',
   styleUrls: ['./randomize.component.css'],
+  standalone: false
 })
 export class RandomizeComponent {
 

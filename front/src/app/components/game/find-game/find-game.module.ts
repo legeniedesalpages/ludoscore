@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FindGameComponent } from './find-game.component';
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
 import { LayoutModule } from '../../layout/layout.module';
@@ -49,6 +50,7 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
+    MatSnackBarModule,
     LayoutModule,
     A11yModule
   ],

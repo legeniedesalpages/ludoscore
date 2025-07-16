@@ -22,7 +22,8 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 @Component({
   selector: 'team-detail',
   templateUrl: './team-detail.component.html',
-  styleUrls: ['./team-detail.component.css']
+  styleUrls: ['./team-detail.component.css'],
+  standalone: false
 })
 export class TeamDetailComponent {
 

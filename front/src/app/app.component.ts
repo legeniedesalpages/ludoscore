@@ -36,7 +36,8 @@ import { Navigate } from '@ngxs/router-plugin';
       perspective:  1px;
       transform-style:  preserve-3d;
     }
-  `]
+  `],
+  standalone: false
 })
 export class AppComponent implements OnInit {
 

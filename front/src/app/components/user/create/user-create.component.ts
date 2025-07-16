@@ -21,6 +21,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service'
 @Component({
   templateUrl: './user-create.component.html',
   styleUrls: ['./user-create.component.css'],
+  standalone: false
 })
 export class UserCreateComponent implements OnInit {
 

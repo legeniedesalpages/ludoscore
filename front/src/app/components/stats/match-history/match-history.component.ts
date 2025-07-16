@@ -22,7 +22,8 @@ import { CollectionViewer, DataSource } from '@angular/cdk/collections'
 @Component({
   templateUrl: './match-history.component.html',
   styleUrls: ['./match-history.component.css', '../../../core/css/list.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class MatchHistoryComponent implements OnInit {
 
@@ -65,7 +66,10 @@ export class MatchHistoryComponent implements OnInit {
       return hours + " heures et " + minutes + " mn"
   }
 
-  public gotToHistoryDetail(match: MatchModel) {
+  public gotToHistoryDetail(match: MatchModel | undefined) {
+    if (!match) {
+      return
+    }
     this.store.dispatch(new Navigate(['/match-history-detail', match.matchId]))
   }
 

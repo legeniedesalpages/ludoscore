@@ -24,6 +24,7 @@ import { formatTimeDifference } from 'src/app/core/services/misc/date.format'
 @Component({
   templateUrl: './game-selection.component.html',
   styleUrls: ['./game-selection.component.css', '../../../core/css/list.css'],
+  standalone: false
 })
 export class GameSelectionComponent implements OnInit {
 

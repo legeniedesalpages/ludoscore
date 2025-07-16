@@ -29,7 +29,8 @@ import { MatchState } from "src/app/core/state/match/match.state"
 @Component({
   selector: "app-wheel",
   templateUrl: "./wheel.component.html",
-  styleUrls: ["./wheel.component.css"]
+  styleUrls: ["./wheel.component.css"],
+  standalone: false
 })
 export class WheelComponent implements AfterViewInit, DoCheck {
 

@@ -26,7 +26,8 @@ import { AuthState } from 'src/app/core/state/auth/auth.state'
 @Component({
   selector: 'edit-player',
   templateUrl: './edit-player.component.html',
-  styleUrls: ['./edit-player.component.css', '../../../core/css/list.css']
+  styleUrls: ['./edit-player.component.css', '../../../core/css/list.css'],
+  standalone: false
 })
 export class EditPlayerComponent implements OnInit {
 

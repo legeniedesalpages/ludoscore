@@ -4,7 +4,7 @@
         <div *ngFor="let occurence of [].constructor(tag.maxOcurrences); let i = index;" class="tag">
             <mat-form-field appearance="fill" class="tag-selector">
                 <mat-label>{{ tag.category }}</mat-label>
-                <mat-select (selectionChange)="selectTag($event.value, tag.category, i)"
+                <mat-select (selectionChange)="selectTag($event, tag.category, i)"
                     [disabled]="tagAvailable(tag, i).length == 0"
                     [value]="alreadySelectedTag(tag.category, i)">
                     <mat-option *ngFor="let tagName of tagAvailable(tag, i)" [value]="tagName">
