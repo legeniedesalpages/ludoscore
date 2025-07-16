@@ -54,12 +54,14 @@
                 <input #inputScore [ngModel] cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category"
                   [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" 
                   [attr.data-category]="scoreCategory.category"
+                  (input)="onScoreInput($event, scoreCategory.category)"
                   (ngModelChange)="categoryValuechange(scoreCategory.category, $event)" />
               } @else {
                 <textarea #inputScore [ngModel] cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" 
                   rows="3" 
                   [attr.data-category]="scoreCategory.category"
                   (keydown.enter)="$event.preventDefault()" 
+                  (input)="onScoreInput($event, scoreCategory.category)"
                   (ngModelChange)="categoryValuechange(scoreCategory.category, $event)">
                 </textarea>
               }
@@ -74,7 +76,9 @@
         } @else {
           <mat-form-field appearance="fill">
             <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
-              <input #inputScore matInput formControlName="score" inputmode='none'>
+              <input #inputScore matInput formControlName="score" inputmode='none' 
+                     [attr.data-category]="'score'"
+                     (input)="onScoreInput($event, 'score')">
           </mat-form-field>
         }
 

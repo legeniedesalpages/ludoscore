@@ -87,11 +87,11 @@ export class TeamScoreComponent implements OnInit {
     }
 
     if (this.complexScoreTemplate) {
+      this.teamScoreFormGroup = new FormGroup({})
+    } else {
       this.teamScoreFormGroup = new FormGroup({
         score: new FormControl('', [Validators.required, Validators.pattern("^[0-9\-]*$"), Validators.minLength(1)])
       })
-    } else {
-      this.teamScoreFormGroup = new FormGroup({})
     }
     
     this.scoreTemplate.forEach(scoreTag => {
@@ -170,6 +170,10 @@ export class TeamScoreComponent implements OnInit {
 
       if (categoryName) {
         console.debug("Triggering value change from active element", categoryName, activeElement.value)
+        
+        // Mettre à jour le FormControl pour déclencher les validators Angular
+        this.teamScoreFormGroup.get(categoryName)?.setValue(activeElement.value);
+        
         // Appliquer la mise à jour et forcer la détection des changements
         this.categoryValuechange(categoryName, activeElement.value)
       } else {
@@ -185,6 +189,16 @@ export class TeamScoreComponent implements OnInit {
       this.key(key, document.activeElement as HTMLTextAreaElement)
     }
     event.preventDefault()
+  }
+
+  public onScoreInput(event: Event, categoryName: string) {
+    const value = (event.target as HTMLInputElement).value;
+    
+    // Mettre à jour le FormControl pour déclencher les validators Angular
+    this.teamScoreFormGroup.get(categoryName)?.setValue(value);
+    
+    // Appliquer la logique de calcul de score
+    this.categoryValuechange(categoryName, value);
   }
 
   public categoryValuechange(categoryName: string, newValue: any) {
@@ -255,6 +269,7 @@ export class TeamScoreComponent implements OnInit {
     if (this.complexScoreTemplate) {
       this.store.dispatch(new AddScoreToTeam(this.team, this.totalScore(), this.localMutableScoreDetails()))
     } else {
+      console.info("Submitting team score form", this.teamScoreFormGroup.value.score)
       this.store.dispatch(new AddScoreToTeam(this.team, this.teamScoreFormGroup.value.score, this.localMutableScoreDetails()))
     }
   }
