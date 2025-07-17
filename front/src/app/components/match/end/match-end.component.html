@@ -4,42 +4,60 @@
     </ng-container>
 
     <ng-container role="body">
-        <div *ngIf="(matchState | async)?.match!">
+        @if (match$ | async; as match) {
+ 
             <div class="score">Saisie des scores</div>
-            <ul class="player-list" *ngIf="(matchState | async)?.match!.game.quantifiableScore">
-                <div *ngFor="let team of (matchState | async)?.match?.teams" class="result-list">
-                    <li class="player" (click)="setTeamScore(team)">
-                        <div class="player-name">
-                            <div *ngIf="team.score != undefined"><mat-icon class="check">done</mat-icon></div>
-                            <div *ngIf="team.score == undefined"><mat-icon class="cancel">cancel</mat-icon></div>
-                            {{ team.name }}
-                            <span *ngIf="team.score">(score: {{ team.score }})</span>
+            
+            @if (match.game.quantifiableScore) {
+                <ul class="player-list">
+                    @for (team of match.teams; track team.id) {
+                        <div class="result-list">
+                            <li class="player" (click)="setTeamScore(team)">
+                                <div class="player-name">
+                                    @if (team.score != undefined) {
+                                        <div><mat-icon class="check">done</mat-icon></div>
+                                    } @else {
+                                        <div><mat-icon class="cancel">cancel</mat-icon></div>
+                                    }
+                                    {{ team.name }}
+                                    @if (team.score) {
+                                        <span>(score: {{ team.score }})</span>
+                                    }
+                                </div>
+                            </li>
                         </div>
-                    </li>
-                </div>
-            </ul>
+                    }
+                </ul>
+            }
 
             <fieldset [disabled]="saving">
                 <mat-form-field appearance="fill" class="winner">
                     <mat-label>Et le vainqueur est...</mat-label>
-                    <mat-select (selectionChange)="selectWiningTeam($event.value)" [disabled]="saving" [value]="(matchState | async)?.match?.winningTeam">
-                        <mat-option *ngFor="let winningTeam of (matchState | async)?.match?.teams" [value]="winningTeam">
-                            {{winningTeam.name}}
-                        </mat-option>
+                    <mat-select (selectionChange)="selectWiningTeam($event.value)" [disabled]="saving" [value]="match.winningTeam">
+                        @for (winningTeam of match.teams; track winningTeam.id) {
+                            <mat-option [value]="winningTeam">
+                                {{winningTeam.name}}
+                            </mat-option>
+                        }
                     </mat-select>
                 </mat-form-field>
 
-
-                <div class="buttons" [hidden]="saving">
-                    <button matButton="filled" (click)="endMatch()">
-                        Enregistrer et mettre fin à la partie
-                    </button>
-                    <button matButton="tonal" (click)="abortMatch()">
-                        La partie est abandonnée
-                    </button>
-                </div>
+                @if (!saving) {
+                    <div class="buttons">
+                        <button matButton="filled" (click)="endMatch()">
+                            Enregistrer et mettre fin à la partie
+                        </button>
+                        <button matButton="tonal" (click)="continueMatch()">
+                            La partie n'est pas terminée !
+                        </button>
+                        <button matButton="tonal" (click)="abortMatch()">
+                            La partie est abandonnée
+                        </button>
+                    </div>
+                }
             </fieldset>
-        </div>
+       
+        }
 
         <loading-spinner [loading]="saving" caption="Enregistrement de la partie..." />
 

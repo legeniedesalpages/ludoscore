@@ -27,7 +27,7 @@ const routes: Routes = [
   { path: 'random-toolbox', loadChildren: () => import('./components/match/randomize/randomize.module').then(m => m.RandomizeModule), data: { animation: 'random-toolbox' } },
 
   { path: 'match-display', loadChildren: () => import('./components/match/display/match-display.module').then(m => m.MatchDisplayModule), data: { animation: 'match-display' } },
-  { path: 'match-end', loadChildren: () => import('./components/match/end/match-end.module').then(m => m.MatchEndModule), data: { animation: 'match-end' } },
+  { path: 'match-end', loadComponent: () => import('./components/match/end/match-end.component').then(c => c.MatchEndComponent), canActivate: [AuthGuardService], data: { animation: 'match-end' } },
   { path: 'team-score', loadComponent: () => import('./components/match/team-score/team-score.component').then(c => c.TeamScoreComponent), canActivate: [AuthGuardService], data: { animation: 'team-score' } },
   { path: 'wheel', loadChildren: () => import('./components/match/wheel/wheel.module').then(m => m.WheelModule), data: { animation: 'wheel' } },
 

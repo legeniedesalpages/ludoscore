@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam } from "./match.action"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
@@ -163,6 +163,18 @@ export class MatchState {
             setState(defaultMatchModel)
         })
 
+    }
+
+    @Action(MatchContinued)
+    matchContinued({ setState, getState }: StateContext<MatchStateModel>) {
+        console.info("Continuing match")
+        setState({
+            match: {
+                ...getState().match!,
+                endedAt: undefined,
+                started: true
+            }
+        })
     }
 
     @Action(SaveMatchResult)

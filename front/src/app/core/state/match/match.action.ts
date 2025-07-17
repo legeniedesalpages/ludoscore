@@ -58,6 +58,10 @@ export class MatchAborted {
     static readonly type: string = '[Match] MatchAborted'
 }
 
+export class MatchContinued {
+    static readonly type: string = '[Match] MatchContinued'
+}
+
 export class SetWinningTeam {
     static readonly type: string = '[Match] SetWinningTeam'
     constructor(public team: Team) { }

@@ -67,7 +67,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   @ViewChild('playerSelector') public playerSelector!: MatSelect
 
-  public match$: Observable<MatchModel> = inject(Store).select(MatchState.match);
+  public match$: Observable<MatchModel> = inject(Store).select(MatchState.match)
   private matchChangeSubscription!: Subscription
 
   public loading: boolean = true
