@@ -18,14 +18,16 @@
                 [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
                 <div class="heading">{{ match.game.title }}</div>
 
-                <ul class="game-category">
-                    <li *ngFor="let matchCategory of match.choosenTags; let i = index">
-                        {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
-                    </li>
-                </ul>
+                @if (match.choosenTags && match.choosenTags.length > 0) {
+                    <ul class="game-category">
+                        <li *ngFor="let matchCategory of match.choosenTags; let i = index">
+                            {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
+                        </li>
+                    </ul>
+                }
 
                 <div class="elapsedtime">
-                    {{ line(match)}}
+                    <span [innerHtml]="line(match)"></span>
                 </div>
 
                 <div class="team-list">
@@ -43,6 +45,9 @@
                                     <div class="line">
                                         <div class="team-name">
                                             {{team.name}}
+                                            @if (team.id == match.winningTeam?.id) {
+                                                <span class="accent">(Gagnant)</span>
+                                            }
                                             <div class="color">
                                                 <span [hidden]="team.color.name == 'Aucune'">
                                                     <span class="dot"
@@ -50,15 +55,19 @@
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="tags">
-                                            <ul *ngFor="let tag of team.choosenTags">
-                                                <li>{{tag.category}}: <span
-                                                        class="tag-value">{{tag.names}}</span>
-                                                </li>
-                                            </ul>
-                                        </div>
+
+                                        @if(team.choosenTags && team.choosenTags.length > 0) {
+                                            <div class="tags">
+                                                <ul *ngFor="let tag of team.choosenTags">
+                                                    <li>{{tag.category}}: <span
+                                                            class="tag-value">{{tag.names}}</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        }
+                                        
                                         <div class="score">
-                                            Score: {{ team.score }}
+                                            Score: <b>{{ team.score }}</b>
                                         </div>
                                     </div>
                                 </div>

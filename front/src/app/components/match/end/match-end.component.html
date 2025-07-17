@@ -22,7 +22,7 @@
             <fieldset [disabled]="saving">
                 <mat-form-field appearance="fill" class="winner">
                     <mat-label>Et le vainqueur est...</mat-label>
-                    <mat-select (selectionChange)="selectWiningTeam($event.value)" [disabled]="saving" [value]="(matchState | async)?.match?.winnigTeam">
+                    <mat-select (selectionChange)="selectWiningTeam($event.value)" [disabled]="saving" [value]="(matchState | async)?.match?.winningTeam">
                         <mat-option *ngFor="let winningTeam of (matchState | async)?.match?.teams" [value]="winningTeam">
                             {{winningTeam.name}}
                         </mat-option>

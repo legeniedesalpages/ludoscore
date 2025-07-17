@@ -14,10 +14,10 @@ import { Component, OnInit } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { MatchService } from 'src/app/core/services/match/match.service'
-import { DatePipe } from '@angular/common'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, switchMap, tap } from 'rxjs'
 import { MatchModel } from 'src/app/core/model/match.model'
+import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
 
 
 @Component({
@@ -31,7 +31,12 @@ export class MatchHistoryDetailComponent implements OnInit {
 
   public loading: boolean = true
 
-  constructor(private store: Store, private route: ActivatedRoute, private matchService: MatchService, private datePipe: DatePipe) {
+  constructor(
+    private store: Store, 
+    private route: ActivatedRoute, 
+    private matchService: MatchService, 
+    public formatter: MatchFormatterService
+  ) {
   }
 
   ngOnInit(): void {
@@ -44,28 +49,18 @@ export class MatchHistoryDetailComponent implements OnInit {
     }))
   }
 
+  /**
+   * @deprecated Use formatter.line instead
+   */
   public line(match: MatchModel): string {
-
-    let headline: string
-    if (match.canceled) {
-      headline = "Annulé le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' à ' + this.datePipe.transform(match.endedAt, 'HH:mm')
-    } else if (!match.endedAt) {
-      headline = "En cours depuis " + this.elapsedTime(match.startedAt!, new Date())
-    } else {
-      headline = "Jouée le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' en ' + this.elapsedTime(match.startedAt!, new Date(match.endedAt))
-    }
-
-    return headline
+    return this.formatter.line(match);
   }
 
-  public elapsedTime(startDate: Date, endDate: Date) {
-      let t = endDate.getTime() - new Date(startDate).getTime()
-      let minutes = "" + Math.floor((t / (1000 * 60)) % 60)
-      let hours = "" + Math.floor((t / (1000 * 60 * 60)) % 24)
-      if (hours == "0") {
-        return minutes + " minutes"
-      }
-      return hours + " heures et " + minutes + " mn"
+  /**
+   * @deprecated Use formatter.elapsedTime instead
+   */
+  public elapsedTime(startDate: Date, endDate: Date): string {
+    return this.formatter.elapsedTime(startDate, endDate);
   }
 
   public deteleMatchHistory() {

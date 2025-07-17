@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule, isDevMode, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
@@ -58,7 +58,8 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
       withFetch(),
       withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-CSRF-TOKEN' }),
       withInterceptorsFromDi()
-    )
+    ),
+    { provide: LOCALE_ID, useValue: 'fr' }
   ],
 
   bootstrap: [AppComponent]

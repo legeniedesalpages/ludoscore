@@ -87,7 +87,7 @@ export class MatchService {
                     canceled: false,
                     running: false,
                     tags: JSON.stringify(match.choosenTags),
-                    winnerTeamId: match.winnigTeam?.id,
+                    winnerTeamId: match.winningTeam?.id,
                 })
             })
         )
@@ -152,7 +152,7 @@ export class MatchService {
             endedAt: matchEntity.finishedAt,
             started: matchEntity.startedAt ? true : false,
             startedAt: matchEntity.startedAt,
-            winnigTeam: matchEntity.winnerTeamId ? { 
+            winningTeam: matchEntity.winnerTeamId ? { 
                 id: matchEntity.winnerTeamId,
                 name: '',
                 choosenTags: [],

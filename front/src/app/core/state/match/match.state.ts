@@ -182,7 +182,7 @@ export class MatchState {
         setState({
             match: {
                 ...getState().match!,
-                winnigTeam: winningTeamEvent.team
+                winningTeam: winningTeamEvent.team
             }
         })
     }
@@ -450,12 +450,12 @@ export class MatchState {
             return team
         })
 
-        let winnigTeam: Team | undefined = undefined
+        let winningTeam: Team | undefined = undefined
         if (modifiedTeamList.filter(team => team.score == undefined).length == 0) {
             if (getState().match!.game.highestScoreWin ?? true) {
-                winnigTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
+                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
             } else {
-                winnigTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
+                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
             }
         }
 
@@ -463,7 +463,7 @@ export class MatchState {
             match: {
                 ...getState().match!,
                 teams: modifiedTeamList,
-                winnigTeam: winnigTeam
+                winningTeam: winningTeam
             }
         })
     }
