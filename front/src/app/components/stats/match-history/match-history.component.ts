@@ -22,8 +22,8 @@ import { BehaviorSubject, map, Observable, Subscription, tap } from 'rxjs'
 import { MatchModel } from 'src/app/core/model/match.model'
 import { MatchService } from 'src/app/core/services/match/match.service'
 import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
-import { LayoutModule } from '../../layout/layout.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
+import { LayoutComponent } from '../../layout/layout.component'
 
 @Component({
   templateUrl: './match-history.component.html',
@@ -34,7 +34,8 @@ import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.modul
     RouterModule,
     MatProgressSpinnerModule,
     ScrollingModule, CdkScrollableModule,
-    LayoutModule, LoadingSpinnerModule
+    LoadingSpinnerModule,
+    LayoutComponent
   ]
 })
 export class MatchHistoryComponent {

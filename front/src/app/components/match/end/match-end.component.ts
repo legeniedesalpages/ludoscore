@@ -29,19 +29,20 @@ import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { MatchAborted, MatchContinued, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
-import { LayoutModule } from '../../layout/layout.module'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
+import { LayoutComponent } from '../../layout/layout.component'
 
 @Component({
   templateUrl: './match-end.component.html',
   styleUrls: ['./match-end.component.css'],
   imports: [
     CommonModule,
-    MatIconModule, MatButtonModule, LayoutModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatDividerModule,
+    MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatDividerModule,
     A11yModule,
     FormsModule,
-    SidenavModule, LoadingSpinnerModule
+    SidenavModule, LoadingSpinnerModule,
+    LayoutComponent
   ]
 })
 export class MatchEndComponent implements OnInit {

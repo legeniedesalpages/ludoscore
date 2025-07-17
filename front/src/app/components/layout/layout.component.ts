@@ -13,10 +13,17 @@
 import { Location } from '@angular/common'
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
 import { fromEvent } from "rxjs"
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-layout',
-  standalone: false,
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule
+  ],
   template: `
     <div class="container">
       <div class="header background-primary" #headerDiv>

@@ -42,9 +42,9 @@ import { Score, ScoreTag } from 'src/app/core/model/score.model'
 import { ArithmeticExpressionEvaluator } from 'src/app/core/services/misc/arithmetic'
 import { AddScoreToTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
-import { LayoutModule } from '../../layout/layout.module'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { KeyboardComponent } from '../../layout/keyboard/keyboard.component'
+import { LayoutComponent } from '../../layout/layout.component'
 
 
 @Component({
@@ -57,7 +57,7 @@ import { KeyboardComponent } from '../../layout/keyboard/keyboard.component'
     FormsModule, ReactiveFormsModule,
     MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatRippleModule, MatCheckboxModule, MatDividerModule,
     A11yModule,
-    LayoutModule, SidenavModule, KeyboardComponent
+    SidenavModule, KeyboardComponent, LayoutComponent
   ]
 })
 export class TeamScoreComponent implements OnInit {

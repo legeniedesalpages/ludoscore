@@ -16,7 +16,6 @@ import { Routes, RouterModule } from '@angular/router'
 import { MatIconModule } from '@angular/material/icon'
 import { MatButtonModule } from '@angular/material/button'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
-import { LayoutModule } from '../../layout/layout.module'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { A11yModule } from '@angular/cdk/a11y'
@@ -26,6 +25,7 @@ import { MatDividerModule } from '@angular/material/divider'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { UserCreateComponent } from './user-create.component'
 import { AuthService } from 'src/app/core/services/auth/auth.service'
+import { LayoutComponent } from '../../layout/layout.component'
 
 const routes: Routes = [ { path: '', component: UserCreateComponent }]
 
@@ -36,7 +36,6 @@ const routes: Routes = [ { path: '', component: UserCreateComponent }]
     RouterModule.forChild(routes),
     MatIconModule,
     MatButtonModule,
-    LayoutModule,
     LoadingSpinnerModule,
     MatFormFieldModule,
     MatInputModule,
@@ -45,7 +44,8 @@ const routes: Routes = [ { path: '', component: UserCreateComponent }]
     MatCheckboxModule,
     MatDividerModule,
     SidenavModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    LayoutComponent
   ],
   providers: [AuthService]
 })

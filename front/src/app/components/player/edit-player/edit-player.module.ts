@@ -23,13 +23,13 @@ import { MatInputModule } from '@angular/material/input'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatDividerModule } from '@angular/material/divider'
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
-import { LayoutModule } from '../../layout/layout.module'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 import { MatChipsModule } from '@angular/material/chips'
 import { EditPlayerComponent } from './edit-player.component'
 import { MatSelectModule } from '@angular/material/select'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { LayoutComponent } from '../../layout/layout.component'
 
 const routes: Routes = [
   {
@@ -53,11 +53,11 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
-    LayoutModule,
     LoadingSpinnerModule,
     MatChipsModule,
     MatSelectModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    LayoutComponent
   ],
   exports: [EditPlayerComponent],
   providers: [PlayerCrudService]

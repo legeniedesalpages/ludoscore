@@ -20,11 +20,11 @@ import { ActivatedRoute, RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { Observable, switchMap, tap } from 'rxjs'
-import { LayoutModule } from 'src/app/components/layout/layout.module'
 import { LoadingSpinnerModule } from 'src/app/components/layout/spinner/loading-spinner.module'
 import { MatchModel } from 'src/app/core/model/match.model'
 import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
 import { MatchService } from 'src/app/core/services/match/match.service'
+import { LayoutComponent } from '../../layout/layout.component'
 
 
 @Component({
@@ -35,7 +35,8 @@ import { MatchService } from 'src/app/core/services/match/match.service'
     CommonModule, AsyncPipe, NgStyle,
     RouterModule,
     MatButtonModule, MatCardModule, MatDividerModule, MatIconModule,
-    LoadingSpinnerModule, LayoutModule
+    LoadingSpinnerModule,
+    LayoutComponent
   ]
 })
 export class MatchHistoryDetailComponent implements OnInit {

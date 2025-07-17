@@ -21,7 +21,6 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatDividerModule } from '@angular/material/divider'
-import { LayoutModule } from '../../layout/layout.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 import { MatChipsModule } from '@angular/material/chips'
 import { MatSelectModule } from '@angular/material/select'
@@ -43,7 +42,6 @@ import { GameTagsSelectionComponent } from './game-tags-selection.component'
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
-    LayoutModule,
     LoadingSpinnerModule,
     MatChipsModule,
     MatSelectModule,

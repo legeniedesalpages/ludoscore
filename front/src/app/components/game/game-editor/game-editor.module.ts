@@ -35,10 +35,10 @@ import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { GameService } from 'src/app/core/services/game/game.service'
-import { LayoutModule } from '../../layout/layout.module'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { DialogScoreTagEditorComponent, ScoreTagEditorComponent } from './score-tag-editor/score-tag-editor.component'
 import { DialogDrawEditorComponent, DrawEditorComponent } from './draw-editor/draw-editor.component'
+import { LayoutComponent } from '../../layout/layout.component'
 
 const routes: Routes = [
   {
@@ -69,8 +69,8 @@ const routes: Routes = [
     MatSnackBarModule,
     MatNativeDateModule,
     MatDialogModule,
-    LayoutModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    LayoutComponent
   ],
   exports: [TagEditorComponent],
   providers: [

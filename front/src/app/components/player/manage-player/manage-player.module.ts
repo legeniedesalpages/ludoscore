@@ -23,11 +23,11 @@ import { MatInputModule } from '@angular/material/input'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatDividerModule } from '@angular/material/divider'
 import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
-import { LayoutModule } from '../../layout/layout.module'
 import { ManagePlayerComponent } from './manage-player.component'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 import { MatChipsModule } from '@angular/material/chips'
+import { LayoutComponent } from '../../layout/layout.component'
 
 const routes: Routes = [
   {
@@ -51,9 +51,9 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
-    LayoutModule,
     LoadingSpinnerModule,
-    MatChipsModule
+    MatChipsModule,
+    LayoutComponent
   ],
   exports: [ManagePlayerComponent],
   providers: [PlayerCrudService]
