@@ -36,7 +36,6 @@ import { AddTeam, CancelMatchCreation, LaunchMatch, RemoveTeam, SwapTeamPosition
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { environment } from 'src/environments/environment'
 import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
-import { ConfirmationDialogModule } from '../../layout/dialogue/confirmation.module'
 import { LayoutModule } from '../../layout/layout.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 import { SwipeableModule } from '../../layout/swipeable/swipeable.module'
@@ -53,7 +52,7 @@ import { TeamDetailModule } from '../team-detail/team-detail.module'
     MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatDialogModule, MatSelectModule, MatDividerModule,
     A11yModule,
     FormsModule,
-    LayoutModule, LoadingSpinnerModule, SwipeableModule, ScrollingModule, ConfirmationDialogModule, TeamDetailModule
+    LayoutModule, LoadingSpinnerModule, SwipeableModule, ScrollingModule, TeamDetailModule
   ]
 })
 export class PlayerSelectionComponent implements OnInit, OnDestroy {

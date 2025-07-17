@@ -4,32 +4,7 @@
   </ng-container>
 
   <ng-container role="footer">
-    <div class="keyboard">
-      <div class="row">        
-        <div class="key" matRipple (mousedown)="handleKey($event, '1')"><button mat-raised-button class="visual">1</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '2')"><button mat-raised-button class="visual">2</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '3')"><button mat-raised-button class="visual">3</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '-')"><button mat-raised-button class="visual grey">-</button></div>
-      </div>
-      <div class="row">
-        <div class="key" matRipple (mousedown)="handleKey($event, '4')"><button mat-raised-button class="visual">4</button></div>        
-        <div class="key" matRipple (mousedown)="handleKey($event, '5')"><button mat-raised-button class="visual">5</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '6')"><button mat-raised-button class="visual">6</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '+')"><button mat-raised-button class="visual accent">+</button></div>
-      </div>
-      <div class="row">
-        <div class="key" matRipple (mousedown)="handleKey($event, '7')"><button mat-raised-button class="visual">7</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '8')"><button mat-raised-button class="visual">8</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '9')"><button mat-raised-button class="visual">9</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, 'Backspace')"><button mat-raised-button class="visual grey"><mat-icon>backspace</mat-icon></button></div>                
-      </div>
-      <div class="row">
-        <div class="key" matRipple (mousedown)="handleKey($event, '()')"><button mat-raised-button class="visual grey">(</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, '0')"><button mat-raised-button class="visual">0</button></div>
-        <div class="key" matRipple (mousedown)="handleKey($event, ')')"><button mat-raised-button class="visual grey">)</button></div>
-        <div class="key double" matRipple (mousedown)="handleKey($event, 'Enter')"><button mat-flat-button class="visual primary"><mat-icon>subdirectory_arrow_left</mat-icon></button></div>
-      </div>
-    </div>
+    <app-keyboard [listOfInput]="listOfInputScore" (keyPressAction)="triggerValueChangeFromActiveElement()" (submitAction)="onSubmit()"></app-keyboard> 
   </ng-container>
 
   <ng-container role="body">

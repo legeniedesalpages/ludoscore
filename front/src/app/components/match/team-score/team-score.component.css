@@ -5,6 +5,10 @@
   height: 100%;
 }
 
+.container {
+  overflow-x: hidden;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -91,55 +95,4 @@ hr {
   text-align: center;
   width: 100%;
   padding: 10px;
-}
-
-/* KEYBOARD */
-
-
-.keyboard {
-  max-width: 600px;
-  box-shadow: 0px 2px 5px 2px #a9a9a9;
-  padding-top:5px;
-  padding-bottom:5px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .keyboard {
-    display: none;
-  }
-}
-
-
-.key {
-  font-size: large;
-  flex: 1 1 0;
-  text-align: center;
-}
-
-.visual {
-  margin: 2px;
-  padding-left:5px;
-  padding-right:5px;
-}
-
-.visual .mat-icon {
-  padding-left:12px;
-  padding-top:3px;
-  padding-right:0px;
-}
-
-.primary {
-  background-color: #2196f3;
-  color:white;
-  border-color: #2196f3;
-}
-
-.accent {
-  background-color: #009688;
-  color:white;
-  border-color: #009688;
-}
-
-.grey {
-  background-color: rgb(228, 228, 228);
 }

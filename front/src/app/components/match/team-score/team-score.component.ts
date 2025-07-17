@@ -1,4 +1,16 @@
 /**
+    * @description      : 
+    * @author           : renau
+    * @group            : 
+    * @created          : 17/07/2025 - 19:37:00
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 17/07/2025
+    * - Author          : renau
+    * - Modification    : 
+**/
+/**
     * @description      :
     * @author           : renau
     * @group            :
@@ -12,7 +24,7 @@
 **/
 import { A11yModule } from '@angular/cdk/a11y'
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, QueryList, ViewChildren, computed, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, OnInit, QueryList, ViewChildren, computed, inject, signal } from '@angular/core'
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCheckboxModule } from '@angular/material/checkbox'
@@ -32,23 +44,25 @@ import { AddScoreToTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { LayoutModule } from '../../layout/layout.module'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
+import { KeyboardComponent } from '../../layout/keyboard/keyboard.component'
 
 
 @Component({
   templateUrl: './team-score.component.html',
   styleUrls: ['./team-score.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
     FormsModule, ReactiveFormsModule,
     MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatRippleModule, MatCheckboxModule, MatDividerModule,
     A11yModule,
-    LayoutModule, SidenavModule
+    LayoutModule, SidenavModule, KeyboardComponent
   ]
 })
 export class TeamScoreComponent implements OnInit {
 
-  @ViewChildren('inputScore') listOfInputScore!: QueryList<any>
+  @ViewChildren('inputScore') public listOfInputScore!: QueryList<any>
 
   private store = inject(Store)
   private activatedRoute = inject(ActivatedRoute)
@@ -90,7 +104,7 @@ export class TeamScoreComponent implements OnInit {
       this.teamScoreFormGroup = new FormGroup({})
     } else {
       this.teamScoreFormGroup = new FormGroup({
-        score: new FormControl('', [Validators.required, Validators.pattern("^[0-9\-]*$"), Validators.minLength(1)])
+        score: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(1)])
       })
     }
     
@@ -119,7 +133,7 @@ export class TeamScoreComponent implements OnInit {
       this.team = teams.find((team: Team) => team.id?.toString() === teamId)!
       console.debug("Team found, fill form with previous score data", this.team)
 
-      this.teamScoreFormGroup.get("score")!.setValue(this.team.score)
+      this.teamScoreFormGroup.get("score")?.setValue(this.team.score)
       this.scoreTemplate.forEach(scoreTag => {
         const value = this.team.scoreDetails.find(score => score.categoryName == scoreTag.category)?.inputString
         this.teamScoreFormGroup.get(scoreTag.category)!.setValue(value)
@@ -128,40 +142,9 @@ export class TeamScoreComponent implements OnInit {
     })
   }
 
-  private key(caracter: any, inputElement: HTMLInputElement | HTMLTextAreaElement) {
+  
 
-    const cursor = inputElement.selectionStart!
-    if (caracter == "Backspace") {
-      if (cursor > 0) {
-        inputElement.value = inputElement.value.substring(0, cursor - 1) + inputElement.value.substring(cursor)
-        inputElement.selectionStart = cursor - 1
-        inputElement.selectionEnd = cursor - 1
-        // Déclencher la mise à jour après suppression
-        this.triggerValueChangeFromActiveElement()
-      }
-
-    } else if (caracter == "Enter") {
-
-      for (let i = 0; i < this.listOfInputScore.length; i++) {
-        if (this.listOfInputScore.toArray()[i].nativeElement == inputElement) {
-          if (i + 2 < this.listOfInputScore.length) {
-            this.listOfInputScore.toArray()[i + 1].nativeElement.focus()
-          } else {
-            this.onSubmit()
-          }
-        }
-      }
-
-    } else {
-      inputElement.value = inputElement.value.substring(0, cursor) + caracter + inputElement.value.substring(cursor)
-      inputElement.selectionStart = cursor + 1
-      inputElement.selectionEnd = cursor + 1
-      // Déclencher la mise à jour après ajout de caractère
-      this.triggerValueChangeFromActiveElement()
-    }
-  }
-
-  private triggerValueChangeFromActiveElement() {
+  public triggerValueChangeFromActiveElement() {
     const activeElement = document.activeElement
 
     if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
@@ -182,14 +165,7 @@ export class TeamScoreComponent implements OnInit {
     }
   }
 
-  public handleKey(event: any, key: any) {
-    if (document.activeElement instanceof HTMLInputElement) {
-      this.key(key, document.activeElement as HTMLInputElement)
-    } else if (document.activeElement instanceof HTMLTextAreaElement) {
-      this.key(key, document.activeElement as HTMLTextAreaElement)
-    }
-    event.preventDefault()
-  }
+  
 
   public onScoreInput(event: Event, categoryName: string) {
     const value = (event.target as HTMLInputElement).value;
