@@ -10,37 +10,64 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core'
-import { Select, Store } from '@ngxs/store'
+import { A11yModule } from '@angular/cdk/a11y'
+import { ScrollingModule } from '@angular/cdk/scrolling'
+import { CommonModule } from '@angular/common'
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
+import { FormsModule } from '@angular/forms'
+import { MatButtonModule } from '@angular/material/button'
+import { MatDialog, MatDialogModule } from '@angular/material/dialog'
+import { MatDividerModule } from '@angular/material/divider'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatIconModule } from '@angular/material/icon'
+import { MatInputModule } from '@angular/material/input'
+import { MatSelect, MatSelectModule } from '@angular/material/select'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { RouterModule } from '@angular/router'
+import { Navigate } from '@ngxs/router-plugin'
+import { Store } from '@ngxs/store'
+import { Observable, Subscription, first } from 'rxjs'
+import { Game } from 'src/app/core/model/game.model'
+import { ChoosenTag, MatchModel, Team, TeamPlayer } from 'src/app/core/model/match.model'
+import { Player } from 'src/app/core/model/player.model'
+import { ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
+import { PlayerService } from 'src/app/core/services/player/player.service'
 import { AddTeam, CancelMatchCreation, LaunchMatch, RemoveTeam, SwapTeamPosition } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { environment } from 'src/environments/environment'
-import { MatSelect } from '@angular/material/select'
-import { Observable, Subscription, first } from 'rxjs'
-import { Navigate } from '@ngxs/router-plugin'
-import { MatSnackBar } from '@angular/material/snack-bar'
-import { MatDialog } from '@angular/material/dialog'
-import { TeamDetailComponent as TeamDetailComponent } from '../team-detail/team-detail.component'
-import { Game } from 'src/app/core/model/game.model'
-import { ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
-import { ChoosenTag, MatchModel, Team, TeamPlayer } from 'src/app/core/model/match.model'
-import { Player } from 'src/app/core/model/player.model'
-import { PlayerService } from 'src/app/core/services/player/player.service'
-import { GameDetailComponent } from '../game-detail/game-detail.component'
 import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
+import { ConfirmationDialogModule } from '../../layout/dialogue/confirmation.module'
+import { LayoutModule } from '../../layout/layout.module'
+import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
+import { SwipeableModule } from '../../layout/swipeable/swipeable.module'
+import { GameDetailComponent } from '../game-detail/game-detail.component'
+import { TeamDetailComponent } from '../team-detail/team-detail.component'
+import { TeamDetailModule } from '../team-detail/team-detail.module'
 
 @Component({
   templateUrl: './player-selection.component.html',
   styleUrls: ['./player-selection.component.css'],
-  standalone: false
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatDialogModule, MatSelectModule, MatDividerModule,
+    A11yModule,
+    FormsModule,
+    LayoutModule, LoadingSpinnerModule, SwipeableModule, ScrollingModule, ConfirmationDialogModule, TeamDetailModule
+  ]
 })
 export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   public env = environment
 
+  private store: Store = inject(Store)
+  private playerService: PlayerService = inject(PlayerService)
+  private snackBar: MatSnackBar = inject(MatSnackBar)
+  private dialog: MatDialog = inject(MatDialog)
+
   @ViewChild('playerSelector') public playerSelector!: MatSelect
 
-  @Select(MatchState.match) matchState!: Observable<MatchModel>
+  public match$: Observable<MatchModel> = inject(Store).select(MatchState.match);
   private matchChangeSubscription!: Subscription
 
   public loading: boolean = true
@@ -54,18 +81,15 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public choosablePlayers!: Player[]
   public numberOfTeams: number = 0
 
-  constructor(private store: Store, private playerService: PlayerService, private snackBar: MatSnackBar, private dialog: MatDialog) {
-  }
-
   ngOnInit(): void {
 
     this.playerService.listAllPlayers().subscribe(allPlayers => {
       this.loading = false
 
-      this.matchChangeSubscription = this.matchState.subscribe(match => {
+      this.matchChangeSubscription = this.match$.subscribe(match => {
 
         if (!match) {
-          console.debug("Match has been erased")
+          console.debug("Match have been erased")
           return
         }
         this.canContinue = match.teams.length >= match.game?.minPlayers!
@@ -241,6 +265,6 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         this.store.dispatch(new CancelMatchCreation()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
       }
     });
-    
+
   }
 }

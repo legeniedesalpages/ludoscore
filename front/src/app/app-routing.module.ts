@@ -23,7 +23,7 @@ const routes: Routes = [
   { path: 'confirm-account', loadChildren: () => import('./components/user/confirmation/user-confirmation.module').then(m => m.UserConfirmationModule), data: { animation: 'user-confirmation' } },
 
   { path: 'game-selection', loadChildren: () => import('./components/match/game-selection/game-selection.module').then(m => m.GameSelectionModule), data: { animation: 'game-selection' } },
-  { path: 'player-selection', loadChildren: () => import('./components/match/player-selection/player-selection.module').then(m => m.PlayerSelectionModule), data: { animation: 'player-selection' } },
+  { path: 'player-selection', loadComponent: () => import('./components/match/player-selection/player-selection.component').then(c => c.PlayerSelectionComponent), canActivate: [AuthGuardService], data: { animation: 'player-selection' } },
   { path: 'random-toolbox', loadChildren: () => import('./components/match/randomize/randomize.module').then(m => m.RandomizeModule), data: { animation: 'random-toolbox' } },
 
   { path: 'match-display', loadChildren: () => import('./components/match/display/match-display.module').then(m => m.MatchDisplayModule), data: { animation: 'match-display' } },
