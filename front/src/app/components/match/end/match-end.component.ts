@@ -48,6 +48,14 @@ export class MatchEndComponent implements OnInit {
       })
       this.store.dispatch(new Navigate(['/']))
     })
+
+    this.actions.pipe(ofActionCompleted(MatchAborted)).subscribe(() => {
+      this.saving = false
+      this.snackBar.open("Match abandonné !", 'Fermer', {
+        duration: 5000
+      })
+      this.store.dispatch(new Navigate(['/']))
+    })
   }
 
   public selectWiningTeam(team: Team) {

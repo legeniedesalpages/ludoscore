@@ -58,13 +58,6 @@ export class MatchHistoryComponent {
     return this.formatter.line(match) + '<br/>' + this.formatter.teamLine(match);
   }
 
-  /**
-   * @deprecated Use formatter.elapsedTime instead
-   */
-  private elapsedTime(startDate: Date, endDate: Date): string {
-    return this.formatter.elapsedTime(startDate, endDate);
-  }
-
   public goToHistoryDetail(match: MatchModel | undefined) {
     if (!match) {
       return

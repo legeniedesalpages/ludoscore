@@ -31,11 +31,11 @@
 
 
                 <div class="buttons" [hidden]="saving">
-                    <button mat-raised-button (click)="endMatch()">
+                    <button matButton="filled" (click)="endMatch()">
                         Enregistrer et mettre fin à la partie
                     </button>
-                    <button mat-raised-button (click)="abortMatch()">
-                        Le match est abandonné
+                    <button matButton="tonal" (click)="abortMatch()">
+                        La partie est abandonnée
                     </button>
                 </div>
             </fieldset>

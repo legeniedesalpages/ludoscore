@@ -58,15 +58,6 @@ export class MatchHistoryDetailComponent implements OnInit {
     }))
   }
 
-
-  public line(match: MatchModel): string {
-    return this.formatter.line(match);
-  }
-
-  public elapsedTime(startDate: Date, endDate: Date): string {
-    return this.formatter.elapsedTime(startDate, endDate);
-  }
-
   public deteleMatchHistory() {
     this.match.pipe(switchMap(m => this.matchService.deleteMatch(m.matchId!))).subscribe(() => {
       this.returnToMatchHistory()
