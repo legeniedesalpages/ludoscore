@@ -264,7 +264,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       if (result) {
         this.store.dispatch(new CancelMatchCreation()).subscribe(() => this.store.dispatch(new Navigate(['game-selection'])))
       }
-    });
+    })
 
   }
 }

@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common'
 import { Component, inject, OnInit } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
+import { MatDialog } from '@angular/material/dialog'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
@@ -27,6 +28,7 @@ import { Observable } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { MatchAborted, MatchContinued, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
+import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
 import { LayoutModule } from '../../layout/layout.module'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
@@ -50,6 +52,7 @@ export class MatchEndComponent implements OnInit {
   private store: Store = inject(Store)
   private actions: Actions = inject(Actions)
   private snackBar: MatSnackBar = inject(MatSnackBar)
+  private dialog: MatDialog = inject(MatDialog)
 
   ngOnInit(): void {
     this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(_ => {
@@ -94,8 +97,34 @@ export class MatchEndComponent implements OnInit {
   }
 
   public endMatch() {
-    this.saving = true
-    this.store.dispatch(new SaveMatchResult()).subscribe(_ => this.saving = false)
+    const match = this.store.selectSnapshot(MatchState.match)
+    
+    if (!match) {
+      return;
+    }
+
+    // Vérifier si toutes les équipes ont un score
+    const allTeamsHaveScore = match.teams.every(team => team.score != null && team.score !== undefined)
+    
+    if (allTeamsHaveScore) {
+      // Toutes les équipes ont un score, terminer directement
+      this.saving = true
+      this.store.dispatch(new SaveMatchResult()).subscribe(_ => this.saving = false)
+    } else {
+      // Certaines équipes n'ont pas de score, demander confirmation
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        data: {
+          message: "Tous les scores n'ont pas été saisis, cliquez sur 'terminer' pour mettre fin à la partie sans avoir enregistré tous les scores."
+        }
+      });
+
+      dialogRef.afterClosed().subscribe((result: boolean) => {
+        if (result) {
+          this.saving = true;
+          this.store.dispatch(new SaveMatchResult()).subscribe(_ => this.saving = false);
+        }
+      });
+    }
   }
 
   public abortMatch() {
