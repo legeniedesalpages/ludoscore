@@ -12,9 +12,10 @@
 **/
 import { A11yModule } from '@angular/cdk/a11y'
 import { CommonModule } from '@angular/common'
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
+import { MatButtonToggleModule } from '@angular/material/button-toggle'
 import { MatDialog } from '@angular/material/dialog'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatFormFieldModule } from '@angular/material/form-field'
@@ -29,16 +30,19 @@ import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { MatchAborted, MatchContinued, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
+import { LayoutComponent } from '../../layout/layout.component'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
-import { LayoutComponent } from '../../layout/layout.component'
+import { ActivatedRoute } from '@angular/router'
+
 
 @Component({
   templateUrl: './match-end.component.html',
   styleUrls: ['./match-end.component.css'],
   imports: [
     CommonModule,
-    MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatDividerModule,
+    MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, 
+    MatSelectModule, MatDividerModule, MatButtonToggleModule,
     A11yModule,
     FormsModule,
     SidenavModule, LoadingSpinnerModule,
@@ -49,13 +53,32 @@ export class MatchEndComponent implements OnInit {
 
   public match$: Observable<MatchModel> = inject(Store).select(MatchState.match)
   public saving: boolean = false
+  public typeDeSaisie = signal<string>('player')
 
   private store: Store = inject(Store)
   private actions: Actions = inject(Actions)
   private snackBar: MatSnackBar = inject(MatSnackBar)
   private dialog: MatDialog = inject(MatDialog)
+  private activatedRoute: ActivatedRoute = inject(ActivatedRoute)
+
 
   ngOnInit(): void {
+
+    const match = this.store.selectSnapshot(MatchState.match)
+    match.teams.forEach(team => {
+      if (!team.scoreDetails) {
+        team.scoreDetails = [{
+          categoryName: '',
+          value: 0,
+          inputString: ''
+        }];
+      }
+    });
+
+    this.activatedRoute.queryParams.subscribe((params: { [x: string]: any }) => {
+      this.typeDeSaisie.set(params['mode'] || 'player');
+    });
+    
     this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(_ => {
       this.snackBar.open("Erreur lors de l'enregistrement de la partie", 'Fermer', {
         duration: 10000
@@ -94,19 +117,23 @@ export class MatchEndComponent implements OnInit {
   }
 
   public setTeamScore(team: Team) {
-    this.store.dispatch(new Navigate(['/team-score'], { "id": team.id }))
+    this.store.dispatch(new Navigate(['/team-score-by-player'], { "id": team.id }))
+  }
+
+  public setCategoryScore(index: number) {
+    this.store.dispatch(new Navigate(['/team-score-by-category'], { "index": index }))
   }
 
   public endMatch() {
     const match = this.store.selectSnapshot(MatchState.match)
-    
+
     if (!match) {
       return;
     }
 
     // Vérifier si toutes les équipes ont un score
     const allTeamsHaveScore = match.teams.every(team => team.score != null && team.score !== undefined)
-    
+
     if (allTeamsHaveScore) {
       // Toutes les équipes ont un score, terminer directement
       this.saving = true
@@ -140,5 +167,9 @@ export class MatchEndComponent implements OnInit {
 
   public returnToHome() {
     this.store.dispatch(new Navigate(['/']))
+  }
+
+  public onTypeSaisieChange(event: any) {
+    this.typeDeSaisie.set(event.value);
   }
 }

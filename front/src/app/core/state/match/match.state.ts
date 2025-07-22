@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued } from "./match.action"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
@@ -451,11 +451,15 @@ export class MatchState {
             return
         }
 
+        const calculatedScore = scoreAddedToTeam.team .scoreDetails
+            .map(scoreDetail => scoreDetail.value ?? 0)
+            .reduce((sum, score) => sum + score, 0);
+
         const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
             if (team == scoreAddedToTeam.team) {
                 return { 
                     ...team,
-                    score: scoreAddedToTeam.score,
+                    score: calculatedScore,
                     scoreDetails: scoreAddedToTeam.scoreDetail
                 }
             }
@@ -479,6 +483,94 @@ export class MatchState {
             }
         })
     }
+
+    @Action(AddScoreToCategory)
+    addScoreToCategory({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToTeam: AddScoreToCategory) {
+
+        console.info("Adding score from category")
+
+        const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
+            const modifiedScore = scoreAddedToTeam.scoreByTeam.get(team)!
+            console.log("modifiedScore:", modifiedScore)
+
+            let modifiedScoreDetails
+            if (team.scoreDetails.find(scoreDetail => scoreDetail.categoryName === modifiedScore.categoryName)) {
+                modifiedScoreDetails = team.scoreDetails.map(scoreDetail => scoreDetail.categoryName === modifiedScore.categoryName ? modifiedScore : scoreDetail)
+                
+            } else {
+                modifiedScoreDetails = [...team.scoreDetails, modifiedScore]
+            }
+            console.log("modifiedScoreDetails:", modifiedScoreDetails)
+
+            const calculatedScore = modifiedScoreDetails
+                .map(scoreDetail => scoreDetail.value ?? 0)
+                .reduce((sum, score) => sum + score, 0);
+            console.log("calculatedScore:", calculatedScore)
+
+            return { 
+                    ...team,
+                    score: calculatedScore,
+                    scoreDetails: modifiedScoreDetails
+                }
+        })
+
+        console.log("final:", modifiedTeamList)
+
+        let winningTeam: Team | undefined = undefined
+        if (modifiedTeamList.filter(team => team.score == undefined || team.scoreDetails.length < getState().match!.game.scoreTags.length).length == 0) {
+            if (getState().match!.game.highestScoreWin ?? true) {
+                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
+            } else {
+                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
+            }
+        }
+
+       setState({
+            match: {
+                ...getState().match!,
+                teams: modifiedTeamList,
+                winningTeam: winningTeam
+            }
+        })
+    }
+
+
+    @Action(AddFinalScoreToTeam)
+    addFinalScoreToTeam({ setState, getState }: StateContext<MatchStateModel>, scoreAddedToTeam: AddFinalScoreToTeam) {
+
+        console.info("Adding score to player")
+        if (!this.checkIntegrityOfTeam(getState(), scoreAddedToTeam.team)) {
+            return
+        }
+
+        const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
+            if (team.id === scoreAddedToTeam.team.id) {
+                return { 
+                    ...team,
+                    score: scoreAddedToTeam.score
+                }
+            }
+            return team
+        })
+
+        let winningTeam: Team | undefined = undefined
+        if (modifiedTeamList.filter(team => team.score == undefined).length == 0) {
+            if (getState().match!.game.highestScoreWin ?? true) {
+                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
+            } else {
+                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
+            }
+        }
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: modifiedTeamList,
+                winningTeam: winningTeam
+            }
+        })
+    }
+
 
     private checkIntegrityOfTeam(state: MatchStateModel, teamToCheck: Team): boolean {
         const team: Team | undefined = state.match?.teams.find(team => team === teamToCheck)

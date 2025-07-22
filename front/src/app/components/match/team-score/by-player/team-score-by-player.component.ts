@@ -40,16 +40,16 @@ import { first } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { Score, ScoreTag } from 'src/app/core/model/score.model'
 import { ArithmeticExpressionEvaluator } from 'src/app/core/services/misc/arithmetic'
-import { AddScoreToTeam } from 'src/app/core/state/match/match.action'
+import { AddFinalScoreToTeam, AddScoreToTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
-import { SidenavModule } from '../../layout/sidenav/sidenav.module'
-import { KeyboardComponent } from '../../layout/keyboard/keyboard.component'
-import { LayoutComponent } from '../../layout/layout.component'
+import { KeyboardComponent } from '../../../layout/keyboard/keyboard.component'
+import { LayoutComponent } from '../../../layout/layout.component'
+import { SidenavModule } from '../../../layout/sidenav/sidenav.module'
 
 
 @Component({
-  templateUrl: './team-score.component.html',
-  styleUrls: ['./team-score.component.css'],
+  templateUrl: './team-score-by-player.component.html',
+  styleUrls: ['./team-score-by-player.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
@@ -60,7 +60,7 @@ import { LayoutComponent } from '../../layout/layout.component'
     SidenavModule, KeyboardComponent, LayoutComponent
   ]
 })
-export class TeamScoreComponent implements OnInit {
+export class TeamScoreByPlayerComponent implements OnInit {
 
   @ViewChildren('inputScore') public listOfInputScore!: QueryList<any>
 
@@ -82,7 +82,7 @@ export class TeamScoreComponent implements OnInit {
       return scoreDetail ? scoreDetail.value : 0
     }
   })
-  
+
   public totalScore = computed(() => {
     const scores = this.localMutableScoreDetails()
     const total = scores.reduce((total, score) => total + score.value, 0)
@@ -107,7 +107,7 @@ export class TeamScoreComponent implements OnInit {
         score: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(1)])
       })
     }
-    
+
     this.scoreTemplate.forEach(scoreTag => {
       const validators = []
       if (scoreTag.min != undefined) {
@@ -120,12 +120,12 @@ export class TeamScoreComponent implements OnInit {
       if (scoreTag.complex) {
         validators.push(Validators.pattern("^[0-9\-\*\/()+]*$"))
       } else {
-        validators.push(Validators.pattern("^[0-9\-]*$"))
+        validators.push(Validators.pattern("^[0-9]*$"))
       }
       this.teamScoreFormGroup.addControl(scoreTag.category, new FormControl('', validators))
     })
 
-    
+
     this.activatedRoute.queryParams.pipe(first()).subscribe((params: { [key: string]: string }) => {
       const teamId = params['id']
       const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
@@ -142,7 +142,7 @@ export class TeamScoreComponent implements OnInit {
     })
   }
 
-  
+
 
   public triggerValueChangeFromActiveElement() {
     const activeElement = document.activeElement
@@ -153,10 +153,10 @@ export class TeamScoreComponent implements OnInit {
 
       if (categoryName) {
         console.debug("Triggering value change from active element", categoryName, activeElement.value)
-        
+
         // Mettre à jour le FormControl pour déclencher les validators Angular
         this.teamScoreFormGroup.get(categoryName)?.setValue(activeElement.value);
-        
+
         // Appliquer la mise à jour et forcer la détection des changements
         this.categoryValuechange(categoryName, activeElement.value)
       } else {
@@ -165,14 +165,14 @@ export class TeamScoreComponent implements OnInit {
     }
   }
 
-  
+
 
   public onScoreInput(event: Event, categoryName: string) {
     const value = (event.target as HTMLInputElement).value;
-    
+
     // Mettre à jour le FormControl pour déclencher les validators Angular
     this.teamScoreFormGroup.get(categoryName)?.setValue(value);
-    
+
     // Appliquer la logique de calcul de score
     this.categoryValuechange(categoryName, value);
   }
@@ -182,11 +182,11 @@ export class TeamScoreComponent implements OnInit {
 
     // Créer une copie du tableau actuel
     const currentScores = [...this.localMutableScoreDetails()]
-    
+
     // Chercher la catégorie dans la copie
     let scoreIndex = currentScores.findIndex(score => score.categoryName == categoryName)
     let scoreDetail: Score
-    
+
     // Si la catégorie n'existe pas, la créer
     if (scoreIndex === -1) {
       scoreDetail = {
@@ -197,9 +197,9 @@ export class TeamScoreComponent implements OnInit {
       currentScores.push(scoreDetail)
       scoreIndex = currentScores.length - 1
     } else {
-      scoreDetail = {...currentScores[scoreIndex]} // Créer une copie de l'objet Score
+      scoreDetail = { ...currentScores[scoreIndex] } // Créer une copie de l'objet Score
     }
-    
+
     // Assigner la nouvelle valeur
     scoreDetail.inputString = newValue
 
@@ -224,33 +224,39 @@ export class TeamScoreComponent implements OnInit {
         scoreDetail.value = scoreDetail.value * -1
       }
     }
-    
+
     // Mettre à jour le tableau avec la nouvelle copie
     currentScores[scoreIndex] = scoreDetail
     this.localMutableScoreDetails.set(currentScores)
-    
+
     // Debug
     console.debug("Updated scores:", this.localMutableScoreDetails(), "Total:", this.totalScore())
   }
 
   ngOnInit(): void {
-    this.actions.pipe(ofActionSuccessful(AddScoreToTeam)).subscribe(() => this.store.dispatch(new Navigate(['/match-end'])))
+    if (this.complexScoreTemplate) {
+      this.actions.pipe(ofActionSuccessful(AddScoreToTeam)).subscribe(() =>
+        this.store.dispatch(new Navigate(['/match-end'], { "mode": "player" })))
+    } else {
+      this.actions.pipe(ofActionSuccessful(AddFinalScoreToTeam)).subscribe(() =>
+        this.store.dispatch(new Navigate(['/match-end'], { "mode": "player" })))
+    }
   }
 
   public onSubmit() {
     console.info("Submitting team score form")
     console.log(this.team.scoreDetails, this.totalScore())
-    
+
     // Si on est en mode complexe, on utilise le score total calculé
     if (this.complexScoreTemplate) {
-      this.store.dispatch(new AddScoreToTeam(this.team, this.totalScore(), this.localMutableScoreDetails()))
+      this.store.dispatch(new AddScoreToTeam(this.team, this.localMutableScoreDetails()))
     } else {
       console.info("Submitting team score form", this.teamScoreFormGroup.value.score)
-      this.store.dispatch(new AddScoreToTeam(this.team, this.teamScoreFormGroup.value.score, this.localMutableScoreDetails()))
+      this.store.dispatch(new AddFinalScoreToTeam(this.team, this.teamScoreFormGroup.value.score))
     }
   }
 
   public returnToMatchEnd() {
-    this.store.dispatch(new Navigate(['/match-end']))
+    this.store.dispatch(new Navigate(['/match-end'], { "mode": "player" }))
   }
 }

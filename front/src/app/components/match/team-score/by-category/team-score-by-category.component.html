@@ -1,0 +1,35 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToMatchEnd()">
+  <ng-container role="header">
+    <span class="title">Fin de partie</span>
+  </ng-container>
+
+  <ng-container role="footer">
+    <app-keyboard [listOfInput]="listOfInputScore" (onSubmit)="onSubmit()"></app-keyboard>
+  </ng-container>
+
+  <ng-container role="body">
+    
+    <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+
+      <span class="title">{{ scoreTag().category }}</span>
+
+      <form [formGroup]="categoryScoreFormGroup" (ngSubmit)="onSubmit()">
+
+        @for(team of matchState().teams; track team.id) {
+          <ls-input-category-score #inputScore 
+            [scoreTag]="scoreTag()" 
+            [team]="team"
+            [myFormGroup]="categoryScoreFormGroup"
+            (valueChange)="onValueChange($event, team)">
+            {{ team.name }}
+          </ls-input-category-score>
+        }
+
+        <button mat-raised-button [disabled]="!categoryScoreFormGroup.valid">
+          Enregistrer les scores
+        </button>
+
+      </form>
+    </div>
+  </ng-container>
+</app-layout>

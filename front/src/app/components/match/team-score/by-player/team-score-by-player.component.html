@@ -4,7 +4,7 @@
   </ng-container>
 
   <ng-container role="footer">
-    <app-keyboard [listOfInput]="listOfInputScore" (keyPressAction)="triggerValueChangeFromActiveElement()" (submitAction)="onSubmit()"></app-keyboard> 
+    <app-keyboard [listOfInput]="listOfInputScore" (onSubmit)="onSubmit()"></app-keyboard> 
   </ng-container>
 
   <ng-container role="body">
@@ -57,7 +57,7 @@
           </mat-form-field>
         }
 
-        <button #inputScore tabindex="60" mat-raised-button [disabled]="!teamScoreFormGroup.valid">
+        <button tabindex="60" mat-raised-button [disabled]="!teamScoreFormGroup.valid">
           Enregistrer le score
         </button>
       </form>

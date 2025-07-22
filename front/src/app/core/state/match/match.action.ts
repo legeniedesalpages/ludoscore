@@ -101,5 +101,15 @@ export class UpdateTeamTags {
 
 export class AddScoreToTeam {
     static readonly type: string = '[Match] AddScoreToTeam'
-    constructor(public team: Team, public score: number, public scoreDetail: Score[]) { }
+    constructor(public team: Team, public scoreDetail: Score[]) { }
+}
+
+export class AddScoreToCategory {
+    static readonly type: string = '[Match] AddScoreToCategory'
+    constructor(public scoreByTeam: Map<Team, Score>) { }
+}
+
+export class AddFinalScoreToTeam {
+    static readonly type: string = '[Match] AddFinalScoreToTeam'
+    constructor(public team: Team, public score: number) { }
 }

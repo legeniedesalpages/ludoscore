@@ -2,6 +2,23 @@
     * @description      : 
     * @author           : renau
     * @group            : 
+    * @created          : 19/07/2025 - 01:39:19
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 19/07/2025
+    * - Author          : renau
+    * - Modification    : 
+**/
+/**
+    * @description      : 
+    * @            <div class="row">
+                <div class="key" matRipple (mousedown)="handleKey($event, '(')"><button mat-raised-button class="visual grey">(</button></div>
+                <div class="key" matRipple (mousedown)="handleKey($event, '0')"><button mat-raised-button class="visual">0</button></div>
+                <div class="key" matRipple (mousedown)="handleKey($event, ')')"><button mat-raised-button class="visual grey">)</button></div>
+                <div class="key double" matRipple (mousedown)="handleKey($event, 'Enter')"><button mat-flat-button class="visual primary"><mat-icon>subdirectory_arrow_left</mat-icon></button></div>
+            </div>           : renau
+    * @group            : 
     * @created          : 14/07/2024 - 23:17:57
     * 
     * MODIFICATION LOG
@@ -11,9 +28,10 @@
     * - Modification    : 
 **/
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, Output, QueryList } from '@angular/core'
+import { Component, input, output, QueryList } from '@angular/core'
 
 import { MatButtonModule } from '@angular/material/button'
+import { MatRippleModule } from '@angular/material/core'
 import { MatIcon } from '@angular/material/icon'
 
 @Component({
@@ -39,10 +57,10 @@ import { MatIcon } from '@angular/material/icon'
                 <div class="key" matRipple (mousedown)="handleKey($event, 'Backspace')"><button mat-raised-button class="visual grey"><mat-icon>backspace</mat-icon></button></div>                
             </div>
             <div class="row">
-                <div class="key" matRipple (mousedown)="handleKey($event, '()')"><button mat-raised-button class="visual grey">(</button></div>
+                <div class="key" matRipple (mousedown)="handleKey($event, '(')"><button mat-raised-button class="visual grey">(</button></div>
                 <div class="key" matRipple (mousedown)="handleKey($event, '0')"><button mat-raised-button class="visual">0</button></div>
                 <div class="key" matRipple (mousedown)="handleKey($event, ')')"><button mat-raised-button class="visual grey">)</button></div>
-                <div class="key double" matRipple (mousedown)="handleKey($event, 'Enter')"><button mat-flat-button class="visual primary"><mat-icon>subdirectory_arrow_left</mat-icon></button></div>
+                <div class="key" matRipple (mousedown)="handleKey($event, 'Enter')"><button mat-flat-button class="visual primary"><mat-icon>subdirectory_arrow_left</mat-icon></button></div>
             </div>
         </div>
     `,
@@ -50,57 +68,69 @@ import { MatIcon } from '@angular/material/icon'
     imports: [
         CommonModule,
         MatButtonModule,
-        MatIcon
+        MatIcon,
+        MatRippleModule
     ]
 })
 export class KeyboardComponent {
 
-    @Input() public listOfInput!: QueryList<any>
-    @Output() public keyPressAction = new EventEmitter<void>
-    @Output() public submitAction = new EventEmitter<void>
+    listOfInput = input.required<QueryList<any>>()
+    onSubmit = output()
 
     public handleKey(event: any, key: any) {
-        if (document.activeElement instanceof HTMLInputElement) {
-            this.key(key, document.activeElement as HTMLInputElement)
-        } else if (document.activeElement instanceof HTMLTextAreaElement) {
-            this.key(key, document.activeElement as HTMLTextAreaElement)
-        }
-        event.preventDefault()
-    }
+        const activeElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement
 
-    private key(caracter: any, inputElement: HTMLInputElement | HTMLTextAreaElement) {
+        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+            const cursor = activeElement.selectionStart || 0
 
-        const cursor = inputElement.selectionStart!
-        if (caracter == "Backspace") {
-            if (cursor > 0) {
-                inputElement.value = inputElement.value.substring(0, cursor - 1) + inputElement.value.substring(cursor)
-                inputElement.selectionStart = cursor - 1
-                inputElement.selectionEnd = cursor - 1
-                // Déclencher la mise à jour après suppression
-                this.keyPressAction.emit()
-            }
+            if (key === 'Backspace') {
+                if (cursor > 0) {
+                    activeElement.value = activeElement.value.substring(0, cursor - 1) + activeElement.value.substring(cursor)
+                    activeElement.selectionStart = cursor - 1
+                    activeElement.selectionEnd = cursor - 1
+                }
+            } else if (key === 'Enter') {
 
-        } else if (caracter == "Enter") {
+                if (this.listOfInput() && this.listOfInput()!.length > 0) {
 
-            if (this.listOfInput && this.listOfInput.length > 0) {
-                for (let i = 0; i < this.listOfInput.length; i++) {
-                    if (this.listOfInput.toArray()[i].nativeElement == inputElement) {
-                        if (i + 2 < this.listOfInput.length) {
-                            this.listOfInput.toArray()[i + 1].nativeElement.focus()
+                    for (let i = 0; i < this.listOfInput().length; i++) {
+                        const elt = this.listOfInput()!.toArray()[i]
+                        
+                        if (typeof elt.getInputNativeElement === 'function') {
+                            if (elt.getInputNativeElement() == activeElement) {
+                                if (i + 1 < this.listOfInput().length) {
+                                    this.listOfInput()!.toArray()[i + 1].getInputNativeElement().focus()
+                                } else {
+                                    console.debug("submitting form wrapped")
+                                    this.onSubmit.emit()
+                                }
+                            }
                         } else {
-                            this.submitAction.emit()
+                            if (elt.nativeElement == activeElement) {
+                                if (i + 1 < this.listOfInput().length) {
+                                    this.listOfInput()!.toArray()[i + 1].nativeElement.focus()
+                                } else {
+                                    console.debug("submitting form native")
+                                    this.onSubmit.emit()
+                                }
+                            }
                         }
                     }
+                } else {
+                    console.debug("submitting form, no list of input")
+                    this.onSubmit.emit()
                 }
+            } else {
+                // Insérer le caractère à la position du curseur
+                activeElement.value = activeElement.value.substring(0, cursor) + key + activeElement.value.substring(cursor)
+                activeElement.selectionStart = cursor + 1
+                activeElement.selectionEnd = cursor + 1
             }
 
-
-        } else {
-            inputElement.value = inputElement.value.substring(0, cursor) + caracter + inputElement.value.substring(cursor)
-            inputElement.selectionStart = cursor + 1
-            inputElement.selectionEnd = cursor + 1
-            // Déclencher la mise à jour après ajout de caractère
-            this.keyPressAction.emit()
+            // Déclencher l'événement input pour que Angular détecte le changement
+            activeElement.dispatchEvent(new Event('input', { bubbles: true }))
         }
+
+        event.preventDefault()
     }
 }

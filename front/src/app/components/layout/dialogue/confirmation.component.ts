@@ -22,7 +22,7 @@ import { MatDialogModule } from '@angular/material/dialog'
     template: `
         <h2 mat-dialog-title>Continuer ?</h2>
         <mat-dialog-content class="dialog row">
-            {{ data.message }}
+            <span [innerHTML]="data.message"></span>
         </mat-dialog-content>
 
         <mat-dialog-actions align="end">

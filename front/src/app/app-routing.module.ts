@@ -28,7 +28,8 @@ const routes: Routes = [
 
   { path: 'match-display', loadChildren: () => import('./components/match/display/match-display.module').then(m => m.MatchDisplayModule), data: { animation: 'match-display' } },
   { path: 'match-end', loadComponent: () => import('./components/match/end/match-end.component').then(c => c.MatchEndComponent), canActivate: [AuthGuardService], data: { animation: 'match-end' } },
-  { path: 'team-score', loadComponent: () => import('./components/match/team-score/team-score.component').then(c => c.TeamScoreComponent), canActivate: [AuthGuardService], data: { animation: 'team-score' } },
+  { path: 'team-score-by-player', loadComponent: () => import('./components/match/team-score/by-player/team-score-by-player.component').then(c => c.TeamScoreByPlayerComponent), canActivate: [AuthGuardService], data: { animation: 'team-score' } },
+  { path: 'team-score-by-category', loadComponent: () => import('./components/match/team-score/by-category/team-score-by-category.component').then(c => c.TeamScoreByCategoryComponent), canActivate: [AuthGuardService], data: { animation: 'team-score' } },
   { path: 'wheel', loadChildren: () => import('./components/match/wheel/wheel.module').then(m => m.WheelModule), data: { animation: 'wheel' } },
 
   { path: 'find-game', loadChildren: () => import('./components/game/find-game/find-game.module').then(m => m.FindGameModule), data: { animation: 'find-game' } },

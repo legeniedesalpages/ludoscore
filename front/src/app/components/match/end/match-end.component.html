@@ -6,28 +6,49 @@
     <ng-container role="body">
         @if (match$ | async; as match) {
  
-            <div class="score">Saisie des scores</div>
-            
+            <div class="score">
+                <mat-button-toggle-group name="Saisie des scores" [value]="typeDeSaisie()" (change)="onTypeSaisieChange($event)">
+                    <mat-button-toggle disabled="true" value="">Saisie des scores par</mat-button-toggle>
+                    <mat-button-toggle value="player">joueur</mat-button-toggle>
+                    <mat-button-toggle value="category">categorie</mat-button-toggle>
+                </mat-button-toggle-group>
+
+            </div>
+
             @if (match.game.quantifiableScore) {
-                <ul class="player-list">
-                    @for (team of match.teams; track team.id) {
-                        <div class="result-list">
-                            <li class="player" (click)="setTeamScore(team)">
-                                <div class="player-name">
-                                    @if (team.score != undefined) {
-                                        <div><mat-icon class="check">done</mat-icon></div>
-                                    } @else {
-                                        <div><mat-icon class="cancel">cancel</mat-icon></div>
-                                    }
-                                    {{ team.name }}
-                                    @if (team.score) {
-                                        <span>(score: {{ team.score }})</span>
-                                    }
-                                </div>
-                            </li>
-                        </div>
-                    }
-                </ul>
+                @if(typeDeSaisie() === 'player') {
+                    <ul class="player-list">
+                        @for (team of match.teams; track team.id) {
+                            <div class="result-list">
+                                <li class="player" (click)="setTeamScore(team)">
+                                    <div class="player-name">
+                                        @if (team.score != undefined) {
+                                            <div><mat-icon class="check">done</mat-icon></div>
+                                        } @else {
+                                            <div><mat-icon class="cancel">cancel</mat-icon></div>
+                                        }
+                                        {{ team.name }}
+                                        @if (team.score) {
+                                            <span>(score: {{ team.score }})</span>
+                                        }
+                                    </div>
+                                </li>
+                            </div>
+                        }
+                    </ul>
+                } @else {
+                    <ul class="player-list">
+                        @for (tag of match.game.scoreTags; track tag.category; let i = $index) {
+                            <div class="result-list">
+                                <li class="player" (click)="setCategoryScore(i)" [ngStyle]="{'background-color': tag.color.code, 'color': tag.color.invert}">
+                                    <div class="player-name">                                
+                                        {{ tag.category }}                                        
+                                    </div>
+                                </li>
+                            </div>
+                        }
+                    </ul>
+                }
             }
 
             <fieldset [disabled]="saving">
