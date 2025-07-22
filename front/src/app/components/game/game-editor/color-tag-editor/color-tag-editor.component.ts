@@ -17,7 +17,8 @@ import { COLORS, ColorTag } from 'src/app/core/model/tag.model'
 @Component({
     selector: 'color-tag-editor',
     templateUrl: './color-tag-editor.component.html',
-    styleUrls: ['./color-tag-editor.component.css']
+    styleUrls: ['./color-tag-editor.component.css'],
+    standalone: false
 })
 export class ColorTagEditorComponent implements OnInit {
 
@@ -51,7 +52,8 @@ export class ColorTagEditorComponent implements OnInit {
 @Component({
     selector: 'dialog-color-tag-editor',
     templateUrl: '../color-tag-editor-dialog/color-tag-editor-dialog.component.html',
-    styleUrls: ['../color-tag-editor-dialog/color-tag-editor-dialog.component.css']
+    styleUrls: ['../color-tag-editor-dialog/color-tag-editor-dialog.component.css'],
+    standalone: false
 })
 export class DialogColorTagEditorComponent {
 

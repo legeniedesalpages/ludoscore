@@ -15,14 +15,7 @@ form {
 .score {
   width: 100;
   text-align: center;
-  padding: 10px;
   font-size: 1.2em;
-}
-
-.buttons {
-  width: 100%;
-  text-align: center;
-  margin-top: 10px;
 }
 
 hr {
@@ -34,13 +27,11 @@ hr {
 }
 
 .complex-field {
-  padding: 10px;
   height: 45px;
   border-top: 1px solid lightgrey;
 }
 
 .complex-field-compute {
-  padding: 10px;
   height: 50px;
 }
 
@@ -59,13 +50,22 @@ hr {
 }
 
 .category-name {
-  height: 30px;
+  height: 36px;
   float: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .negative-score {
   background-color: pink;
 }
+
+.total-score-text {
+  display: block;
+  text-align: center;
+}
+
 
 .complex-field input.ng-invalid {
   background-color: red;
@@ -81,61 +81,9 @@ hr {
 
 .mat-icon {
   vertical-align: middle;
-  padding-left: 20px;
 }
 
-.keyboard {
-  background-color: lightgrey;
-  height: 180px;
-  border-top: 1px solid black;
-  padding-bottom: 10px;
-  padding-top: 10px;
-}
-
-.key {
-  font-size: large;
-  cursor: pointer;
-  border: 1px solid black;
-  border-radius: 4px;
-  background-color: white;
-  flex: 1 1 0;  
-  margin-top: 4px;
-  margin-bottom: 4px;
-  color:black
-}
-
-.mat-icon {
-  padding-left: 0px;
-}
-
-.keyboard .row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  height: 33%;
-  gap: 4px;
-}
-
-.primary {
-  background-color: #2196f3;
-  color:white
-}
-
-.accent {
-  background-color: #009688;
-  color:white
-}
-
-.large {
-  flex: 3 1 0;
-}
-
-.mid {
-  flex: 2 1 0;
-}
-
-.grey {
-  background-color: lightgrey;
+.total-score-text {
+  text-align: center;
+  width: 100%;
 }

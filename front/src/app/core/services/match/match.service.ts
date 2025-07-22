@@ -87,7 +87,7 @@ export class MatchService {
                     canceled: false,
                     running: false,
                     tags: JSON.stringify(match.choosenTags),
-                    winnerTeamId: match.winnigTeam?.id,
+                    winnerTeamId: match.winningTeam?.id,
                 })
             })
         )
@@ -132,7 +132,8 @@ export class MatchService {
                 drawAllowed: matchEntity.drawAllowed,
                 drawBreaker: matchEntity.drawBreaker ? JSON.parse(matchEntity.drawBreaker) : [] as DrawBreaker[],
                 quantifiableScore: matchEntity.quantifiableScore,
-                highestScoreWin: matchEntity.highestScoreWin
+                highestScoreWin: matchEntity.highestScoreWin,
+                estimatedDurationInMinutes: matchEntity.estimatedDurationInMinutes
             },
             choosenTags: matchEntity.tags ? JSON.parse(matchEntity.tags) : [] as Tag[],
             teams: matchEntity.teams?.map((teamEntity: any) => {
@@ -151,7 +152,7 @@ export class MatchService {
             endedAt: matchEntity.finishedAt,
             started: matchEntity.startedAt ? true : false,
             startedAt: matchEntity.startedAt,
-            winnigTeam: matchEntity.winnerTeamId ? { 
+            winningTeam: matchEntity.winnerTeamId ? { 
                 id: matchEntity.winnerTeamId,
                 name: '',
                 choosenTags: [],

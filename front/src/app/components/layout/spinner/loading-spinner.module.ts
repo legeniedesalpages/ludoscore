@@ -10,11 +10,10 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { NgModule } from '@angular/core';
-
-import { CommonModule } from '@angular/common';
-import { LoadingSpinnerComponent } from './loading-spinner.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgModule } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { LoadingSpinnerComponent } from './loading-spinner.component'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 
 @NgModule({
   declarations: [LoadingSpinnerComponent],
@@ -22,7 +21,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     CommonModule,
     MatProgressSpinnerModule
   ],
-  exports: [LoadingSpinnerComponent]
+  exports: [LoadingSpinnerComponent, MatProgressSpinnerModule]
 })
 
 export class LoadingSpinnerModule { }

@@ -26,10 +26,10 @@ export class FindGameService {
     constructor(private http: HttpClient) {
     }
 
-    public search(searchString: string): Observable<void> {
-        this.searchString = searchString
+    public search(): Observable<void> {
+        this.searchString = this.searchString
         return this.http.get<GameSearchResult[]>(environment.apiURL + '/api/game_search', { params: { q: this.searchString } }).pipe(
-            tap((result: GameSearchResult[]) => {
+            tap(result => {
                 this.searchResult = result
             }), 
             map(_ => {})

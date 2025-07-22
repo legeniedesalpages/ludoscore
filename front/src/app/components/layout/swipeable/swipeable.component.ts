@@ -10,8 +10,8 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter } from '@angular/core';
-import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter } from '@angular/core'
+import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs'
 
 interface MoveEvent {
   positionX: number,
@@ -36,31 +36,32 @@ export interface WipeActionStyle {
         </div>
       </div>  
     `,
-  styleUrls: ['./swipeable.component.css']
+  styleUrls: ['./swipeable.component.css'],
+  standalone: false
 })
 export class SwipeableComponent implements OnInit {
 
   @HostListener('window:scroll')
   onScroll() {
-    this.scroll = true;
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => { this.scroll = false; }, 300);
+    this.scroll = true
+    clearTimeout(this.timeout)
+    this.timeout = setTimeout(() => { this.scroll = false }, 300)
   }
-  private scroll: boolean = false;
-  private timeout: NodeJS.Timeout = setTimeout(() => { this.scroll = false; }, 1);
+  private scroll: boolean = false
+  private timeout = setTimeout(() => { this.scroll = false }, 1)
 
-  public icon: string = "";
-  public text: string = "";
-  public action: string = 'clicked';
+  public icon: string = ""
+  public text: string = ""
+  public action: string = 'clicked'
 
-  @Input() tresholdStartDrag: number = 20;
-  @Input() tresholdAction: number = 120;
+  @Input() tresholdStartDrag: number = 20
+  @Input() tresholdAction: number = 120
   @Input() leftWipeStyle: WipeActionStyle | null = null
   @Input() rightWipeStyle: WipeActionStyle | null = null
 
-  @Output() rightSwipeEvent = new EventEmitter<void>();
-  @Output() leftSwipeEvent = new EventEmitter<void>();
-  @Output() actionEvent = new EventEmitter<void>();
+  @Output() rightSwipeEvent = new EventEmitter<void>()
+  @Output() leftSwipeEvent = new EventEmitter<void>()
+  @Output() actionEvent = new EventEmitter<void>()
 
   @ViewChild('draggable', { static: true }) private draggableDiv!: ElementRef<HTMLDivElement>
   @ViewChild('back', { static: true }) private backDiv!: ElementRef<HTMLDivElement>
@@ -69,7 +70,7 @@ export class SwipeableComponent implements OnInit {
   ngOnInit() {
 
     // overlap divs : back behind front
-    let height = this.draggableDiv.nativeElement.clientHeight
+    const height = this.draggableDiv.nativeElement.clientHeight
     this.draggableDiv.nativeElement.style.marginTop = `-${height}px`
     this.backDiv.nativeElement.style.height = `${height}px`
 
@@ -118,7 +119,7 @@ export class SwipeableComponent implements OnInit {
             })
           )),
 
-        );
+        )
       })).subscribe(event => {
         if (event.direction === 'left' && this.leftWipeStyle != null) {
           this.applyLeftSwipe()
@@ -149,13 +150,13 @@ export class SwipeableComponent implements OnInit {
     switch (this.action) {
       case 'clicking':
         this.actionEvent.emit()
-        break;
+        break
       case 'swipping-left':
         this.leftSwipeEvent.emit()
-        break;
+        break
       case 'swipping-right':
         this.rightSwipeEvent.emit()
-        break;
+        break
     }
   }
 
@@ -195,8 +196,8 @@ export class SwipeableComponent implements OnInit {
     return {
       positionX: event.touches[0].clientX,
       actionWhenDragStart: () => {
-        event.preventDefault();
-        event.stopPropagation();
+        event.preventDefault()
+        event.stopPropagation()
       }
     }
   }

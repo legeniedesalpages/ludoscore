@@ -27,7 +27,7 @@ export class PlayerService {
     public listAllPlayers(): Observable<Player[]> {
         if (this.cachePlayers != undefined) {
             return new Observable(subscriber => {
-                subscriber.next(this.cachePlayers)
+                subscriber.next(this.cachePlayers ?? [])
                 subscriber.complete()
             })
         }

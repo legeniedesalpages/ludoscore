@@ -1,0 +1,68 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToMatchEnd()">
+  <ng-container role="header">
+    <span class="title">Fin de partie</span>
+  </ng-container>
+
+  <ng-container role="footer">
+    <app-keyboard [listOfInput]="listOfInputScore" (onSubmit)="onSubmit()"></app-keyboard> 
+  </ng-container>
+
+  <ng-container role="body">
+    <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+      <div class="score">Score pour <b>{{ team.name }}</b></div>
+
+      <form [formGroup]="teamScoreFormGroup" (ngSubmit)="onSubmit()">
+
+        @for (scoreCategory of scoreTemplate; track scoreCategory.category) {
+          <div class="complex-group">
+            <div [ngClass]="scoreCategory.complex ? 'complex-field-compute complex-field' : 'complex-field'"
+              [ngStyle]="{'background-color': scoreCategory.color.code, 'color': scoreCategory.color.invert}">
+
+              <span class="category-name">
+                {{ scoreCategory.category }}<br />
+                @if (scoreCategory.complex) {
+                  <span class="sub-total"><mat-icon>arrow_right</mat-icon>{{ scoreDetails()(scoreCategory.category) }}</span>
+                }
+              </span>
+
+              @if (!scoreCategory.complex) {
+                <input #inputScore [ngModel] cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category"
+                  [ngClass]="scoreCategory.negatif ? 'negative-score' : ''" 
+                  [attr.data-category]="scoreCategory.category"
+                  (input)="onScoreInput($event, scoreCategory.category)"
+                  (ngModelChange)="categoryValuechange(scoreCategory.category, $event)" />
+              } @else {
+                <textarea #inputScore [ngModel] cdkFocusInitial inputmode='none' [formControlName]="scoreCategory.category" 
+                  rows="3" 
+                  [attr.data-category]="scoreCategory.category"
+                  (keydown.enter)="$event.preventDefault()" 
+                  (input)="onScoreInput($event, scoreCategory.category)"
+                  (ngModelChange)="categoryValuechange(scoreCategory.category, $event)">
+                </textarea>
+              }
+            </div>
+          </div>
+        }
+
+        <hr />
+
+        @if (complexScoreTemplate) {
+          <span class="total-score-text">Score total: <b>{{ totalScore() }}</b></span>
+        } @else {
+          <mat-form-field appearance="fill">
+            <mat-label>{{ complexScoreTemplate ? 'Total' : 'Score (uniquement des chiffres)'}}</mat-label>
+              <input #inputScore matInput formControlName="score" inputmode='none' 
+                     [attr.data-category]="'score'"
+                     (input)="onScoreInput($event, 'score')">
+          </mat-form-field>
+        }
+
+        <button tabindex="60" mat-raised-button [disabled]="!teamScoreFormGroup.valid">
+          Enregistrer le score
+        </button>
+      </form>
+
+    </div>
+  </ng-container>
+
+</app-layout>

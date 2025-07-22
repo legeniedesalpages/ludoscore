@@ -19,6 +19,11 @@ export interface Game extends GameDetail {
     thumbnailUrl: string
 }
 
+export interface SelectingGame extends Game {
+    lastPlayed: Date
+    lastWinner: string
+}
+
 export interface GameToSave extends GameDetail {
     id?: number
     imageUrlFromBgg?: string
@@ -40,14 +45,15 @@ export interface GameDetail {
     drawBreaker: DrawBreaker[]
     quantifiableScore: boolean
     highestScoreWin: boolean
+    estimatedDurationInMinutes: number
 }
 
 export interface DrawBreaker {
-    name: string
+    reason: string
     withValue: boolean
 }
 
 export interface CancelReason {
-    name: string
+    reason: string
     withValue: boolean
 }

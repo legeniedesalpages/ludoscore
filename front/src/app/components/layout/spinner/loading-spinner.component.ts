@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core'
 
 @Component({
   selector: 'loading-spinner',
@@ -33,7 +33,8 @@ import { Component, Input, OnInit } from '@angular/core';
       opacity: 0.6;
       margin-left: 10px;
     }
-  `]
+  `],
+  standalone: false
 })
 export class LoadingSpinnerComponent {
 

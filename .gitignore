@@ -4,3 +4,4 @@ ludoscore.code-workspace
 back/public/images
 .vscode/
 **/dist/
+.github/copilot-instructions.md

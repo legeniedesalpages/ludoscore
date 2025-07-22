@@ -1,9 +1,9 @@
-FROM node:18.13
+FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
-RUN npm install -g @angular/cli
+RUN npm install -g @angular/cli@20
 
 EXPOSE 5000 49153
 
-CMD npm install;ng serve --hmr --poll 500 --port 5000 --host 0.0.0.0 --disable-host-check
+CMD rm -rf node_modules package-lock.json && npm cache clean --force && npm install --legacy-peer-deps && ng serve --hmr --poll 500 --port 5000 --host 0.0.0.0 --disable-host-check

@@ -1,30 +1,21 @@
-@use '@angular/material' as mat;
-@use './app/components/layout/layout-theme.scss' as header;
-@use './app/components/home/home-theme.scss' as home;
+@use '@angular/material'as mat;
 
 @include mat.core();
 
-$ludoscore-primary: mat.define-palette(mat.$blue-palette);
-$ludoscore-accent: mat.define-palette(mat.$teal-palette);
-$ludoscore-warn: mat.define-palette(mat.$deep-orange-palette);
+$ludoscore-theme: mat.define-theme((
+      color: (
+        theme-type: light, 
+        primary: mat.$azure-palette,
+        tertiary: mat.$green-palette
+      )
+));
 
-$ludoscore-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $ludoscore-primary,
-      accent: $ludoscore-accent,
-      warn: $ludoscore-warn,
-      is-dark: false,
-    ),
-    typography: mat.define-typography-config(),
-    density: 0,
-  )
-);
 
-@include mat.all-component-themes($ludoscore-theme);
-@include home.theme($ludoscore-theme);
-@include header.theme($ludoscore-theme);
+html {
+  @include mat.all-component-themes($ludoscore-theme);
+}
 
+/* Layout */
 html,
 body {
   margin: 0;
@@ -58,10 +49,123 @@ fieldset {
   border: 0 none;
 }
 
-.material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24
+
+/* colors */
+.background-primary {
+  background-color: mat.get-theme-color($ludoscore-theme, primary);
+  color: mat.get-theme-color($ludoscore-theme, on-primary);
+}
+
+.background-secondary {
+  background-color: mat.get-theme-color($ludoscore-theme, tertiary);
+  color: mat.get-theme-color($ludoscore-theme, on-tertiary);
+}
+
+.secondary-progress-spinner {
+  @include mat.progress-spinner-color($ludoscore-theme, $color-variant: error);
+}
+
+@function long-shadow($direction, $length, $color, $fade: false, $shadow-count: 100) {
+  $shadows: ();
+  $conversion-map: (
+    to top: 180deg,
+    to top right: 135deg,
+    to right top: 135deg,
+    to right: 90deg,
+    to bottom right: 45deg,
+    to right bottom: 45deg,
+    to bottom: 0deg,
+    to bottom left: 315deg,
+    to left bottom: 315deg,
+    to left: 270deg,
+    to left top: 225deg,
+    to top left: 225deg
+  );
+
+  @if map-has-key($conversion-map, $direction) {
+    $direction: map-get($conversion-map, $direction);
+  }
+
+  @for $i from 1 through $shadow-count {
+    $current-step: ($i * $length / $shadow-count);
+    $current-color: if(not $fade, $color, if(type-of($fade) == 'color',  mix($fade, $color, ($i / $shadow-count * 100)), rgba($color, 1 - $i / $shadow-count)));
+
+    $shadows: append($shadows, (sin(0deg + $direction) * $current-step) (cos(0deg + $direction) * $current-step) 0 $current-color, 'comma');
+  }
+
+  @return $shadows;
+}
+
+.header button {
+  color: mat.get-theme-color($ludoscore-theme, on-primary);
+}
+
+.yellow .circle {
+  background-color: #e9de0f;
+}
+.yellow .mat-icon {
+  background-color: #e9de0f;
+  text-shadow: long-shadow(
+    $direction: 50deg,
+    $length: 60px,
+    $color: #cbc20c,
+    $fade: false,
+    $shadow-count: 50
+  );  
+}
+
+.green .circle {
+  background-color: #00aa97;
+}
+.green .mat-icon {
+  background-color: #00aa97;
+  text-shadow: long-shadow(
+    $direction: 50deg,
+    $length: 60px,
+    $color: #007c6e,
+    $fade: false,
+    $shadow-count: 50
+  );  
+}
+
+.red .circle {
+  background-color: #fd5d4b;
+}
+.red .mat-icon {
+  background-color: #fd5d4b;
+  text-shadow: long-shadow(
+    $direction: 50deg,
+    $length: 60px,
+    $color: #aa463b,
+    $fade: false,
+    $shadow-count: 50
+  );  
+}
+
+.blue .circle {
+  background-color: #1381e9;
+}
+.blue .mat-icon {
+  background-color: #1381e9;
+  text-shadow: long-shadow(
+    $direction: 50deg,
+    $length: 60px,
+    $color: #1463ac,
+    $fade: false,
+    $shadow-count: 50
+  );  
+}
+
+.orange .circle {
+  background-color: #f58a27;
+}
+.orange .mat-icon {
+  background-color: #f58a27;
+  text-shadow: long-shadow(
+    $direction: 50deg,
+    $length: 60px,
+    $color: #d7761c,
+    $fade: false,
+    $shadow-count: 50
+  );  
 }

@@ -5,68 +5,81 @@
 
     <ng-container role="footer">
         <div class="validate-div">
-            <button mat-raised-button color="warn" class="validate-button" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
+            <button mat-raised-button class="validate-button" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
         </div>
     </ng-container>
 
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la partie"></loading-spinner>
 
-        <div *ngIf="match | async as match" class="container">
+        @if (match | async; as match) {
+            <div class="container">
 
-            <div class="game"
-                [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
-                <div class="heading">{{ match.game.title }}</div>
+                <div class="game"
+                    [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
+                    <div class="heading">{{ match.game.title }}</div>
 
-                <ul class="game-category">
-                    <li *ngFor="let matchCategory of match.choosenTags; let i = index">
-                        {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
-                    </li>
-                </ul>
+                    @if (match.choosenTags && match.choosenTags.length > 0) {
+                        <ul class="game-category">
+                            @for (matchCategory of match.choosenTags; track matchCategory; let i = $index) {
+                                <li>
+                                    {{matchCategory.category}}: <span class="value">{{matchCategory.names.join(', ')}}</span>
+                                </li>
+                            }
+                        </ul>
+                    }
 
-                <div class="elapsedtime">
-                    {{ line(match)}}
-                </div>
+                    <div class="elapsedtime">
+                        <span [innerHtml]="formatter.line(match)"></span>
+                    </div>
 
-                <div class="team-list">
-                    <div *ngFor="let team of match.teams">
-                        <div class="row">
-                            <div class="column">
-                                <div class="team">
-                                    <div *ngFor="let teamPlayer of team.teamPlayers">
-                                        <div class="player">
-                                            <div class="avatar">
-                                                <img src="{{teamPlayer.player.gravatarUrl}}">
-                                            </div>                                            
-                                        </div>
-                                    </div>
-                                    <div class="line">
-                                        <div class="team-name">
-                                            {{team.name}}
-                                            <div class="color">
-                                                <span [hidden]="team.color.name == 'Aucune'">
-                                                    <span class="dot"
-                                                        [ngStyle]="{'background-color': team.color.code, 'color': team.color.invert}"></span>
-                                                </span>
+                    <div class="team-list">
+                        @for (team of match.teams; track team) {
+                            <div class="row">
+                                <div class="column">
+                                    <div class="team">
+                                        @for (teamPlayer of team.teamPlayers; track teamPlayer) {
+                                            <div class="player">
+                                                <div class="avatar">
+                                                    <img src="{{teamPlayer.player.gravatarUrl}}">
+                                                </div>                                            
                                             </div>
-                                        </div>
-                                        <div class="tags">
-                                            <ul *ngFor="let tag of team.choosenTags">
-                                                <li>{{tag.category}}: <span
-                                                        class="tag-value">{{tag.names}}</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="score">
-                                            Score: {{ team.score }}
+                                        }
+                                        <div class="line">
+                                            <div class="team-name">
+                                                {{team.name}}
+                                                @if (team.id == match.winningTeam?.id) {
+                                                    <span class="accent">(Gagnant)</span>
+                                                }
+                                                <div class="color">
+                                                    @if (team.color.name != 'Aucune') {
+                                                        <span class="dot"
+                                                            [ngStyle]="{'background-color': team.color.code, 'color': team.color.invert}"></span>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            @if(team.choosenTags && team.choosenTags.length > 0) {
+                                                <div class="tags">
+                                                    <ul>
+                                                        @for (tag of team.choosenTags; track tag) {
+                                                            <li>{{tag.category}}: <span class="tag-value">{{tag.names}}</span></li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            }
+
+                                            <div class="score">
+                                                Score: <b>{{ team.score }}</b>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
-        </div>
+        }
     </ng-container>
 </app-layout>

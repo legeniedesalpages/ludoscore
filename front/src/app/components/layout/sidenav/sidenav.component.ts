@@ -10,20 +10,21 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { fadeInOut, slideInOut } from 'src/app/core/animation/sidenav.anmiation';
-import { fromEvent } from "rxjs";
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core'
+import { fadeInOut, slideInOut } from 'src/app/core/animation/sidenav.anmiation'
+import { fromEvent } from "rxjs"
 
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.css'],
-  animations: [slideInOut, fadeInOut]
+  animations: [slideInOut, fadeInOut],
+  standalone: false
 })
 export class SidenavComponent implements OnInit {
 
-  @Input() isOpen!: boolean;
-  @Output() isOpenChange = new EventEmitter<boolean>();
+  @Input() isOpen!: boolean
+  @Output() isOpenChange = new EventEmitter<boolean>()
 
   constructor() { }
 

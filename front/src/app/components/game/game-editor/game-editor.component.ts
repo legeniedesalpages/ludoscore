@@ -15,7 +15,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ColorTag, Tag } from 'src/app/core/model/tag.model'
-import { Game, GameToSave } from 'src/app/core/model/game.model'
+import { DrawBreaker, Game, GameToSave } from 'src/app/core/model/game.model'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { DateValidator } from 'src/app/core/services/misc/date.validator'
 import { GameService } from 'src/app/core/services/game/game.service'
@@ -28,7 +28,8 @@ import { ScoreTag } from 'src/app/core/model/score.model'
 @Component({
   selector: 'game-editor',
   templateUrl: './game-editor.component.html',
-  styleUrls: ['./game-editor.component.css']
+  styleUrls: ['./game-editor.component.css'],
+  standalone: false
 })
 export class GameEditorComponent implements OnInit {
 
@@ -47,6 +48,7 @@ export class GameEditorComponent implements OnInit {
   public tagsPlayer: Tag[] = []
   public tagsColor: ColorTag[] = []
   public tagsScore: ScoreTag[] = []
+  public tagsDraw: DrawBreaker[] = []
 
   constructor(private store: Store, private route: ActivatedRoute, private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService) {
 
@@ -55,7 +57,11 @@ export class GameEditorComponent implements OnInit {
 
     this.gameEditorForm = new FormGroup({
       name: new FormControl('', Validators.required),
-      cooperative: new FormControl('', Validators.required),
+      quantifiableScore: new FormControl(true, Validators.required),
+      highestScoreWin: new FormControl(true, Validators.required),
+      drawAllowed: new FormControl(true, Validators.required),
+      estimatedDurationInMinutes: new FormControl(0, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
+      cooperative: new FormControl(false, Validators.required),
       minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       ownership: new FormControl('', DateValidator.dateValidator),
@@ -80,7 +86,7 @@ export class GameEditorComponent implements OnInit {
   }
 
   private initFromLibrary() {
-    
+
     console.info('Fill from game library, bgg id: ', this.bggId)
     this.gameService.getFromBgg(this.bggId!).subscribe({
 
@@ -92,16 +98,21 @@ export class GameEditorComponent implements OnInit {
 
         this.gameEditorForm.setValue({
           name: game.title,
+          quantifiableScore: game.quantifiableScore,
+          highestScoreWin: game.highestScoreWin,
+          drawAllowed: game.drawAllowed,
           minPlayer: game.minPlayers,
           maxPlayer: game.maxPlayers,
-          cooperative: game.isOnlyCooperative ? "true" : "false",
-          ownership: game.ownershipDate
+          cooperative: game.isOnlyCooperative,
+          ownership: game.ownershipDate,
+          estimatedDurationInMinutes: game.estimatedDurationInMinutes
         })
 
         this.tagsGame = game.matchTags
         this.tagsPlayer = game.playerTags
         this.tagsColor = game.playerColors
         this.tagsScore = game.scoreTags
+        this.tagsDraw = game.drawBreaker
       },
       complete: () => {
         this.loading = false
@@ -122,10 +133,14 @@ export class GameEditorComponent implements OnInit {
 
         this.gameEditorForm.setValue({
           name: gameSearchDetail.name,
+          quantifiableScore: true,
+          drawAllowed: true,
+          highestScoreWin: true,
           minPlayer: gameSearchDetail.minplayers,
           maxPlayer: gameSearchDetail.maxplayers,
-          cooperative: "false",
-          ownership: null
+          cooperative: false,
+          ownership: null,
+          estimatedDurationInMinutes: 0
         })
 
         this.imageUrlFromBgg = gameSearchDetail.imageUrlFromBgg
@@ -144,7 +159,7 @@ export class GameEditorComponent implements OnInit {
     const gameToSave: GameToSave = {
       id: this.gameId,
       title: this.gameEditorForm.get('name')?.value,
-      isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value == "false" ? false : true,
+      isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value,
       minPlayers: this.gameEditorForm.get('minPlayer')?.value,
       maxPlayers: this.gameEditorForm.get('maxPlayer')?.value,
       ownershipDate: this.gameEditorForm.get('ownership')?.value!,
@@ -153,12 +168,13 @@ export class GameEditorComponent implements OnInit {
       playerColors: this.tagsColor,
       scoreTags: this.tagsScore,
       bggId: this.bggId!,
-      drawAllowed: true,
-      drawBreaker: [],
-      quantifiableScore: true,
-      highestScoreWin: true,
+      drawAllowed: this.gameEditorForm.get('drawAllowed')?.value,
+      drawBreaker: this.tagsDraw,
+      quantifiableScore: this.gameEditorForm.get('quantifiableScore')?.value,
+      highestScoreWin: this.gameEditorForm.get('highestScoreWin')?.value,
       imageUrlFromBgg: this.imageUrlFromBgg,
-      thumbnailUrlFromBgg: this.thumbnailUrlFromBgg
+      thumbnailUrlFromBgg: this.thumbnailUrlFromBgg,
+      estimatedDurationInMinutes: this.gameEditorForm.get('estimatedDurationInMinutes')?.value
     }
 
     this.gameService.save(gameToSave).subscribe({
@@ -167,7 +183,8 @@ export class GameEditorComponent implements OnInit {
         console.debug("Game id :" + game.id)
         this.snackBar.open("Jeu enregistré", 'Fermer', {
           duration: 5000
-        })        
+        })
+        this.saving = false
         this.store.dispatch(new Navigate(['/']))
       },
 
@@ -176,16 +193,13 @@ export class GameEditorComponent implements OnInit {
           duration: 10000
         })
         console.error('Error saving game', err)
-      },
-
-      complete: () => {
         this.saving = false
       }
-
     })
   }
 
   public returnToGameList() {
     this.store.dispatch(new Navigate(['/find-game']))
   }
+
 }

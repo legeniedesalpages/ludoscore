@@ -15,7 +15,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable, map } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import moment from 'moment'
-import { DrawBreaker, Game, GameToSave } from '../../model/game.model'
+import { DrawBreaker, Game, GameToSave, SelectingGame } from '../../model/game.model'
 import { ColorTag, Tag } from '../../model/tag.model'
 import { GameCrudService } from '../crud/game-crud.service'
 import { GameEntity } from '../../entity/game-entity.model'
@@ -52,16 +52,22 @@ export class GameService {
             highestScoreWin: gameToSave.highestScoreWin,
             imageUrlFromBgg: gameToSave.imageUrlFromBgg,
             thumbnailUrlFromBgg: gameToSave.thumbnailUrlFromBgg,
+            estimatedDurationInMinutes: gameToSave.estimatedDurationInMinutes
         }).pipe(
             map(gameEntity => this.gameEntityToGame(gameEntity))
         )
     }
 
-    public listAllGames(): Observable<Game[]> {
+    public listAllGames(): Observable<SelectingGame[]> {
         return this.gameCrudService.findAll().pipe(map(gameEntities =>
-            gameEntities.map(gameEntity =>
-                this.gameEntityToGame(gameEntity)
-            )
+            gameEntities.map((gameEntity: any) => {
+                const game: SelectingGame = {
+                    ...this.gameEntityToGame(gameEntity),
+                    lastPlayed: gameEntity.lastPlayed,
+                    lastWinner: gameEntity.lastWinner
+                }
+                return game
+            })
         ))
     }
 
@@ -95,7 +101,8 @@ export class GameService {
             drawAllowed: gameEntity.drawAllowed,
             drawBreaker: gameEntity.drawBreaker ? JSON.parse(gameEntity.drawBreaker) : [] as DrawBreaker[],
             quantifiableScore: gameEntity.quantifiableScore,
-            highestScoreWin: gameEntity.highestScoreWin
+            highestScoreWin: gameEntity.highestScoreWin,
+            estimatedDurationInMinutes: gameEntity.estimatedDurationInMinutes
         }
     }
 }

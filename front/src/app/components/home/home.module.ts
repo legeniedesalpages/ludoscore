@@ -20,10 +20,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LayoutModule } from '../layout/layout.module';
 import { LoadingSpinnerModule } from '../layout/spinner/loading-spinner.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatRippleModule } from '@angular/material/core';
+import { MatCardModule } from '@angular/material/card';
+import { LayoutComponent } from '../layout/layout.component';
 
 const routes: Routes = [
   {
@@ -42,11 +43,12 @@ const routes: Routes = [
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
-    LayoutModule,
     MatProgressSpinnerModule,
     LoadingSpinnerModule,
     MatRippleModule,
     MatDialogModule,
+    MatCardModule,
+    LayoutComponent
   ]
 })
 export class HomeModule { }

@@ -17,10 +17,10 @@
         </mat-form-field>
 
         <div *ngIf="errorMessage">
-            <button mat-button color="warn" type="button">{{errorMessage}}</button>
+            {{errorMessage}}
         </div>  
 
-        <button mat-raised-button color="primary" [disabled]="!loginForm.valid" [hidden]="loading">
+        <button mat-flat-button [disabled]="!loginForm.valid" [hidden]="loading">
             C'est parti !
         </button>
 

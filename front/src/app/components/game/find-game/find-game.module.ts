@@ -10,22 +10,23 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common'
+import { NgModule } from '@angular/core'
 
-import { Routes, RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatDividerModule } from '@angular/material/divider';
-import { FindGameComponent } from './find-game.component';
-import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service';
-import { LayoutModule } from '../../layout/layout.module';
-import {A11yModule} from '@angular/cdk/a11y';
+import { A11yModule } from '@angular/cdk/a11y'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { MatDividerModule } from '@angular/material/divider'
+import { MatGridListModule } from '@angular/material/grid-list'
+import { MatIconModule } from '@angular/material/icon'
+import { MatInputModule } from '@angular/material/input'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { RouterModule, Routes } from '@angular/router'
+import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
+import { LayoutComponent } from '../../layout/layout.component'
+import { FindGameComponent } from './find-game.component'
 
 const routes: Routes = [
   {
@@ -33,7 +34,7 @@ const routes: Routes = [
     component: FindGameComponent,
     canActivate: [AuthGuardService]
   }
-];
+]
 
 @NgModule({
   declarations: [FindGameComponent],
@@ -49,8 +50,9 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatGridListModule,
     MatDividerModule,
-    LayoutModule,
-    A11yModule
+    MatSnackBarModule,
+    A11yModule,
+    LayoutComponent
   ],
   exports: [FindGameComponent],
   providers: []

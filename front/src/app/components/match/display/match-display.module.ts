@@ -17,7 +17,6 @@ import { AuthGuardService } from 'src/app/core/services/auth/auth-guard.service'
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module';
-import { LayoutModule } from '../../layout/layout.module';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { A11yModule } from '@angular/cdk/a11y'
@@ -26,9 +25,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { SidenavModule } from '../../layout/sidenav/sidenav.module';
 import { MatchDisplayComponent } from './match-display.component';
-import { TeamDetailModule } from '../team-detail/team-detail.module';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { LayoutComponent } from '../../layout/layout.component';
 
 const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActivate: [AuthGuardService] }];
 
@@ -39,7 +38,6 @@ const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActiva
     RouterModule.forChild(routes),
     MatIconModule,
     MatButtonModule,
-    LayoutModule,
     LoadingSpinnerModule,
     MatFormFieldModule,
     MatInputModule,
@@ -50,6 +48,7 @@ const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActiva
     SidenavModule,
     MatDialogModule,
     MatSelectModule,
+    LayoutComponent
   ],
   providers: [
     { provide: MatDialogRef, useValue: {} },

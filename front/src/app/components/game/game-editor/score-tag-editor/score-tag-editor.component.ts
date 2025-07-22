@@ -10,45 +10,46 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, Input, Inject } from '@angular/core';
-import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ScoreTag } from 'src/app/core/model/score.model';
-import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/tag.model';
+import { Component, OnInit, Input, Inject } from '@angular/core'
+import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
+import { COMMA, ENTER } from '@angular/cdk/keycodes'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { ScoreTag } from 'src/app/core/model/score.model'
+import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
 
 
 @Component({
   selector: 'score-tag-editor',
   templateUrl: './score-tag-editor.component.html',
-  styleUrls: ['./score-tag-editor.component.css']
+  styleUrls: ['./score-tag-editor.component.css'],
+  standalone: false
 })
 export class ScoreTagEditorComponent implements OnInit {
 
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const
 
   @Input()
-  public tags: ScoreTag[] = [];
+  public tags: ScoreTag[] = []
 
   @Input()
-  public title: string = '';
+  public title: string = ''
 
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    console.log("Score tags", this.tags);
+    console.log("Score tags", this.tags)
   }
 
   public removeTag(tag: ScoreTag): void {
-    const index = this.tags.indexOf(tag);
+    const index = this.tags.indexOf(tag)
     if (index >= 0) {
-      this.tags.splice(index, 1);
+      this.tags.splice(index, 1)
     }
   }
 
   public editTag(tag: ScoreTag) {
-    this.openDialog(tag, this.tags.indexOf(tag));
+    this.openDialog(tag, this.tags.indexOf(tag))
   }
 
   public addTag(): void {
@@ -60,7 +61,7 @@ export class ScoreTagEditorComponent implements OnInit {
       complex: false,
       color: NO_COLOR
     }
-    this.openDialog(tag, -1);
+    this.openDialog(tag, -1)
   }
 
   private openDialog(tag: ScoreTag, index: number) {
@@ -68,23 +69,24 @@ export class ScoreTagEditorComponent implements OnInit {
       disableClose: true,
       data: tag
     }).afterClosed().subscribe((result: ScoreTag) => {
-      console.log("Tag", result, index);
+      console.log("Tag", result, index)
       if (!result) {
-        return;
+        return
       }
       if (index === -1) {
-        this.tags.push(result);
+        this.tags.push(result)
       } else {
-        this.tags[index] = result;
+        this.tags[index] = result
       }
-    });
+    })
   }
 }
 
 @Component({
   selector: 'dialog-score-tag-editor',
   templateUrl: '../score-tag-editor-dialog/score-tag-editor-dialog.component.html',
-  styleUrls: ['../score-tag-editor-dialog/score-tag-editor-dialog.component.css']
+  styleUrls: ['../score-tag-editor-dialog/score-tag-editor-dialog.component.css'],
+  standalone: false
 })
 export class DialogScoreTagEditorComponent {
 
@@ -155,7 +157,7 @@ export class DialogScoreTagEditorComponent {
       negatif: new FormControl(data.negatif, Validators.required),
       complex: new FormControl(data.complex, Validators.required),
       color: new FormControl(data.color, Validators.required)
-    });
+    })
     this. newColor = data.color
   }
 }

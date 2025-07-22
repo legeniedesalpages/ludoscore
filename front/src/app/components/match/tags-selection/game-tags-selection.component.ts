@@ -22,6 +22,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   selector: 'game-tags-selection',
   templateUrl: './tags-selection.component.html',
   styleUrls: ['./tags-selection.component.css'],
+  standalone: false
 })
 export class GameTagsSelectionComponent implements OnInit, OnDestroy {
 
@@ -89,7 +90,7 @@ export class GameTagsSelectionComponent implements OnInit, OnDestroy {
     return filteredName!
   }
 
-  public selectTag(name: string, category: string, index: number) {
+  public selectTag(name: any, category: string, index: number) {
     const chosenTagForCategory = this.choosenTags.find(tag => tag.category == category)
     if (chosenTagForCategory != undefined) {
       chosenTagForCategory.names[index] = name

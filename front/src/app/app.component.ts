@@ -13,7 +13,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { pageAnimation } from './core/animation/page.animation';
-import { Actions, Store, ofActionCompleted, ofActionDispatched } from '@ngxs/store';
+import { Actions, Store, ofActionCompleted } from '@ngxs/store';
 import { DoLogout } from './core/state/auth/auth.actions';
 import { Navigate } from '@ngxs/router-plugin';
 
@@ -36,13 +36,15 @@ import { Navigate } from '@ngxs/router-plugin';
       perspective:  1px;
       transform-style:  preserve-3d;
     }
-  `]
+  `],
+  standalone: false
 })
 export class AppComponent implements OnInit {
 
   constructor(private actions: Actions, private store: Store) {
     console.info("Launching 'Ludo score'");
   }
+  
   ngOnInit(): void {
     this.actions.pipe(ofActionCompleted(DoLogout)).subscribe(() => this.store.dispatch(new Navigate(['/login'])))
   }

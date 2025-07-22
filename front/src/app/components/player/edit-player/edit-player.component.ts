@@ -21,13 +21,13 @@ import { UserEntity } from 'src/app/core/entity/user-entity.model'
 import { COLORS } from 'src/app/core/model/tag.model'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
-import { AuthStateModel } from 'src/app/core/state/auth/auth.model'
 import { AuthState } from 'src/app/core/state/auth/auth.state'
 
 @Component({
   selector: 'edit-player',
   templateUrl: './edit-player.component.html',
-  styleUrls: ['./edit-player.component.css', '../../../core/css/list.css']
+  styleUrls: ['./edit-player.component.css', '../../../core/css/list.css'],
+  standalone: false
 })
 export class EditPlayerComponent implements OnInit {
 
@@ -58,7 +58,7 @@ export class EditPlayerComponent implements OnInit {
       console.debug("Id: ", this.currentPlayerId)
       this.creating = (this.currentPlayerId === 0)
       console.debug("Creating: ", this.creating)
-      let loggedUserId: number = this.store.selectSnapshot<AuthStateModel>(AuthState).id
+      let loggedUserId: number = this.store.selectSnapshot<number>(AuthState.userId)
 
       this.userCrudService.findAll().subscribe(users => {
         this.users = users

@@ -10,31 +10,34 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject, OnInit } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
-import { DoLogout } from 'src/app/core/state/auth/auth.actions';
-import { AuthState } from 'src/app/core/state/auth/auth.state';
-import { first, forkJoin, Observable } from 'rxjs';
-import { Dispatch } from '@ngxs-labs/dispatch-decorator';
-import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state';
-import { MatchService } from 'src/app/core/services/match/match.service';
-import { Navigate } from '@ngxs/router-plugin';
-import { UserCrudService } from 'src/app/core/services/crud/user-crud.service';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FindGameService } from 'src/app/core/services/game/find-game.service';
+import { Component, inject, Inject, OnInit } from '@angular/core'
+import { Store } from '@ngxs/store'
+import { DoLogout } from 'src/app/core/state/auth/auth.actions'
+import { AuthState } from 'src/app/core/state/auth/auth.state'
+import { first, forkJoin, Observable } from 'rxjs'
+import { Dispatch } from '@ngxs-labs/dispatch-decorator'
+import { MatchState, MatchStateEnum } from 'src/app/core/state/match/match.state'
+import { MatchService } from 'src/app/core/services/match/match.service'
+import { Navigate } from '@ngxs/router-plugin'
+import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { FindGameService } from 'src/app/core/services/game/find-game.service'
+import { environment } from 'src/environments/environment'
 
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  standalone: false
 })
 export class HomeComponent implements OnInit {
 
-  @Select(AuthState.userName) loggedUser!: Observable<any>;
-  @Select(AuthState.userId) loggedUserId!: Observable<number>;
+  public matchStateEnum: typeof MatchStateEnum = MatchStateEnum
+  public env = environment
 
-  @Select(MatchState.state) matchState!: Observable<MatchStateEnum>;
+  loggedUser$: Observable<string> = inject(Store).select(AuthState.userName)
+  loggedUserId$: Observable<number> = inject(Store).select(AuthState.userId)
+  MatchStateEnum$: Observable<MatchStateEnum> = inject(Store).select(MatchState.state)
 
-  public matchStateEnum: typeof MatchStateEnum = MatchStateEnum;
   public loggingOut: boolean = false
   public loading: boolean
   public notAssociated: boolean
@@ -52,7 +55,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.loggedUserId.subscribe(id => {
+    this.loggedUserId$.subscribe(id => {
       forkJoin({
         user: this.userService.findOne(id),
         runningMatch: this.matchService.findRunningMatch()
@@ -92,7 +95,8 @@ export class HomeComponent implements OnInit {
 @Component({
   selector: 'welcome-dialog',
   templateUrl: './welcome-dialog/welcome-dialog.component.html',
-  styleUrls: ['./welcome-dialog/welcome-dialog.component.css']
+  styleUrls: ['./welcome-dialog/welcome-dialog.component.css'],
+  standalone: false
 })
 export class WelcomeDialogComponent {
 

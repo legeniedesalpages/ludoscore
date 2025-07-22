@@ -10,28 +10,44 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core'
+import { AsyncPipe, CommonModule, NgStyle } from '@angular/common'
+import { Component, OnInit, inject } from '@angular/core'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { MatDividerModule } from '@angular/material/divider'
+import { MatIconModule } from '@angular/material/icon'
+import { ActivatedRoute, RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { MatchService } from 'src/app/core/services/match/match.service'
-import { DatePipe } from '@angular/common'
-import { ActivatedRoute } from '@angular/router'
 import { Observable, switchMap, tap } from 'rxjs'
+import { LoadingSpinnerModule } from 'src/app/components/layout/spinner/loading-spinner.module'
 import { MatchModel } from 'src/app/core/model/match.model'
+import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
+import { MatchService } from 'src/app/core/services/match/match.service'
+import { LayoutComponent } from '../../layout/layout.component'
 
 
 @Component({
   templateUrl: './match-history-detail.component.html',
   styleUrls: ['./match-history-detail.component.css', '../../../core/css/list.css'],
+  standalone: true,
+  imports: [
+    CommonModule, AsyncPipe, NgStyle,
+    RouterModule,
+    MatButtonModule, MatCardModule, MatDividerModule, MatIconModule,
+    LoadingSpinnerModule,
+    LayoutComponent
+  ]
 })
 export class MatchHistoryDetailComponent implements OnInit {
 
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
+  private matchService = inject(MatchService);
+  public formatter = inject(MatchFormatterService);
+
   public match!: Observable<MatchModel>
-
   public loading: boolean = true
-
-  constructor(private store: Store, private route: ActivatedRoute, private matchService: MatchService, private datePipe: DatePipe) {
-  }
 
   ngOnInit(): void {
     this.match = this.route.paramMap.pipe(switchMap(params => {
@@ -43,32 +59,7 @@ export class MatchHistoryDetailComponent implements OnInit {
     }))
   }
 
-  public line(match: MatchModel): string {
-
-    let headline: string
-    if (match.canceled) {
-      headline = "Annulé le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' à ' + this.datePipe.transform(match.endedAt, 'HH:mm')
-    } else if (!match.endedAt) {
-      headline = "En cours depuis " + this.elapsedTime(match.startedAt!, new Date())
-    } else {
-      headline = "Jouée le " + this.datePipe.transform(match.endedAt, 'dd/MM/yyyy') + ' en ' + this.elapsedTime(match.startedAt!, new Date(match.endedAt))
-    }
-
-    return headline
-  }
-
-  public elapsedTime(startDate: Date, endDate: Date) {
-      let t = endDate.getTime() - new Date(startDate).getTime()
-      let minutes = "" + Math.floor((t / (1000 * 60)) % 60)
-      let hours = "" + Math.floor((t / (1000 * 60 * 60)) % 24)
-      if (hours == "0") {
-        return minutes + " minutes"
-      }
-      return hours + " heures et " + minutes + " mn"
-  }
-
   public deteleMatchHistory() {
-
     this.match.pipe(switchMap(m => this.matchService.deleteMatch(m.matchId!))).subscribe(() => {
       this.returnToMatchHistory()
     })
