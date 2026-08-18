@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'boardgamegeek' => [
+        'token' => env('BGG_API_TOKEN'),
+    ],
+
 ];

@@ -202,6 +202,14 @@ class GameSearchController extends Controller
     private function requester($request)
     {
         Log::debug("Execute request: " . $request);
-        return json_decode(json_encode(simplexml_load_string(Http::get($request))), true);
+
+        $headers = [];
+        $token = config('services.boardgamegeek.token');
+
+        if (!empty($token)) {
+            $headers['Authorization'] = 'Bearer ' . $token;
+        }
+
+        return json_decode(json_encode(simplexml_load_string(Http::withHeaders($headers)->get($request))), true);
     }
 }
