@@ -72,8 +72,9 @@ jobs:
         sed -i "s/SECRET_MAIL_HOST/${{secrets.MAIL_HOST}}/g" "./deployment/.env"
         sed -i "s/SECRET_MAIL_USERNAME/${{secrets.MAIL_USERNAME}}/g" "./deployment/.env"
         sed -i "s/SECRET_MAIL_PASSWORD/${{secrets.MAIL_PASSWORD}}/g" "./deployment/.env"
+        sed -i "s/SECRET_BGG_API_TOKEN/${{secrets.BGG_APP_KEY}}/g" "./deployment/.env"
         sed -i "s/VARIABLE_BACK_URL/${{vars.BACK_URL}}/g" "./deployment/.env"
-        sed -i "s/VARIABLE_NAME/${{vars.NAME}}/g" "./deployment/.env"        
+        sed -i "s/VARIABLE_NAME/${{vars.NAME}}/g" "./deployment/.env"
       
     - name: Copie des fichiers pour le déploiement Back Office
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
