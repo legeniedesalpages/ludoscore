@@ -49,8 +49,6 @@ class GameSearchController extends Controller
                 array_push($idList, $id);
             }
         }
-
-        
         
         $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&id=' . implode(',', array_slice($idList, 0, 20));
         $jsonDetailData = $this->requester($detailRequest);
@@ -202,6 +200,11 @@ class GameSearchController extends Controller
     private function requester($request)
     {
         Log::debug("Execute request: " . $request);
-        return json_decode(json_encode(simplexml_load_string(Http::get($request))), true);
+        $token = (string) config('services.boardgamegeek.token', '');
+        $response = Http::withHeaders([
+            'Authorization' => trim('Bearer ' . $token),
+        ])->get($request);
+
+        return json_decode(json_encode(simplexml_load_string($response->body())), true);
     }
 }
