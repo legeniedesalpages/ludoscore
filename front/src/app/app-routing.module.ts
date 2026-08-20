@@ -38,6 +38,11 @@ const routes: Routes = [
   { path: 'manage-player', loadChildren: () => import('./components/player/manage-player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },
   { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } },
 
+  { path: 'statistics', loadComponent: () => import('./components/stats/statistics/statistics.component').then(c => c.StatisticsComponent), canActivate: [AuthGuardService], data: { animation: 'statistics' } },
+  { path: 'statistics/overview', loadComponent: () => import('./components/stats/statistics/statistics-overview.component').then(c => c.StatisticsOverviewComponent), canActivate: [AuthGuardService], data: { animation: 'statistics-overview' } },
+  { path: 'statistics/games', loadComponent: () => import('./components/stats/statistics/statistics-by-game.component').then(c => c.StatisticsByGameComponent), canActivate: [AuthGuardService], data: { animation: 'statistics-by-game' } },
+  { path: 'statistics/players', loadComponent: () => import('./components/stats/statistics/statistics-by-player.component').then(c => c.StatisticsByPlayerComponent), canActivate: [AuthGuardService], data: { animation: 'statistics-players' } },
+
   { path: 'match-history', loadComponent: () => import('./components/stats/match-history/match-history.component').then(c => c.MatchHistoryComponent), canActivate: [AuthGuardService], data: { animation: 'match-history' } },
   { path: 'match-history-detail/:id', loadComponent: () => import('./components/stats/match-history-detail/match-history-detail.component').then(c => c.MatchHistoryDetailComponent), canActivate: [AuthGuardService], data: { animation: 'match-history-detail' } },
 

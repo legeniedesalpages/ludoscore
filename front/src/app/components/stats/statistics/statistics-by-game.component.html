@@ -1,0 +1,49 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToStatistics()">
+  <ng-container role="header">
+    <span class="title">Statistiques par jeu</span>
+  </ng-container>
+
+  <ng-container role="body">
+    <div class="page" *ngIf="loading; else loaded">
+      <div class="loading-box">Chargement des statistiques…</div>
+    </div>
+
+    <ng-template #loaded>
+      <div class="page" *ngIf="games.length; else failed">
+        <div class="cards">
+          <div class="card" *ngFor="let game of games">
+            <div class="head">
+              <strong>{{ game.title }}</strong>
+              <span>{{ game.matches }} parties</span>
+            </div>
+
+            <div class="metrics">
+              <div>
+                <span>Durée moyenne</span>
+                <strong>{{ formatMinutes(game.averageDurationMinutes) }}</strong>
+              </div>
+              <div>
+                <span>Diff. moyenne</span>
+                <strong>{{ game.averageScoreGap }} pts</strong>
+              </div>
+              <div>
+                <span>Temps entre parties</span>
+                <strong>{{ game.averageWaitDays }} j</strong>
+              </div>
+              <div>
+                <span>Vainqueur</span>
+                <strong>{{ game.winner }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #failed>
+        <div class="page">
+          <div class="error-box">{{ error || 'Aucune statistique de jeu à afficher.' }}</div>
+        </div>
+      </ng-template>
+    </ng-template>
+  </ng-container>
+</app-layout>

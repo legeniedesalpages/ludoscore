@@ -1,0 +1,32 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
+  <ng-container role="header">
+    <span class="title">Statistiques</span>
+  </ng-container>
+
+  <ng-container role="body">
+    <div class="statistics-shell">
+      <div class="hero-panel">
+        <div>
+          <p class="eyebrow">Analyse de performance</p>
+          <h2>Vue d’ensemble de vos parties</h2>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card blue" *ngFor="let card of cards" [routerLink]="card.route">
+          <div class="icon-wrap">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+          <div>
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.subtitle }}</p>
+          </div>
+          <button mat-stroked-button>
+            Ouvrir
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-layout>

@@ -1,0 +1,86 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.page {
+  padding: 0.75rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.card {
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: card-in 450ms ease both;
+}
+
+.card:nth-child(2) { animation-delay: 60ms; }
+.card:nth-child(3) { animation-delay: 120ms; }
+.card:nth-child(4) { animation-delay: 180ms; }
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.head strong {
+  font-size: 1.05rem;
+}
+
+.head span {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 0.8rem;
+}
+
+.metrics div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  min-width: 0;
+}
+
+.metrics span {
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.loading-box {
+  padding: 2rem 1rem;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.error-box {
+  padding: 1rem;
+  border-radius: 12px;
+  color: #a83d3d;
+  background: rgba(190, 70, 70, 0.1);
+  text-align: center;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

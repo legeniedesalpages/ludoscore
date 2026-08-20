@@ -1,0 +1,96 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToStatistics()">
+  <ng-container role="header">
+    <span class="title">Vue d’ensemble</span>
+  </ng-container>
+
+  <ng-container role="body">
+    <div class="page" *ngIf="loading; else loaded">
+      <div class="loading-box">Chargement des statistiques…</div>
+    </div>
+
+    <ng-template #loaded>
+      <div class="page" *ngIf="dashboard; else failed">
+        <div class="stats-strip">
+          <div class="mini-card">
+            <span class="label">Parties</span>
+            <strong>{{ dashboard.totalMatches }}</strong>
+          </div>
+          <div class="mini-card">
+            <span class="label">Jeux</span>
+            <strong>{{ dashboard.totalGames }}</strong>
+          </div>
+          <div class="mini-card">
+            <span class="label">Joueurs</span>
+            <strong>{{ dashboard.totalPlayers }}</strong>
+          </div>
+          <div class="mini-card">
+            <span class="label">Durée moyenne</span>
+            <strong>{{ formatMinutes(dashboard.averageDurationMinutes) }}</strong>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Jeu le plus joué</h3>
+            </div>
+            <div class="highlight-box">
+              <span class="big-number">{{ dashboard.mostPlayedGame }}</span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Meilleur joueur</h3>
+            </div>
+            <div class="highlight-box accent">
+              <span class="big-number">{{ dashboard.bestPlayer }}</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Jeux les plus joués</h3>
+          </div>
+          <div class="bar-chart" *ngIf="dashboard.topGames.length; else noGames">
+            <svg class="bar-plot" viewBox="0 0 360 180" role="img" aria-label="Parties par jeu" preserveAspectRatio="none">
+              <line class="axis" x1="8" y1="166" x2="352" y2="166"></line>
+              <g *ngFor="let item of dashboard.topGames; let index = index">
+                <rect class="bar-fill" [attr.x]="12 + index * 56" [attr.y]="166 - (item.percent * 1.35)" width="34" [attr.height]="item.percent * 1.35" [attr.fill]="item.color" rx="8"></rect>
+                <text class="bar-value" [attr.x]="29 + index * 56" [attr.y]="158 - (item.percent * 1.35)">{{ item.value }}</text>
+                <text class="bar-label" [attr.x]="29 + index * 56" y="178">{{ item.label | slice:0:7 }}</text>
+              </g>
+            </svg>
+          </div>
+          <ng-template #noGames><p class="empty-state">Aucune partie enregistrée.</p></ng-template>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Répartition des victoires</h3>
+          </div>
+          <div class="donut-wrap">
+            <svg class="donut" viewBox="0 0 42 42" role="img" aria-label="Répartition des victoires">
+              <circle class="donut-track" cx="21" cy="21" r="15.9"></circle>
+              <circle *ngFor="let item of dashboard.winnerDistribution; let index = index" class="donut-segment" cx="21" cy="21" r="15.9" [attr.stroke]="item.color" [attr.stroke-dasharray]="donutDash(item.value, dashboard.winnerDistribution)" [attr.stroke-dashoffset]="donutOffset(index, dashboard.winnerDistribution)"></circle>
+            </svg>
+            <ul class="legend">
+              <li *ngFor="let item of dashboard.winnerDistribution">
+                <span class="dot" [style.background]="item.color"></span>
+                <span>{{ item.label }}</span>
+                <b>{{ item.value }}</b>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <ng-template #failed>
+        <div class="page">
+          <div class="error-box">{{ error || 'Les statistiques sont indisponibles pour le moment.' }}</div>
+        </div>
+      </ng-template>
+    </ng-template>
+  </ng-container>
+</app-layout>

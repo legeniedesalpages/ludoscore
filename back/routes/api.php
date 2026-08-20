@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\GameMatchController;
 use App\Http\Controllers\Api\GameSearchController;
 use App\Http\Controllers\Api\PlayerController;
+use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UserController;
 
@@ -64,6 +65,15 @@ Route::middleware('auth:sanctum')->resource('player', PlayerController::class, [
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->resource('team', TeamController::class, ['except' => ['edit', 'create']]);
+
+/*
+|--------------------------------------------------------------------------
+| Statistics
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->get('/statistics/overview', [StatisticsController::class, 'overview']);
+Route::middleware('auth:sanctum')->get('/statistics/games', [StatisticsController::class, 'games']);
+Route::middleware('auth:sanctum')->get('/statistics/players', [StatisticsController::class, 'players']);
 
 /*
 |--------------------------------------------------------------------------

@@ -87,6 +87,10 @@ export class HomeComponent implements OnInit {
     this.store.dispatch(new Navigate(['/manage-player']))
   }
 
+  navigateToStatistics() {
+    this.store.dispatch(new Navigate(['/statistics']))
+  }
+
   navigateToMatchHistory() {
     this.store.dispatch(new Navigate(['/match-history']))
   }
