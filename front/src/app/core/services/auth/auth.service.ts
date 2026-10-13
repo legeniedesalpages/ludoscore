@@ -43,6 +43,10 @@ export class AuthService {
     )
   }
 
+  public refreshCsrfCookie(): Observable<unknown> {
+    return this.http.get(this.csrfUrl)
+  }
+
   public logout(): Observable<string> {
     return this.http.get<string>(this.logoutUrl).pipe(tap(() => console.info("Utilisateur déconnecté")))
   }
