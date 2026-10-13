@@ -18,7 +18,7 @@ jobs:
 
     steps:
     
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Remplacement des variables d'environnement 'front'
       run: |-
@@ -26,9 +26,11 @@ jobs:
         sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./front/src/environments/environment.prod.ts"
     
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: npm
+        cache-dependency-path: front/package-lock.json
         
     - name: Install Front Dependencies
       if: steps.cache-nodemodules.outputs.cache-hit != 'true'
