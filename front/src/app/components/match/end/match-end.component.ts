@@ -24,7 +24,7 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
-import { Actions, ofActionCompleted, ofActionErrored, Store } from '@ngxs/store'
+import { Actions, ofActionCompleted, ofActionErrored, ofActionSuccessful, Store } from '@ngxs/store'
 import { Observable } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { MatchAborted, MatchContinued, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
@@ -80,12 +80,13 @@ export class MatchEndComponent implements OnInit {
     });
     
     this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(_ => {
+      this.saving = false
       this.snackBar.open("Erreur lors de l'enregistrement de la partie", 'Fermer', {
         duration: 10000
       })
     })
 
-    this.actions.pipe(ofActionCompleted(SaveMatchResult)).subscribe(() => {
+    this.actions.pipe(ofActionSuccessful(SaveMatchResult)).subscribe(() => {
       this.saving = false
       this.snackBar.open("Partie enregistrée ! à bientôt sur Ludoscore ;-)", 'Fermer', {
         duration: 5000
