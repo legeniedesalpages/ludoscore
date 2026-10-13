@@ -34,6 +34,9 @@ import { LayoutComponent } from '../../layout/layout.component'
 import { SidenavModule } from '../../layout/sidenav/sidenav.module'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 import { ActivatedRoute } from '@angular/router'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { MatchService } from 'src/app/core/services/match/match.service'
+import { resizeImage } from 'src/app/core/utils/image-resize'
 
 
 @Component({
@@ -54,6 +57,12 @@ export class MatchEndComponent implements OnInit {
   public match$: Observable<MatchModel> = inject(Store).select(MatchState.match)
   public saving: boolean = false
   public typeDeSaisie = signal<string>('player')
+  public photoUrl?: SafeUrl
+
+  private photo?: Blob
+  private rawPhotoUrl?: string
+  private sanitizer: DomSanitizer = inject(DomSanitizer)
+  private matchService: MatchService = inject(MatchService)
 
   private store: Store = inject(Store)
   private actions: Actions = inject(Actions)
@@ -148,8 +157,7 @@ export class MatchEndComponent implements OnInit {
 
     if (allTeamsHaveScore) {
       // Toutes les équipes ont un score, terminer directement
-      this.saving = true
-      this.store.dispatch(new SaveMatchResult()).subscribe(_ => this.saving = false)
+      this.save()
     } else {
       // Certaines équipes n'ont pas de score, demander confirmation
       const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -160,11 +168,62 @@ export class MatchEndComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
-          this.saving = true;
-          this.store.dispatch(new SaveMatchResult()).subscribe(_ => this.saving = false);
+          this.save()
         }
       });
     }
+  }
+
+  public async onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement
+    const file = input.files?.[0]
+    input.value = ''
+    if (!file) {
+      return
+    }
+
+    try {
+      this.photo = await resizeImage(file)
+      this.setPhotoPreview(URL.createObjectURL(this.photo))
+    } catch (error) {
+      console.error("Impossible de traiter la photo", error)
+      this.snackBar.open("Impossible de traiter cette photo", 'Fermer', { duration: 5000 })
+    }
+  }
+
+  public removePhoto() {
+    this.photo = undefined
+    this.setPhotoPreview(undefined)
+  }
+
+  private setPhotoPreview(url?: string) {
+    if (this.rawPhotoUrl) {
+      URL.revokeObjectURL(this.rawPhotoUrl)
+    }
+    this.rawPhotoUrl = url
+    this.photoUrl = url ? this.sanitizer.bypassSecurityTrustUrl(url) : undefined
+  }
+
+  // La photo est envoyée avant le résultat car la sauvegarde réinitialise l'état de la partie
+  private save() {
+    const matchId = this.store.selectSnapshot(MatchState.match)?.matchId
+    this.saving = true
+
+    if (!this.photo || matchId == undefined) {
+      this.store.dispatch(new SaveMatchResult()).subscribe({ next: () => this.saving = false, error: () => this.saving = false })
+      return
+    }
+
+    this.matchService.uploadMatchPhoto(matchId, this.photo).subscribe({
+      next: () => {
+        this.store.dispatch(new SaveMatchResult()).subscribe({ next: () => this.saving = false, error: () => this.saving = false })
+      },
+      error: error => {
+        this.saving = false
+        console.error("Erreur lors de l'envoi de la photo", error)
+        this.snackBar.open("Erreur lors de l'envoi de la photo : " + error.message, 'Fermer', { duration: 10000 })
+      }
+    })
   }
 
   public abortMatch() {

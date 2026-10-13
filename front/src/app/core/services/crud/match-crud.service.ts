@@ -14,7 +14,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { CrudService } from './abstract-crud.service'
 import { MatchEntity, MatchTeamPlayerEntity } from '../../entity/match-entity.model'
-import { Observable, tap } from 'rxjs'
+import { Observable, map, tap } from 'rxjs'
 
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +32,17 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
     getPreviousMatchOfPlayer(playerId: number, gameId: number): Observable<MatchTeamPlayerEntity> {
         var url = `${this.apiUrl}/previous-match/${playerId}/${gameId}`
         return this.http.get<MatchTeamPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
+    }
+
+    uploadPhoto(matchId: number, photo: Blob): Observable<void> {
+        const formData = new FormData()
+        formData.append('photo', photo, 'photo.jpg')
+        return this.http.post<void>(`${this.apiUrl}${this.base}/${matchId}/photo`, formData)
+    }
+
+    getPhoto(matchId: number): Observable<Blob | null> {
+        return this.http.get(`${this.apiUrl}${this.base}/${matchId}/photo`, { responseType: 'blob' })
+            .pipe(map(blob => blob && blob.size > 0 ? blob : null))
     }
 
     findAllCount(): Observable<number> {

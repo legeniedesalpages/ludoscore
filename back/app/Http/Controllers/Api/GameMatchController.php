@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\GameMatch;
+use App\Models\MatchPhoto;
 use App\Models\Team;
 use App\Models\TeamPlayer;
 use Illuminate\Http\Request;
@@ -16,6 +17,10 @@ class GameMatchController extends Controller
     {
         Log::info("Suppression du match id : " . $id);
         DB::transaction(function () use ($id) {
+            DB::table('match_photos')
+                ->where('match_id', $id)
+                ->delete();
+
             DB::table('matches')
                 ->where('id', $id)
                 ->update(['winner_team_id' => null]);
@@ -36,6 +41,40 @@ class GameMatchController extends Controller
                 ->where('id', $id)
                 ->delete();
         });
+    }
+
+    public function storePhoto(Request $request, $id)
+    {
+        $request->validate([
+            'photo' => 'required|file|mimes:jpeg,png,webp|max:8192',
+        ]);
+
+        $gameMatch = GameMatch::findOrFail($id);
+        $file = $request->file('photo');
+        Log::info("Ajout de la photo du match id : " . $id);
+
+        MatchPhoto::updateOrCreate(
+            ['match_id' => $gameMatch->id],
+            [
+                'mime_type' => $file->getMimeType(),
+                'data' => base64_encode(file_get_contents($file->getRealPath())),
+            ]
+        );
+
+        return response()->noContent();
+    }
+
+    public function showPhoto($id)
+    {
+        $photo = MatchPhoto::where('match_id', $id)->first();
+        if ($photo === null) {
+            return response()->noContent();
+        }
+
+        return response(base64_decode($photo->data), 200, [
+            'Content-Type' => $photo->mime_type,
+            'Cache-Control' => 'private, max-age=86400',
+        ]);
     }
 
     public function index(Request $request)

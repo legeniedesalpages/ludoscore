@@ -63,6 +63,25 @@
                     </mat-select>
                 </mat-form-field>
 
+                <div class="photo">
+                    <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)">
+                    @if (photoUrl) {
+                        <img class="photo-preview" [src]="photoUrl" alt="Photo de la partie">
+                        <div class="buttons">
+                            <button matButton="tonal" type="button" (click)="photoInput.click()">
+                                <mat-icon>photo_camera</mat-icon> Reprendre la photo
+                            </button>
+                            <button matButton="tonal" type="button" (click)="removePhoto()">
+                                <mat-icon>delete</mat-icon> Retirer la photo
+                            </button>
+                        </div>
+                    } @else {
+                        <button matButton="tonal" type="button" (click)="photoInput.click()">
+                            <mat-icon>photo_camera</mat-icon> Ajouter une photo
+                        </button>
+                    }
+                </div>
+
                 @if (!saving) {
                     <div class="buttons">
                         <button matButton="filled" (click)="endMatch()">

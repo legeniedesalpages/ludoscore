@@ -78,6 +78,10 @@
                             </div>
                         }
                     </div>
+
+                    @if (photoUrl$ | async; as photoUrl) {
+                        <img class="match-photo" [src]="photoUrl" alt="Photo de la partie">
+                    }
                 </div>
             </div>
         }

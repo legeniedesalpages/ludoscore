@@ -19,7 +19,8 @@ import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute, RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { Observable, switchMap, tap } from 'rxjs'
+import { Observable, catchError, map, of, switchMap, tap } from 'rxjs'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { LoadingSpinnerModule } from 'src/app/components/layout/spinner/loading-spinner.module'
 import { MatchModel } from 'src/app/core/model/match.model'
 import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
@@ -47,7 +48,10 @@ export class MatchHistoryDetailComponent implements OnInit {
   public formatter = inject(MatchFormatterService);
 
   public match!: Observable<MatchModel>
+  public photoUrl$!: Observable<SafeUrl | null>
   public loading: boolean = true
+
+  private sanitizer = inject(DomSanitizer)
 
   ngOnInit(): void {
     this.match = this.route.paramMap.pipe(switchMap(params => {
@@ -57,6 +61,11 @@ export class MatchHistoryDetailComponent implements OnInit {
         this.loading = false
       ))
     }))
+
+    this.photoUrl$ = this.route.paramMap.pipe(
+      switchMap(params => this.matchService.getMatchPhoto(Number(params.get('id'))).pipe(catchError(() => of(null)))),
+      map(blob => blob ? this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob)) : null)
+    )
   }
 
   public deteleMatchHistory() {

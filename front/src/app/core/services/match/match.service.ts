@@ -27,6 +27,14 @@ export class MatchService {
     constructor(private matchCrudService: MatchCrudService, private teamCrudService: TeamCrudService) {
     }
 
+    public uploadMatchPhoto(matchId: number, photo: Blob): Observable<void> {
+        return this.matchCrudService.uploadPhoto(matchId, photo)
+    }
+
+    public getMatchPhoto(matchId: number): Observable<Blob | null> {
+        return this.matchCrudService.getPhoto(matchId)
+    }
+
     public findRunningMatch(): Observable<MatchEntity> {
         return this.matchCrudService.findRunningMatch()
     }
