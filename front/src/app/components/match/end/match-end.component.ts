@@ -27,7 +27,7 @@ import { Navigate } from '@ngxs/router-plugin'
 import { Actions, ofActionCompleted, ofActionErrored, ofActionSuccessful, Store } from '@ngxs/store'
 import { Observable } from 'rxjs'
 import { MatchModel, Team } from 'src/app/core/model/match.model'
-import { MatchAborted, MatchContinued, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
+import { CancelMatchCreation, MatchAborted, MatchContinued, SaveMatchResult, SetWinningTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { ConfirmationDialogComponent } from '../../layout/dialogue/confirmation.component'
 import { LayoutComponent } from '../../layout/layout.component'
@@ -79,11 +79,22 @@ export class MatchEndComponent implements OnInit {
       this.typeDeSaisie.set(params['mode'] || 'player');
     });
     
-    this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(_ => {
+    this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(({ result }) => {
       this.saving = false
-      this.snackBar.open("Erreur lors de l'enregistrement de la partie", 'Fermer', {
-        duration: 10000
-      })
+      const error = result.error as any
+      const detail = error?.error?.message ?? error?.message ?? String(error)
+      const status = error?.status ? ` (HTTP ${error.status})` : ''
+      console.error("Erreur lors de l'enregistrement de la partie", error)
+
+      this.snackBar
+        .open(`Erreur lors de l'enregistrement de la partie${status} : ${detail}`, 'Réinitialiser la partie', {
+          duration: 15000
+        })
+        .onAction()
+        .subscribe(() => {
+          this.store.dispatch(new CancelMatchCreation())
+          this.store.dispatch(new Navigate(['/']))
+        })
     })
 
     this.actions.pipe(ofActionSuccessful(SaveMatchResult)).subscribe(() => {
