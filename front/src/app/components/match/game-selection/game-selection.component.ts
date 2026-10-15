@@ -120,8 +120,10 @@ export class GameSelectionComponent implements OnInit {
 
   public filterGames(games: SelectingGame[] | null): SelectingGame[] {
     const searchText = this.searchText.trim().toLocaleLowerCase()
+    const now = Date.now()
+    const newGameThreshold = 24 * 60 * 60 * 1000
 
-    return (games ?? []).filter(game =>
+    const filteredGames = (games ?? []).filter(game =>
       (!this.onlyInLibraryFilter || game.inLibrary) &&
       (!searchText || game.title.toLocaleLowerCase().includes(searchText)) &&
       (!this.onlyCooperativeFilter || game.isOnlyCooperative) &&
@@ -130,6 +132,25 @@ export class GameSelectionComponent implements OnInit {
       (!this.lessThanThirtyMinutes || (game.estimatedDurationInMinutes > 0 && game.estimatedDurationInMinutes < 30)) &&
       (!this.moreThanOneHourAndAHalfFilter || game.estimatedDurationInMinutes > 90)
     )
+
+    const newestRecentGame = filteredGames.reduce<SelectingGame | undefined>((newest, game) => {
+      const createdAt = new Date(game.createdAt).getTime()
+      const age = now - createdAt
+      if (!Number.isFinite(createdAt) || age < 0 || age >= newGameThreshold) {
+        return newest
+      }
+
+      return !newest || createdAt > new Date(newest.createdAt).getTime() ? game : newest
+    }, undefined)
+
+    return filteredGames.sort((a, b) => {
+      if (a.id === newestRecentGame?.id) return -1
+      if (b.id === newestRecentGame?.id) return 1
+
+      return b.playedMatchCount - a.playedMatchCount ||
+        a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' }) ||
+        a.id - b.id
+    })
   }
 
   public cancelMatchCreation() {

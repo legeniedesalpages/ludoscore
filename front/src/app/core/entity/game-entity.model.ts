@@ -31,4 +31,6 @@ export interface GameEntity {
     estimatedDuration: string
     scoreTemplate: string,
     estimatedDurationInMinutes: number
+    createdAt: string
+    playedMatchCount: number
 }

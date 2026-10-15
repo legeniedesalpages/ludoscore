@@ -22,6 +22,8 @@ export interface Game extends GameDetail {
 export interface SelectingGame extends Game {
     lastPlayed: Date
     lastWinner: string
+    createdAt: string
+    playedMatchCount: number
 }
 
 export interface GameToSave extends GameDetail {

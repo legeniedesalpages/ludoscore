@@ -65,7 +65,9 @@ export class GameService {
                 const game: SelectingGame = {
                     ...this.gameEntityToGame(gameEntity),
                     lastPlayed: gameEntity.lastPlayed,
-                    lastWinner: gameEntity.lastWinner
+                    lastWinner: gameEntity.lastWinner,
+                    createdAt: gameEntity.createdAt,
+                    playedMatchCount: gameEntity.playedMatchCount
                 }
                 return game
             })

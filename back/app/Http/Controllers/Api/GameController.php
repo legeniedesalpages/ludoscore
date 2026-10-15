@@ -38,6 +38,13 @@ class GameController extends Controller
                     ->orderByDesc('matches.started_at')
                     ->limit(1);
             }, 'last_played')
+            ->selectSub(function($query) {
+                $query->from('matches')
+                    ->whereColumn('matches.game_id', 'games.id')
+                    ->where('matches.canceled', false)
+                    ->where('matches.running', false)
+                    ->selectRaw('COUNT(*)');
+            }, 'played_match_count')
             ->orderBy('games.created_at', 'desc')
             ->get();
 
