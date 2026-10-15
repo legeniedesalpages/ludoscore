@@ -28,6 +28,7 @@ export interface MatchModel {
     winningTeam?: Team
     drawBreaker?: ChoosedDrawBreaker
     canceled?: boolean
+    running?: boolean
     cancelReason?: string
 }
 

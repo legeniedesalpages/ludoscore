@@ -56,6 +56,9 @@ Route::middleware('auth:sanctum')->get('/game-match-count', [GameMatchController
 
 Route::middleware('auth:sanctum')->post('/game-match/{id}/photo', [GameMatchController::class, 'storePhoto']);
 Route::middleware('auth:sanctum')->get('/game-match/{id}/photo', [GameMatchController::class, 'showPhoto']);
+Route::middleware('auth:sanctum')->delete('/game-match/{id}/photo', [GameMatchController::class, 'destroyPhoto']);
+
+Route::middleware('auth:sanctum')->put('/game-match/{id}/history', [GameMatchController::class, 'updateHistory']);
 
 Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 /*

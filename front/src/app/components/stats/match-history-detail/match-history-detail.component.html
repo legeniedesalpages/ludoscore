@@ -5,14 +5,20 @@
 
     <ng-container role="footer">
         <div class="validate-div">
-            <button mat-raised-button class="validate-button" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
+            @if (editing()) {
+                <button mat-raised-button class="validate-button" [disabled]="saving() || form?.invalid" (click)="save()">Enregistrer les modifications</button>
+                <button mat-button class="validate-button" [disabled]="saving()" (click)="cancelEditing()">Annuler</button>
+            } @else {
+                <button mat-raised-button class="validate-button" [disabled]="!matchModel()" (click)="startEditing()">Modifier</button>
+                <button mat-raised-button class="validate-button" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
+            }
         </div>
     </ng-container>
 
     <ng-container role="body">
-        <loading-spinner [loading]="loading" caption="Chargement de la partie"></loading-spinner>
+        <loading-spinner [loading]="loading || saving()" [caption]="saving() ? 'Enregistrement de la partie' : 'Chargement de la partie'"></loading-spinner>
 
-        @if (match | async; as match) {
+        @if (matchModel(); as match) {
             <div class="container">
 
                 <div class="game"
@@ -33,6 +39,98 @@
                         <span [innerHtml]="formatter.line(match)"></span>
                     </div>
 
+                    @if (editing() && form) {
+                        <form class="edit-form" [formGroup]="form">
+                            <div class="edit-dates">
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Début</mat-label>
+                                    <input matInput type="datetime-local" step="1" formControlName="startedAt">
+                                    @if (form.get('startedAt')?.hasError('required')) {
+                                        <mat-error>La date de début est obligatoire</mat-error>
+                                    }
+                                </mat-form-field>
+
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Fin</mat-label>
+                                    <input matInput type="datetime-local" step="1" formControlName="endedAt">
+                                    <button mat-icon-button matSuffix type="button" aria-label="Supprimer la date de fin" (click)="clearEndDate()">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                    <mat-hint>{{ form.get('endedAt')?.value ? '' : '(non déterminé)' }}</mat-hint>
+                                </mat-form-field>
+
+                                @if (form.hasError('endBeforeStart')) {
+                                    <div class="form-error">La date de fin doit être postérieure à la date de début</div>
+                                }
+                            </div>
+
+                            <div formArrayName="teams">
+                                @for (teamGroup of teamsArray.controls; track $index; let i = $index) {
+                                    <div class="team-edit" [formGroupName]="i">
+                                        <div class="team-name">
+                                            {{ match.teams[i].name }}
+                                            @if (match.teams[i].id == match.winningTeam?.id) {
+                                                <span class="accent">(Gagnant)</span>
+                                            }
+                                        </div>
+
+                                        @if (match.teams[i].scoreDetails.length > 0) {
+                                            <div formArrayName="details">
+                                                @for (detail of match.teams[i].scoreDetails; track $index; let j = $index) {
+                                                    <mat-form-field appearance="fill">
+                                                        <mat-label>{{ detail.categoryName }}</mat-label>
+                                                        <input matInput type="number" step="1" [formControlName]="j">
+                                                    </mat-form-field>
+                                                }
+                                            </div>
+                                            <div class="score">Total: <b>{{ teamTotal(i) }}</b></div>
+                                        } @else {
+                                            <mat-form-field appearance="fill">
+                                                <mat-label>Score</mat-label>
+                                                <input matInput type="number" step="1" formControlName="score">
+                                            </mat-form-field>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="winner-edit">
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Gagnant</mat-label>
+                                    <mat-select formControlName="winnerTeamId">
+                                        <mat-option [value]="null">Aucun</mat-option>
+                                        @for (team of match.teams; track team.id) {
+                                            <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                                <button mat-button type="button" (click)="recomputeWinner()">
+                                    <mat-icon>calculate</mat-icon> Déterminer selon les scores
+                                </button>
+                            </div>
+
+                            <div class="photo-edit">
+                                <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)">
+                                @let shownPhoto = pendingPhotoUrl() ?? (photoRemoved() ? null : photoUrl());
+                                @if (shownPhoto) {
+                                    <img class="match-photo" [src]="shownPhoto" alt="Photo de la partie">
+                                    <div class="photo-buttons">
+                                        <button mat-stroked-button type="button" (click)="photoInput.click()">
+                                            <mat-icon>photo_camera</mat-icon> Changer la photo
+                                        </button>
+                                        <button mat-stroked-button type="button" (click)="removePhoto()">
+                                            <mat-icon>delete</mat-icon> Retirer la photo
+                                        </button>
+                                    </div>
+                                } @else {
+                                    <button mat-stroked-button type="button" (click)="photoInput.click()">
+                                        <mat-icon>photo_camera</mat-icon> Ajouter une photo
+                                    </button>
+                                }
+                            </div>
+                        </form>
+                    }
+
+                    @if (!editing()) {
                     <div class="team-list">
                         @for (team of match.teams; track team) {
                             <div class="row">
@@ -78,8 +176,9 @@
                             </div>
                         }
                     </div>
+                    }
 
-                    @if (photoUrl$ | async; as photoUrl) {
+                    @if (!editing() && photoUrl(); as photoUrl) {
                         <img class="match-photo" [src]="photoUrl" alt="Photo de la partie">
                     }
                 </div>

@@ -47,7 +47,10 @@ export class StatisticsByGameComponent implements OnInit {
     this.store.dispatch(new Navigate(['/statistics']))
   }
 
-  public formatMinutes(value: number): string {
+  public formatMinutes(value: number | null | undefined): string {
+    if (value == null) {
+      return '(non déterminé)'
+    }
     if (value <= 0) {
       return '0 min'
     }

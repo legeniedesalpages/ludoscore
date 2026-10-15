@@ -12,7 +12,7 @@ export interface StatisticsOverviewApi {
   totalMatches: number
   totalGames: number
   totalPlayers: number
-  averageDurationMinutes: number
+  averageDurationMinutes: number | null
   mostPlayedGame: { name: string; value: number }
   bestPlayer: string
   gameRanking: Array<{ name: string; value: number }>
@@ -24,7 +24,7 @@ export interface StatisticsGameApi {
   data: Array<{
     title: string
     matches: number
-    averageDurationMinutes: number
+    averageDurationMinutes: number | null
     averageScoreGap: number
     averageWaitDays: number
     winner: string

@@ -40,9 +40,17 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         return this.http.post<void>(`${this.apiUrl}${this.base}/${matchId}/photo`, formData)
     }
 
+    deletePhoto(matchId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}${this.base}/${matchId}/photo`)
+    }
+
     getPhoto(matchId: number): Observable<Blob | null> {
         return this.http.get(`${this.apiUrl}${this.base}/${matchId}/photo`, { responseType: 'blob' })
             .pipe(map(blob => blob && blob.size > 0 ? blob : null))
+    }
+
+    updateHistory(matchId: number, payload: unknown): Observable<void> {
+        return this.http.put<void>(`${this.apiUrl}${this.base}/${matchId}/history`, payload)
     }
 
     findAllCount(): Observable<number> {

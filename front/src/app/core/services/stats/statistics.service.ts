@@ -15,7 +15,7 @@ export interface PlayerStats {
 export interface GameStats {
   title: string
   matches: number
-  averageDurationMinutes: number
+  averageDurationMinutes: number | null
   averageScoreGap: number
   averageWaitDays: number
   winner: string
@@ -38,7 +38,7 @@ export interface StatisticsDashboard {
   totalMatches: number
   totalGames: number
   totalPlayers: number
-  averageDurationMinutes: number
+  averageDurationMinutes: number | null
   mostPlayedGame: string
   bestPlayer: string
   topGames: TopBarItem[]
@@ -62,7 +62,7 @@ export class StatisticsService {
           totalMatches: overview.totalMatches ?? 0,
           totalGames: overview.totalGames ?? 0,
           totalPlayers: overview.totalPlayers ?? 0,
-          averageDurationMinutes: overview.averageDurationMinutes ?? 0,
+          averageDurationMinutes: overview.averageDurationMinutes ?? null,
           mostPlayedGame: overview.mostPlayedGame?.name ?? 'Aucun',
           bestPlayer: overview.bestPlayer ?? 'Aucun',
           topGames: (overview.gameRanking ?? []).map((item: any, index: number) => ({

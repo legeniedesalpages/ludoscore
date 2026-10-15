@@ -18,8 +18,17 @@ import { MatchModel, Team } from '../../model/match.model'
 import { TeamCrudService } from '../crud/team-crud.service'
 import { environment } from 'src/environments/environment'
 import { ColorTag, NO_COLOR, Tag } from '../../model/tag.model'
-import { ScoreTag } from '../../model/score.model'
+import { Score, ScoreTag } from '../../model/score.model'
 import { DrawBreaker } from '../../model/game.model'
+
+// Dates au format serveur "YYYY-MM-DD HH:mm:ss" ; finishedAt peut être nul (durée non déterminée)
+export interface MatchHistoryUpdate {
+    matchId: number
+    startedAt: string
+    finishedAt: string | null
+    winnerTeamId: number | null
+    teams: { id: number, score: number | null, scoreDetails: Score[] }[]
+}
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -29,6 +38,10 @@ export class MatchService {
 
     public uploadMatchPhoto(matchId: number, photo: Blob): Observable<void> {
         return this.matchCrudService.uploadPhoto(matchId, photo)
+    }
+
+    public deleteMatchPhoto(matchId: number): Observable<void> {
+        return this.matchCrudService.deletePhoto(matchId)
     }
 
     public getMatchPhoto(matchId: number): Observable<Blob | null> {
@@ -119,10 +132,37 @@ export class MatchService {
         }))
     }
 
+    // Les équipes ne sont pas converties en camelCase par l'API : on accepte les deux écritures
+    private parseScoreDetails(raw: unknown): Score[] {
+        if (!raw) {
+            return []
+        }
+        try {
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+            return Array.isArray(parsed) ? parsed : []
+        } catch {
+            return []
+        }
+    }
+
+    public updateMatchHistory(match: MatchHistoryUpdate): Observable<void> {
+        return this.matchCrudService.updateHistory(match.matchId, {
+            started_at: match.startedAt,
+            finished_at: match.finishedAt,
+            winner_team_id: match.winnerTeamId,
+            teams: match.teams.map(team => ({
+                id: team.id,
+                score: team.score,
+                score_details: team.scoreDetails
+            }))
+        })
+    }
+
     private matchEntityToModel(matchEntity: any): MatchModel {
         const matchModel: MatchModel = {
             matchId: matchEntity.idMatch,
             canceled: matchEntity.canceled,
+            running: !!matchEntity.running,
             game: {
                 id: matchEntity.gameId,
                 title: matchEntity.title,
@@ -151,7 +191,7 @@ export class MatchService {
                     choosenTags: teamEntity.tags ? JSON.parse(teamEntity.tags) : [] as Tag[],
                     color: NO_COLOR,
                     score: teamEntity.score,
-                    scoreDetails: [],
+                    scoreDetails: this.parseScoreDetails(teamEntity.scoreDetails ?? teamEntity.score_details),
                     teamPlayers: []
                 }
                 return team

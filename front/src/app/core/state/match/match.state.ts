@@ -19,6 +19,7 @@ import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
 import { MatchEntity } from "../../entity/match-entity.model"
 import { lastValueFrom } from "rxjs"
+import { determineWinner } from "../../utils/winner"
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 
@@ -575,17 +576,8 @@ export class MatchState {
     }
 
 
-    // Vainqueur uniquement si toutes les équipes ont un score ; le critère dépend du jeu (plus haut ou plus bas score)
     private determineWinner(teams: Team[], highestScoreWin: boolean | undefined): Team | undefined {
-        if (teams.length === 0 || teams.some(team => team.score == undefined || Number.isNaN(Number(team.score)))) {
-            return undefined
-        }
-        const highestWins = highestScoreWin ?? true
-        return teams.reduce((best, current) => {
-            const bestScore = Number(best.score)
-            const currentScore = Number(current.score)
-            return (highestWins ? currentScore > bestScore : currentScore < bestScore) ? current : best
-        })
+        return determineWinner(teams, highestScoreWin)
     }
 
     private checkIntegrityOfTeam(state: MatchStateModel, teamToCheck: Team): boolean {

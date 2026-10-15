@@ -18,6 +18,8 @@ import { DatePipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { MatchModel } from '../../model/match.model'
 
+export const NOT_DETERMINED = '(non déterminé)'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,12 +42,17 @@ export class MatchFormatterService {
     
     if (match.canceled) {
       const cancelledText = "<span class='accent'>Annulée</span>"
-      headline = `${cancelledText} le ${this.datePipe.transform(match.endedAt, 'dd/MM/yyyy')} à ${this.datePipe.transform(match.endedAt, 'HH:mm')}`
-    } else if (!match.endedAt) {
+      headline = match.endedAt
+        ? `${cancelledText} le ${this.datePipe.transform(match.endedAt, 'dd/MM/yyyy')} à ${this.datePipe.transform(match.endedAt, 'HH:mm')}`
+        : `${cancelledText} le ${this.datePipe.transform(match.startedAt, 'dd/MM/yyyy') ?? NOT_DETERMINED}`
+    } else if (!match.endedAt && (match.running ?? true)) {
       const ongoingText = "<span class='emphase'>En cours</span>"
-      headline = `${ongoingText} depuis ${this.elapsedTime(match.startedAt!, new Date())}`
+      const sinceStart = this.elapsedTime(match.startedAt, new Date())
+      headline = sinceStart === NOT_DETERMINED ? ongoingText : `${ongoingText} depuis ${sinceStart}`
     } else {
-      headline = `Jouée le ${this.datePipe.transform(match.endedAt, 'dd/MM/yyyy')} en ${this.elapsedTime(match.startedAt!, new Date(match.endedAt))}`
+      const playedDate = this.datePipe.transform(match.endedAt ?? match.startedAt, 'dd/MM/yyyy') ?? NOT_DETERMINED
+      const duration = match.endedAt ? this.elapsedTime(match.startedAt, new Date(match.endedAt)) : NOT_DETERMINED
+      headline = duration === NOT_DETERMINED ? `Jouée le ${playedDate}` : `Jouée le ${playedDate} en ${duration}`
     }
 
     return headline;
@@ -64,12 +71,19 @@ export class MatchFormatterService {
 }
 
   /**
-   * Calculates and formats the elapsed time between two dates
+   * Calculates and formats the elapsed time between two dates.
+   * Returns "(non déterminé)" when a date is missing/invalid or when the end precedes the start.
    */
-  public elapsedTime(startDate: Date, endDate: Date): string {
-    let t = endDate.getTime() - new Date(startDate).getTime();
-    let minutes = "" + Math.floor((t / (1000 * 60)) % 60);
-    let hours = "" + Math.floor((t / (1000 * 60 * 60)) % 24);
+  public elapsedTime(startDate: Date | string | undefined | null, endDate: Date | string | undefined | null): string {
+    if (!startDate || !endDate) {
+      return NOT_DETERMINED
+    }
+    const t = new Date(endDate).getTime() - new Date(startDate).getTime()
+    if (Number.isNaN(t) || t < 0) {
+      return NOT_DETERMINED
+    }
+    const minutes = "" + Math.floor((t / (1000 * 60)) % 60)
+    const hours = "" + Math.floor(t / (1000 * 60 * 60))
     
     if (hours === "0") {
       return minutes + " minutes";

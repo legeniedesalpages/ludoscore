@@ -64,6 +64,15 @@ class GameMatchController extends Controller
         return response()->noContent();
     }
 
+    public function destroyPhoto($id)
+    {
+        $gameMatch = GameMatch::findOrFail($id);
+        Log::info("Suppression de la photo du match id : " . $id);
+        MatchPhoto::where('match_id', $gameMatch->id)->delete();
+
+        return response()->noContent();
+    }
+
     public function showPhoto($id)
     {
         $photo = MatchPhoto::where('match_id', $id)->first();
@@ -120,6 +129,57 @@ class GameMatchController extends Controller
         $gameMatch->save();
 
         return $gameMatch;
+    }
+
+    /**
+     * Correction a posteriori d'une partie de l'historique : dates (la date de fin peut être nulle),
+     * scores des équipes et vainqueur.
+     */
+    public function updateHistory(Request $request, $id)
+    {
+        $gameMatch = GameMatch::findOrFail($id);
+
+        $data = $request->validate([
+            'started_at' => ['required', 'date_format:Y-m-d H:i:s'],
+            'finished_at' => ['nullable', 'date_format:Y-m-d H:i:s', 'after_or_equal:started_at'],
+            'winner_team_id' => ['nullable', 'integer'],
+            'teams' => ['required', 'array'],
+            'teams.*.id' => ['required', 'integer'],
+            'teams.*.score' => ['nullable', 'integer', 'between:-32768,32767'],
+            'teams.*.score_details' => ['nullable', 'array'],
+        ]);
+
+        $teamIds = DB::table('teams')->where('match_id', $gameMatch->id)->pluck('id')->all();
+        foreach ($data['teams'] as $team) {
+            if (!in_array($team['id'], $teamIds)) {
+                abort(422, "L'équipe " . $team['id'] . " n'appartient pas à cette partie");
+            }
+        }
+        $winnerTeamId = $data['winner_team_id'] ?? null;
+        if ($winnerTeamId !== null && !in_array($winnerTeamId, $teamIds)) {
+            abort(422, "L'équipe gagnante n'appartient pas à cette partie");
+        }
+
+        Log::info("Update history of match id : " . $id);
+        DB::transaction(function () use ($gameMatch, $data, $winnerTeamId) {
+            $gameMatch->started_at = $data['started_at'];
+            $gameMatch->finished_at = $data['finished_at'] ?? null;
+            $gameMatch->winner_team_id = $winnerTeamId;
+            $gameMatch->save();
+
+            foreach ($data['teams'] as $teamData) {
+                $team = Team::find($teamData['id']);
+                $team->score = $teamData['score'] ?? null;
+                if (array_key_exists('score_details', $teamData)) {
+                    $team->score_details = $teamData['score_details'] === null
+                        ? null
+                        : json_encode($teamData['score_details']);
+                }
+                $team->save();
+            }
+        });
+
+        return response()->json(['id' => $gameMatch->id]);
     }
 
     public function store(Request $request)

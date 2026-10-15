@@ -40,7 +40,7 @@ class StatisticsController extends Controller
             }
         }
 
-        $averageDurationMinutes = count($durationValues) > 0 ? (int) round(array_sum($durationValues) / count($durationValues)) : 0;
+        $averageDurationMinutes = count($durationValues) > 0 ? (int) round(array_sum($durationValues) / count($durationValues)) : null;
 
         $gameCount = [];
         foreach ($matches as $match) {
@@ -164,7 +164,7 @@ class StatisticsController extends Controller
             }
 
             $winner = $data['winners'] ? array_key_first($data['winners']) : 'Aucun';
-            $averageDuration = count($data['durations']) > 0 ? round(array_sum($data['durations']) / count($data['durations'])) : 0;
+            $averageDuration = count($data['durations']) > 0 ? round(array_sum($data['durations']) / count($data['durations'])) : null;
             $averageGap = count($data['scoreGaps']) > 0 ? round(array_sum($data['scoreGaps']) / count($data['scoreGaps'])) : 0;
             $averageWait = count($waitDays) > 0 ? round(array_sum($waitDays) / count($waitDays), 1) : 0;
 

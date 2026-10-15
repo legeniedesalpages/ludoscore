@@ -133,6 +133,40 @@ ul {
 .validate-div {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edit-form {
+  padding: 10px 16px;
+}
+
+.edit-dates, .team-edit {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-edit {
+  margin-top: 12px;
+}
+
+.form-error {
+  color: #f44336;
+  font-size: small;
+}
+
+.winner-edit, .photo-edit {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.photo-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .validate-button {
