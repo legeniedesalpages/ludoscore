@@ -19,6 +19,7 @@ import { MatchEnded, ReorderTeams } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { TeamDetailComponent } from '../team-detail/team-detail.component'
+import { Tag } from 'src/app/core/model/tag.model'
 import { ChoosenTag, MatchModel, Team } from 'src/app/core/model/match.model'
 
 @Component({
@@ -62,6 +63,15 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.markForCheck()
       }
     }, 1000)
+  }
+
+  // Catégories "révélées plus tard" : le bouton reste disponible, plusieurs valeurs pouvant être ajoutées
+  public deferredMatchTags(match: MatchModel): Tag[] {
+    return match.game.matchTags.filter(tag => tag.revealedLater)
+  }
+
+  public deferredTeamTags(match: MatchModel): Tag[] {
+    return match.game.playerTags.filter(tag => tag.revealedLater)
   }
 
   public startEdit() {

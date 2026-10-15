@@ -15,6 +15,13 @@
                 </li>
             </ul>
 
+            <div class="pending-tags" *ngIf="!editing && deferredMatchTags((matchState | async)!.match!).length > 0">
+                <button mat-stroked-button *ngFor="let tag of deferredMatchTags((matchState | async)!.match!)"
+                    (click)="startEdit()">
+                    <mat-icon>visibility</mat-icon> Renseigner : {{ tag.category }}
+                </button>
+            </div>
+
             <div class="elapsedtime">
                 Temps écoulé :<br />
                 <span class="bold">{{ elapsedTime }}</span>
@@ -75,6 +82,13 @@
                                                     [ngStyle]="{'background-color': team.color.code, 'color': team.color.invert}"></span>
                                             </span>
                                         </div>
+                                    </div>
+                                    <div class="pending-tags" *ngIf="deferredTeamTags((matchState | async)!.match!).length > 0">
+                                        <button mat-stroked-button
+                                            *ngFor="let tag of deferredTeamTags((matchState | async)!.match!)"
+                                            (click)="$event.stopPropagation(); startEdit()">
+                                            <mat-icon>visibility</mat-icon> Renseigner : {{ tag.category }}
+                                        </button>
                                     </div>
                                     <div class="tags">
                                         <ul *ngFor="let tag of team.choosenTags">

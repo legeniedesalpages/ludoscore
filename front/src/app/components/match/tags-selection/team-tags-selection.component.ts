@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subject, Subscription } from 'rxjs'
 import { ChoosenTag, MatchModel, Team } from 'src/app/core/model/match.model'
-import { Tag } from 'src/app/core/model/tag.model'
+import { Tag, TagPhase, tagsForPhase } from 'src/app/core/model/tag.model'
 import { UpdateTeamTags } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 
@@ -36,6 +36,16 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
   @Input() teamChoosenTags!: ChoosenTag[][];
   @Input() saving!: Subject<boolean>;
   @Input() randomize!: Subject<boolean>;
+  @Input() phase: TagPhase = 'all'
+  private allTags: Tag[] = []
+
+  public get hasHiddenTags(): boolean {
+    return this.tags.length < this.allTags.length
+  }
+
+  public showHiddenTags() {
+    this.tags = this.allTags
+  }
   
 
   public tags: Tag[]
@@ -49,6 +59,8 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.allTags = this.tags
+    this.tags = tagsForPhase(this.allTags, this.phase)
 
     if (this.teamChoosenTags == undefined) {
       const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)

@@ -32,7 +32,7 @@
                 </span>
             </h2>
             <div class="list-tag-container">
-                <game-tags-selection [saving]="saving" [randomize]="randomizeAllMatchTagObservable"/>
+                <game-tags-selection phase="initial" [saving]="saving" [randomize]="randomizeAllMatchTagObservable"/>
             </div>
         </div>
 
@@ -58,7 +58,7 @@
             <div *ngFor="let team of (matchState | async)?.match!.teams">
                 <h3>{{ team.name }}</h3>
                 <div class="list-tag-container">
-                    <team-tags-selection [teamIndex]="(matchState | async)!.match!.teams.indexOf(team)"
+                    <team-tags-selection phase="initial" [teamIndex]="(matchState | async)!.match!.teams.indexOf(team)"
                         [saving]="saving" [randomize]="randomizeAllTeamTagObservable" [teamChoosenTags]="teamChoosenTags"/>
                 </div>
             </div>

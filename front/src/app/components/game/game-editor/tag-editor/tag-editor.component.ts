@@ -58,7 +58,8 @@ export class TagEditorComponent implements OnInit {
       unique: true,
       names: [],
       minOcurrences: 1,
-      maxOcurrences: 1
+      maxOcurrences: 1,
+      revealedLater: false
     }
     this.openDialog(tag, -1)
   }
@@ -142,7 +143,8 @@ export class DialogTagEditorComponent {
       unique: this.tagEditorForm.get('unique')?.value,
       names: this.values,
       minOcurrences: this.tagEditorForm.get('minOcurrences')?.value,
-      maxOcurrences: this.tagEditorForm.get('maxOcurrences')?.value
+      maxOcurrences: this.tagEditorForm.get('maxOcurrences')?.value,
+      revealedLater: !!this.tagEditorForm.get('revealedLater')?.value
     })
   }
 
@@ -150,6 +152,7 @@ export class DialogTagEditorComponent {
     this.tagEditorForm = new FormGroup({
       category: new FormControl(data.category, Validators.required),
       unique: new FormControl(data.unique, Validators.required),
+      revealedLater: new FormControl(!!data.revealedLater),
       minOcurrences: new FormControl(data.minOcurrences, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxOcurrences: new FormControl(data.maxOcurrences, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)])
     })

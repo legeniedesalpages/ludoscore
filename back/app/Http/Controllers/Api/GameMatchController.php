@@ -124,6 +124,9 @@ class GameMatchController extends Controller
         $gameMatch->running = $request->running;
         $gameMatch->canceled = $request->canceled;
         $gameMatch->winner_team_id = $request->winner_team_id;
+        if ($request->has('tags')) {
+            $gameMatch->tags = $request->tags;
+        }
         Log::info("winner_team_id : " . $gameMatch->winner_team_id);
         $gameMatch->finished_at = now(); //Carbon::createFromFormat('Y-m-d\TH:i:s+', $request->finished_at);
         $gameMatch->save();

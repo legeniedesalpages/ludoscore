@@ -153,3 +153,11 @@ ul {
 .list-tag-container {
   padding: 10px;
 }
+
+.pending-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0;
+}

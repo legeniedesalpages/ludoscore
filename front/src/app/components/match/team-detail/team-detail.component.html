@@ -13,7 +13,7 @@
             </mat-select>
         </mat-form-field>
 
-        <team-tags-selection [teamIndex]="(match | async)!.teams.indexOf(team)" [saving]="saving"/>
+        <team-tags-selection phase="initial" [teamIndex]="(match | async)!.teams.indexOf(team)" [saving]="saving"/>
     </fieldset>
 </mat-dialog-content>
 

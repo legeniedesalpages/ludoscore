@@ -16,6 +16,14 @@ export interface Tag {
     minOcurrences: number
     maxOcurrences: number
     names: string[]
+    // Catégorie non renseignée au début de la partie, révélée plus tard
+    revealedLater?: boolean
+}
+
+export type TagPhase = 'initial' | 'all'
+
+export function tagsForPhase(tags: Tag[], phase: TagPhase): Tag[] {
+    return phase === 'initial' ? tags.filter(tag => !tag.revealedLater) : tags
 }
 
 export interface ColorTag {

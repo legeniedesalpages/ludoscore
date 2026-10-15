@@ -27,7 +27,7 @@ import { TagsSelectionModule } from '../tags-selection/tags-selection.module'
 
     <mat-dialog-content class="dialog row">
         <fieldset>
-            <game-tags-selection [saving]="saving"/>
+            <game-tags-selection phase="initial" [saving]="saving"/>
         </fieldset>
     </mat-dialog-content>
 

@@ -31,4 +31,7 @@
             </div>
         </div>
     </div>
+    <button mat-stroked-button type="button" class="hidden-tags" *ngIf="hasHiddenTags" (click)="showHiddenTags()">
+        <mat-icon>visibility</mat-icon> Catégories à renseigner plus tard
+    </button>
 </div>
