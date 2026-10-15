@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, Input, Inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, Inject } from '@angular/core'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
@@ -34,7 +34,7 @@ export class DrawEditorComponent {
   @Input()
   public title: string = ''
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) { }
 
   public removeTag(tag: DrawBreaker): void {
     const index = this.drawBreakerList.indexOf(tag)
@@ -68,6 +68,7 @@ export class DrawEditorComponent {
       } else {
         this.drawBreakerList[index] = result
       }
+      this.changeDetectorRef.markForCheck()
     })
   }
 }

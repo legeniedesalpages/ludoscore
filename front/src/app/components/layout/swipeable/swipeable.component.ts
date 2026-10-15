@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter, inject } from '@angular/core'
 import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs'
 
 interface MoveEvent {
@@ -41,6 +41,8 @@ export interface WipeActionStyle {
   standalone: false
 })
 export class SwipeableComponent implements OnInit {
+
+  private readonly changeDetectorRef = inject(ChangeDetectorRef)
 
   @HostListener('window:scroll')
   onScroll() {
@@ -163,16 +165,28 @@ export class SwipeableComponent implements OnInit {
 
   private applyLeftSwipe() {
     this.backDiv.nativeElement.style.backgroundColor = this.leftWipeStyle?.backgroundColor!
-    this.icon = this.leftWipeStyle?.icon!
-    this.text = this.leftWipeStyle?.text!
+    const icon = this.leftWipeStyle?.icon!
+    const text = this.leftWipeStyle?.text!
+    const changed = this.icon !== icon || this.text !== text
+    this.icon = icon
+    this.text = text
     this.actionDiv.nativeElement.style.flexDirection = 'row'
+    if (changed) {
+      this.changeDetectorRef.markForCheck()
+    }
   }
 
   private applyRightSwipe() {
     this.backDiv.nativeElement.style.backgroundColor = this.rightWipeStyle?.backgroundColor!
-    this.icon = this.rightWipeStyle?.icon!
-    this.text = this.rightWipeStyle?.text!
+    const icon = this.rightWipeStyle?.icon!
+    const text = this.rightWipeStyle?.text!
+    const changed = this.icon !== icon || this.text !== text
+    this.icon = icon
+    this.text = text
     this.actionDiv.nativeElement.style.flexDirection = 'row-reverse'
+    if (changed) {
+      this.changeDetectorRef.markForCheck()
+    }
   }
 
   private applyFading(positionX: number, startPositionX: number) {

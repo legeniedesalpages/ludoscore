@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, Input, Inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, Input, Inject } from '@angular/core'
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
@@ -36,7 +36,7 @@ export class ScoreTagEditorComponent implements OnInit {
   @Input()
   public title: string = ''
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     console.log("Score tags", this.tags)
@@ -79,6 +79,7 @@ export class ScoreTagEditorComponent implements OnInit {
       } else {
         this.tags[index] = result
       }
+      this.changeDetectorRef.markForCheck()
     })
   }
 }

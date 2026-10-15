@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 
-import { NgModule, isDevMode, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
+import { NgModule, isDevMode, LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi, withXsrfConfiguration } from "@angular/common/http";
@@ -48,7 +48,7 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
   ],
 
   providers: [
-    provideZoneChangeDetection(),
+    provideZonelessChangeDetection(),
     { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
     PusherService,
     provideHttpClient(

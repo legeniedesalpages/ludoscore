@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { AsyncPipe, CommonModule, NgStyle } from '@angular/common'
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
 import { MatDividerModule } from '@angular/material/divider'
@@ -53,14 +53,16 @@ export class MatchHistoryDetailComponent implements OnInit {
   public loading: boolean = true
 
   private sanitizer = inject(DomSanitizer)
+  private changeDetectorRef = inject(ChangeDetectorRef)
 
   ngOnInit(): void {
     this.match = this.route.paramMap.pipe(switchMap(params => {
       const id = Number(params.get('id'))
       console.log("id match:", id)
-      return this.matchService.getMatch(id).pipe(tap(_ =>
+      return this.matchService.getMatch(id).pipe(tap(() => {
         this.loading = false
-      ))
+        this.changeDetectorRef.markForCheck()
+      }))
     }))
 
     this.photoUrl$ = this.route.paramMap.pipe(

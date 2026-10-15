@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
@@ -26,6 +26,7 @@ import { FindGameService } from 'src/app/core/services/game/find-game.service'
 })
 export class FindGameComponent {
 
+  private readonly changeDetectorRef = inject(ChangeDetectorRef)
   public searching: boolean
 
   constructor(public findGameService: FindGameService, private store: Store, private snackBar: MatSnackBar) {
@@ -51,6 +52,7 @@ export class FindGameComponent {
     this.findGameService.search().subscribe({
       next: (_) => {
         console.info("Number of found game: " + this.findGameService.searchResult.length)
+        this.changeDetectorRef.markForCheck()
         if (this.findGameService.searchResult.length === 0) {
           this.snackBar.open("Aucun jeu trouvé", 'Fermer', {
             duration: 5000
@@ -59,12 +61,15 @@ export class FindGameComponent {
       },
       error: (error: any) => {
         this.findGameService.resetSearch()
+        this.searching = false
+        this.changeDetectorRef.markForCheck()
         this.snackBar.open("Erreur:" + error, 'Fermer', {
           duration: 10000
         })
       },
       complete: () => {
         this.searching = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }

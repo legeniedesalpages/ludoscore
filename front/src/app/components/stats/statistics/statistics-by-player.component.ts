@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterModule } from '@angular/router'
@@ -20,6 +20,7 @@ import { PlayerStats, StatisticsService } from 'src/app/core/services/stats/stat
 export class StatisticsByPlayerComponent implements OnInit {
   private store = inject(Store)
   private statisticsService = inject(StatisticsService)
+  private changeDetectorRef = inject(ChangeDetectorRef)
   private destroy$ = new Subject<void>()
 
   public players: PlayerStats[] = []
@@ -33,6 +34,7 @@ export class StatisticsByPlayerComponent implements OnInit {
         this.loading = result.loading
         this.error = result.error
         this.players = result.data ?? []
+        this.changeDetectorRef.markForCheck()
       })
   }
 

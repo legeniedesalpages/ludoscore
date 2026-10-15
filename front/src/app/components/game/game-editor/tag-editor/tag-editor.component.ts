@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, Input, Inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, Input, Inject } from '@angular/core'
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { Tag } from 'src/app/core/model/tag.model'
@@ -35,7 +35,7 @@ export class TagEditorComponent implements OnInit {
   @Input()
   public title: string = ''
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     console.log("tags", this.tags)
@@ -77,6 +77,7 @@ export class TagEditorComponent implements OnInit {
       } else {
         this.tags[index] = result
       }
+      this.changeDetectorRef.markForCheck()
     })
   }
 }

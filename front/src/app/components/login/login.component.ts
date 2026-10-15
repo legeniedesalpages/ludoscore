@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit {
   public errorMessage: any
   public loading: boolean
 
-  constructor(private store: Store, private router: Router) {
+  constructor(private store: Store, private router: Router, private changeDetectorRef: ChangeDetectorRef) {
    
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.email, Validators.required]),
@@ -67,6 +67,7 @@ export class LoginComponent implements OnInit {
         this.errors = true
         this.errorMessage = "login ou mot de passe inccorect"
         this.loading = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterModule } from '@angular/router'
@@ -20,6 +20,7 @@ import { StatisticsDashboard, StatisticsService } from 'src/app/core/services/st
 export class StatisticsOverviewComponent implements OnInit {
   private store = inject(Store)
   private statisticsService = inject(StatisticsService)
+  private changeDetectorRef = inject(ChangeDetectorRef)
   private destroy$ = new Subject<void>()
 
   public dashboard: StatisticsDashboard | null = null
@@ -33,6 +34,7 @@ export class StatisticsOverviewComponent implements OnInit {
         this.loading = result.loading
         this.error = result.error
         this.dashboard = result.dashboard
+        this.changeDetectorRef.markForCheck()
       })
   }
 

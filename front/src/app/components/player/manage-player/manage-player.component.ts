@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { first, forkJoin } from 'rxjs'
@@ -32,7 +32,7 @@ export class ManagePlayerComponent implements OnInit {
   public loading: boolean = true
   public isAdmin: boolean = false
 
-  constructor(private store: Store, private playerService: PlayerCrudService, private userService: UserCrudService) {
+  constructor(private store: Store, private playerService: PlayerCrudService, private userService: UserCrudService, private changeDetectorRef: ChangeDetectorRef) {
     this.playerEntities = []
   }
 
@@ -44,6 +44,7 @@ export class ManagePlayerComponent implements OnInit {
       this.playerEntities = actions.playerEntities
       this.loading = false
       this.isAdmin = actions.user.isAdmin
+      this.changeDetectorRef.markForCheck()
     })
   }
 

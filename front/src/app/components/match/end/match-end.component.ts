@@ -12,7 +12,7 @@
 **/
 import { A11yModule } from '@angular/cdk/a11y'
 import { CommonModule } from '@angular/common'
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatButtonToggleModule } from '@angular/material/button-toggle'
@@ -70,6 +70,7 @@ export class MatchEndComponent implements OnInit {
   private snackBar: MatSnackBar = inject(MatSnackBar)
   private dialog: MatDialog = inject(MatDialog)
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute)
+  private changeDetectorRef = inject(ChangeDetectorRef)
 
 
   ngOnInit(): void {
@@ -91,6 +92,7 @@ export class MatchEndComponent implements OnInit {
     
     this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(({ result }) => {
       this.saving = false
+      this.changeDetectorRef.markForCheck()
       const error = result.error as any
       const detail = error?.error?.message ?? error?.message ?? String(error)
       const status = error?.status ? ` (HTTP ${error.status})` : ''
@@ -109,6 +111,7 @@ export class MatchEndComponent implements OnInit {
 
     this.actions.pipe(ofActionSuccessful(SaveMatchResult)).subscribe(() => {
       this.saving = false
+      this.changeDetectorRef.markForCheck()
       this.snackBar.open("Partie enregistrée ! à bientôt sur Ludoscore ;-)", 'Fermer', {
         duration: 5000
       })
@@ -117,6 +120,7 @@ export class MatchEndComponent implements OnInit {
 
     this.actions.pipe(ofActionCompleted(MatchAborted)).subscribe(() => {
       this.saving = false
+      this.changeDetectorRef.markForCheck()
       this.snackBar.open("Partie abandonnée !", 'Fermer', {
         duration: 5000
       })
@@ -125,6 +129,7 @@ export class MatchEndComponent implements OnInit {
 
     this.actions.pipe(ofActionCompleted(MatchContinued)).subscribe(() => {
       this.saving = false
+      this.changeDetectorRef.markForCheck()
       this.snackBar.open("Reprise de la partie !", 'Fermer', {
         duration: 5000
       })
@@ -135,7 +140,10 @@ export class MatchEndComponent implements OnInit {
   public selectWiningTeam(team: Team) {
     console.log("choose wining team", team)
     this.saving = true
-    this.store.dispatch(new SetWinningTeam(team)).subscribe(_ => this.saving = false)
+    this.store.dispatch(new SetWinningTeam(team)).subscribe(_ => {
+      this.saving = false
+      this.changeDetectorRef.markForCheck()
+    })
   }
 
   public setTeamScore(team: Team) {
@@ -170,6 +178,7 @@ export class MatchEndComponent implements OnInit {
       dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.save()
+          this.changeDetectorRef.markForCheck()
         }
       });
     }
@@ -186,6 +195,7 @@ export class MatchEndComponent implements OnInit {
     try {
       this.photo = await resizeImage(file)
       this.setPhotoPreview(URL.createObjectURL(this.photo))
+      this.changeDetectorRef.markForCheck()
     } catch (error) {
       console.error("Impossible de traiter la photo", error)
       this.snackBar.open("Impossible de traiter cette photo", 'Fermer', { duration: 5000 })
@@ -211,16 +221,35 @@ export class MatchEndComponent implements OnInit {
     this.saving = true
 
     if (!this.photo || matchId == undefined) {
-      this.store.dispatch(new SaveMatchResult()).subscribe({ next: () => this.saving = false, error: () => this.saving = false })
+      this.store.dispatch(new SaveMatchResult()).subscribe({
+        next: () => {
+          this.saving = false
+          this.changeDetectorRef.markForCheck()
+        },
+        error: () => {
+          this.saving = false
+          this.changeDetectorRef.markForCheck()
+        }
+      })
       return
     }
 
     this.matchService.uploadMatchPhoto(matchId, this.photo).subscribe({
       next: () => {
-        this.store.dispatch(new SaveMatchResult()).subscribe({ next: () => this.saving = false, error: () => this.saving = false })
+        this.store.dispatch(new SaveMatchResult()).subscribe({
+          next: () => {
+            this.saving = false
+            this.changeDetectorRef.markForCheck()
+          },
+          error: () => {
+            this.saving = false
+            this.changeDetectorRef.markForCheck()
+          }
+        })
       },
       error: error => {
         this.saving = false
+        this.changeDetectorRef.markForCheck()
         console.error("Erreur lors de l'envoi de la photo", error)
         this.snackBar.open("Erreur lors de l'envoi de la photo : " + error.message, 'Fermer', { duration: 10000 })
       }

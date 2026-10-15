@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, inject, Inject, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Inject, OnInit } from '@angular/core'
 import { Store } from '@ngxs/store'
 import { DoLogout } from 'src/app/core/state/auth/auth.actions'
 import { AuthState } from 'src/app/core/state/auth/auth.state'
@@ -48,7 +48,7 @@ export class HomeComponent implements OnInit {
   public loading: boolean
   public notAssociated: boolean
 
-  constructor(private matchService: MatchService, private userService: UserCrudService, private store: Store, private dialog: MatDialog, private findGameService: FindGameService) {
+  constructor(private matchService: MatchService, private userService: UserCrudService, private store: Store, private dialog: MatDialog, private findGameService: FindGameService, private changeDetectorRef: ChangeDetectorRef) {
     this.loading = true
     this.notAssociated = false
   }
@@ -76,6 +76,7 @@ export class HomeComponent implements OnInit {
 
         console.log('running match', actions.runningMatch)
         this.loading = false
+        this.changeDetectorRef.markForCheck()
       })
     })
   }

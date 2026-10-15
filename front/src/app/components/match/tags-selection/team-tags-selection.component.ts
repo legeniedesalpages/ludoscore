@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subject, Subscription } from 'rxjs'
 import { ChoosenTag, MatchModel, Team } from 'src/app/core/model/match.model'
@@ -44,7 +44,7 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
   public tagRemoved: Map<string, [string, number]> = new Map()
   public choosenTags: ChoosenTag[] = []
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private changeDetectorRef: ChangeDetectorRef) {
     this.tags = this.store.selectSnapshot<MatchModel>(MatchState.match).game.playerTags
   }
 
@@ -59,6 +59,7 @@ export class TeamTagsSelectionComponent implements OnInit, OnDestroy {
 
     this.teamSubscription = this.teams.subscribe(teams => {
       this.team = teams[this.teamIndex]
+      this.changeDetectorRef.markForCheck()
     })
 
     this.choosenTags = this.team.choosenTags.map(tag => {

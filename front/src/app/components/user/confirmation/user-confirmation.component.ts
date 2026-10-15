@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AuthService } from 'src/app/core/services/auth/auth.service'
 
@@ -25,7 +25,7 @@ export class UserConfirmationComponent implements OnInit {
   public loading: boolean = true
   public confirmed: boolean | undefined = undefined
 
-  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {    
+  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private changeDetectorRef: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -41,17 +41,20 @@ export class UserConfirmationComponent implements OnInit {
             console.info('User confirmed: ', result)
             this.loading = false
             this.confirmed = true
+            this.changeDetectorRef.markForCheck()
           },
           error: (error) => {
             console.error('Error confirming user: ', error)
             this.loading = false
             this.confirmed = false
+            this.changeDetectorRef.markForCheck()
           }
         })
       } else {
         console.error('Pas de clef de confirmation')
         this.loading = false
         this.confirmed = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }

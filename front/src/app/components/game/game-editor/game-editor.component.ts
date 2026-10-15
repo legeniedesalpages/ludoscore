@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
@@ -51,7 +51,7 @@ export class GameEditorComponent implements OnInit {
   public tagsScore: ScoreTag[] = []
   public tagsDraw: DrawBreaker[] = []
 
-  constructor(private store: Store, private route: ActivatedRoute, private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService) {
+  constructor(private store: Store, private route: ActivatedRoute, private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {
 
     this.loading = true
     this.saving = false
@@ -73,6 +73,7 @@ export class GameEditorComponent implements OnInit {
     this.route.paramMap.subscribe((params) => {
 
       this.bggId = Number(params.get('id'))
+      this.changeDetectorRef.markForCheck()
       if (!this.bggId) {
         console.warn('No bgg id provided, redirecting to find game')
         this.store.dispatch(new Navigate(['/find-game']))
@@ -114,9 +115,11 @@ export class GameEditorComponent implements OnInit {
         this.tagsColor = game.playerColors
         this.tagsScore = game.scoreTags
         this.tagsDraw = game.drawBreaker
+        this.changeDetectorRef.markForCheck()
       },
       complete: () => {
         this.loading = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }
@@ -146,10 +149,12 @@ export class GameEditorComponent implements OnInit {
 
         this.imageUrlFromBgg = gameSearchDetail.imageUrlFromBgg
         this.thumbnailUrlFromBgg = gameSearchDetail.thumbnailUrlFromBgg
+        this.changeDetectorRef.markForCheck()
 
       },
       complete: () => {
         this.loading = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }
@@ -186,6 +191,7 @@ export class GameEditorComponent implements OnInit {
           duration: 5000
         })
         this.saving = false
+        this.changeDetectorRef.markForCheck()
         this.store.dispatch(new Navigate(['/']))
       },
 
@@ -195,6 +201,7 @@ export class GameEditorComponent implements OnInit {
         })
         console.error('Error saving game', err)
         this.saving = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }

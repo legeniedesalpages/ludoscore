@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { Observable, tap } from 'rxjs'
@@ -41,7 +41,7 @@ export class GameSelectionComponent implements OnInit {
   public lessThanThirtyMinutes: boolean = false
   public moreThanOneHourAndAHalfFilter: boolean = false
 
-  constructor(private gameService: GameService, private store: Store) {
+  constructor(private gameService: GameService, private store: Store, private changeDetectorRef: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -54,7 +54,10 @@ export class GameSelectionComponent implements OnInit {
       this.store.dispatch(new Navigate(['player-selection']))
     } else {
       console.debug("Game not selected, fetch game list")
-      this.gameList$ = this.gameService.listAllGames().pipe(tap(_ => this.loading = false))
+      this.gameList$ = this.gameService.listAllGames().pipe(tap(_ => {
+        this.loading = false
+        this.changeDetectorRef.markForCheck()
+      }))
     }
   }
 
@@ -63,6 +66,7 @@ export class GameSelectionComponent implements OnInit {
     this.store.dispatch(new CreateMatch(game)).subscribe(_ => {
       // TODO : ajouter ici le joueur correspondant à l'utilisateur connecté
       this.store.dispatch(new Navigate(['player-selection']))
+      this.changeDetectorRef.markForCheck()
     })
   }
 

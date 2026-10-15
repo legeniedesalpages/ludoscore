@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
@@ -31,7 +31,7 @@ export class UserCreateComponent implements OnInit {
   public loading: boolean
   public hidePassword: boolean
 
-  constructor(private authServie: AuthService, private store: Store, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
+  constructor(private authServie: AuthService, private store: Store, private formBuilder: FormBuilder, private snackBar: MatSnackBar, private changeDetectorRef: ChangeDetectorRef) {
 
     this.hidePassword = true
 
@@ -47,6 +47,7 @@ export class UserCreateComponent implements OnInit {
     )
 
     this.loading = false
+    this.changeDetectorRef.markForCheck()
   }
 
   ngOnInit(): void {
@@ -59,6 +60,7 @@ export class UserCreateComponent implements OnInit {
     this.authServie.createUser(this.registerForm.value.email, this.registerForm.value.password).pipe(first()).subscribe({
       next: () => {
         this.loading = false
+        this.changeDetectorRef.markForCheck()
         this.snackBar.open("Compte créé, un email de confirmation a été envoyé (il est probablement dans les SPAM)", 'Fermer', {
           duration: 10000
         })

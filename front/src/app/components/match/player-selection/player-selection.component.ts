@@ -13,7 +13,7 @@
 import { A11yModule } from '@angular/cdk/a11y'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
-import { Component, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
@@ -65,6 +65,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   private playerService: PlayerService = inject(PlayerService)
   private snackBar: MatSnackBar = inject(MatSnackBar)
   private dialog: MatDialog = inject(MatDialog)
+  private changeDetectorRef: ChangeDetectorRef = inject(ChangeDetectorRef)
 
   @ViewChild('playerSelector') public playerSelector!: MatSelect
 
@@ -86,6 +87,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
     this.playerService.listAllPlayers().subscribe(allPlayers => {
       this.loading = false
+      this.changeDetectorRef.markForCheck()
 
       this.matchChangeSubscription = this.match$.subscribe(match => {
 
@@ -102,6 +104,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         if (match.game?.playerColors != null) {
           this.choosableColors = match.game.playerColors.filter(color => !match.teams.map(team => team.color.name).includes(color.name))
         }
+        this.changeDetectorRef.markForCheck()
       })
     })
   }
@@ -143,6 +146,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         if (this.playerSelector != null) {
           this.playerSelector.value = ""
           this.loading = false
+          this.changeDetectorRef.markForCheck()
         }
       })
     }
@@ -210,6 +214,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       next: _ => {
         this.store.dispatch(new Navigate(['/match-display']))
         this.saving = false
+        this.changeDetectorRef.markForCheck()
         this.snackBar.open("Partie créée", 'Fermer', {
           duration: 5000
         })
@@ -220,6 +225,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
           duration: 15000
         })
         this.saving = false
+        this.changeDetectorRef.markForCheck()
       }
     })
   }

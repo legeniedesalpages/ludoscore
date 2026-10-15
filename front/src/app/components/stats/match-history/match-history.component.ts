@@ -13,7 +13,7 @@
 import { CollectionViewer, DataSource } from '@angular/cdk/collections'
 import { CdkScrollableModule, ScrollingModule } from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
@@ -43,6 +43,7 @@ export class MatchHistoryComponent {
   private store = inject(Store)
   private matchService = inject(MatchService)
   public formatter = inject(MatchFormatterService)
+  private changeDetectorRef = inject(ChangeDetectorRef)
 
   public loading: boolean = true
   public dataSource!: Observable<MatchDataSource>
@@ -50,7 +51,10 @@ export class MatchHistoryComponent {
 
   constructor() {
     this.dataSource = this.matchService.getAllMatchesCount().pipe(
-      tap(_ => this.loading = false),
+      tap(_ => {
+        this.loading = false
+        this.changeDetectorRef.markForCheck()
+      }),
       map(count => new MatchDataSource(this.matchService, this.pageSize, count))
     )
   }

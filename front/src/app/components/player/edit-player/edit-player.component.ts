@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
@@ -43,7 +43,7 @@ export class EditPlayerComponent implements OnInit {
   public currentPlayerId: number = 0
   public isEditable: boolean = false
 
-  constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private userCrudService: UserCrudService, private snackBar: MatSnackBar) {
+  constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private userCrudService: UserCrudService, private snackBar: MatSnackBar, private changeDetectorRef: ChangeDetectorRef) {
     this.playerEditorForm = new FormGroup({
       pseudo: new FormControl('', Validators.required),
       prenom: new FormControl(''),
@@ -56,6 +56,7 @@ export class EditPlayerComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       this.currentPlayerId = Number(params.get('id'))
+      this.changeDetectorRef.markForCheck()
       console.debug("Id: ", this.currentPlayerId)
       this.creating = (this.currentPlayerId === 0)
       console.debug("Creating: ", this.creating)
@@ -63,6 +64,7 @@ export class EditPlayerComponent implements OnInit {
 
       this.userCrudService.findAll().subscribe(users => {
         this.users = users
+        this.changeDetectorRef.markForCheck()
         
         let loggedUser: UserEntity = this.users.find(user => user.id === loggedUserId)!
 
@@ -91,6 +93,7 @@ export class EditPlayerComponent implements OnInit {
               user: userId
             })
             this.loading = false
+            this.changeDetectorRef.markForCheck()
           })
         } else {
           this.isEditable = true
@@ -100,6 +103,7 @@ export class EditPlayerComponent implements OnInit {
           }
           
           this.loading = false
+          this.changeDetectorRef.markForCheck()
         }
       })
     })
@@ -129,6 +133,7 @@ export class EditPlayerComponent implements OnInit {
       this.playerService.save(playerEntity).subscribe(() => {
         console.debug("Player created")
         this.saving = false
+        this.changeDetectorRef.markForCheck()
         this.snackBar.open("Joueur créé", 'Fermer', {
           duration: 10000
         })
@@ -138,6 +143,7 @@ export class EditPlayerComponent implements OnInit {
       this.playerService.update(playerEntity.id, playerEntity).subscribe(() => {
         console.debug("Player updated")
         this.saving = false
+        this.changeDetectorRef.markForCheck()
         this.snackBar.open("Joueur mis à jour", 'Fermer', {
           duration: 10000
         })

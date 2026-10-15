@@ -13,8 +13,8 @@
 import {
   AfterViewInit,
   Component,
-  DoCheck,
   ElementRef,
+  ChangeDetectorRef,
   ViewChild,
   ChangeDetectionStrategy
 } from "@angular/core"
@@ -34,7 +34,7 @@ import { MatchState } from "src/app/core/state/match/match.state"
   changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
-export class WheelComponent implements AfterViewInit, DoCheck {
+export class WheelComponent implements AfterViewInit {
 
   @Select(MatchState.teams) teams!: Observable<Team[]>
 
@@ -58,7 +58,7 @@ export class WheelComponent implements AfterViewInit, DoCheck {
   private angleInRadians = 0
   private lastSelection: any
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private changeDetectorRef: ChangeDetectorRef) {
     this.sectors = store.selectSnapshot<Team[]>(MatchState.teams).map(team => {
       return {
         color: team.color,
@@ -70,10 +70,6 @@ export class WheelComponent implements AfterViewInit, DoCheck {
     if (this.wheel) {
       this.createWheel()
     }
-  }
-
-  ngDoCheck(): void {
-    this.engine()
   }
 
   ngAfterViewInit(): void {
@@ -106,6 +102,7 @@ export class WheelComponent implements AfterViewInit, DoCheck {
     this.friction = this.rand(0.992, 0.999)
     if (!this.angularVelocity) {
       this.angularVelocity = this.rand(0.25, 0.35)
+      this.engine()
     }
   }
 
@@ -164,15 +161,19 @@ export class WheelComponent implements AfterViewInit, DoCheck {
     this.angleInRadians %= this.TAU // Normalize angle
     this.rotate()
     this.checkWinner()
+    if (this.angularVelocity) {
+      this.engine()
+    }
   }
 
   private engine() {
-    requestAnimationFrame(this.frame.bind(this))
+    requestAnimationFrame(() => this.frame())
   }
 
   private checkWinner() {
     if (!this.angularVelocity) {
       this.winner = this.sectors[this.lastSelection].team
+      this.changeDetectorRef.markForCheck()
       console.info("Team randomly choosen", this.winner)
       if (this.spin && this.spin.nativeElement) {        
         this.spin.nativeElement.textContent = this.sectors[this.lastSelection].label

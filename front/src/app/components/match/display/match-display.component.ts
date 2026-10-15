@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
@@ -39,7 +39,7 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
   public teamChoosenTags: ChoosenTag[][] = []
   public saving: Subject<boolean> = new Subject()
 
-  constructor(private store: Store, private actions: Actions, private dialog: MatDialog) {
+  constructor(private store: Store, private actions: Actions, private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
     this.dialog.closeAll()
   }
@@ -59,6 +59,7 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
         let minutes = "" + Math.floor((t / (1000 * 60)) % 60)
         let hours = "" + Math.floor((t / (1000 * 60 * 60)) % 24)
         this.elapsedTime = hours.padStart(2, "0")  + " heures, " + minutes.padStart(2, "0") + " minutes, " + seconds.padStart(2, "0") + " secondes"
+        this.changeDetectorRef.markForCheck()
       }
     }, 1000)
   }
