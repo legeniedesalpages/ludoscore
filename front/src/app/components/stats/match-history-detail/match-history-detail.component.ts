@@ -13,6 +13,8 @@
 import { CommonModule, NgStyle } from '@angular/common'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { MatDialog } from '@angular/material/dialog'
+import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
@@ -25,7 +27,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { BehaviorSubject, catchError, combineLatest, of, switchMap } from 'rxjs'
+import { BehaviorSubject, catchError, combineLatest, filter, of, switchMap } from 'rxjs'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { LoadingSpinnerModule } from 'src/app/components/layout/spinner/loading-spinner.module'
 import { MatchModel } from 'src/app/core/model/match.model'
@@ -87,6 +89,7 @@ export class MatchHistoryDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private matchService = inject(MatchService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
   public formatter = inject(MatchFormatterService);
 
@@ -306,7 +309,10 @@ export class MatchHistoryDetailComponent implements OnInit {
     if (matchId == undefined) {
       return
     }
-    this.matchService.deleteMatch(matchId).subscribe(() => {
+    this.dialog.open(ConfirmDeleteDialogComponent).afterClosed().pipe(
+      filter(confirmed => confirmed === true),
+      switchMap(() => this.matchService.deleteMatch(matchId))
+    ).subscribe(() => {
       this.returnToMatchHistory()
     })
   }
