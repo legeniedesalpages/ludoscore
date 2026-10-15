@@ -26,12 +26,13 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { Observable, Subscription, first } from 'rxjs'
+import { Observable, Subscription, catchError, first, map, mergeMap, of, switchMap } from 'rxjs'
 import { Game } from 'src/app/core/model/game.model'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from 'src/app/core/model/match.model'
 import { Player } from 'src/app/core/model/player.model'
 import { ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
 import { PlayerService } from 'src/app/core/services/player/player.service'
+import { MatchService } from 'src/app/core/services/match/match.service'
 import { AddTeam, CancelMatchCreation, LaunchMatch, RemoveTeam, SwapTeamPosition } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { environment } from 'src/environments/environment'
@@ -63,6 +64,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   private store: Store = inject(Store)
   private playerService: PlayerService = inject(PlayerService)
+  private matchService: MatchService = inject(MatchService)
   private snackBar: MatSnackBar = inject(MatSnackBar)
   private dialog: MatDialog = inject(MatDialog)
   private changeDetectorRef: ChangeDetectorRef = inject(ChangeDetectorRef)
@@ -136,18 +138,21 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         id: undefined,
         name: player.pseudo,
         choosenTags: [],
-        color: this.chooseColor(player),
+        color: NO_COLOR,
         score: undefined,
         scoreDetails: [],
         teamPlayers: [teamPlayer]
       }
 
-      this.store.dispatch(new AddTeam(team)).pipe(first()).subscribe(() => {
+      this.chooseColor(player).pipe(
+        mergeMap(color => this.store.dispatch(new AddTeam({ ...team, color }))),
+        first()
+      ).subscribe(() => {
         if (this.playerSelector != null) {
           this.playerSelector.value = ""
-          this.loading = false
-          this.changeDetectorRef.markForCheck()
         }
+        this.loading = false
+        this.changeDetectorRef.markForCheck()
       })
     }
   }
@@ -169,30 +174,52 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
     return true
   }
 
-  private chooseColor(player: Player): ColorTag {
-    const game: Game = this.store.selectSnapshot<MatchModel>(MatchState.match).game!
+  // Priorité : couleur de la dernière partie du jeu avec les mêmes joueurs, puis couleur préférée,
+  // puis couleurs approchantes de la couleur préférée, puis au hasard.
+  private chooseColor(player: Player): Observable<ColorTag> {
+    const match = this.store.selectSnapshot<MatchModel>(MatchState.match)
+    const game: Game = match.game!
+    const available = (game.playerColors ?? []).filter(color => !match.teams.some(team => team.color.name === color.name))
 
-    if (this.choosableColors.length === 0) {
+    if (available.length === 0) {
       console.debug("Aucune couleur disponible")
-      return NO_COLOR
+      return of(NO_COLOR)
     }
 
-    console.debug("Colors not yet selected:", this.choosableColors)
+    const otherPlayerIds = match.teams.flatMap(team => team.teamPlayers.map(teamPlayer => teamPlayer.player.id!))
+    const findAvailable = (name: string | null | undefined) => available.find(color => color.name === name)
 
-    let preferedColor
-    let foundPreferedColor = game.playerColors.filter(color => color.name === player.preferedColor.name)
-    console.debug("Prefered color of first player of the team:", player.preferedColor)
-    if (foundPreferedColor.length > 0) {
-      preferedColor = foundPreferedColor[0]
+    const previousColor$ = this.matchService.findPreviousTeamColor(game.id, player.id!, otherPlayerIds).pipe(
+      switchMap(color => {
+        const sameGroupColor = findAvailable(color)
+        if (sameGroupColor || otherPlayerIds.length === 0) {
+          return of(sameGroupColor)
+        }
+        return this.matchService.findPreviousTeamColor(game.id, player.id!, []).pipe(map(findAvailable))
+      })
+    )
+
+    return previousColor$.pipe(
+      map(previous => previous ?? this.chooseColorFromPreference(player, available)),
+      catchError(() => of(this.chooseColorFromPreference(player, available)))
+    )
+  }
+
+  private chooseColorFromPreference(player: Player, available: ColorTag[]): ColorTag {
+    const preferred = player.preferedColor
+    if (preferred && preferred.name !== NO_COLOR.name) {
+      const exact = available.find(color => color.name === preferred.name)
+      if (exact) {
+        return exact
+      }
+      for (const fallbackName of preferred.fallback ?? []) {
+        const approaching = available.find(color => color.name === fallbackName)
+        if (approaching) {
+          return approaching
+        }
+      }
     }
-
-    if (preferedColor != null && this.choosableColors.includes(preferedColor)) {
-      console.debug("Choose prefered color because it is available", preferedColor)
-      return preferedColor
-    }
-
-    console.debug("Choose a random color among colors that have not been chosen yet")
-    return this.choosableColors[Math.floor(Math.random() * this.choosableColors.length)]
+    return available[Math.floor(Math.random() * available.length)]
   }
 
   public deleteAction(team: Team) {

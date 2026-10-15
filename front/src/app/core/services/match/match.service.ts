@@ -11,13 +11,13 @@
     * - Modification    : 
 **/
 import { Injectable } from '@angular/core'
-import { Observable, forkJoin, map, mergeMap, switchMap } from 'rxjs'
+import { Observable, catchError, forkJoin, map, mergeMap, of, switchMap } from 'rxjs'
 import { MatchCrudService } from '../crud/match-crud.service'
 import { MatchEntity } from '../../entity/match-entity.model'
 import { MatchModel, Team } from '../../model/match.model'
 import { TeamCrudService } from '../crud/team-crud.service'
 import { environment } from 'src/environments/environment'
-import { ColorTag, NO_COLOR, Tag } from '../../model/tag.model'
+import { COLORS, ColorTag, NO_COLOR, Tag } from '../../model/tag.model'
 import { Score, ScoreTag } from '../../model/score.model'
 import { DrawBreaker } from '../../model/game.model'
 
@@ -52,6 +52,14 @@ export class MatchService {
 
     public findRunningMatch(): Observable<MatchEntity> {
         return this.matchCrudService.findRunningMatch()
+    }
+
+    // Couleur du joueur lors de la dernière partie du jeu (avec les mêmes autres joueurs si précisés)
+    public findPreviousTeamColor(gameId: number, playerId: number, withPlayerIds: number[]): Observable<string | null> {
+        return this.matchCrudService.getPreviousTeamColor(gameId, playerId, withPlayerIds).pipe(
+            map(result => result.color ?? null),
+            catchError(() => of(null))
+        )
     }
 
     public deleteMatch(matchId: number): Observable<void> {
@@ -193,7 +201,7 @@ export class MatchService {
                     id: teamEntity.id,
                     name: teamEntity.name,
                     choosenTags: teamEntity.tags ? JSON.parse(teamEntity.tags) : [] as Tag[],
-                    color: NO_COLOR,
+                    color: COLORS.find(color => color.name === teamEntity.color) ?? NO_COLOR,
                     score: teamEntity.score,
                     scoreDetails: this.parseScoreDetails(teamEntity.scoreDetails ?? teamEntity.score_details),
                     teamPlayers: []

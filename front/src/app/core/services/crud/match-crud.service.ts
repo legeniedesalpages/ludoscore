@@ -34,6 +34,11 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         return this.http.get<MatchTeamPlayerEntity>(url).pipe(tap(res => console.debug("get previous match " + url + " => ", res)))
     }
 
+    getPreviousTeamColor(gameId: number, playerId: number, withPlayerIds: number[]): Observable<{ color: string | null }> {
+        const url = `${this.apiUrl}/previous-team-color/${gameId}/${playerId}`
+        return this.http.get<{ color: string | null }>(url, { params: { with: withPlayerIds.join(',') } })
+    }
+
     uploadPhoto(matchId: number, photo: Blob): Observable<void> {
         const formData = new FormData()
         formData.append('photo', photo, 'photo.jpg')

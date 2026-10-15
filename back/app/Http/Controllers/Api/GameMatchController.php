@@ -279,6 +279,40 @@ class GameMatchController extends Controller
             ->get('teams.*');
     }
 
+    /**
+     * Couleur utilisée par un joueur lors de la partie la plus récente du même jeu.
+     * Si "with" (ids de joueurs séparés par des virgules) est fourni, seules les parties où
+     * tous ces joueurs étaient aussi présents sont considérées.
+     */
+    public function previousTeamColor(Request $request, $gameid, $playerid)
+    {
+        $with = array_filter(array_map('intval', explode(',', (string) $request->query('with', ''))));
+
+        $query = DB::table('teams')
+            ->join('matches', 'matches.id', '=', 'teams.match_id')
+            ->join('team_players', 'team_players.team_id', '=', 'teams.id')
+            ->where('matches.game_id', $gameid)
+            ->where('matches.canceled', false)
+            ->where('matches.running', false)
+            ->where('team_players.player_id', $playerid)
+            ->whereNotNull('teams.color')
+            ->where('teams.color', '!=', 'Aucune');
+
+        foreach ($with as $otherPlayerId) {
+            $query->whereExists(function ($sub) use ($otherPlayerId) {
+                $sub->select(DB::raw(1))
+                    ->from('teams as other_teams')
+                    ->join('team_players as other_tp', 'other_tp.team_id', '=', 'other_teams.id')
+                    ->whereColumn('other_teams.match_id', 'matches.id')
+                    ->where('other_tp.player_id', $otherPlayerId);
+            });
+        }
+
+        $color = $query->orderByDesc('matches.started_at')->orderByDesc('matches.id')->value('teams.color');
+
+        return response()->json(['color' => $color]);
+    }
+
     public function show($id)
     {
         Log::debug("Recherche le match d'id : " . $id);
