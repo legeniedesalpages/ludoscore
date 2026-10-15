@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterModule } from '@angular/router'
@@ -14,6 +14,7 @@ import { StatisticsDashboard, StatisticsService } from 'src/app/core/services/st
   templateUrl: './statistics-overview.component.html',
   styleUrls: ['./statistics-overview.component.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, LayoutComponent],
 })
 export class StatisticsOverviewComponent implements OnInit {

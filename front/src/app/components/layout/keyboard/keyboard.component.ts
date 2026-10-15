@@ -28,7 +28,7 @@
     * - Modification    : 
 **/
 import { CommonModule } from '@angular/common'
-import { Component, input, output, QueryList } from '@angular/core'
+import { Component, input, output, QueryList, ChangeDetectionStrategy } from '@angular/core'
 
 import { MatButtonModule } from '@angular/material/button'
 import { MatRippleModule } from '@angular/material/core'
@@ -65,6 +65,7 @@ import { MatIcon } from '@angular/material/icon'
         </div>
     `,
     styleUrls: ['./keyboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CommonModule,
         MatButtonModule,

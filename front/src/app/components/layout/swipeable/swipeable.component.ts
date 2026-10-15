@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter } from '@angular/core'
+import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core'
 import { map, fromEvent, switchMap, takeUntil, tap, merge } from 'rxjs'
 
 interface MoveEvent {
@@ -37,6 +37,7 @@ export interface WipeActionStyle {
       </div>  
     `,
   styleUrls: ['./swipeable.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class SwipeableComponent implements OnInit {

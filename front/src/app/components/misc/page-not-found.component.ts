@@ -10,10 +10,11 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component } from "@angular/core"
+import { Component, ChangeDetectionStrategy } from "@angular/core"
 
 @Component({
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `<div>Page not found</div>`
 })
 export class PagenotfoundComponent { }

@@ -12,7 +12,7 @@
 **/
 import { A11yModule } from '@angular/cdk/a11y'
 import { CommonModule } from '@angular/common'
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatButtonToggleModule } from '@angular/material/button-toggle'
@@ -42,6 +42,7 @@ import { resizeImage } from 'src/app/core/utils/image-resize'
 @Component({
   templateUrl: './match-end.component.html',
   styleUrls: ['./match-end.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule,
     MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, 

@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { Location } from '@angular/common'
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core'
 import { fromEvent } from "rxjs"
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -42,6 +42,7 @@ import { MatButtonModule } from '@angular/material/button';
     </div>
 
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .container {
       width:100%;

@@ -5,7 +5,18 @@
   bottom: 0;
   left: 0;
   touch-action: none;
-  background: rgba(70, 70, 70, 0.7)
+  background: rgba(70, 70, 70, 0);
+  display: none;
+  opacity: 0;
+  transition: opacity 200ms ease-in-out, background-color 200ms ease-in-out;
+  pointer-events: none;
+}
+
+.sidenav-overlay.open {
+  background: rgba(70, 70, 70, 0.7);
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sidenav {
@@ -18,8 +29,14 @@
   border-end-start-radius: 15px;
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   transform-origin: top right;
+  transform: scaleX(0);
   background-color: white;
   touch-action: none;
+  transition: transform 300ms ease-in-out;
+}
+
+.sidenav.open {
+  transform: scaleX(1);
 }
 
 .close-sidenav {

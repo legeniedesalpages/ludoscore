@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterModule } from '@angular/router'
@@ -12,6 +12,7 @@ import { LayoutComponent } from 'src/app/components/layout/layout.component'
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule,
     RouterModule,

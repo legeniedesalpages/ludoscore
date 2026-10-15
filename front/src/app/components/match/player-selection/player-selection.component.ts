@@ -13,7 +13,7 @@
 import { A11yModule } from '@angular/cdk/a11y'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
@@ -46,6 +46,7 @@ import { LayoutComponent } from '../../layout/layout.component'
 @Component({
   templateUrl: './player-selection.component.html',
   styleUrls: ['./player-selection.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule,
     RouterModule,

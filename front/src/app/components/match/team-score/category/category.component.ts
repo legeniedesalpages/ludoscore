@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, computed, input, OnInit, output, signal } from "@angular/core"
+import { Component, computed, input, OnInit, output, signal, ChangeDetectionStrategy } from "@angular/core"
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import { MatFormFieldModule } from "@angular/material/form-field"
 import { MatIconModule } from "@angular/material/icon"
@@ -58,6 +58,7 @@ import { Md5 } from 'ts-md5'
            
         }
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         MatIconModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule
     ]

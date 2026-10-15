@@ -1,3 +1,7 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:meta';
 @use '@angular/material'as mat;
 
 @include mat.core();
@@ -82,15 +86,23 @@ fieldset {
     to top left: 225deg
   );
 
-  @if map-has-key($conversion-map, $direction) {
-    $direction: map-get($conversion-map, $direction);
+  @if map.has-key($conversion-map, $direction) {
+    $direction: map.get($conversion-map, $direction);
   }
 
   @for $i from 1 through $shadow-count {
-    $current-step: ($i * $length / $shadow-count);
-    $current-color: if(not $fade, $color, if(type-of($fade) == 'color',  mix($fade, $color, ($i / $shadow-count * 100)), rgba($color, 1 - $i / $shadow-count)));
+    $current-step: math.div($i * $length, $shadow-count);
+    $current-color: $color;
 
-    $shadows: append($shadows, (sin(0deg + $direction) * $current-step) (cos(0deg + $direction) * $current-step) 0 $current-color, 'comma');
+    @if $fade {
+      @if meta.type-of($fade) == 'color' {
+        $current-color: mix($fade, $color, math.div($i, $shadow-count) * 100);
+      } @else {
+        $current-color: rgba($color, 1 - math.div($i, $shadow-count));
+      }
+    }
+
+    $shadows: list.append($shadows, (sin(0deg + $direction) * $current-step) (cos(0deg + $direction) * $current-step) 0 $current-color, $separator: comma);
   }
 
   @return $shadows;

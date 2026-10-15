@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { first, forkJoin } from 'rxjs'
@@ -23,6 +23,7 @@ import { AuthState } from 'src/app/core/state/auth/auth.state'
   selector: 'manage-player',
   templateUrl: './manage-player.component.html',
   styleUrls: ['./manage-player.component.css', '../../../core/css/list.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ManagePlayerComponent implements OnInit {

@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, inject, Inject, OnInit } from '@angular/core'
+import { Component, inject, Inject, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Store } from '@ngxs/store'
 import { DoLogout } from 'src/app/core/state/auth/auth.actions'
 import { AuthState } from 'src/app/core/state/auth/auth.state'
@@ -30,6 +30,7 @@ import { catchError, of } from 'rxjs'
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class HomeComponent implements OnInit {
@@ -105,6 +106,7 @@ export class HomeComponent implements OnInit {
   selector: 'welcome-dialog',
   templateUrl: './welcome-dialog/welcome-dialog.component.html',
   styleUrls: ['./welcome-dialog/welcome-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class WelcomeDialogComponent {

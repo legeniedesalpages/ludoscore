@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
@@ -21,6 +21,7 @@ import { DoLogin } from 'src/app/core/state/auth/auth.actions'
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class LoginComponent implements OnInit {

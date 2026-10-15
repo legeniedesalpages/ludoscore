@@ -10,15 +10,14 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core'
-import { fadeInOut, slideInOut } from 'src/app/core/animation/sidenav.anmiation'
+import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core'
 import { fromEvent } from "rxjs"
 
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.css'],
-  animations: [slideInOut, fadeInOut],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class SidenavComponent implements OnInit {

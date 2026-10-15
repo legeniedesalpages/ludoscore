@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
@@ -27,6 +27,7 @@ import { AuthState } from 'src/app/core/state/auth/auth.state'
   selector: 'edit-player',
   templateUrl: './edit-player.component.html',
   styleUrls: ['./edit-player.component.css', '../../../core/css/list.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class EditPlayerComponent implements OnInit {

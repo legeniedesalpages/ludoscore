@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { AsyncPipe, CommonModule, NgStyle } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
 import { MatDividerModule } from '@angular/material/divider'
@@ -32,6 +32,7 @@ import { LayoutComponent } from '../../layout/layout.component'
   templateUrl: './match-history-detail.component.html',
   styleUrls: ['./match-history-detail.component.css', '../../../core/css/list.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule, AsyncPipe, NgStyle,
     RouterModule,

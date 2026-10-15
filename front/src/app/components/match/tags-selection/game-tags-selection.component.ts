@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { Component, Input, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subject, Subscription } from 'rxjs'
 import { ChoosenTag, MatchModel } from 'src/app/core/model/match.model'
@@ -22,6 +22,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   selector: 'game-tags-selection',
   templateUrl: './tags-selection.component.html',
   styleUrls: ['./tags-selection.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class GameTagsSelectionComponent implements OnInit, OnDestroy {

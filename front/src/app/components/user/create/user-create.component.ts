@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
@@ -21,6 +21,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service'
 @Component({
   templateUrl: './user-create.component.html',
   styleUrls: ['./user-create.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class UserCreateComponent implements OnInit {

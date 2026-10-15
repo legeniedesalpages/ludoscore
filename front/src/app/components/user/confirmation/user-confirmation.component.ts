@@ -10,13 +10,14 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AuthService } from 'src/app/core/services/auth/auth.service'
 
 @Component({
   templateUrl: './user-confirmation.component.html',
   styleUrls: ['./user-confirmation.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class UserConfirmationComponent implements OnInit {

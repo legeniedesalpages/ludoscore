@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
@@ -29,6 +29,7 @@ import { ScoreTag } from 'src/app/core/model/score.model'
   selector: 'game-editor',
   templateUrl: './game-editor.component.html',
   styleUrls: ['./game-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class GameEditorComponent implements OnInit {

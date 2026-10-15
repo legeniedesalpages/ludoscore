@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component } from '@angular/core'
+import { Component, ChangeDetectionStrategy } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
@@ -21,6 +21,7 @@ import { FindGameService } from 'src/app/core/services/game/find-game.service'
   selector: 'find-game',
   templateUrl: './find-game.component.html',
   styleUrls: ['./find-game.component.css', '../../../core/css/list.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class FindGameComponent {

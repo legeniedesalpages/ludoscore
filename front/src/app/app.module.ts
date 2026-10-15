@@ -11,9 +11,8 @@
     * - Modification    : 
 **/
 
-import { NgModule, isDevMode, LOCALE_ID } from '@angular/core';
+import { NgModule, isDevMode, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi, withXsrfConfiguration } from "@angular/common/http";
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -35,7 +34,6 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,
     MatSnackBarModule,
     AppRoutingModule,
 
@@ -50,6 +48,7 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
   ],
 
   providers: [
+    provideZoneChangeDetection(),
     { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
     PusherService,
     provideHttpClient(

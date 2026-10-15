@@ -15,7 +15,8 @@ import {
   Component,
   DoCheck,
   ElementRef,
-  ViewChild
+  ViewChild,
+  ChangeDetectionStrategy
 } from "@angular/core"
 import { Navigate } from "@ngxs/router-plugin"
 import { Select, Store } from "@ngxs/store"
@@ -30,6 +31,7 @@ import { MatchState } from "src/app/core/state/match/match.state"
   selector: "app-wheel",
   templateUrl: "./wheel.component.html",
   styleUrls: ["./wheel.component.css"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class WheelComponent implements AfterViewInit, DoCheck {

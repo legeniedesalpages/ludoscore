@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Input } from '@angular/core'
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core'
 
 @Component({
   selector: 'loading-spinner',
@@ -34,6 +34,7 @@ import { Component, Input } from '@angular/core'
       margin-left: 10px;
     }
   `],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class LoadingSpinnerComponent {

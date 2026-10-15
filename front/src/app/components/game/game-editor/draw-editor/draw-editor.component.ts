@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, Input, Inject } from '@angular/core'
+import { Component, Input, Inject, ChangeDetectionStrategy } from '@angular/core'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
@@ -21,6 +21,7 @@ import { DrawBreaker } from 'src/app/core/model/game.model'
   selector: 'draw-editor',
   templateUrl: './draw-editor.component.html',
   styleUrls: ['./draw-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class DrawEditorComponent {
@@ -75,6 +76,7 @@ export class DrawEditorComponent {
   selector: 'dialog-draw-editor',
   templateUrl: '../draw-editor-dialog/draw-editor-dialog.component.html',
   styleUrls: ['../draw-editor-dialog/draw-editor-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class DialogDrawEditorComponent {

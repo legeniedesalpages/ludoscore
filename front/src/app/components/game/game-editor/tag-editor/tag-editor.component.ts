@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, Input, Inject } from '@angular/core'
+import { Component, OnInit, Input, Inject, ChangeDetectionStrategy } from '@angular/core'
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { Tag } from 'src/app/core/model/tag.model'
@@ -22,6 +22,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
   selector: 'tag-editor',
   templateUrl: './tag-editor.component.html',
   styleUrls: ['./tag-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class TagEditorComponent implements OnInit {
@@ -84,6 +85,7 @@ export class TagEditorComponent implements OnInit {
   selector: 'dialog-tag-editor',
   templateUrl: '../tag-editor-dialog/tag-editor-dialog.component.html',
   styleUrls: ['../tag-editor-dialog/tag-editor-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class DialogTagEditorComponent {

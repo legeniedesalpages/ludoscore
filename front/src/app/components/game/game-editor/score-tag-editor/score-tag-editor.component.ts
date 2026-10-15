@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    :
 **/
-import { Component, OnInit, Input, Inject } from '@angular/core'
+import { Component, OnInit, Input, Inject, ChangeDetectionStrategy } from '@angular/core'
 import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
@@ -23,6 +23,7 @@ import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
   selector: 'score-tag-editor',
   templateUrl: './score-tag-editor.component.html',
   styleUrls: ['./score-tag-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ScoreTagEditorComponent implements OnInit {
@@ -86,6 +87,7 @@ export class ScoreTagEditorComponent implements OnInit {
   selector: 'dialog-score-tag-editor',
   templateUrl: '../score-tag-editor-dialog/score-tag-editor-dialog.component.html',
   styleUrls: ['../score-tag-editor-dialog/score-tag-editor-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class DialogScoreTagEditorComponent {

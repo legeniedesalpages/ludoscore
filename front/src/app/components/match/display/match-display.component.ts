@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
@@ -24,6 +24,7 @@ import { ChoosenTag, MatchModel, Team } from 'src/app/core/model/match.model'
 @Component({
   templateUrl: './match-display.component.html',
   styleUrls: ['./match-display.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class MatchDisplayComponent implements OnInit, OnDestroy {

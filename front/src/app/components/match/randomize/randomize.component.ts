@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component } from '@angular/core'
+import { Component, ChangeDetectionStrategy } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subject } from 'rxjs'
@@ -21,6 +21,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 @Component({
   templateUrl: './randomize.component.html',
   styleUrls: ['./randomize.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class RandomizeComponent {

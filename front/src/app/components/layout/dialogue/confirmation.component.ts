@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { CommonModule } from '@angular/common'
-import { Component, Inject } from '@angular/core'
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 
 import { MatButtonModule } from '@angular/material/button'
@@ -30,6 +30,7 @@ import { MatDialogModule } from '@angular/material/dialog'
             <button mat-button (click)="dialogRef.close(true)">Continuer</button>
         </mat-dialog-actions>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CommonModule,
         MatButtonModule,

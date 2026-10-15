@@ -11,17 +11,15 @@
     * - Modification    : 
 **/
 
-import { Component, OnInit } from '@angular/core';
-import { pageAnimation } from './core/animation/page.animation';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Actions, Store, ofActionCompleted } from '@ngxs/store';
 import { DoLogout } from './core/state/auth/auth.actions';
 import { Navigate } from '@ngxs/router-plugin';
 
 @Component({
   selector: 'app-root',
-  animations: [pageAnimation],
   template: `
-    <div class="app" [@routeAnimations]="o && o.activatedRouteData && o.activatedRouteData['animation']">
+    <div class="app">
     
       <router-outlet #o="outlet"></router-outlet>
     </div>
@@ -37,6 +35,7 @@ import { Navigate } from '@ngxs/router-plugin';
       transform-style:  preserve-3d;
     }
   `],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AppComponent implements OnInit {

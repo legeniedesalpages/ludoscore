@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { Observable, tap } from 'rxjs'
@@ -24,6 +24,7 @@ import { formatTimeDifference } from 'src/app/core/services/misc/date.format'
 @Component({
   templateUrl: './game-selection.component.html',
   styleUrls: ['./game-selection.component.css', '../../../core/css/list.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class GameSelectionComponent implements OnInit {

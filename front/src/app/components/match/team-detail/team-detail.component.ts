@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject } from '@angular/core'
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { Select, Store } from '@ngxs/store'
 import { Observable, Subject } from 'rxjs'
@@ -23,6 +23,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
   selector: 'team-detail',
   templateUrl: './team-detail.component.html',
   styleUrls: ['./team-detail.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class TeamDetailComponent {

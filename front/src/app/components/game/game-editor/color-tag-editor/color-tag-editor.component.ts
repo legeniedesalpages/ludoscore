@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject, Input, OnInit } from '@angular/core'
+import { Component, Inject, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { COLORS, ColorTag } from 'src/app/core/model/tag.model'
 
@@ -18,6 +18,7 @@ import { COLORS, ColorTag } from 'src/app/core/model/tag.model'
     selector: 'color-tag-editor',
     templateUrl: './color-tag-editor.component.html',
     styleUrls: ['./color-tag-editor.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ColorTagEditorComponent implements OnInit {
@@ -53,6 +54,7 @@ export class ColorTagEditorComponent implements OnInit {
     selector: 'dialog-color-tag-editor',
     templateUrl: '../color-tag-editor-dialog/color-tag-editor-dialog.component.html',
     styleUrls: ['../color-tag-editor-dialog/color-tag-editor-dialog.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DialogColorTagEditorComponent {
