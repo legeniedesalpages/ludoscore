@@ -85,8 +85,22 @@
   right: 0.75rem;
 }
 
+.period-select {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 10.5rem;
+  font-size: 0.875rem;
+  --mat-form-field-container-height: 40px;
+  --mat-form-field-container-vertical-padding: 8px;
+}
+
 .stat-card:has(.more-button) mat-card-header {
   padding-right: 4rem;
+}
+
+.stat-card:has(.period-select) mat-card-header {
+  padding-right: 11.75rem;
 }
 
 /* Carte de synthèse : non cliquable, même couleur que les boutons des autres cartes */

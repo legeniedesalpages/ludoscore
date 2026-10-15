@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class StatisticsController extends Controller
 {
-    public function overview(): JsonResponse
+    public function overview(Request $request): JsonResponse
     {
+        [$from, $to] = $this->periodRange((string) $request->query('period', 'all'));
+
         $matches = DB::table('matches as m')
             ->leftJoin('games as g', 'g.id', '=', 'm.game_id')
             ->leftJoin('teams as w', 'w.id', '=', 'm.winner_team_id')
@@ -26,13 +30,18 @@ class StatisticsController extends Controller
             ->orderBy('m.started_at', 'desc')
             ->get();
 
-        $totalMatches = $matches->count();
+        $inPeriod = fn($match) => !$from || ($match->started_at && $match->started_at >= $from && $match->started_at <= $to);
+        $periodMatches = $matches->filter($inPeriod);
+
+        $applyPeriod = fn($query) => $from ? $query->whereBetween('m.started_at', [$from, $to]) : $query;
+
+        $totalMatches = $periodMatches->count();
         $totalGames = DB::table('games')->count();
         $totalPlayers = DB::table('players')->count();
 
         $durationValues = [];
-        foreach ($matches as $match) {
-            if ($match->started_at && $match->finished_at) {
+        foreach ($periodMatches as $match) {
+            if ($match->started_at && $match->finished_at && !$match->canceled && !$match->running) {
                 $diff = (strtotime($match->finished_at) - strtotime($match->started_at)) / 60;
                 if ($diff > 0) {
                     $durationValues[] = $diff;
@@ -43,17 +52,17 @@ class StatisticsController extends Controller
         $averageDurationMinutes = count($durationValues) > 0 ? (int) round(array_sum($durationValues) / count($durationValues)) : null;
 
         $gameCount = [];
-        foreach ($matches as $match) {
+        foreach ($periodMatches as $match) {
             $key = $match->game_title ?? 'Inconnu';
             $gameCount[$key] = ($gameCount[$key] ?? 0) + 1;
         }
         arsort($gameCount);
         $mostPlayedGame = $gameCount ? ['name' => array_key_first($gameCount), 'value' => (int) reset($gameCount)] : ['name' => 'Aucun', 'value' => 0];
 
-        $playerWins = DB::table('team_players as tp')
+        $playerWins = $applyPeriod(DB::table('team_players as tp')
             ->join('teams as t', 't.id', '=', 'tp.team_id')
             ->join('matches as m', 'm.winner_team_id', '=', 't.id')
-            ->join('players as p', 'p.id', '=', 'tp.player_id')
+            ->join('players as p', 'p.id', '=', 'tp.player_id'))
             ->select('p.id', 'p.pseudo', DB::raw('COUNT(*) as wins'))
             ->groupBy('p.id', 'p.pseudo')
             ->orderByDesc('wins')
@@ -62,8 +71,8 @@ class StatisticsController extends Controller
 
         $bestPlayer = $playerWins->first();
 
-        $winnerDistribution = DB::table('matches as m')
-            ->join('teams as t', 't.id', '=', 'm.winner_team_id')
+        $winnerDistribution = $applyPeriod(DB::table('matches as m')
+            ->join('teams as t', 't.id', '=', 'm.winner_team_id'))
             ->select('t.name as name', DB::raw('COUNT(*) as value'))
             ->whereNotNull('m.winner_team_id')
             ->groupBy('t.id', 't.name')
@@ -71,8 +80,8 @@ class StatisticsController extends Controller
             ->limit(6)
             ->get();
 
-        $gameRanking = DB::table('matches as m')
-            ->join('games as g', 'g.id', '=', 'm.game_id')
+        $gameRanking = $applyPeriod(DB::table('matches as m')
+            ->join('games as g', 'g.id', '=', 'm.game_id'))
             ->select('g.title as name', DB::raw('COUNT(*) as value'))
             ->groupBy('g.id', 'g.title')
             ->orderByDesc('value')
@@ -85,11 +94,19 @@ class StatisticsController extends Controller
         $weekdayCount = [];
         $weekdays = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
         $longestMatch = null;
-        foreach ($matches as $match) {
+        foreach ($periodMatches as $match) {
             if (!$match->started_at || $match->canceled) {
                 continue;
             }
             $start = strtotime($match->started_at);
+
+            if ($match->finished_at && !$match->running) {
+                $minutes = (int) round((strtotime($match->finished_at) - $start) / 60);
+                if ($minutes > 0 && ($longestMatch === null || $minutes > $longestMatch['minutes'])) {
+                    $longestMatch = ['game' => $match->game_title ?? 'Inconnu', 'minutes' => $minutes];
+                }
+            }
+
             $hour = (int) date('G', $start);
             $period = match (true) {
                 $hour >= 6 && $hour < 12 => 'matin',
@@ -101,13 +118,6 @@ class StatisticsController extends Controller
 
             $weekday = $weekdays[(int) date('w', $start)];
             $weekdayCount[$weekday] = ($weekdayCount[$weekday] ?? 0) + 1;
-
-            if ($match->finished_at) {
-                $minutes = (int) round((strtotime($match->finished_at) - $start) / 60);
-                if ($minutes > 0 && ($longestMatch === null || $minutes > $longestMatch['minutes'])) {
-                    $longestMatch = ['game' => $match->game_title ?? 'Inconnu', 'minutes' => $minutes];
-                }
-            }
         }
         arsort($periodCount);
         arsort($weekdayCount);
@@ -115,15 +125,15 @@ class StatisticsController extends Controller
         $favoriteWeekday = $weekdayCount ? array_key_first($weekdayCount) : null;
 
         $neverPlayedGames = DB::table('games as g')
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))->from('matches as m')->whereColumn('m.game_id', 'g.id');
+            ->whereNotExists(function ($query) use ($applyPeriod) {
+                $applyPeriod($query->select(DB::raw(1))->from('matches as m')->whereColumn('m.game_id', 'g.id'));
             })
             ->count();
 
-        $mostActivePlayer = DB::table('team_players as tp')
+        $mostActivePlayer = $applyPeriod(DB::table('team_players as tp')
             ->join('teams as t', 't.id', '=', 'tp.team_id')
             ->join('matches as m', 'm.id', '=', 't.match_id')
-            ->join('players as p', 'p.id', '=', 'tp.player_id')
+            ->join('players as p', 'p.id', '=', 'tp.player_id'))
             ->where('m.canceled', false)
             ->select('p.pseudo', DB::raw('COUNT(DISTINCT ' . DB::getTablePrefix() . 'm.id) as matches'))
             ->groupBy('p.id', 'p.pseudo')
@@ -150,6 +160,19 @@ class StatisticsController extends Controller
             'winnerDistribution' => $winnerDistribution,
             'status' => 'success',
         ]);
+    }
+
+    private function periodRange(string $period): array
+    {
+        $now = Carbon::now();
+        $fmt = 'Y-m-d H:i:s';
+        return match ($period) {
+            'year' => [$now->copy()->startOfYear()->format($fmt), $now->format($fmt)],
+            'last3months' => [$now->copy()->subMonths(3)->format($fmt), $now->format($fmt)],
+            'lastmonth' => [$now->copy()->subMonthNoOverflow()->startOfMonth()->format($fmt), $now->copy()->subMonthNoOverflow()->endOfMonth()->format($fmt)],
+            'lastweek' => [$now->copy()->subWeek()->startOfWeek()->format($fmt), $now->copy()->subWeek()->endOfWeek()->format($fmt)],
+            default => [null, null],
+        };
     }
 
     public function games(): JsonResponse
@@ -183,7 +206,7 @@ class StatisticsController extends Controller
 
             $stats[$gameTitle]['matches']++;
 
-            if ($match->started_at && $match->finished_at) {
+            if ($match->started_at && $match->finished_at && !$match->canceled && !$match->running) {
                 $diff = (strtotime($match->finished_at) - strtotime($match->started_at)) / 60;
                 if ($diff > 0) {
                     $stats[$gameTitle]['durations'][] = $diff;

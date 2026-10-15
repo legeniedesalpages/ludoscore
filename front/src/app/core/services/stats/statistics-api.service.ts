@@ -57,8 +57,8 @@ export class StatisticsApiService {
 
   constructor(private http: HttpClient) {}
 
-  public overview(): Observable<StatisticsOverviewApi | ApiStatus> {
-    return this.http.get<StatisticsOverviewApi>(`${this.baseUrl}/overview`).pipe(
+  public overview(period = 'all'): Observable<StatisticsOverviewApi | ApiStatus> {
+    return this.http.get<StatisticsOverviewApi>(`${this.baseUrl}/overview`, { params: { period } }).pipe(
       tap(() => console.info('Statistics overview loaded')),
       catchError(error => {
         console.error('Statistics overview failed', error)

@@ -15,18 +15,23 @@
       <section class="stats-grid" *ngIf="!loading && dashboard as stats" aria-label="Synthèse des statistiques">
         <mat-card class="stat-card summary-card">
           <mat-card-header>
-            <mat-card-title>Stats générales</mat-card-title>
-            <mat-card-subtitle>{{ stats.totalMatches }} {{ stats.totalMatches > 1 ? 'parties enregistrées' : 'partie enregistrée' }}</mat-card-subtitle>
+            <mat-card-title>Stats</mat-card-title>
+            <mat-card-subtitle>Sur {{ stats.totalMatches }} {{ stats.totalMatches > 1 ? 'parties' : 'partie' }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <p class="metric"><span>{{ generalStory(stats) }}</span></p>
           </mat-card-content>
+          <mat-form-field class="period-select" appearance="outline" subscriptSizing="dynamic">
+            <mat-select [value]="period" (selectionChange)="onPeriodChange($event.value)" aria-label="Période des statistiques">
+              <mat-option *ngFor="let p of periods" [value]="p.value">{{ p.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
         </mat-card>
 
         <mat-card class="stat-card">
           <mat-card-header>
             <mat-card-title>Stats par jeux</mat-card-title>
-            <mat-card-subtitle>{{ stats.totalGames }} {{ stats.totalGames > 1 ? 'jeux enregistrés' : 'jeu enregistré' }}</mat-card-subtitle>
+            <mat-card-subtitle>Sur {{ stats.totalGames }} {{ stats.totalGames > 1 ? 'jeux' : 'jeu' }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <p class="metric"><span>{{ gamesStory(stats) }}</span></p>
@@ -39,7 +44,7 @@
         <mat-card class="stat-card">
           <mat-card-header>
             <mat-card-title>Stats par joueurs</mat-card-title>
-            <mat-card-subtitle>{{ stats.totalPlayers }} {{ stats.totalPlayers > 1 ? 'joueurs enregistrés' : 'joueur enregistré' }}</mat-card-subtitle>
+            <mat-card-subtitle>Sur {{ stats.totalPlayers }} {{ stats.totalPlayers > 1 ? 'joueurs' : 'joueur' }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <p class="metric"><span>{{ playersStory(stats) }}</span></p>

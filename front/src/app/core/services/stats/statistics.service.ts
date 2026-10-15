@@ -59,8 +59,8 @@ export interface StatisticsDashboard {
 export class StatisticsService {
   constructor(private statisticsApi: StatisticsApiService) {}
 
-  public loadDashboard(): Observable<{ dashboard: StatisticsDashboard | null; error: string | null; loading: boolean }> {
-    return this.statisticsApi.overview().pipe(
+  public loadDashboard(period = 'all'): Observable<{ dashboard: StatisticsDashboard | null; error: string | null; loading: boolean }> {
+    return this.statisticsApi.overview(period).pipe(
       map((overview: any) => {
         if (!overview || overview.status === 'error') {
           return { dashboard: null, error: overview?.message ?? 'Erreur inconnue', loading: false }
