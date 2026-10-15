@@ -39,6 +39,11 @@ export class PlayerService {
         ))
     }
 
+    // À appeler après toute création/modification de joueur pour que la prochaine liste soit rechargée
+    public invalidateCache(): void {
+        this.cachePlayers = undefined
+    }
+
     private playerEntityToPlayer(playerEntity: PlayerEntity): Player {
         const preferedColor = COLORS.find(color => color.name == playerEntity.preferedColor)
         return {

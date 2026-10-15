@@ -20,6 +20,7 @@ import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
 import { UserEntity } from 'src/app/core/entity/user-entity.model'
 import { COLORS } from 'src/app/core/model/tag.model'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
+import { PlayerService } from 'src/app/core/services/player/player.service'
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
 import { AuthState } from 'src/app/core/state/auth/auth.state'
 
@@ -43,7 +44,7 @@ export class EditPlayerComponent implements OnInit {
   public currentPlayerId: number = 0
   public isEditable: boolean = false
 
-  constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private userCrudService: UserCrudService, private snackBar: MatSnackBar, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private playerListService: PlayerService, private userCrudService: UserCrudService, private snackBar: MatSnackBar, private changeDetectorRef: ChangeDetectorRef) {
     this.playerEditorForm = new FormGroup({
       pseudo: new FormControl('', Validators.required),
       prenom: new FormControl(''),
@@ -132,6 +133,7 @@ export class EditPlayerComponent implements OnInit {
     if (this.creating) {
       this.playerService.save(playerEntity).subscribe(() => {
         console.debug("Player created")
+        this.playerListService.invalidateCache()
         this.saving = false
         this.changeDetectorRef.markForCheck()
         this.snackBar.open("Joueur créé", 'Fermer', {
@@ -142,6 +144,7 @@ export class EditPlayerComponent implements OnInit {
     } else {
       this.playerService.update(playerEntity.id, playerEntity).subscribe(() => {
         console.debug("Player updated")
+        this.playerListService.invalidateCache()
         this.saving = false
         this.changeDetectorRef.markForCheck()
         this.snackBar.open("Joueur mis à jour", 'Fermer', {
