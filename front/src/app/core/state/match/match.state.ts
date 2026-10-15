@@ -470,8 +470,8 @@ export class MatchState {
             return
         }
 
-        const calculatedScore = scoreAddedToTeam.team .scoreDetails
-            .map(scoreDetail => scoreDetail.value ?? 0)
+        const calculatedScore = scoreAddedToTeam.scoreDetail
+            .map(scoreDetail => Number(scoreDetail.value) || 0)
             .reduce((sum, score) => sum + score, 0);
 
         const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
