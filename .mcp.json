@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "angular-cli": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "-w",
+        "/usr/src/app",
+        "angular-app",
+        "npx",
+        "-y",
+        "@angular/cli",
+        "mcp"
+      ]
+    }
+  }
+}
