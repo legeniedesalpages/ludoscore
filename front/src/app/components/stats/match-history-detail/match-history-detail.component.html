@@ -95,6 +95,14 @@
                             </div>
                             <div class="winner-edit">
                                 <mat-form-field appearance="fill">
+                                    <mat-label>Statut</mat-label>
+                                    <mat-select formControlName="status">
+                                        <mat-option value="running">En cours</mat-option>
+                                        <mat-option value="finished">Terminée</mat-option>
+                                        <mat-option value="canceled">Abandonnée</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field appearance="fill">
                                     <mat-label>Gagnant</mat-label>
                                     <mat-select formControlName="winnerTeamId">
                                         <mat-option [value]="null">Aucun</mat-option>

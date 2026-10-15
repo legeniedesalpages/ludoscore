@@ -143,6 +143,8 @@ class GameMatchController extends Controller
             'started_at' => ['required', 'date_format:Y-m-d H:i:s'],
             'finished_at' => ['nullable', 'date_format:Y-m-d H:i:s', 'after_or_equal:started_at'],
             'winner_team_id' => ['nullable', 'integer'],
+            'running' => ['required', 'boolean'],
+            'canceled' => ['required', 'boolean'],
             'teams' => ['required', 'array'],
             'teams.*.id' => ['required', 'integer'],
             'teams.*.score' => ['nullable', 'integer', 'between:-32768,32767'],
@@ -155,6 +157,12 @@ class GameMatchController extends Controller
                 abort(422, "L'équipe " . $team['id'] . " n'appartient pas à cette partie");
             }
         }
+        if ($data['running'] && $data['canceled']) {
+            abort(422, "Une partie ne peut pas être à la fois en cours et abandonnée");
+        }
+        if ($data['running'] && GameMatch::where('running', true)->where('id', '!=', $gameMatch->id)->exists()) {
+            abort(422, "Une autre partie est déjà en cours");
+        }
         $winnerTeamId = $data['winner_team_id'] ?? null;
         if ($winnerTeamId !== null && !in_array($winnerTeamId, $teamIds)) {
             abort(422, "L'équipe gagnante n'appartient pas à cette partie");
@@ -165,6 +173,8 @@ class GameMatchController extends Controller
             $gameMatch->started_at = $data['started_at'];
             $gameMatch->finished_at = $data['finished_at'] ?? null;
             $gameMatch->winner_team_id = $winnerTeamId;
+            $gameMatch->running = $data['running'];
+            $gameMatch->canceled = $data['canceled'];
             $gameMatch->save();
 
             foreach ($data['teams'] as $teamData) {

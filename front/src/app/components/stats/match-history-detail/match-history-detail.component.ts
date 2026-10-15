@@ -163,6 +163,7 @@ export class MatchHistoryDetailComponent implements OnInit {
       startedAt: new FormControl(toInputValue(match.startedAt), Validators.required),
       endedAt: new FormControl(toInputValue(match.endedAt)),
       winnerTeamId: new FormControl<number | null>(match.winningTeam?.id ?? null),
+      status: new FormControl<'running' | 'finished' | 'canceled'>(match.canceled ? 'canceled' : match.running ? 'running' : 'finished'),
       teams: new FormArray(match.teams.map(team => new FormGroup({
         score: new FormControl<number | null>(team.score ?? null, [Validators.min(-32768), Validators.max(32767)]),
         details: new FormArray(team.scoreDetails.map(detail =>
@@ -282,6 +283,8 @@ export class MatchHistoryDetailComponent implements OnInit {
       startedAt: toServerValue(this.form.get('startedAt')?.value)!,
       finishedAt: toServerValue(this.form.get('endedAt')?.value),
       winnerTeamId,
+      running: this.form.get('status')?.value === 'running',
+      canceled: this.form.get('status')?.value === 'canceled',
       teams: updatedTeams
     }).pipe(switchMap(() => photoOperation)).subscribe({
       next: () => {

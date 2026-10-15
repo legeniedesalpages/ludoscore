@@ -27,6 +27,8 @@ export interface MatchHistoryUpdate {
     startedAt: string
     finishedAt: string | null
     winnerTeamId: number | null
+    running: boolean
+    canceled: boolean
     teams: { id: number, score: number | null, scoreDetails: Score[] }[]
 }
 
@@ -150,6 +152,8 @@ export class MatchService {
             started_at: match.startedAt,
             finished_at: match.finishedAt,
             winner_team_id: match.winnerTeamId,
+            running: match.running,
+            canceled: match.canceled,
             teams: match.teams.map(team => ({
                 id: team.id,
                 score: team.score,
