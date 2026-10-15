@@ -2,6 +2,8 @@ data
 .vscode-janus-debug
 ludoscore.code-workspace
 back/public/images
+back/version.json
+front/src/environments/version.ts
 .vscode/
 **/dist/
 .github/copilot-instructions.md

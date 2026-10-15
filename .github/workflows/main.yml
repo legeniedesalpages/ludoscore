@@ -25,6 +25,10 @@ jobs:
         sed -i "s/SECRET_RECAPTCHA_SITE_KEY/${{secrets.RECAPTCHA_SITE_KEY}}/g" "./front/src/environments/environment.prod.ts"
         sed -i "s/SECRET_PUSHER_APP_KEY/${{secrets.PUSHER_APP_KEY}}/g" "./front/src/environments/environment.prod.ts"
     
+    - name: Version du Back Office
+      run: |-
+        echo "{\"version\":\"1.0.${{ github.run_number }}\",\"buildDate\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./back/version.json
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:

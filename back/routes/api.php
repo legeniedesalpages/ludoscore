@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\VersionController;
+
+Route::get('/version', [VersionController::class, 'show']);
 
 /*
 |--------------------------------------------------------------------------

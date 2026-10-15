@@ -127,7 +127,12 @@
       </div>
     </div>
 
-    
+    <div class="versions">
+      <div>Front : v{{ frontVersion.version }} ({{ frontVersion.buildDate | date:'dd/MM/yyyy HH:mm' }})</div>
+      <div *ngIf="backVersion$ | async as back">
+        Serveur : v{{ back.version }}<span *ngIf="back.buildDate"> ({{ back.buildDate | date:'dd/MM/yyyy HH:mm' }})</span>
+      </div>
+    </div>
 
   </ng-container>
 </app-layout>

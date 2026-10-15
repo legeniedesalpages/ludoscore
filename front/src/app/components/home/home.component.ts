@@ -23,6 +23,9 @@ import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { environment } from 'src/environments/environment'
+import { appVersion } from 'src/environments/version'
+import { BackVersion, VersionService } from 'src/app/core/services/misc/version.service'
+import { catchError, of } from 'rxjs'
 
 @Component({
   templateUrl: './home.component.html',
@@ -33,6 +36,8 @@ export class HomeComponent implements OnInit {
 
   public matchStateEnum: typeof MatchStateEnum = MatchStateEnum
   public env = environment
+  public frontVersion = appVersion
+  public backVersion$: Observable<BackVersion | null> = inject(VersionService).getBackVersion().pipe(catchError(() => of(null)))
 
   loggedUser$: Observable<string> = inject(Store).select(AuthState.userName)
   loggedUserId$: Observable<number> = inject(Store).select(AuthState.userId)
