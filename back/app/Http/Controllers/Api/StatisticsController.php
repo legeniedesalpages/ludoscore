@@ -79,11 +79,71 @@ class StatisticsController extends Controller
             ->limit(6)
             ->get();
 
+        $totalPlayMinutes = (int) round(array_sum($durationValues));
+
+        $periodCount = ['matin' => 0, 'après-midi' => 0, 'soirée' => 0, 'nuit' => 0];
+        $weekdayCount = [];
+        $weekdays = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+        $longestMatch = null;
+        foreach ($matches as $match) {
+            if (!$match->started_at || $match->canceled) {
+                continue;
+            }
+            $start = strtotime($match->started_at);
+            $hour = (int) date('G', $start);
+            $period = match (true) {
+                $hour >= 6 && $hour < 12 => 'matin',
+                $hour >= 12 && $hour < 18 => 'après-midi',
+                $hour >= 18 => 'soirée',
+                default => 'nuit',
+            };
+            $periodCount[$period]++;
+
+            $weekday = $weekdays[(int) date('w', $start)];
+            $weekdayCount[$weekday] = ($weekdayCount[$weekday] ?? 0) + 1;
+
+            if ($match->finished_at) {
+                $minutes = (int) round((strtotime($match->finished_at) - $start) / 60);
+                if ($minutes > 0 && ($longestMatch === null || $minutes > $longestMatch['minutes'])) {
+                    $longestMatch = ['game' => $match->game_title ?? 'Inconnu', 'minutes' => $minutes];
+                }
+            }
+        }
+        arsort($periodCount);
+        arsort($weekdayCount);
+        $favoritePeriod = reset($periodCount) > 0 ? array_key_first($periodCount) : null;
+        $favoriteWeekday = $weekdayCount ? array_key_first($weekdayCount) : null;
+
+        $neverPlayedGames = DB::table('games as g')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))->from('matches as m')->whereColumn('m.game_id', 'g.id');
+            })
+            ->count();
+
+        $mostActivePlayer = DB::table('team_players as tp')
+            ->join('teams as t', 't.id', '=', 'tp.team_id')
+            ->join('matches as m', 'm.id', '=', 't.match_id')
+            ->join('players as p', 'p.id', '=', 'tp.player_id')
+            ->where('m.canceled', false)
+            ->select('p.pseudo', DB::raw('COUNT(DISTINCT ' . DB::getTablePrefix() . 'm.id) as matches'))
+            ->groupBy('p.id', 'p.pseudo')
+            ->orderByDesc('matches')
+            ->first();
+
         return response()->json([
             'totalMatches' => $totalMatches,
             'totalGames' => $totalGames,
             'totalPlayers' => $totalPlayers,
             'averageDurationMinutes' => $averageDurationMinutes,
+            'totalPlayMinutes' => $totalPlayMinutes,
+            'favoritePeriod' => $favoritePeriod,
+            'favoriteWeekday' => $favoriteWeekday,
+            'longestMatch' => $longestMatch,
+            'neverPlayedGames' => $neverPlayedGames,
+            'mostActivePlayer' => $mostActivePlayer
+                ? ['name' => $mostActivePlayer->pseudo, 'matches' => (int) $mostActivePlayer->matches]
+                : null,
+            'bestPlayerWins' => $bestPlayer ? (int) $bestPlayer->wins : 0,
             'mostPlayedGame' => $mostPlayedGame,
             'bestPlayer' => $bestPlayer?->pseudo ?: 'Aucun',
             'gameRanking' => $gameRanking,

@@ -39,7 +39,15 @@ export interface StatisticsDashboard {
   totalGames: number
   totalPlayers: number
   averageDurationMinutes: number | null
+  totalPlayMinutes: number
+  favoritePeriod: string | null
+  favoriteWeekday: string | null
+  longestMatch: { game: string; minutes: number } | null
+  neverPlayedGames: number
+  mostActivePlayer: { name: string; matches: number } | null
+  bestPlayerWins: number
   mostPlayedGame: string
+  mostPlayedGameCount: number
   bestPlayer: string
   topGames: TopBarItem[]
   winnerDistribution: WinnerDistribution[]
@@ -63,7 +71,15 @@ export class StatisticsService {
           totalGames: overview.totalGames ?? 0,
           totalPlayers: overview.totalPlayers ?? 0,
           averageDurationMinutes: overview.averageDurationMinutes ?? null,
+          totalPlayMinutes: overview.totalPlayMinutes ?? 0,
+          favoritePeriod: overview.favoritePeriod ?? null,
+          favoriteWeekday: overview.favoriteWeekday ?? null,
+          longestMatch: overview.longestMatch ?? null,
+          neverPlayedGames: overview.neverPlayedGames ?? 0,
+          mostActivePlayer: overview.mostActivePlayer ?? null,
+          bestPlayerWins: overview.bestPlayerWins ?? 0,
           mostPlayedGame: overview.mostPlayedGame?.name ?? 'Aucun',
+          mostPlayedGameCount: overview.mostPlayedGame?.value ?? 0,
           bestPlayer: overview.bestPlayer ?? 'Aucun',
           topGames: (overview.gameRanking ?? []).map((item: any, index: number) => ({
             label: item.name,

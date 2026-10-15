@@ -13,6 +13,13 @@ export interface StatisticsOverviewApi {
   totalGames: number
   totalPlayers: number
   averageDurationMinutes: number | null
+  totalPlayMinutes: number
+  favoritePeriod: string | null
+  favoriteWeekday: string | null
+  longestMatch: { game: string; minutes: number } | null
+  neverPlayedGames: number
+  mostActivePlayer: { name: string; matches: number } | null
+  bestPlayerWins: number
   mostPlayedGame: { name: string; value: number }
   bestPlayer: string
   gameRanking: Array<{ name: string; value: number }>

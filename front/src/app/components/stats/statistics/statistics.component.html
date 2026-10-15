@@ -4,29 +4,51 @@
   </ng-container>
 
   <ng-container role="body">
-    <div class="statistics-shell">
-      <div class="hero-panel">
-        <div>
-          <p class="eyebrow">Analyse de performance</p>
-          <h2>Vue d’ensemble de vos parties</h2>
-        </div>
-      </div>
+    <main class="statistics-shell">
+  
+      <p class="loading-state" *ngIf="loading">Chargement des statistiques…</p>
 
-      <div class="stats-grid">
-        <div class="stat-card blue" *ngFor="let card of cards" [routerLink]="card.route">
-          <div class="icon-wrap">
-            <mat-icon>{{ card.icon }}</mat-icon>
-          </div>
-          <div>
-            <h3>{{ card.title }}</h3>
-            <p>{{ card.subtitle }}</p>
-          </div>
-          <button mat-stroked-button>
-            Ouvrir
+      <p class="error-state" *ngIf="!loading && error" role="alert">
+        {{ error }}
+      </p>
+
+      <section class="stats-grid" *ngIf="!loading && dashboard as stats" aria-label="Synthèse des statistiques">
+        <mat-card class="stat-card summary-card">
+          <mat-card-header>
+            <mat-card-title>Stats générales</mat-card-title>
+            <mat-card-subtitle>{{ stats.totalMatches }} {{ stats.totalMatches > 1 ? 'parties enregistrées' : 'partie enregistrée' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="metric"><span>{{ generalStory(stats) }}</span></p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-card-header>
+            <mat-card-title>Stats par jeux</mat-card-title>
+            <mat-card-subtitle>{{ stats.totalGames }} {{ stats.totalGames > 1 ? 'jeux enregistrés' : 'jeu enregistré' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="metric"><span>{{ gamesStory(stats) }}</span></p>
+          </mat-card-content>
+          <button mat-mini-fab color="primary" class="more-button" aria-label="Voir plus de stats par jeux">
             <mat-icon>arrow_forward</mat-icon>
           </button>
-        </div>
-      </div>
-    </div>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-card-header>
+            <mat-card-title>Stats par joueurs</mat-card-title>
+            <mat-card-subtitle>{{ stats.totalPlayers }} {{ stats.totalPlayers > 1 ? 'joueurs enregistrés' : 'joueur enregistré' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="metric"><span>{{ playersStory(stats) }}</span></p>
+          </mat-card-content>
+          <button mat-mini-fab color="primary" class="more-button" aria-label="Voir plus de stats par joueurs">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </mat-card>
+      </section>
+    </main>
   </ng-container>
 </app-layout>
