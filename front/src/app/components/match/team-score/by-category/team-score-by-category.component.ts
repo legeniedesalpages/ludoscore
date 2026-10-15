@@ -89,6 +89,7 @@ export class TeamScoreByCategoryComponent implements OnInit {
 
   protected onSubmit() {
     if (this.categoryScoreFormGroup.valid) {
+      this.listOfInputScore.forEach(input => input.onChange())
 
       this.store.dispatch(new AddScoreToCategory(this.scoreDetailsByTeam))
 

@@ -113,6 +113,10 @@ export class CategoryComponent implements OnInit {
             }
         }
 
+        if (this.scoreTag().negatif) {
+            localCalculatedValue *= -1
+        }
+
         this.calculatedValue.set(localCalculatedValue)
         this.valueChange.emit({
             categoryName: this.scoreTag().category,
