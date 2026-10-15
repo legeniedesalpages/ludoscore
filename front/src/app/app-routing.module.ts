@@ -33,6 +33,7 @@ const routes: Routes = [
   { path: 'wheel', loadChildren: () => import('./components/match/wheel/wheel.module').then(m => m.WheelModule), data: { animation: 'wheel' } },
 
   { path: 'find-game', loadChildren: () => import('./components/game/find-game/find-game.module').then(m => m.FindGameModule), data: { animation: 'find-game' } },
+  { path: 'game-library', loadComponent: () => import('./components/game/game-library/game-library.component').then(c => c.GameLibraryComponent), canActivate: [AuthGuardService], data: { animation: 'game-library' } },
   { path: 'game-editor/:type/:id', loadChildren: () => import('./components/game/game-editor/game-editor.module').then(m => m.GameEditorModule), data: { animation: 'game-editor' } },
 
   { path: 'manage-player', loadChildren: () => import('./components/player/manage-player/manage-player.module').then(m => m.ManagePlayerModule), data: { animation: 'manage-player' } },

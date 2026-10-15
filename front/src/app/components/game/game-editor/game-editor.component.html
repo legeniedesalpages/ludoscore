@@ -39,7 +39,11 @@
                             </mat-form-field>
                         </div>
 
-                        <div class="column date">
+                        <div class="column boolean">
+                            <mat-slide-toggle formControlName="inLibrary">Dans notre ludothèque</mat-slide-toggle>
+                        </div>
+
+                        <div class="column date" *ngIf="gameEditorForm.get('inLibrary')!.value">
                             <mat-form-field appearance="fill">
                                 <mat-label>Date d'obtention</mat-label>
                                 <input matInput formControlName="ownership" [matDatepicker]="ownership">

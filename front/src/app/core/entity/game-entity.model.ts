@@ -17,6 +17,7 @@ export interface GameEntity {
     thumbnailId: string
     isOnlyCooperative: boolean
     ownershipDate: Date
+    inLibrary: boolean
     minPlayers: number
     maxPlayers: number
     bggId: number

@@ -90,6 +90,10 @@ export class HomeComponent implements OnInit {
     this.store.dispatch(new Navigate(['/find-game']))
   }
 
+  navigateToGameLibrary() {
+    this.store.dispatch(new Navigate(['/game-library']))
+  }
+
   navigateToManagePlayer() {
     this.store.dispatch(new Navigate(['/manage-player']))
   }

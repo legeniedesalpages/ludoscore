@@ -65,6 +65,7 @@ export class GameEditorComponent implements OnInit {
       cooperative: new FormControl(false, Validators.required),
       minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
+      inLibrary: new FormControl(true),
       ownership: new FormControl('', DateValidator.dateValidator),
     })
   }
@@ -106,6 +107,7 @@ export class GameEditorComponent implements OnInit {
           minPlayer: game.minPlayers,
           maxPlayer: game.maxPlayers,
           cooperative: game.isOnlyCooperative,
+          inLibrary: game.inLibrary,
           ownership: game.ownershipDate,
           estimatedDurationInMinutes: game.estimatedDurationInMinutes
         })
@@ -143,6 +145,7 @@ export class GameEditorComponent implements OnInit {
           minPlayer: gameSearchDetail.minplayers,
           maxPlayer: gameSearchDetail.maxplayers,
           cooperative: false,
+          inLibrary: true,
           ownership: null,
           estimatedDurationInMinutes: 0
         })
@@ -168,6 +171,7 @@ export class GameEditorComponent implements OnInit {
       isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value,
       minPlayers: this.gameEditorForm.get('minPlayer')?.value,
       maxPlayers: this.gameEditorForm.get('maxPlayer')?.value,
+      inLibrary: !!this.gameEditorForm.get('inLibrary')?.value,
       ownershipDate: this.gameEditorForm.get('ownership')?.value!,
       matchTags: this.tagsGame,
       playerTags: this.tagsPlayer,
@@ -192,7 +196,7 @@ export class GameEditorComponent implements OnInit {
         })
         this.saving = false
         this.changeDetectorRef.markForCheck()
-        this.store.dispatch(new Navigate(['/']))
+        this.store.dispatch(this.cameFromLibrary() ? new Navigate(['/game-library']) : new Navigate(['/']))
       },
 
       error: (err) => {
@@ -206,8 +210,12 @@ export class GameEditorComponent implements OnInit {
     })
   }
 
+  private cameFromLibrary(): boolean {
+    return this.route.snapshot.queryParamMap.get('from') === 'library'
+  }
+
   public returnToGameList() {
-    this.store.dispatch(new Navigate(['/find-game']))
+    this.store.dispatch(new Navigate([this.cameFromLibrary() ? '/game-library' : '/find-game']))
   }
 
 }

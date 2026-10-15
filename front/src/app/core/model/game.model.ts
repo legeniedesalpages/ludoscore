@@ -36,6 +36,7 @@ export interface GameDetail {
     minPlayers: number
     maxPlayers: number
     ownershipDate: Date
+    inLibrary: boolean
     matchTags: Tag[]
     playerTags: Tag[]
     playerColors: ColorTag[]

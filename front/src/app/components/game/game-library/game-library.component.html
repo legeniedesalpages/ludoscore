@@ -1,0 +1,59 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
+    <ng-container role="header">
+        <span class="title" *ngIf="!searching()">Bibliothèque de jeux</span>
+        <button mat-icon-button (click)="searching.set(true)" *ngIf="!searching()" class="header-button">
+            <mat-icon>search</mat-icon>
+        </button>
+
+        <input placeholder="Rechercher un jeu" class="search-input" [cdkTrapFocusAutoCapture]="true"
+            [cdkTrapFocus]="true" *ngIf="searching()" [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+        <button mat-icon-button (click)="searching.set(false); searchText.set('')" *ngIf="searching()" class="header-button">
+            <mat-icon>cancel</mat-icon>
+        </button>
+    </ng-container>
+
+    <ng-container role="body">
+        <div class="actions">
+            <button mat-raised-button (click)="addGame()">Ajouter un jeu</button>
+        </div>
+
+        <div class="toolbar">
+            <mat-button-toggle-group [value]="filter()" (change)="filter.set($event.value)" aria-label="Filtre">
+                <mat-button-toggle value="all">Tous</mat-button-toggle>
+                <mat-button-toggle value="in">Dans la ludothèque</mat-button-toggle>
+                <mat-button-toggle value="out">Hors ludothèque</mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <div class="summary">
+                {{ filteredGames().length }} jeu(x) affiché(s) — {{ countInLibrary() }} dans la ludothèque sur {{ games().length }}
+            </div>
+        </div>
+
+        <loading-spinner [loading]="loading" caption="Chargement de la bibliothèque"></loading-spinner>
+
+        @for (game of filteredGames(); track game.id) {
+            <div class="result-list" (click)="edit(game)">
+                <div class="visual">
+                    <img [src]="game.thumbnailUrl">
+                </div>
+                <div class="content">
+                    <div class="heading">{{ game.title }}</div>
+                    <div class="supporting">
+                        {{ playersLabel(game) }}
+                        @if (game.isOnlyCooperative) { · coopératif }
+                        @if (game.inLibrary) {
+                            · <span class="in-library"><mat-icon>star</mat-icon> Dans la ludothèque</span>
+                            @if (game.ownershipDate) { depuis le {{ game.ownershipDate | date:'dd/MM/yyyy' }} }
+                        } @else {
+                            · <span class="out-library">Hors ludothèque</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        } @empty {
+            @if (!loading) {
+                <div class="empty">Aucun jeu ne correspond.</div>
+            }
+        }
+    </ng-container>
+</app-layout>

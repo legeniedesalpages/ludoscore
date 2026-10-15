@@ -92,13 +92,17 @@ class GameController extends Controller
         }
 
 
+        // absent de la requête = comportement historique (dans la ludothèque)
+        $inLibrary = $request->has('in_library') ? $request->boolean('in_library') : true;
+
         if ($existingGame) {
             $existingGame->title = $request->name;
             $existingGame->is_expansion = false;
             $existingGame->is_only_cooperative = $is_only_cooperative;
             $existingGame->min_players = $request->min_players;
             $existingGame->max_players = $request->max_players;
-            $existingGame->ownership_date = $request->ownership_date;
+            $existingGame->in_library = $inLibrary;
+            $existingGame->ownership_date = $inLibrary ? $request->ownership_date : null;
             $existingGame->thumbnail_id = $uuid_thumbnail;
             $existingGame->image_id = $uuid_image;
             $existingGame->match_tags = $request->match_tags;
@@ -123,7 +127,8 @@ class GameController extends Controller
             $game->is_only_cooperative = $is_only_cooperative;
             $game->min_players = $request->min_players;
             $game->max_players = $request->max_players;
-            $game->ownership_date = $request->ownership_date;
+            $game->in_library = $inLibrary;
+            $game->ownership_date = $inLibrary ? $request->ownership_date : null;
             $game->thumbnail_id = $uuid_thumbnail;
             $game->image_id = $uuid_image;
             $game->match_tags = $request->match_tags;
