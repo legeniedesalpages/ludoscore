@@ -35,6 +35,7 @@ export class GameSelectionComponent implements OnInit {
   public isFilterMenuOpen: boolean = false
   public gameList$!: Observable<SelectingGame[]>
 
+  public onlyInLibraryFilter: boolean = true
   public onlyCooperativeFilter: boolean = false
   public twoPlayerOnlyFilter: boolean = false
   public moreThanFourPlayersFilter: boolean = false
@@ -117,7 +118,19 @@ export class GameSelectionComponent implements OnInit {
     return line2
   }
 
-  
+  public filterGames(games: SelectingGame[] | null): SelectingGame[] {
+    const searchText = this.searchText.trim().toLocaleLowerCase()
+
+    return (games ?? []).filter(game =>
+      (!this.onlyInLibraryFilter || game.inLibrary) &&
+      (!searchText || game.title.toLocaleLowerCase().includes(searchText)) &&
+      (!this.onlyCooperativeFilter || game.isOnlyCooperative) &&
+      (!this.twoPlayerOnlyFilter || (game.minPlayers === 2 && game.maxPlayers === 2)) &&
+      (!this.moreThanFourPlayersFilter || game.maxPlayers > 4) &&
+      (!this.lessThanThirtyMinutes || (game.estimatedDurationInMinutes > 0 && game.estimatedDurationInMinutes < 30)) &&
+      (!this.moreThanOneHourAndAHalfFilter || game.estimatedDurationInMinutes > 90)
+    )
+  }
 
   public cancelMatchCreation() {
     this.store.dispatch(new Navigate(['/']))
