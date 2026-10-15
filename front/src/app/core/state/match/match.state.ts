@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory } from "./match.action"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, ReorderTeams, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
@@ -347,6 +347,25 @@ export class MatchState {
             match: {
                 ...getState().match!,
                 teams: newlyOrderedTeams
+            }
+        })
+    }
+
+    @Action(ReorderTeams)
+    reorderTeams({ setState, getState }: StateContext<MatchStateModel>, reorder: ReorderTeams) {
+        const teams = getState().match!.teams
+        const isPermutation = reorder.order.length === teams.length
+            && new Set(reorder.order).size === teams.length
+            && reorder.order.every(i => i >= 0 && i < teams.length)
+        if (!isPermutation) {
+            console.error("Cannot reorder teams: invalid order", reorder.order)
+            return
+        }
+
+        setState({
+            match: {
+                ...getState().match!,
+                teams: reorder.order.map(i => teams[i])
             }
         })
     }

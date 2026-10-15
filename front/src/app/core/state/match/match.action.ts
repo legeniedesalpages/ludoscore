@@ -89,6 +89,11 @@ export class SwapTeamPosition {
     constructor(public firstTeam: Team, public secondTeam: Team) { }
 }
 
+export class ReorderTeams {
+    static readonly type: string = '[Match] ReorderTeams'
+    constructor(public order: number[]) { }
+}
+
 export class RemoveTeam {
     static readonly type: string = '[Match] RemoveTeam'
     constructor(public team: Team) { }

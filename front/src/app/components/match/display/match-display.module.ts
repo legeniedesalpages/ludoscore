@@ -28,6 +28,7 @@ import { MatchDisplayComponent } from './match-display.component';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { LayoutComponent } from '../../layout/layout.component';
+import { TagsSelectionModule } from '../tags-selection/tags-selection.module';
 
 const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActivate: [AuthGuardService] }];
 
@@ -48,7 +49,8 @@ const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActiva
     SidenavModule,
     MatDialogModule,
     MatSelectModule,
-    LayoutComponent
+    LayoutComponent,
+    TagsSelectionModule
   ],
   providers: [
     { provide: MatDialogRef, useValue: {} },

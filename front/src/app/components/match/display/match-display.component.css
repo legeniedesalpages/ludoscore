@@ -122,3 +122,34 @@ ul {
   margin: 0;
   padding: 0;
 }
+
+.edit-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.edit-panel h3 {
+  background-color: rgb(234, 234, 234);
+  padding: 5px;
+  margin: 0;
+  text-align: center;
+}
+
+.edit-team-header {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background-color: white;
+  opacity: 0.8;
+}
+
+.edit-team-name {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.list-tag-container {
+  padding: 10px;
+}

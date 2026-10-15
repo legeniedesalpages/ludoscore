@@ -20,7 +20,45 @@
                 <span class="bold">{{ elapsedTime }}</span>
             </div>
 
-            <div class="player-list">
+            <div class="edit-actions" *ngIf="!editing">
+                <button mat-stroked-button (click)="startEdit()">
+                    <mat-icon>edit</mat-icon> Modifier
+                </button>
+            </div>
+
+            <div class="edit-actions" *ngIf="editing">
+                <button mat-stroked-button (click)="cancelEdit()">Annuler</button>
+                <button mat-raised-button color="primary" (click)="saveEdit()">Valider</button>
+            </div>
+
+            <div class="edit-panel" *ngIf="editing">
+                <div *ngIf="((matchState | async)?.match!.game?.matchTags?.length ?? 0) > 0">
+                    <h3>Catégories du match</h3>
+                    <div class="list-tag-container">
+                        <game-tags-selection [saving]="saving" />
+                    </div>
+                </div>
+
+                <h3>Joueurs</h3>
+                <div *ngFor="let teamIndex of order; let position = index; trackBy: trackByIndex" class="edit-team">
+                    <div class="edit-team-header">
+                        <span class="edit-team-name">{{ (matchState | async)!.match!.teams[teamIndex].name }}</span>
+                        <button mat-icon-button [disabled]="position == 0" (click)="move(position, -1)">
+                            <mat-icon>arrow_upward</mat-icon>
+                        </button>
+                        <button mat-icon-button [disabled]="position == order.length - 1" (click)="move(position, 1)">
+                            <mat-icon>arrow_downward</mat-icon>
+                        </button>
+                    </div>
+                    <div class="list-tag-container"
+                        *ngIf="((matchState | async)?.match!.game?.playerTags?.length ?? 0) > 0">
+                        <team-tags-selection [teamIndex]="teamIndex" [saving]="saving"
+                            [teamChoosenTags]="teamChoosenTags" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="player-list" *ngIf="!editing">
                 <div *ngFor="let team of (matchState | async)?.match!.teams; let i = index" (click)="goToTeamDetail(team)">
                     <div class="row">
                         <div class="column">
@@ -51,7 +89,7 @@
                 </div>
             </div>
 
-            <div class="elapsedtime">
+            <div class="elapsedtime" *ngIf="!editing">
                 <button mat-raised-button (click)="endGame()">
                     Cliquer ici pour mettre fin à la partie
                 </button>

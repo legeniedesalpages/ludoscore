@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs>
+<linearGradient id="g" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".55" stop-color="#f57c1f"/><stop offset="1" stop-color="#c85a0a"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".22" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<clipPath id="k"><circle cx="100" cy="100" r="92"/></clipPath>
+</defs>
+<circle cx="100" cy="106" r="92" fill="#000" opacity=".16"/>
+<circle cx="100" cy="100" r="92" fill="url(#g)"/>
+<g clip-path="url(#k)">
+<g opacity=".16" transform="translate(7 9)"><path d="M66 80 A44 44 0 1 1 62.6 117" fill="none" stroke="#000" stroke-width="11" stroke-linecap="round"/><polygon points="58,94 80.1,83.5 55.9,69.5" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/><path d="M104 78 V102 L121 113" fill="none" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>
+<circle cx="100" cy="100" r="92" fill="url(#h)"/>
+<path d="M66 80 A44 44 0 1 1 62.6 117" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round"/><polygon points="58,94 80.1,83.5 55.9,69.5" fill="#ffffff" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/><path d="M104 78 V102 L121 113" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<circle cx="100" cy="100" r="90.5" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3"/>
+</svg>

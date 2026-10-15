@@ -14,12 +14,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { Navigate } from '@ngxs/router-plugin'
 import { Actions, Select, Store, ofActionSuccessful } from '@ngxs/store'
-import { first, Observable } from 'rxjs'
-import { MatchEnded } from 'src/app/core/state/match/match.action'
+import { first, Observable, Subject } from 'rxjs'
+import { MatchEnded, ReorderTeams } from 'src/app/core/state/match/match.action'
 import { MatchStateModel } from 'src/app/core/state/match/match.model'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { TeamDetailComponent } from '../team-detail/team-detail.component'
-import { MatchModel, Team } from 'src/app/core/model/match.model'
+import { ChoosenTag, MatchModel, Team } from 'src/app/core/model/match.model'
 
 @Component({
   templateUrl: './match-display.component.html',
@@ -32,6 +32,11 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
 
   public elapsedTime: String
   public timer!: any
+
+  public editing = false
+  public order: number[] = []
+  public teamChoosenTags: ChoosenTag[][] = []
+  public saving: Subject<boolean> = new Subject()
 
   constructor(private store: Store, private actions: Actions, private dialog: MatDialog) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
@@ -55,6 +60,36 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
         this.elapsedTime = hours.padStart(2, "0")  + " heures, " + minutes.padStart(2, "0") + " minutes, " + seconds.padStart(2, "0") + " secondes"
       }
     }, 1000)
+  }
+
+  public startEdit() {
+    const teams = this.store.selectSnapshot<Team[]>(MatchState.teams)
+    this.order = teams.map((_, i) => i)
+    this.teamChoosenTags = teams.map(team => team.choosenTags)
+    this.saving = new Subject()
+    this.editing = true
+  }
+
+  public cancelEdit() {
+    this.editing = false
+  }
+
+  public saveEdit() {
+    this.saving.next(true)
+    this.store.dispatch(new ReorderTeams(this.order))
+    this.editing = false
+  }
+
+  public move(position: number, direction: -1 | 1) {
+    const target = position + direction
+    if (target < 0 || target >= this.order.length) {
+      return
+    }
+    [this.order[position], this.order[target]] = [this.order[target], this.order[position]]
+  }
+
+  public trackByIndex(_: number, teamIndex: number) {
+    return teamIndex
   }
 
   public endGame() {

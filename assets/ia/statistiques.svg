@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs>
+<linearGradient id="g" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#fff06a"/><stop offset=".55" stop-color="#f2c200"/><stop offset="1" stop-color="#c99a00"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".22" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<clipPath id="k"><circle cx="100" cy="100" r="92"/></clipPath>
+</defs>
+<circle cx="100" cy="106" r="92" fill="#000" opacity=".16"/>
+<circle cx="100" cy="100" r="92" fill="url(#g)"/>
+<g clip-path="url(#k)">
+<g opacity=".16" transform="translate(7 9)"><rect x="50" y="120" width="26" height="32" rx="7" fill="#000"/><rect x="84" y="102" width="26" height="50" rx="7" fill="#000"/><rect x="118" y="84" width="26" height="68" rx="7" fill="#000"/><polyline points="50,92 86,70 108,82 150,46" fill="none" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><polygon points="162,36 138,40 154,58" fill="#000"/></g>
+<circle cx="100" cy="100" r="92" fill="url(#h)"/>
+<rect x="50" y="120" width="26" height="32" rx="7" fill="#ffffff"/><rect x="84" y="102" width="26" height="50" rx="7" fill="#ffffff"/><rect x="118" y="84" width="26" height="68" rx="7" fill="#ffffff"/><polyline points="50,92 86,70 108,82 150,46" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><polygon points="162,36 138,40 154,58" fill="#ffffff"/>
+</g>
+<circle cx="100" cy="100" r="90.5" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3"/>
+</svg>
