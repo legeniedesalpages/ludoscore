@@ -12,7 +12,7 @@
 **/
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ColorTag, Tag } from 'src/app/core/model/tag.model'
 import { DrawBreaker, Game, GameToSave } from 'src/app/core/model/game.model'
@@ -24,6 +24,7 @@ import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { GameSearchDetail } from 'src/app/core/model/game-search.model'
 import { ScoreTag } from 'src/app/core/model/score.model'
+import { UpdateMatchGame } from 'src/app/core/state/match/match.action'
 
 @Component({
   selector: 'game-editor',
@@ -42,6 +43,7 @@ export class GameEditorComponent implements OnInit {
 
   public gameEditorForm: FormGroup
   public gameId?: number
+  public editingExistingGame: boolean = false
   public bggId?: number
   public imageUrlFromBgg?: string
   public thumbnailUrlFromBgg?: string
@@ -51,7 +53,7 @@ export class GameEditorComponent implements OnInit {
   public tagsScore: ScoreTag[] = []
   public tagsDraw: DrawBreaker[] = []
 
-  constructor(private store: Store, private route: ActivatedRoute, private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private store: Store, private route: ActivatedRoute, private router: Router, private findGameService: FindGameService, private snackBar: MatSnackBar, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {
 
     this.loading = true
     this.saving = false
@@ -96,6 +98,7 @@ export class GameEditorComponent implements OnInit {
       next: (game: Game) => {
         console.info("Game details: [" + game.title + "]")
         this.gameId = game.id
+        this.editingExistingGame = true
 
         this.backgroundImageUrl = `'${game.imageUrl}'`
 
@@ -196,7 +199,7 @@ export class GameEditorComponent implements OnInit {
         })
         this.saving = false
         this.changeDetectorRef.markForCheck()
-        this.store.dispatch(this.cameFromLibrary() ? new Navigate(['/game-library']) : new Navigate(['/']))
+        this.store.dispatch(new UpdateMatchGame(game)).subscribe(() => this.navigateAfterSave())
       },
 
       error: (err) => {
@@ -214,8 +217,27 @@ export class GameEditorComponent implements OnInit {
     return this.route.snapshot.queryParamMap.get('from') === 'library'
   }
 
+  private returnUrl(): string | undefined {
+    const url = this.route.snapshot.queryParamMap.get('returnUrl')
+    return url?.startsWith('/') && !url.startsWith('//') ? url : undefined
+  }
+
+  private navigateAfterSave(): void {
+    const returnUrl = this.returnUrl()
+    if (returnUrl) {
+      this.router.navigateByUrl(returnUrl)
+    } else {
+      this.store.dispatch(this.cameFromLibrary() ? new Navigate(['/game-library']) : new Navigate(['/']))
+    }
+  }
+
   public returnToGameList() {
-    this.store.dispatch(new Navigate([this.cameFromLibrary() ? '/game-library' : '/find-game']))
+    const returnUrl = this.returnUrl()
+    if (returnUrl) {
+      this.router.navigateByUrl(returnUrl)
+    } else {
+      this.store.dispatch(new Navigate([this.cameFromLibrary() ? '/game-library' : '/find-game']))
+    }
   }
 
 }

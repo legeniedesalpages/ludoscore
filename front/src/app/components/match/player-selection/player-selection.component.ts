@@ -33,6 +33,7 @@ import { Player } from 'src/app/core/model/player.model'
 import { ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
 import { PlayerService } from 'src/app/core/services/player/player.service'
 import { MatchService } from 'src/app/core/services/match/match.service'
+import { GameEditorNavigationService } from 'src/app/core/services/game/game-editor-navigation.service'
 import { AddTeam, CancelMatchCreation, LaunchMatch, RemoveTeam, SwapTeamPosition } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { environment } from 'src/environments/environment'
@@ -65,6 +66,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   private store: Store = inject(Store)
   private playerService: PlayerService = inject(PlayerService)
   private matchService: MatchService = inject(MatchService)
+  private gameEditorNavigation: GameEditorNavigationService = inject(GameEditorNavigationService)
   private snackBar: MatSnackBar = inject(MatSnackBar)
   private dialog: MatDialog = inject(MatDialog)
   private changeDetectorRef: ChangeDetectorRef = inject(ChangeDetectorRef)
@@ -285,6 +287,11 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
         maxWidth: '100%'
       })
     }
+  }
+
+  public editGameConfiguration(): void {
+    const game = this.store.selectSnapshot<MatchModel>(MatchState.match).game
+    this.gameEditorNavigation.open(game)
   }
 
   public cancelGameSelection() {

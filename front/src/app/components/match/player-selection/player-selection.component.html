@@ -30,12 +30,8 @@
         <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
 
         @if (!loading) {
-            <div class="headline" (click)="goToGameDetail()">
-                <span class="choice">{{ (match$ | async)!.game.title }}
-                    @if ((match$ | async)!.game.matchTags.length > 0) {
-                        <mat-icon class="edit-game-icon">edit</mat-icon>
-                    }
-                </span>
+            <div class="headline" (click)="editGameConfiguration()">
+                <span class="choice">{{ (match$ | async)!.game.title }}</span>
             </div>
 
             <div class="game-category" (click)="goToGameDetail()">

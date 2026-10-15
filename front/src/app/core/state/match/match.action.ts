@@ -22,6 +22,11 @@ export class CreateMatch {
     constructor(public game: Game) { }
 }
 
+export class UpdateMatchGame {
+    static readonly type: string = '[Match] UpdateMatchGame'
+    constructor(public game: Game) { }
+}
+
 export class CancelMatchCreation {
     static readonly type: string = '[Match] CancelMatchCreation'
 }

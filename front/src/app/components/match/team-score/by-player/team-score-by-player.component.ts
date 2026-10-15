@@ -42,6 +42,7 @@ import { Score, ScoreTag } from 'src/app/core/model/score.model'
 import { ArithmeticExpressionEvaluator } from 'src/app/core/services/misc/arithmetic'
 import { AddFinalScoreToTeam, AddScoreToTeam } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
+import { GameEditorNavigationService } from 'src/app/core/services/game/game-editor-navigation.service'
 import { KeyboardComponent } from '../../../layout/keyboard/keyboard.component'
 import { LayoutComponent } from '../../../layout/layout.component'
 import { SidenavModule } from '../../../layout/sidenav/sidenav.module'
@@ -67,8 +68,10 @@ export class TeamScoreByPlayerComponent implements OnInit {
   private store = inject(Store)
   private activatedRoute = inject(ActivatedRoute)
   private actions = inject(Actions)
+  private gameEditorNavigation = inject(GameEditorNavigationService)
 
   public team!: Team
+  public gameTitle = this.store.selectSnapshot<MatchModel>(MatchState.match).game.title
   public localMutableScoreDetails = signal<Score[]>([])
 
   public readonly teamScoreFormGroup: FormGroup
@@ -258,5 +261,10 @@ export class TeamScoreByPlayerComponent implements OnInit {
 
   public returnToMatchEnd() {
     this.store.dispatch(new Navigate(['/match-end'], { "mode": "player" }))
+  }
+
+  public editGameConfiguration(): void {
+    const game = this.store.selectSnapshot<MatchModel>(MatchState.match).game
+    this.gameEditorNavigation.open(game)
   }
 }

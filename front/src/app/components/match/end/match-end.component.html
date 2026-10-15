@@ -6,6 +6,8 @@
     <ng-container role="body">
         @if (match$ | async; as match) {
  
+            <button type="button" class="game-title-link" (click)="editGameConfiguration()">{{ match.game.title }}</button>
+
             <div class="score">
                 <mat-button-toggle-group name="Saisie des scores" [value]="typeDeSaisie()" (change)="onTypeSaisieChange($event)">
                     <mat-button-toggle disabled="true" value="">Saisie des scores par</mat-button-toggle>

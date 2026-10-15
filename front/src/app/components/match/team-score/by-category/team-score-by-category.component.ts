@@ -31,6 +31,7 @@ import { MatchModel, Team } from 'src/app/core/model/match.model'
 import { Score, ScoreTag } from 'src/app/core/model/score.model'
 import { AddScoreToCategory } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
+import { GameEditorNavigationService } from 'src/app/core/services/game/game-editor-navigation.service'
 import { KeyboardComponent } from '../../../layout/keyboard/keyboard.component'
 import { LayoutComponent } from '../../../layout/layout.component'
 import { CategoryComponent } from '../category/category.component'
@@ -58,6 +59,7 @@ export class TeamScoreByCategoryComponent implements OnInit {
   private readonly dialog = inject(MatDialog)
   private readonly actions = inject(Actions)
   private readonly snackBar = inject(MatSnackBar)
+  private readonly gameEditorNavigation = inject(GameEditorNavigationService)
 
   protected readonly scoreTag = signal<ScoreTag>({} as ScoreTag)
   protected readonly matchState = select(MatchState.match)
@@ -73,11 +75,23 @@ export class TeamScoreByCategoryComponent implements OnInit {
     )
 
     this.route.queryParams.pipe(first()).subscribe((params: { [key: string]: string }) => {
-      const index = Number(params['index'])
       const matchState = this.store.selectSnapshot<MatchModel>(MatchState.match)
       const scoreTags = matchState.game.scoreTags
-      this.scoreTag.set(scoreTags[index])
+      const index = params['category']
+        ? scoreTags.findIndex(tag => tag.category === params['category'])
+        : Number(params['index'])
+      const selectedTag = scoreTags[index]
+      if (!selectedTag) {
+        this.store.dispatch(new Navigate(['/match-end'], { mode: 'category' }))
+        return
+      }
+      this.scoreTag.set(selectedTag)
     })
+  }
+
+  protected editGameConfiguration(): void {
+    const game = this.store.selectSnapshot<MatchModel>(MatchState.match).game
+    this.gameEditorNavigation.open(game)
   }
 
   protected onValueChange(score: Score, team: Team) {

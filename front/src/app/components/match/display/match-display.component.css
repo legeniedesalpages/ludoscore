@@ -28,6 +28,14 @@
   font-weight: bold;
 }
 
+.game-title-link {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .game-category {
   opacity: 0.7;
   margin: 0;

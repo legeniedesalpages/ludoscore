@@ -12,7 +12,7 @@
 **/
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { Observable, map } from 'rxjs'
+import { Observable, map, switchMap } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import moment from 'moment'
 import { DrawBreaker, Game, GameToSave, SelectingGame } from '../../model/game.model'
@@ -34,7 +34,7 @@ export class GameService {
 
     public save(gameToSave: GameToSave): Observable<Game> {
 
-        return this.http.post<GameEntity>(this.gameUrl, {
+        return this.http.post<{ id: number }>(this.gameUrl, {
             id: gameToSave.id,
             name: gameToSave.title,
             isOnlyCooperative: gameToSave.isOnlyCooperative,
@@ -54,9 +54,7 @@ export class GameService {
             imageUrlFromBgg: gameToSave.imageUrlFromBgg,
             thumbnailUrlFromBgg: gameToSave.thumbnailUrlFromBgg,
             estimatedDurationInMinutes: gameToSave.estimatedDurationInMinutes
-        }).pipe(
-            map(gameEntity => this.gameEntityToGame(gameEntity))
-        )
+        }).pipe(switchMap(() => this.getFromBgg(gameToSave.bggId)))
     }
 
     public listAllGames(): Observable<SelectingGame[]> {

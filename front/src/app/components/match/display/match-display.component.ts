@@ -21,6 +21,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 import { TeamDetailComponent } from '../team-detail/team-detail.component'
 import { Tag } from 'src/app/core/model/tag.model'
 import { ChoosenTag, MatchModel, Team } from 'src/app/core/model/match.model'
+import { GameEditorNavigationService } from 'src/app/core/services/game/game-editor-navigation.service'
 
 @Component({
   templateUrl: './match-display.component.html',
@@ -40,7 +41,7 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
   public teamChoosenTags: ChoosenTag[][] = []
   public saving: Subject<boolean> = new Subject()
 
-  constructor(private store: Store, private actions: Actions, private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private store: Store, private actions: Actions, private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef, private gameEditorNavigation: GameEditorNavigationService) {
     this.elapsedTime = "00 heures, 00 minutes, 00 secondes"
     this.dialog.closeAll()
   }
@@ -106,6 +107,11 @@ export class MatchDisplayComponent implements OnInit, OnDestroy {
 
   public endGame() {
     this.store.dispatch(new MatchEnded(new Date()))
+  }
+
+  public editGameConfiguration(): void {
+    const game = this.store.selectSnapshot<MatchModel>(MatchState.match).game
+    this.gameEditorNavigation.open(game)
   }
 
   public goToTeamDetail(team: Team) {

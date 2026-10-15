@@ -37,6 +37,7 @@ import { ActivatedRoute } from '@angular/router'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { MatchService } from 'src/app/core/services/match/match.service'
 import { resizeImage } from 'src/app/core/utils/image-resize'
+import { GameEditorNavigationService } from 'src/app/core/services/game/game-editor-navigation.service'
 
 
 @Component({
@@ -71,6 +72,7 @@ export class MatchEndComponent implements OnInit {
   private dialog: MatDialog = inject(MatDialog)
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute)
   private changeDetectorRef = inject(ChangeDetectorRef)
+  private gameEditorNavigation = inject(GameEditorNavigationService)
 
 
   ngOnInit(): void {
@@ -151,7 +153,13 @@ export class MatchEndComponent implements OnInit {
   }
 
   public setCategoryScore(index: number) {
-    this.store.dispatch(new Navigate(['/team-score-by-category'], { "index": index }))
+    const match = this.store.selectSnapshot<MatchModel>(MatchState.match)
+    this.store.dispatch(new Navigate(['/team-score-by-category'], { "category": match.game.scoreTags[index].category }))
+  }
+
+  public editGameConfiguration(): void {
+    const game = this.store.selectSnapshot<MatchModel>(MatchState.match).game
+    this.gameEditorNavigation.open(game)
   }
 
   public endMatch() {

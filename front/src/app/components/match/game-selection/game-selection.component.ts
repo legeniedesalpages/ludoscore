@@ -11,6 +11,7 @@
     * - Modification    : 
 **/
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { Observable, tap } from 'rxjs'
@@ -42,12 +43,20 @@ export class GameSelectionComponent implements OnInit {
   public lessThanThirtyMinutes: boolean = false
   public moreThanOneHourAndAHalfFilter: boolean = false
 
-  constructor(private gameService: GameService, private store: Store, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private gameService: GameService, private store: Store, private changeDetectorRef: ChangeDetectorRef, private route: ActivatedRoute, private router: Router) {
   }
 
   ngOnInit(): void {
     this.loading = true
-    this.searching = false
+    const params = this.route.snapshot.queryParamMap
+    this.searchText = params.get('searchText') ?? ''
+    this.searching = this.searchText.length > 0
+    this.onlyInLibraryFilter = params.get('onlyInLibrary') !== 'false'
+    this.onlyCooperativeFilter = params.get('onlyCooperative') === 'true'
+    this.twoPlayerOnlyFilter = params.get('twoPlayerOnly') === 'true'
+    this.moreThanFourPlayersFilter = params.get('moreThanFourPlayers') === 'true'
+    this.lessThanThirtyMinutes = params.get('lessThanThirtyMinutes') === 'true'
+    this.moreThanOneHourAndAHalfFilter = params.get('moreThanOneHourAndAHalf') === 'true'
 
     const match = this.store.selectSnapshot<MatchModel>(MatchState.match)
     if (match) {

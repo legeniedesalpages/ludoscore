@@ -13,7 +13,7 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, ReorderTeams, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory } from "./match.action"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, ReorderTeams, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory, UpdateMatchGame } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
@@ -79,6 +79,52 @@ export class MatchState {
                 started: false,
                 creating: true,
                 choosenTags: [],
+            }
+        })
+    }
+
+    @Action(UpdateMatchGame)
+    updateMatchGame({ setState, getState }: StateContext<MatchStateModel>, update: UpdateMatchGame) {
+        const match = getState().match
+        if (!match || match.game.id !== update.game.id) {
+            return
+        }
+
+        const matchTagsByCategory = new Map<string, { names: string[] }>(update.game.matchTags.map(tag => [tag.category, tag] as const))
+        const playerTagsByCategory = new Map<string, { names: string[] }>(update.game.playerTags.map(tag => [tag.category, tag] as const))
+        const scoreCategories = new Set(update.game.scoreTags.map(tag => tag.category))
+        const retainTags = (tags: ChoosenTag[], availableTags: Map<string, { names: string[] }>) =>
+            tags.flatMap(tag => {
+                const definition = availableTags.get(tag.category)
+                const names = tag.names.filter(name => definition?.names.includes(name))
+                return definition && names.length > 0 ? [{ ...tag, names }] : []
+            })
+
+        const teams = match.teams.map(team => {
+            const scoreDetails = update.game.scoreTags.length > 0
+                ? team.scoreDetails.filter(score => scoreCategories.has(score.categoryName))
+                : match.game.scoreTags.length > 0 ? [] : team.scoreDetails
+
+            return {
+                ...team,
+                choosenTags: retainTags(team.choosenTags, playerTagsByCategory),
+                scoreDetails,
+                score: update.game.scoreTags.length > 0
+                    ? scoreDetails.reduce((total, detail) => total + (detail.value ?? 0), 0)
+                    : match.game.scoreTags.length > 0 ? undefined : team.score
+            }
+        })
+        const winningTeamId = match.winningTeam?.id
+
+        setState({
+            match: {
+                ...match,
+                game: update.game,
+                choosenTags: retainTags(match.choosenTags, matchTagsByCategory),
+                teams,
+                winningTeam: winningTeamId === undefined
+                    ? undefined
+                    : teams.find(team => team.id === winningTeamId)
             }
         })
     }

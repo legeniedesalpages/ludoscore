@@ -8,6 +8,10 @@
   </ng-container>
 
   <ng-container role="body">
+    <div class="headline">
+      <button type="button" class="choice game-title-link" (click)="editGameConfiguration()">{{ gameTitle }}</button>
+    </div>
+    <div class="divider"></div>
     <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
       <div class="score">Score pour <b>{{ team.name }}</b></div>
 

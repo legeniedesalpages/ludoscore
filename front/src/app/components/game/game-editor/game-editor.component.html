@@ -1,6 +1,6 @@
 <app-layout [withBackButton]="true" (backButtonAction)="returnToGameList()">
     <ng-container role="header">
-        <span class="title">Ajouter un jeu</span>
+        <span class="title">{{ editingExistingGame ? 'Modifier le jeu' : 'Ajouter un jeu' }}</span>
     </ng-container>
 
     <ng-container role="body">
