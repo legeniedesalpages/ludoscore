@@ -485,14 +485,7 @@ export class MatchState {
             return team
         })
 
-        let winningTeam: Team | undefined = undefined
-        if (modifiedTeamList.filter(team => team.score == undefined).length == 0) {
-            if (getState().match!.game.highestScoreWin ?? true) {
-                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
-            } else {
-                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
-            }
-        }
+        const winningTeam = this.determineWinner(modifiedTeamList, getState().match!.game.highestScoreWin)
 
         setState({
             match: {
@@ -535,14 +528,10 @@ export class MatchState {
 
         console.log("final:", modifiedTeamList)
 
-        let winningTeam: Team | undefined = undefined
-        if (modifiedTeamList.filter(team => team.score == undefined || team.scoreDetails.length < getState().match!.game.scoreTags.length).length == 0) {
-            if (getState().match!.game.highestScoreWin ?? true) {
-                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
-            } else {
-                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
-            }
-        }
+        const allCategoriesFilled = modifiedTeamList.every(team => team.scoreDetails.length >= getState().match!.game.scoreTags.length)
+        const winningTeam = allCategoriesFilled
+            ? this.determineWinner(modifiedTeamList, getState().match!.game.highestScoreWin)
+            : undefined
 
        setState({
             match: {
@@ -562,24 +551,19 @@ export class MatchState {
             return
         }
 
+        // Le score vient d'un champ de formulaire (chaîne) : on le convertit pour comparer des nombres
+        const numericScore = Number(scoreAddedToTeam.score)
         const modifiedTeamList: Team[] = getState().match!.teams.map(team => {
             if (team.id === scoreAddedToTeam.team.id) {
                 return { 
                     ...team,
-                    score: scoreAddedToTeam.score
+                    score: Number.isNaN(numericScore) ? undefined : numericScore
                 }
             }
             return team
         })
 
-        let winningTeam: Team | undefined = undefined
-        if (modifiedTeamList.filter(team => team.score == undefined).length == 0) {
-            if (getState().match!.game.highestScoreWin ?? true) {
-                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! > current.score!) ? previous : current)
-            } else {
-                winningTeam = modifiedTeamList.reduce((previous, current) => (previous.score! < current.score!) ? previous : current)
-            }
-        }
+        const winningTeam = this.determineWinner(modifiedTeamList, getState().match!.game.highestScoreWin)
 
         setState({
             match: {
@@ -590,6 +574,19 @@ export class MatchState {
         })
     }
 
+
+    // Vainqueur uniquement si toutes les équipes ont un score ; le critère dépend du jeu (plus haut ou plus bas score)
+    private determineWinner(teams: Team[], highestScoreWin: boolean | undefined): Team | undefined {
+        if (teams.length === 0 || teams.some(team => team.score == undefined || Number.isNaN(Number(team.score)))) {
+            return undefined
+        }
+        const highestWins = highestScoreWin ?? true
+        return teams.reduce((best, current) => {
+            const bestScore = Number(best.score)
+            const currentScore = Number(current.score)
+            return (highestWins ? currentScore > bestScore : currentScore < bestScore) ? current : best
+        })
+    }
 
     private checkIntegrityOfTeam(state: MatchStateModel, teamToCheck: Team): boolean {
         const team: Team | undefined = state.match?.teams.find(team => team === teamToCheck)

@@ -108,6 +108,7 @@ class GameController extends Controller
             $existingGame->score_template = $request->score_template;
             $existingGame->estimated_duration_in_minutes = $request->estimated_duration_in_minutes;
             $existingGame->quantifiable_score = $request->quantifiable_score;
+            $existingGame->highest_score_win = $request->highest_score_win;
             $existingGame->draw_allowed = $request->draw_allowed;
             $existingGame->draw_breaker = $request->draw_breaker;
 
