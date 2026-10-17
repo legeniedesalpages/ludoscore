@@ -1,4 +1,5 @@
 data
+.env.secrets
 .vscode-janus-debug
 ludoscore.code-workspace
 back/public/images

@@ -47,7 +47,7 @@ export class HomeComponent implements OnInit {
   public loggingOut: boolean = false
   public loading: boolean
   public notAssociated: boolean
-
+  public isAdmin = false
   constructor(private matchService: MatchService, private userService: UserCrudService, private store: Store, private dialog: MatDialog, private findGameService: FindGameService, private changeDetectorRef: ChangeDetectorRef) {
     this.loading = true
     this.notAssociated = false
@@ -67,6 +67,7 @@ export class HomeComponent implements OnInit {
         runningMatch: this.matchService.findRunningMatch()
       }).pipe(first()).subscribe(actions => {
         this.notAssociated = actions.user.playerId === null
+        this.isAdmin = !!actions.user.isAdmin
         console.info("Player id of the user:", actions.user.playerId, this.notAssociated)
 
         if (actions.user.firstConnection) {
@@ -104,6 +105,10 @@ export class HomeComponent implements OnInit {
 
   navigateToMatchHistory() {
     this.store.dispatch(new Navigate(['/match-history']))
+  }
+
+  navigateToNewsletter() {
+    this.store.dispatch(new Navigate(['/newsletter-preview']))
   }
 }
 

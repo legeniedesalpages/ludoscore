@@ -15,7 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('stats:generate-insights')->weeklyOn(0, '03:00')->withoutOverlapping();
+        $schedule->command('newsletter:send')->weeklyOn(1, '08:00')->withoutOverlapping();
     }
 
     /**

@@ -35,4 +35,17 @@ return [
         'token' => env('BGG_API_TOKEN'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),
+    ],
+
+    'newsletter' => [
+        'latitude' => env('NEWSLETTER_LATITUDE', 43.66),
+        'longitude' => env('NEWSLETTER_LONGITUDE', 6.99),
+        'city' => env('NEWSLETTER_CITY', 'Châteauneuf-Grasse'),
+        // Au-delà de cette distance du lieu de référence, une partie est considérée comme jouée en déplacement.
+        'away_km' => env('NEWSLETTER_AWAY_KM', 30),
+    ],
+
 ];

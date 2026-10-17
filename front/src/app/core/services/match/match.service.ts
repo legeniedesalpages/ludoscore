@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable, catchError, forkJoin, map, mergeMap, of, switchMap } from 'rxjs'
 import { MatchCrudService } from '../crud/match-crud.service'
 import { MatchEntity } from '../../entity/match-entity.model'
@@ -20,6 +20,7 @@ import { environment } from 'src/environments/environment'
 import { COLORS, ColorTag, NO_COLOR, Tag } from '../../model/tag.model'
 import { Score, ScoreTag } from '../../model/score.model'
 import { DrawBreaker } from '../../model/game.model'
+import { GeolocationService, Position } from '../misc/geolocation.service'
 
 // Dates au format serveur "YYYY-MM-DD HH:mm:ss" ; finishedAt peut être nul (durée non déterminée)
 export interface MatchHistoryUpdate {
@@ -34,6 +35,8 @@ export interface MatchHistoryUpdate {
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
+
+    private geolocationService = inject(GeolocationService)
 
     constructor(private matchCrudService: MatchCrudService, private teamCrudService: TeamCrudService) {
     }
@@ -67,12 +70,20 @@ export class MatchService {
     }
 
     public createMatch(matchModel: MatchModel): Observable<MatchEntity> {
+        return this.geolocationService.currentPosition().pipe(
+            switchMap(position => this.saveNewMatch(matchModel, position))
+        )
+    }
+
+    private saveNewMatch(matchModel: MatchModel, position: Position | null): Observable<MatchEntity> {
         const aggregatedMatchEntity = {
             match: {
                 gameId: matchModel.game.id,
                 canceled: false,
                 running: true,
-                tags: JSON.stringify(matchModel.choosenTags)
+                tags: JSON.stringify(matchModel.choosenTags),
+                latitude: position?.latitude ?? null,
+                longitude: position?.longitude ?? null
             },
             teams: matchModel.teams.map(team => ({
                 color: team.color.name,

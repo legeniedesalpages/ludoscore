@@ -1,0 +1,33 @@
+<app-layout [withBackButton]="true" (backButtonAction)="returnToHome()">
+  <ng-container role="header">
+    <span class="title">Newsletter</span>
+  </ng-container>
+
+  <ng-container role="body">
+    <main class="newsletter-shell">
+      <p class="state" *ngIf="loading">Génération de la newsletter en cours… cela peut prendre quelques secondes.</p>
+      <p class="state error" *ngIf="!loading && error" role="alert">{{ error }}</p>
+
+      <ng-container *ngIf="!loading && preview">
+        <div class="toolbar">
+          <div class="meta">
+            <strong>{{ preview.subject }}</strong>
+            <span>Générée le {{ preview.generatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <button mat-stroked-button (click)="load(true)">
+            <mat-icon>refresh</mat-icon>
+            Régénérer
+          </button>
+        </div>
+        <iframe class="frame" sandbox="" title="Aperçu de la newsletter" [srcdoc]="html"></iframe>
+      </ng-container>
+
+      <div class="toolbar" *ngIf="!loading && error">
+        <button mat-stroked-button (click)="load(true)">
+          <mat-icon>refresh</mat-icon>
+          Réessayer
+        </button>
+      </div>
+    </main>
+  </ng-container>
+</app-layout>

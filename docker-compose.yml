@@ -33,6 +33,10 @@ services:
     environment:
       - APACHE_RUN_USER=#1000
       - APACHE_RUN_GROUP=#1000
+    # Secrets locaux hors git (voir .env.secrets.example) : les variables d'environnement priment sur .env dans Laravel.
+    env_file:
+      - path: .env.secrets
+        required: false
     volumes:
       - ./back:/var/www/html
       - .env:/var/www/html/.env

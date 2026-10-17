@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\GameMatchController;
 use App\Http\Controllers\Api\GameSearchController;
+use App\Http\Controllers\Api\InsightsController;
+use App\Http\Controllers\Api\NewsletterController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Api\TeamController;
@@ -85,6 +87,9 @@ Route::middleware('auth:sanctum')->resource('team', TeamController::class, ['exc
 Route::middleware('auth:sanctum')->get('/statistics/overview', [StatisticsController::class, 'overview']);
 Route::middleware('auth:sanctum')->get('/statistics/games', [StatisticsController::class, 'games']);
 Route::middleware('auth:sanctum')->get('/statistics/players', [StatisticsController::class, 'players']);
+Route::middleware('auth:sanctum')->get('/statistics/insights', [InsightsController::class, 'index']);
+Route::middleware(['auth:sanctum', 'throttle:6,1'])->post('/statistics/ask', [InsightsController::class, 'ask']);
+Route::middleware(['auth:sanctum', 'throttle:6,1'])->get('/admin/newsletter/preview', [NewsletterController::class, 'preview']);
 
 /*
 |--------------------------------------------------------------------------

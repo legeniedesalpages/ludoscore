@@ -125,6 +125,19 @@
         </span>
         <span class="ludo-card-content">Analyse par jeu et par joueur avec des graphiques simples et lisibles.</span>
       </div>
+
+      <div class="ludo-card" *ngIf="isAdmin" (click)="navigateToNewsletter()">
+        <span class="green image-icon">
+          <div class="circle">
+            <mat-icon>mail</mat-icon>
+          </div>
+        </span>
+        <span class="ludo-card-title">
+          <span class="card-title">Newsletter</span>
+          <span class="card-short">Aperçu de la newsletter hebdomadaire (administrateur).</span>
+        </span>
+        <span class="ludo-card-content">Consulter la newsletter générée par l'IA avant son envoi hebdomadaire : résumé, suggestions de jeux et histoire de la semaine.</span>
+      </div>
     </div>
 
     <div class="versions">

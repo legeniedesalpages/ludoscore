@@ -7,6 +7,7 @@ use App\Models\GameMatch;
 use App\Models\MatchPhoto;
 use App\Models\Team;
 use App\Models\TeamPlayer;
+use App\Services\Analytics\LocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -214,6 +215,14 @@ class GameMatchController extends Controller
             $gameMatch->running = true;
             $gameMatch->started_at = now();
             $gameMatch->tags = $match['tags'];
+
+            $lat = $match['latitude'] ?? null;
+            $lon = $match['longitude'] ?? null;
+            if (is_numeric($lat) && is_numeric($lon) && abs($lat) <= 90 && abs($lon) <= 180) {
+                $gameMatch->latitude = round((float) $lat, 6);
+                $gameMatch->longitude = round((float) $lon, 6);
+                $gameMatch->location_name = app(LocationService::class)->reverse((float) $lat, (float) $lon);
+            }
             $gameMatch->save();
 
 
