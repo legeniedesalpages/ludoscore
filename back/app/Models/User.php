@@ -22,7 +22,8 @@ class User extends Authenticatable
         'password',
         "is_admin",
         "confirmation_key",
-        "first_connection"
+        "first_connection",
+        'newsletter_subscribed',
     ];
 
     /**
@@ -42,5 +43,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'newsletter_subscribed' => 'boolean',
     ];
 }

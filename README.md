@@ -1,6 +1,66 @@
 # ludoscore
 Enregistreur de score
 
+## Abonnement a la newsletter
+
+L'indicateur `users.newsletter_subscribed` vaut `false` par defaut pour les
+comptes existants et futurs. Aucun utilisateur n'est abonne automatiquement.
+Appliquer la migration avec
+`docker compose exec -u devuser laravel-app php artisan migrate` en local.
+
+La commande `newsletter:send` n'envoie qu'aux comptes confirmes, abonnes
+(`newsletter_subscribed = 1`) et disposant d'une adresse e-mail non vide.
+L'option `--to` restreint ces destinataires sans contourner le consentement.
+Sans destinataire eligible, aucun appel IA n'est effectue.
+L'option `--dry` et l'apercu administrateur n'envoient aucun e-mail.
+L'interface de gestion de cet abonnement n'est pas encore disponible.
+
+## Envoi hebdomadaire sur OVH (PHP 8.1)
+
+Le fichier `back/newsletter-cron.php` est inclus dans le deploiement du backend.
+Avec les chemins du deploiement actuel, il est installe dans
+`/home/lgdafrg/ludoscore/newsletter-cron.php`, hors du repertoire web `www`.
+Il appelle directement `newsletter:send` et refuse toute execution HTTP.
+
+Dans le Manager OVH, ajouter une tache planifiee :
+
+- Commande a executer (relative a la racine FTP) : `ludoscore/newsletter-cron.php`
+  (si le formulaire affiche deja `./`, ne pas le saisir une seconde fois).
+- Langage : PHP 8.1.
+- Activation : cochee.
+- Logs par e-mail : activer au moins pour les premiers envois.
+- Description : Newsletter hebdomadaire LudoScore.
+- Frequence : une fois par semaine, par exemple lundi a 08 h.
+  Verifier le fuseau horaire et les limites de duree des taches dans le Manager OVH.
+
+Ce script envoie des que la tache OVH le lance : il ne passe pas par
+`schedule:run`. Ne pas activer en parallele un autre cron Laravel envoyant la
+newsletter, sous peine de doublons. Une nouvelle execution manuelle peut
+egalement renvoyer la newsletter.
+
+Avant d'activer la tache, verifier sur le serveur :
+
+- migrations appliquees, notamment `users.newsletter_subscribed` ;
+- au moins un compte confirme, avec e-mail et `newsletter_subscribed = 1` ;
+- `GEMINI_API_KEY` configuree et quota Gemini disponible ;
+- `MAIL_MAILER=php_mail`, expediteur autorise et fonction PHP `mail()` disponible ;
+- `storage` et `bootstrap/cache` accessibles en ecriture par le processus cron.
+
+Le cron affiche le debut, le resultat et le code de sortie (0 = succes).
+Sans abonne eligible, il n'envoie rien et ne contacte pas Gemini.
+Les details d'envoi sont dans `storage/logs/laravel.log` selon la configuration
+de logs de production. Une remise acceptee par `mail()` ne garantit pas la
+livraison finale.
+
+Pour verifier le point d'entree en local sans envoi ni appel IA :
+
+```sh
+docker compose exec -u devuser laravel-app php newsletter-cron.php --help
+```
+
+L'option `--dry` genere un apercu via Gemini sans envoyer d'e-mail.
+L'option `--to=adresse` limite l'envoi a un compte abonne et confirme.
+
 # démarrer l'environnement en local
 ```
 docker-compose up -d
@@ -16,56 +76,11 @@ Accès à la page d'accueil :
 http://localhost:5000/
 ```
 
-## Diagnostic des e-mails (confirmation de compte et newsletter)
-
-Les envois produisent les logs suivants, avec un `delivery_id` commun :
-
-- `mail.sending` : tentative et configuration effective (mailer, transport,
-  adresse d'expedition, hote/port/chiffrement SMTP ou commande sendmail).
-- `mail.accepted` : le transport a pris en charge le message, avec son identifiant
-  et la duree de l'envoi. Cela ne garantit pas la livraison en boite de reception.
-  Les transports de test `array` et `log` n'expedient pas de mail.
-- `mail.failed` : classe d'exception, code et message d'erreur, sans mot de passe
-  SMTP, identifiant SMTP ni adresse du destinataire. L'erreur n'est pas ignoree :
-  la creation de compte est annulee et retourne une erreur HTTP.
-
-Le destinataire est represente par une empreinte SHA-256 pour la correlation,
-pas par son adresse. Le contenu du mail et le lien de confirmation ne sont pas
-journalises par ce diagnostic.
-
-### Sur OVH
-
-Avec la configuration de deploiement actuelle (`LOG_CHANNEL=stack`), consulter
-`storage/logs/laravel.log` dans le repertoire Laravel du serveur, par FTP ou SSH.
-Le repertoire `storage` doit etre accessible en ecriture par PHP.
-
-`deployment/.env` selectionne `MAIL_MAILER=php_mail`, le transport personnalise
-qui appelle directement la fonction PHP `mail()` recommandee par OVH.
-Les modeles HTML/MIME Laravel et les logs restent utilises. Un retour `false`
-ou un avertissement PHP provoque une erreur explicite (`mail.failed`).
-Dans ce mode, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` et
-`MAIL_ENCRYPTION` ne sont pas utilises. Un `mail.accepted` indique seulement que
-`mail()` a accepte le message, pas sa livraison au destinataire.
-La fonction doit etre autorisee dans la configuration PHP de l'hebergement.
-Consulter aussi le suivi des e-mails
-automatises dans le Manager OVH (selon l'offre), les rejets et les spams.
-Verifier que l'expediteur (`MAIL_FROM_ADDRESS`, par defaut `ludoscore@lgda.fr`)
-est autorise pour le domaine et que SPF/DKIM/DMARC sont correctement configures.
-
-Pour utiliser un serveur SMTP authentifie a la place, selectionner
-`MAIL_MAILER=smtp` dans `deployment/.env`, puis verifier les secrets GitHub
-`MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, le port et le chiffrement selon
-les instructions de l'offre OVH. Ne jamais commiter leurs valeurs.
-
-Apres une modification de configuration, vider le cache Laravel :
-
-```sh
-# Local Docker uniquement
-docker compose exec -u devuser laravel-app php artisan config:clear
-docker compose logs --tail=100 laravel-app
+trouver les comptes qui n'ont pas été utilisé pour faire des parties
 ```
-
-Sur OVH, effectuer l'equivalent de `artisan config:clear` dans l'environnement
-PHP du serveur/deploiement, puis retester une inscription avec une nouvelle
-adresse et chercher les entrees `mail.*` dans les logs. Ne pas exposer les logs
-ni une route de diagnostic publique.
+SELECT p.id, p.pseudo, COUNT(l.player_id) AS nb_teams
+FROM `ludo$players` AS p
+LEFT JOIN `ludo$team_players` AS l ON l.player_id = p.id
+GROUP BY p.id, p.pseudo
+ORDER BY nb_teams desc
+```
