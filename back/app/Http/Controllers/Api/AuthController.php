@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\UserConnectedEvent;
 use App\Models\User;
+use App\Services\MailDelivery;
 use Illuminate\Http\Request;
 use App\Mail\ConfirmAccountEmail;;
 use App\Http\Controllers\Controller;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
@@ -71,14 +71,12 @@ class AuthController extends Controller
             ]);
 
             try {
-                Mail::to($request->email)->send(new ConfirmAccountEmail(env("FRONT_URL")."/confirm-account?key=".$user->confirmation_key));
+                app(MailDelivery::class)->send($request->email, new ConfirmAccountEmail(env("FRONT_URL")."/confirm-account?key=".$user->confirmation_key));
             } catch (\Throwable $th) {
                 DB::rollBack();
-                Log::error("Impossible d'envoyer email: ".$th->getMessage());
                 return response()->json([
                     'status' => false,
                         'message' => 'Impossible de créer le compte car on ne peut envoyer le mail de confirmation',
-                        'errors' => $th->getMessage()
                 ], 500);
             }
             

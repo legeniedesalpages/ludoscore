@@ -4,9 +4,9 @@ namespace App\Console\Commands;
 
 use App\Mail\WeeklyNewsletter;
 use App\Services\Analytics\NewsletterBuilder;
+use App\Services\MailDelivery;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class SendWeeklyNewsletter extends Command
 {
@@ -29,7 +29,7 @@ class SendWeeklyNewsletter extends Command
             : DB::table('users')->whereNotNull('email')->where('email', '!=', '')->whereNull('confirmation_key')->pluck('email')->all();
 
         foreach ($recipients as $email) {
-            Mail::to($email)->send(new WeeklyNewsletter($newsletter));
+            app(MailDelivery::class)->send($email, new WeeklyNewsletter($newsletter));
         }
 
         $this->info(count($recipients) . " e-mail(s) envoyé(s).");

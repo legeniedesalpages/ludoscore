@@ -34,6 +34,10 @@ return [
     */
 
     'mailers' => [
+        'php_mail' => [
+            'transport' => 'php_mail',
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'host' => env('MAIL_HOST', ''),

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Mail\PhpMailTransport;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 
 use Illuminate\Support\Facades\DB as FacadesDB;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Mail::extend('php_mail', static fn(array $config) => new PhpMailTransport());
         //
         // Add in boot function
         FacadesDB::listen(function ($query) {
