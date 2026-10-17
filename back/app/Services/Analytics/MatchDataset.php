@@ -77,8 +77,8 @@ class MatchDataset
                 'away' => $away,
                 'distance_km' => (int) round($distance),
                 'place' => $away ? ($r->location_name ?: 'lieu inconnu') : $home['name'],
-                'match_tags' => $this->flattenTags($r->match_tags),
-                'team_tags' => $this->flattenTags($r->team_tags),
+                'match_tags' => ParticipationStatistics::tags($r->match_tags),
+                'team_tags' => ParticipationStatistics::tags($r->team_tags),
             ];
         });
 
@@ -115,20 +115,4 @@ class MatchDataset
         return $out;
     }
 
-    private function flattenTags($json): array
-    {
-        $tags = is_string($json) ? json_decode($json, true) : $json;
-        if (!is_array($tags)) {
-            return [];
-        }
-
-        $flat = [];
-        foreach ($tags as $tag) {
-            foreach ((array) ($tag['names'] ?? []) as $name) {
-                $flat[] = trim(($tag['category'] ?? '') . ': ' . $name, ': ');
-            }
-        }
-
-        return $flat;
-    }
 }

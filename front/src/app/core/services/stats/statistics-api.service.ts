@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable, catchError, of, tap } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { GameStatisticsDetail, GameStatisticsLibrary, StatisticsChart, StatisticsQuestion } from '../../model/game-statistics.model'
+import { PlayerStatisticsDetail, PlayerStatisticsDirectory } from '../../model/player-statistics.model'
 
 export interface ApiStatus {
   status: 'success' | 'error'
@@ -68,6 +69,14 @@ export class StatisticsApiService {
 
   public ask(question: StatisticsQuestion): Observable<StatisticsChart> {
     return this.http.post<StatisticsChart>(`${this.baseUrl}/ask`, question)
+  }
+
+  public playerDirectory(): Observable<PlayerStatisticsDirectory> {
+    return this.http.get<PlayerStatisticsDirectory>(`${this.baseUrl}/player-directory`)
+  }
+
+  public playerDetail(id: number): Observable<PlayerStatisticsDetail> {
+    return this.http.get<PlayerStatisticsDetail>(`${this.baseUrl}/players/${id}`)
   }
 
   public overview(period = 'all'): Observable<StatisticsOverviewApi | ApiStatus> {

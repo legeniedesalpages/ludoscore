@@ -36,6 +36,6 @@ export interface GameStatisticsDetail extends PlaySummary {
 
 export interface StatisticsQuestion {
   question: string
-  scope?: 'game'
+  scope?: 'game' | 'player'
   id?: number
 }

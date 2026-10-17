@@ -64,4 +64,18 @@ class MatchDatasetMigrationTest extends TestCase
         $this->assertSame(2, $rows[1]['gap_game_days']);
         $this->assertSame(2, $rows[1]['gap_player_days']);
     }
+
+    public function test_ai_dataset_preserves_tag_categories_without_duplicate_values(): void
+    {
+        $row = $this->matchRow(1, '2026-10-01 12:00:00', null);
+        $row->match_tags = json_encode([['category' => 'Mode', 'names' => ['Expert', 'Expert']]]);
+        $row->team_tags = json_encode([
+            ['category' => 'Rôle', 'names' => ['Mage', 'Mage']],
+            ['category' => 'Faction', 'names' => ['Mage']],
+        ]);
+        $this->mockRows([$row]);
+        $data = app(MatchDataset::class)->rows()->first();
+        $this->assertSame(['Mode: Expert'], $data['match_tags']);
+        $this->assertSame(['Rôle: Mage', 'Faction: Mage'], $data['team_tags']);
+    }
 }

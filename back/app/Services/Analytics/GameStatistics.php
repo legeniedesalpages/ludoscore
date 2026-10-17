@@ -31,11 +31,16 @@ class GameStatistics
 
     public function detail(object $game, Collection $matches): array
     {
+        return $this->activity($matches) + ['id' => (int) $game->id, 'title' => $game->title];
+    }
+
+    public function activity(Collection $matches, ?int $playerId = null): array
+    {
         $participants = DB::table('teams as t')
             ->leftJoin('team_players as tp', 'tp.team_id', '=', 't.id')
             ->leftJoin('players as p', 'p.id', '=', 'tp.player_id')
             ->whereIn('t.match_id', $matches->pluck('id'))
-            ->select('t.match_id', 't.id as team_id', 't.name', 'tp.player_id', 'p.pseudo')
+            ->select('t.match_id', 't.id as team_id', 't.name', 't.color', 't.position', 't.tags', 'tp.player_id', 'p.pseudo')
             ->get()->groupBy('match_id');
         $winners = [];
         $playerCounts = [];
@@ -98,9 +103,8 @@ class GameStatistics
             'rows' => collect($values)->map(fn($value, $label) => [(string) $label, $value])->values()->all(),
         ];
         return $this->summary($matches) + [
-            'id' => (int) $game->id, 'title' => $game->title,
             'averageWaitDays' => $gaps ? round(array_sum($gaps) / count($gaps), 1) : null,
-            'charts' => [
+            'charts' => array_merge([
                 ['title' => 'Répartition des vainqueurs', 'type' => 'pie', 'columns' => ['Vainqueur', 'Victoires'],
                     'rows' => array_map(fn($w) => [$w['label'], $w['value']], array_values($winners)),
                     'comment' => 'Une victoire par membre de l’équipe gagnante. Les parties sans vainqueur sont indiquées séparément.'],
@@ -109,7 +113,7 @@ class GameStatistics
                 $chart('Nombre de joueurs', 'bar', 'Joueurs', $playerCounts),
                 $chart('Parties par mois', 'line', 'Mois', $months),
                 ['title' => 'Évolution des durées', 'type' => 'line', 'columns' => ['Début de partie', 'Minutes'], 'rows' => $durations],
-            ],
+            ], (new ParticipationStatistics())->charts($matches, $participants->collapse(), $playerId)),
         ];
     }
 

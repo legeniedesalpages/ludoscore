@@ -17,6 +17,7 @@ class GameStatisticsTest extends TestCase
         return (object) [
             'id' => $id, 'game_id' => $gameId, 'started_at' => $start, 'finished_at' => $finish,
             'winner_team_id' => $winner,
+            'tags' => null,
         ];
     }
 
@@ -85,6 +86,8 @@ class GameStatisticsTest extends TestCase
         $players->shouldReceive('whereIn')->once()->with('t.match_id', Mockery::on(fn($ids) => $ids->all() === [1, 2]))->andReturnSelf();
         $row = fn($match, $team, $player, $pseudo) => (object) [
             'match_id' => $match, 'team_id' => $team, 'player_id' => $player, 'pseudo' => $pseudo, 'name' => 'Équipe',
+            'color' => $team === 10 ? 'Rouge' : 'Bleu', 'position' => 0,
+            'tags' => json_encode([['category' => 'Rôle', 'names' => ['Mage', 'Mage']]]),
         ];
         $players->shouldReceive('get')->once()->andReturn(collect([
             $row(1, 10, 1, 'Alice'), $row(1, 10, 2, 'Bob'), $row(1, 11, 3, 'Charlie'),
@@ -101,7 +104,9 @@ class GameStatisticsTest extends TestCase
             ->assertJsonPath('charts.0.rows', [['Alice', 1], ['Bob', 1], ['Sans vainqueur renseigné', 1]])
             ->assertJsonPath('charts.3.rows', [['1', 1], ['3', 1]])
             ->assertJsonPath('charts.4.rows', [['2026-01', 1], ['2026-02', 0], ['2026-03', 1]])
-            ->assertJsonPath('charts.5.rows', [['2026-01-01 18:00', 60]]);
+            ->assertJsonPath('charts.5.rows', [['2026-01-01 18:00', 60]])
+            ->assertJsonPath('charts.7.rows', [['Bleu', 2, 0, 1, 0], ['Rouge', 1, 1, 1, 100]])
+            ->assertJsonPath('charts.13.rows', [['Rôle: Mage', 3, 1, 2, 50]]);
     }
 
     public function test_summary_excludes_unknown_zero_and_negative_durations(): void

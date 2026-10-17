@@ -11,4 +11,5 @@ a.result-list { color: inherit; text-decoration: none; border-radius: 4px; }
 a.result-list:hover, a.result-list:focus-visible { background: var(--mat-sys-surface-container, #eee); }
 .result-list .supporting { line-height: 1.5; }
 .result-list .visual { flex-shrink: 0; }
+.rank { display: grid; place-items: center; height: 100%; font-size: 1.4rem; }
 @media (max-width: 650px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

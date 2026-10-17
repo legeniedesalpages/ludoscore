@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { StatsAnswerComponent } from '../stats-answer/stats-answer.component'
+import { StatisticsQuestion } from 'src/app/core/model/game-statistics.model'
 
 @Component({
   imports: [FormField, MatButtonModule, MatFormFieldModule, MatInputModule],
@@ -15,6 +16,7 @@ import { StatsAnswerComponent } from '../stats-answer/stats-answer.component'
 export class StatsQuestionComponent {
   private readonly dialog = inject(MatDialog)
   readonly gameId = input<number>()
+  readonly playerId = input<number>()
   readonly model = signal({ question: '' })
   readonly questionForm = form(this.model, path => {
     required(path.question)
@@ -25,10 +27,13 @@ export class StatsQuestionComponent {
   ask(event: Event): void {
     event.preventDefault()
     if (this.questionForm().invalid() || this.model().question.trim().length < 3) return
-    const id = this.gameId()
-    this.dialog.open(StatsAnswerComponent, {
+    const playerId = this.playerId()
+    const gameId = this.gameId()
+    const scope: Pick<StatisticsQuestion, 'scope' | 'id'> = playerId !== undefined ? { scope: 'player', id: playerId }
+      : gameId !== undefined ? { scope: 'game', id: gameId } : {}
+    this.dialog.open<StatsAnswerComponent, StatisticsQuestion>(StatsAnswerComponent, {
       width: '960px', maxWidth: '95vw', maxHeight: '90dvh',
-      data: { question: this.model().question.trim(), ...(id !== undefined ? { scope: 'game', id } : {}) },
+      data: { question: this.model().question.trim(), ...scope },
     })
   }
 }

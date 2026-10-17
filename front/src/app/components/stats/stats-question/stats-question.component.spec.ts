@@ -4,11 +4,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { StatsQuestionComponent } from './stats-question.component'
 
 describe('StatsQuestionComponent', () => {
-  it('validates questions and opens a modal scoped to the current game', async () => {
+  it.each([
+    { input: 'gameId', scope: 'game' },
+    { input: 'playerId', scope: 'player' },
+  ])('validates questions and opens a modal scoped to $scope', async ({ input, scope }) => {
     const open = vi.fn()
     TestBed.configureTestingModule({ providers: [{ provide: MatDialog, useValue: { open } }] })
     const fixture = TestBed.createComponent(StatsQuestionComponent)
-    fixture.componentRef.setInput('gameId', 7)
+    fixture.componentRef.setInput(input, 7)
     await fixture.whenStable()
     const component = fixture.componentInstance
     component.model.set({ question: '   ' })
@@ -20,7 +23,7 @@ describe('StatsQuestionComponent', () => {
     component.model.set({ question: ' Qui gagne le plus ? ' })
     component.ask(new Event('submit'))
     expect(open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-      data: { question: 'Qui gagne le plus ?', scope: 'game', id: 7 },
+      data: { question: 'Qui gagne le plus ?', scope, id: 7 },
     }))
   })
 })

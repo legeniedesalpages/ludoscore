@@ -1,0 +1,37 @@
+<app-layout [withBackButton]="true">
+  <ng-container role="header"><span class="title">{{ statistics()?.name ?? 'Statistiques du joueur' }}</span></ng-container>
+  <ng-container role="body">
+    <main class="statistics-shell">
+      <a mat-button routerLink="/statistics/players">Tous les joueurs</a>
+      @if (loading()) { <p role="status">Chargement des statistiques…</p> }
+      @if (error()) {
+        <p role="alert">{{ error() }}</p>
+        <button mat-button (click)="retry.next()">Réessayer</button>
+      }
+      @if (!loading()) {
+        @if (statistics(); as stats) {
+          <h1>{{ stats.name }}</h1>
+          <dl class="summary">
+            <div><dt>Parties terminées</dt><dd>{{ stats.matches }}</dd></div>
+            <div><dt>Victoires</dt><dd>{{ stats.wins }}</dd></div>
+            <div><dt>Taux de victoire</dt><dd>{{ stats.winRate === null ? 'Non déterminé' : stats.winRate + ' %' }}</dd></div>
+            <div><dt>Jeux joués</dt><dd>{{ stats.gamesPlayed }}</dd></div>
+            <div><dt>Temps global</dt><dd>{{ stats.totalPlayMinutes | statsDuration }}</dd></div>
+            <div><dt>Durée moyenne</dt><dd>{{ stats.averageDurationMinutes | statsDuration }}</dd></div>
+            <div><dt>Entre deux parties</dt><dd>{{ stats.averageWaitDays === null ? 'Non déterminé' : stats.averageWaitDays + ' jours en moyenne' }}</dd></div>
+            <div><dt>Partie la plus courte</dt><dd>{{ stats.minDurationMinutes | statsDuration }}</dd></div>
+            <div><dt>Partie la plus longue</dt><dd>{{ stats.maxDurationMinutes | statsDuration }}</dd></div>
+          </dl>
+          <p class="note">Hors annulations et parties en cours. Durées calculées sur {{ stats.measuredMatches }} parties renseignées. Taux calculé sur {{ stats.decidedMatches }} parties avec un vainqueur.</p>
+          <app-stats-question [playerId]="stats.id" />
+          @if (!stats.matches) { <p>Ce joueur n’a pas encore de partie terminée.</p> }
+          @else {
+            <div class="charts">
+              @for (chart of stats.charts; track chart.title) { <app-stats-chart [chart]="chart" /> }
+            </div>
+          }
+        }
+      }
+    </main>
+  </ng-container>
+</app-layout>

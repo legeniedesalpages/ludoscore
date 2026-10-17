@@ -1,0 +1,38 @@
+<app-layout [withBackButton]="true">
+  <ng-container role="header"><span class="title">Statistiques des joueurs</span></ng-container>
+  <ng-container role="body">
+    <main class="statistics-shell">
+      <a mat-button routerLink="/statistics">Toutes les statistiques</a>
+      @if (loading()) { <p role="status">Chargement des statistiques…</p> }
+      @if (error()) {
+        <p role="alert">{{ error() }}</p>
+        <button mat-button (click)="load()">Réessayer</button>
+      }
+      @if (!loading() && !error()) {
+        @if (statistics(); as stats) {
+          <dl class="summary" aria-label="Résumé des joueurs">
+            <div><dt>Joueurs enregistrés</dt><dd>{{ stats.summary.totalPlayers }}</dd></div>
+            <div><dt>Joueurs ayant joué</dt><dd>{{ stats.summary.activePlayers }}</dd></div>
+            <div><dt>Temps global</dt><dd>{{ stats.summary.totalPlayMinutes | statsDuration }}</dd></div>
+            <div><dt>Durée moyenne / partie</dt><dd>{{ stats.summary.averageDurationMinutes | statsDuration }}</dd></div>
+          </dl>
+          <p class="note">Parties terminées, hors annulations. Chaque partie est comptée une seule fois dans le résumé, quel que soit le nombre de joueurs. Durées calculées sur {{ stats.summary.measuredMatches }} parties renseignées.</p>
+          <app-stats-question />
+          <h2>Vos joueurs les plus actifs</h2>
+          <p class="note">À égalité, les joueurs ajoutés le plus récemment apparaissent en premier.</p>
+          <div aria-label="Joueurs classés par nombre de parties">
+            @for (player of stats.data; track player.id; let rank = $index) {
+              <a class="result-list" [routerLink]="['/statistics/players', player.id]">
+                <div class="visual" aria-hidden="true"><span class="rank">{{ rank + 1 }}</span></div>
+                <div class="content">
+                  <span class="heading">{{ player.name }}</span>
+                  <span class="supporting">{{ player.matches }} parties · {{ player.wins }} victoires · {{ player.winRate === null ? 'Taux non déterminé' : player.winRate + ' % de victoires' }}<br>Ajouté le {{ player.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </a>
+            } @empty { <p>Aucun joueur enregistré pour le moment.</p> }
+          </div>
+        }
+      }
+    </main>
+  </ng-container>
+</app-layout>

@@ -63,6 +63,31 @@ Les graphiques proposent aussi leurs donnees sous forme de tableau.
 L'assistant necessite `GEMINI_API_KEY` et reste limite a six requetes
 par minute ; les erreurs sont affichees avec possibilite de reessayer.
 
+## Statistiques des joueurs et dimensions de jeu
+
+La carte « Stats par joueurs » ouvre `/statistics/players` : resume,
+question IA et liste au format historique. Le classement suit le nombre
+de parties decroissant, puis la date d'ajout decroissante a egalite.
+Les joueurs sans partie sont inclus et les pseudos identiques restent
+distincts. Le temps global compte chaque partie une seule fois, pas une
+fois par participant. Les parties annulees et en cours sont exclues.
+
+Chaque fiche `/statistics/players/:id` affiche victoires, taux de victoire,
+jeux joues, durees, rythme de jeu, resultats et jeux favoris.
+L'assistant IA est restreint au joueur de la fiche.
+
+Les fiches joueurs **et** jeux proposent les participations, victoires
+et taux selon la couleur, la place dans l'ordre de jeu (1 = premier),
+les tags de jeux/parties et les tags de joueurs/equipes. Les tags sont
+les valeurs selectionnees pendant les parties, pas les choix possibles
+configures dans la fiche du jeu. Le libelle inclut la categorie ; les
+doublons d'un meme tag ne multiplient pas les participations.
+Une equipe n'est comptee qu'une fois par partie, meme avec plusieurs
+joueurs. Sur une fiche joueur, seules ses propres equipes sont analysees.
+Les valeurs non renseignees sont exclues de ces repartitions.
+Les taux excluent les parties sans vainqueur ; un taux sans resultat
+connu reste non determine. Moins de trois parties reste une simple tendance.
+
 ## Temps reel
 
 L'application n'utilise plus de WebSockets ni de service Pusher.
