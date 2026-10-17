@@ -1,0 +1,2 @@
+.question { font-style: italic; white-space: pre-wrap; }
+[role=alert] { color: var(--mat-sys-error, #b3261e); }

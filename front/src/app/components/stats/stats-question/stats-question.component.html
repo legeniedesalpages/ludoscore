@@ -1,0 +1,12 @@
+<section aria-label="Assistant statistiques">
+  <h2>Une question sur vos jeux ?</h2>
+  <form (submit)="ask($event)">
+    <mat-form-field appearance="outline">
+      <mat-label>Votre question à l’IA</mat-label>
+      <textarea matInput [formField]="questionForm.question" rows="2"
+        placeholder="Quels jeux ont été les plus joués chaque mois ?"></textarea>
+      <mat-hint>Entre 3 et 500 caractères. Réponse en texte, tableau ou graphique.</mat-hint>
+    </mat-form-field>
+    <button mat-flat-button type="submit" [disabled]="questionForm().invalid() || model().question.trim().length < 3">Analyser</button>
+  </form>
+</section>

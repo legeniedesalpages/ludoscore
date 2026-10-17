@@ -1,0 +1,44 @@
+<app-layout [withBackButton]="true">
+  <ng-container role="header"><span class="title">Statistiques des jeux</span></ng-container>
+  <ng-container role="body">
+    <main class="statistics-shell">
+      <a mat-button routerLink="/statistics">Toutes les statistiques</a>
+      @if (loading()) { <p role="status">Chargement des statistiques…</p> }
+      @if (error()) {
+        <p role="alert">{{ error() }}</p>
+        <button mat-button (click)="load()">Réessayer</button>
+      }
+      @if (!loading() && !error()) {
+        @if (statistics(); as stats) {
+          <dl class="summary" aria-label="Résumé des jeux">
+            <div><dt>Jeux enregistrés</dt><dd>{{ stats.summary.totalGames }}</dd></div>
+            <div><dt>Jeux joués</dt><dd>{{ stats.summary.playedGames }}</dd></div>
+            <div><dt>Temps global</dt><dd>{{ stats.summary.totalPlayMinutes | statsDuration }}</dd></div>
+            <div><dt>Durée moyenne / partie</dt><dd>{{ stats.summary.averageDurationMinutes | statsDuration }}</dd></div>
+          </dl>
+          <p class="note">Parties terminées, hors annulations. Durées calculées sur {{ stats.summary.measuredMatches }} parties avec un temps renseigné.</p>
+          <app-stats-question />
+          <h2>Vos jeux les plus joués</h2>
+          <p class="note">À égalité, les jeux ajoutés le plus récemment apparaissent en premier.</p>
+          <div class="game-list" aria-label="Jeux classés par nombre de parties">
+            @for (game of stats.data; track game.id) {
+              <a class="result-list" [routerLink]="['/statistics/games', game.id]">
+                <div class="visual">
+                  @if (game.thumbnailId) {
+                    <img [src]="imagesUrl + '/' + game.thumbnailId" alt="" loading="lazy">
+                  }
+                </div>
+                <div class="content">
+                  <span class="heading">{{ game.title }}</span>
+                  <span class="supporting">{{ game.matches }} {{ game.matches > 1 ? 'parties' : 'partie' }} · {{ game.totalPlayMinutes | statsDuration }} au total<br>Ajouté le {{ game.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </a>
+            } @empty {
+              <p>Aucun jeu enregistré pour le moment.</p>
+            }
+          </div>
+        }
+      }
+    </main>
+  </ng-container>
+</app-layout>

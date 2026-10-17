@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Analyse de vos statistiques</h2>
+<mat-dialog-content>
+  <p class="question">{{ question.question }}</p>
+  @if (loading()) { <p role="status">Analyse en cours…</p> }
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+    <button mat-button (click)="load()">Réessayer</button>
+  }
+  @if (answer(); as result) { <app-stats-chart [chart]="result" /> }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fermer</button>
+</mat-dialog-actions>

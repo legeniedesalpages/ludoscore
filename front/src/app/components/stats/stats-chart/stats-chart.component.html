@@ -1,0 +1,77 @@
+<section>
+  <h2>{{ chart().title }}</h2>
+  @if (chart().comment) { <p class="comment">{{ chart().comment }}</p> }
+  @if (!chart().rows.length) {
+    <p>Aucune donnée disponible.</p>
+  } @else {
+    @if (chart().type !== 'table') {
+      @for (item of series(); track $index) {
+        <h3>{{ item.title }}</h3>
+        @if (chart().type === 'pie' && item.nonNegative && item.total > 0) {
+          <div class="pie-layout">
+            <svg viewBox="0 0 42 42" class="pie" role="img" [attr.aria-label]="chart().title + ' — ' + item.title">
+              @for (point of item.points; track $index) {
+                @if (point.share > 0) {
+                  <circle cx="21" cy="21" r="15.9154943" fill="none" stroke-width="10"
+                    [attr.stroke]="point.color" [attr.stroke-dasharray]="point.share + ' ' + (100 - point.share)"
+                    [attr.stroke-dashoffset]="-point.offset" transform="rotate(-90 21 21)">
+                    <title>{{ point.label }} : {{ point.value }} ({{ point.share | number:'1.0-1' }} %)</title>
+                  </circle>
+                }
+              }
+            </svg>
+            <ul>
+              @for (point of item.points; track $index) {
+                <li><span class="swatch" [style.background]="point.color"></span>{{ point.label }} : {{ point.value ?? '—' }} ({{ point.share | number:'1.0-1' }} %)</li>
+              }
+            </ul>
+          </div>
+        } @else if (chart().type === 'line') {
+          <svg viewBox="0 0 600 220" class="timeline" role="img" [attr.aria-label]="chart().title + ' — ' + item.title">
+            <line x1="20" y1="110" x2="580" y2="110" stroke="currentColor" stroke-opacity=".3" />
+            @for (segment of item.segments; track $index) {
+              <polyline [attr.points]="segment" fill="none" stroke="#2457a7" stroke-width="2" />
+            }
+            @for (point of item.points; track $index) {
+              @if (point.value !== null) {
+                <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" fill="#2457a7">
+                  <title>{{ point.label }} : {{ point.value }}</title>
+                </circle>
+              }
+            }
+            <text x="20" y="215" fill="currentColor" font-size="12">{{ item.points[0]?.label }}</text>
+            <text x="580" y="215" text-anchor="end" fill="currentColor" font-size="12">{{ item.points[item.points.length - 1]?.label }}</text>
+          </svg>
+        } @else {
+          <div class="bars">
+            @for (point of item.points; track $index) {
+              <div class="bar-row">
+                <span>{{ point.label }}</span>
+                <div class="track"><div class="bar" [style.width.%]="point.width" [style.background]="point.color"></div></div>
+                <strong>{{ point.value ?? '—' }}</strong>
+              </div>
+            }
+          </div>
+        }
+      }
+      <details><summary>Voir les données du graphique</summary>
+        <ng-container [ngTemplateOutlet]="dataTable" />
+      </details>
+    } @else {
+      <ng-container [ngTemplateOutlet]="dataTable" />
+    }
+  }
+  <ng-template #dataTable>
+    <div class="table-scroll">
+      <table>
+        <caption>{{ chart().title }}</caption>
+        <thead><tr>@for (column of chart().columns; track $index) { <th scope="col">{{ column }}</th> }</tr></thead>
+        <tbody>
+          @for (row of chart().rows; track $index) {
+            <tr>@for (cell of row; track $index) { <td>{{ cell ?? '—' }}</td> }</tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
+</section>

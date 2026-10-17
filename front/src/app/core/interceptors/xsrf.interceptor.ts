@@ -76,7 +76,7 @@ export class HttpXSRFInterceptor implements HttpInterceptor {
             })
         }
 
-        return throwError(() => new Error(err.error?.message ?? err.message))
+        return throwError(() => err)
     }
 
 }

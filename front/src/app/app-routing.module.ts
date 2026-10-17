@@ -40,6 +40,8 @@ const routes: Routes = [
   { path: 'edit-player/:id', loadChildren: () => import('./components/player/edit-player/edit-player.module').then(m => m.EditPlayerModule), data: { animation: 'edit-player' } },
 
   { path: 'statistics', loadComponent: () => import('./components/stats/statistics/statistics.component').then(c => c.StatisticsComponent), canActivate: [AuthGuardService], data: { animation: 'statistics' } },
+  { path: 'statistics/games', loadComponent: () => import('./components/stats/game-statistics/game-statistics.component').then(c => c.GameStatisticsComponent), canActivate: [AuthGuardService], title: 'Statistiques des jeux', data: { animation: 'game-statistics' } },
+  { path: 'statistics/games/:id', loadComponent: () => import('./components/stats/game-statistics-detail/game-statistics-detail.component').then(c => c.GameStatisticsDetailComponent), canActivate: [AuthGuardService], title: 'Statistiques du jeu', data: { animation: 'game-statistics-detail' } },
 
   { path: 'newsletter-preview', loadComponent: () => import('./components/admin/newsletter-preview/newsletter-preview.component').then(c => c.NewsletterPreviewComponent), canActivate: [AuthGuardService], data: { animation: 'newsletter-preview' } },
 

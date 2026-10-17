@@ -1,0 +1,10 @@
+:host { display: block; margin: 1.5rem 0; }
+section { border: 1px solid var(--mat-sys-outline-variant, #bbb); border-radius: 16px; padding: 1rem; }
+h2 { font-size: 1.15rem; margin: 0 0 1rem; }
+form { display: flex; gap: 1rem; align-items: flex-start; }
+mat-form-field { flex: 1; min-width: 0; }
+button { margin-top: .5rem; }
+@media (max-width: 560px) {
+  form { flex-direction: column; }
+  mat-form-field { width: 100%; }
+}

@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatSelectModule } from '@angular/material/select'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
+import { RouterLink } from '@angular/router'
 import { BehaviorSubject, Subject, switchMap, takeUntil } from 'rxjs'
 import { LayoutComponent } from 'src/app/components/layout/layout.component'
 import { StatisticsDashboard, StatisticsService } from 'src/app/core/services/stats/statistics.service'
@@ -19,6 +20,7 @@ import { StatisticsDashboard, StatisticsService } from 'src/app/core/services/st
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule,
+    RouterLink,
     MatButtonModule,
     MatIconModule,
     MatCardModule,

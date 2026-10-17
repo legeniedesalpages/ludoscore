@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { Observable, catchError, of, tap } from 'rxjs'
 import { environment } from 'src/environments/environment'
+import { GameStatisticsDetail, GameStatisticsLibrary, StatisticsChart, StatisticsQuestion } from '../../model/game-statistics.model'
 
 export interface ApiStatus {
   status: 'success' | 'error'
@@ -56,6 +57,18 @@ export class StatisticsApiService {
   private readonly baseUrl = `${environment.apiURL}/api/statistics`
 
   constructor(private http: HttpClient) {}
+
+  public gameLibrary(): Observable<GameStatisticsLibrary> {
+    return this.http.get<GameStatisticsLibrary>(`${this.baseUrl}/game-library`)
+  }
+
+  public gameDetail(id: number): Observable<GameStatisticsDetail> {
+    return this.http.get<GameStatisticsDetail>(`${this.baseUrl}/games/${id}`)
+  }
+
+  public ask(question: StatisticsQuestion): Observable<StatisticsChart> {
+    return this.http.post<StatisticsChart>(`${this.baseUrl}/ask`, question)
+  }
 
   public overview(period = 'all'): Observable<StatisticsOverviewApi | ApiStatus> {
     return this.http.get<StatisticsOverviewApi>(`${this.baseUrl}/overview`, { params: { period } }).pipe(

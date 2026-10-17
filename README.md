@@ -40,6 +40,29 @@ Avant de deployer sur OVH :
 - verifier une connexion, la consultation des statistiques et le cron avec
   `--help` (sans envoi d'e-mail).
 
+## Statistiques des jeux
+
+Depuis la carte « Stats par jeux », l'ecran `/statistics/games` affiche le
+nombre de jeux enregistres (y compris hors ludotheque), le nombre de jeux
+joues, le temps cumule et la duree moyenne par partie mesuree.
+La liste reprend le format de l'historique : nombre de parties decroissant,
+puis date d'enregistrement decroissante (`created_at` et identifiant a egalite).
+Les jeux jamais joues restent visibles et les titres identiques ne sont pas fusionnes.
+
+Seules les parties terminees et non annulees sont comptees. Les durees
+absentes, nulles ou negatives sont exclues des calculs de temps, pas du
+nombre de parties. Chaque fiche `/statistics/games/:id` presente les
+vainqueurs (une victoire par membre de l'equipe gagnante), les jours et
+heures de debut, le nombre de joueurs distincts, les parties par mois,
+les durees et l'intervalle moyen entre deux parties datees.
+
+Le champ IA utilise l'API existante `POST /api/statistics/ask` et ouvre
+une modale avec le commentaire et un tableau, des barres, des courbes
+ou un camembert. Sur une fiche de jeu, le perimetre est impose a ce jeu.
+Les graphiques proposent aussi leurs donnees sous forme de tableau.
+L'assistant necessite `GEMINI_API_KEY` et reste limite a six requetes
+par minute ; les erreurs sont affichees avec possibilite de reessayer.
+
 ## Temps reel
 
 L'application n'utilise plus de WebSockets ni de service Pusher.
