@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\UserConnectedEvent;
 use App\Models\User;
 use App\Services\MailDelivery;
 use Illuminate\Http\Request;
@@ -112,8 +111,6 @@ class AuthController extends Controller
             if (Auth::attempt($credentials)) {
 
                 $request->session()->regenerate();
-
-                UserConnectedEvent::dispatch("utilisateur");
 
                 if (Auth::user()->email_verified_at == null) {
                     return response()->json('User Not Confirmed', 401);

@@ -1,6 +1,17 @@
 # ludoscore
 Enregistreur de score
 
+## Temps reel
+
+L'application n'utilise plus de WebSockets ni de service Pusher.
+Les variables et secrets `PUSHER_*` ne sont plus necessaires, y compris dans
+GitHub Actions. La diffusion Laravel est desactivee, meme si un ancien
+environnement definit encore `BROADCAST_DRIVER=pusher`.
+
+La migration historique `create_websockets_statistics_entries_table` est
+conservee pour ne pas modifier l'historique des migrations. La table existante
+n'est plus utilisee ; ce nettoyage ne supprime aucune donnee.
+
 ## Abonnement a la newsletter
 
 L'indicateur `users.newsletter_subscribed` vaut `false` par defaut pour les

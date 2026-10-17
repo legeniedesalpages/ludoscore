@@ -21,7 +21,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './app.component';
 import { environment } from 'src/environments/environment';
 import { AuthState } from './core/state/auth/auth.state';
-import { PusherService } from './core/services/pusher/pusher.service';
 import { MatchState } from './core/state/match/match.state';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
@@ -50,7 +49,6 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
   providers: [
     provideZonelessChangeDetection(),
     { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
-    PusherService,
     provideHttpClient(
       withFetch(),
       withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-CSRF-TOKEN' }),
