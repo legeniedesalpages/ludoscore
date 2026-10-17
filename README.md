@@ -1,6 +1,45 @@
 # ludoscore
 Enregistreur de score
 
+## Backend : Laravel 13 et PHP 8.5
+
+Le backend utilise Laravel 13 avec PHP 8.5, en local comme dans le build de
+deploiement. Composer 2.2 minimum est requis. La plateforme Composer est fixee
+a PHP 8.5.0 pour que les mises a jour restent compatibles avec l'hebergement.
+Installer les versions de `back/composer.lock`, sans executer `composer update`
+en production.
+
+Pour mettre a jour l'environnement local existant :
+
+```sh
+docker compose build laravel-app
+docker compose up -d --no-deps laravel-app
+docker compose exec -u devuser laravel-app composer install
+docker compose exec -u devuser laravel-app php artisan optimize:clear
+docker compose exec -u devuser laravel-app php artisan migrate
+docker compose exec -u devuser laravel-app php artisan test
+```
+
+La structure historique du backend (kernels, providers et routes) est conservee.
+Sanctum 4 garde l'authentification SPA par cookies et les jetons personnels.
+La serialisation PHP des sessions est conservee pour ne pas invalider les
+sessions existantes. Les durees et ecarts des statistiques restent des nombres
+entiers malgre le passage a Carbon 3. Doctrine DBAL n'est plus necessaire.
+MySQL 5.7 reste compatible ; cette migration ne change pas le serveur de base.
+
+Avant de deployer sur OVH :
+
+- sauvegarder la base et les fichiers persistants ;
+- selectionner PHP 8.5 pour le site **avant** de deployer ce backend ;
+- selectionner aussi PHP 8.5 pour les taches planifiees (la version CLI/cron
+  peut etre differente de celle du site) ;
+- verifier les extensions PHP requises avec `composer check-platform-reqs --no-dev`
+  si un acces CLI est disponible, et conserver les extensions applicatives
+  `pdo_mysql`, `calendar`, `mbstring`, `intl` et `zip` ;
+- appliquer les migrations et vider les anciens caches Laravel ;
+- verifier une connexion, la consultation des statistiques et le cron avec
+  `--help` (sans envoi d'e-mail).
+
 ## Temps reel
 
 L'application n'utilise plus de WebSockets ni de service Pusher.
@@ -26,7 +65,7 @@ Sans destinataire eligible, aucun appel IA n'est effectue.
 L'option `--dry` et l'apercu administrateur n'envoient aucun e-mail.
 L'interface de gestion de cet abonnement n'est pas encore disponible.
 
-## Envoi hebdomadaire sur OVH (PHP 8.1)
+## Envoi hebdomadaire sur OVH (PHP 8.5)
 
 Le fichier `back/newsletter-cron.php` est inclus dans le deploiement du backend.
 Avec les chemins du deploiement actuel, il est installe dans
@@ -37,7 +76,7 @@ Dans le Manager OVH, ajouter une tache planifiee :
 
 - Commande a executer (relative a la racine FTP) : `ludoscore/newsletter-cron.php`
   (si le formulaire affiche deja `./`, ne pas le saisir une seconde fois).
-- Langage : PHP 8.1.
+- Langage : PHP 8.5.
 - Activation : cochee.
 - Logs par e-mail : activer au moins pour les premiers envois.
 - Description : Newsletter hebdomadaire LudoScore.
@@ -74,12 +113,9 @@ L'option `--to=adresse` limite l'envoi a un compte abonne et confirme.
 
 # démarrer l'environnement en local
 ```
-docker-compose up -d
-
-dans l'image laravel :
-- composer install
-- php artisan migrate:fresh
-
+docker compose up -d --build
+docker compose exec -u devuser laravel-app composer install
+docker compose exec -u devuser laravel-app php artisan migrate
 ```
 
 Accès à la page d'accueil :

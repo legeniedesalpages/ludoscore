@@ -48,6 +48,9 @@ return [
 
     'encrypt' => false,
 
+    // Preserve existing sessions during the framework upgrade.
+    'serialization' => 'php',
+
     /*
     |--------------------------------------------------------------------------
     | Session File Location

@@ -20,7 +20,7 @@ services:
           - angular-app
   
   laravel-app:
-    image: apache-php:3.0
+    image: ludoscore-apache-php:8.5
     build:
       context: ./docker/
       dockerfile: Dockerfile-Apache-Php

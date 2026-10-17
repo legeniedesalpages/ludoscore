@@ -52,7 +52,7 @@ class MatchDataset
             $hasLocation = $r->latitude !== null && $r->longitude !== null;
             $distance = $hasLocation ? LocationService::distanceKm($home['lat'], $home['lon'], (float) $r->latitude, (float) $r->longitude) : 0.0;
             $away = $distance > $awayKm;
-            $duration = $r->finished_at ? $start->diffInMinutes(Carbon::parse($r->finished_at)) : null;
+            $duration = $r->finished_at ? (int) $start->diffInMinutes(Carbon::parse($r->finished_at), true) : null;
 
             return [
                 'match_id' => (int) $r->match_id,
@@ -97,12 +97,12 @@ class MatchDataset
         foreach ($rows->groupBy('match_id') as $group) {
             $at = $group->first()['started_at'];
             $gameId = $group->first()['game_id'];
-            $gapGame = isset($lastByGame[$gameId]) ? $lastByGame[$gameId]->diffInDays($at) : null;
+            $gapGame = isset($lastByGame[$gameId]) ? (int) $lastByGame[$gameId]->diffInDays($at, true) : null;
 
             foreach ($group as $row) {
                 $last = $lastByPlayer[$row['player_id']] ?? null;
                 $row['gap_game_days'] = $gapGame;
-                $row['gap_player_days'] = $last ? $last->diffInDays($at) : null;
+                $row['gap_player_days'] = $last ? (int) $last->diffInDays($at, true) : null;
                 $out->push($row);
             }
 

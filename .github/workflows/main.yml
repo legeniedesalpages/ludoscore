@@ -57,6 +57,7 @@ jobs:
     - name: Installation des dépendances Back Office
       uses: php-actions/composer@v6
       with:
+        php_version: "8.5"
         command: install --no-dev --ansi --no-progress --no-interaction --prefer-dist --working-dir=./back/
     
     - name: Compression du repertoire  Back Office

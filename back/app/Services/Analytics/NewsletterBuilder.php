@@ -231,7 +231,7 @@ class NewsletterBuilder
     private function calendar(Carbon $date): array
     {
         $year = $date->year;
-        $easter = Carbon::createFromTimestamp(easter_date($year))->startOfDay();
+        $easter = Carbon::createFromTimestamp(easter_date($year), $date->getTimezone())->startOfDay();
         $fixed = [
             'Nouvel An' => [1, 1], 'Épiphanie (galette des rois)' => [1, 6], 'Chandeleur (crêpes)' => [2, 2],
             'Saint-Valentin' => [2, 14], 'Poisson d\'avril' => [4, 1], 'Fête du travail (muguet)' => [5, 1],
