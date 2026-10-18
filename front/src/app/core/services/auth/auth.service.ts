@@ -17,6 +17,7 @@ import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { User } from '../../model/user.model'
 import { UserCrudService } from '../crud/user-crud.service'
+import { PlayerService } from '../player/player.service'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
   private readonly confirmrUrl = environment.apiURL + '/api/auth/confirm'
 
 
-  constructor(private http: HttpClient, private userCrudService: UserCrudService) {
+  constructor(private http: HttpClient, private userCrudService: UserCrudService, private playerService: PlayerService) {
   }
 
   public login(email: string, password: string): Observable<User> {
@@ -39,7 +40,10 @@ export class AuthService {
       mergeMap(() => this.http.post<number>(this.loginUrl, { email: email, password: password })),
       // third and last request : retrieve user details
       mergeMap(id => this.userCrudService.findOne(id)),
-      tap(user => console.info("Utilisateur connecté", user))
+      tap(user => {
+        this.playerService.invalidateCache()
+        console.info("Utilisateur connecté", user)
+      })
     )
   }
 
@@ -48,7 +52,10 @@ export class AuthService {
   }
 
   public logout(): Observable<string> {
-    return this.http.get<string>(this.logoutUrl).pipe(tap(() => console.info("Utilisateur déconnecté")))
+    return this.http.get<string>(this.logoutUrl).pipe(tap(() => {
+      this.playerService.invalidateCache()
+      console.info("Utilisateur déconnecté")
+    }))
   }
 
   public createUser(email: string, password: string) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\Analytics\GameStatistics;
 use App\Services\Analytics\PlayerStatistics;
+use App\Services\PlayerAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,8 @@ class PlayerStatisticsController extends Controller
 {
     public function index(PlayerStatistics $statistics, GameStatistics $games): JsonResponse
     {
-        $players = DB::table('players')->orderByDesc('created_at')->orderByDesc('id')->get();
+        $players = app(PlayerAccess::class)->scopePlayers(DB::table('players'), request()->user())
+            ->orderByDesc('created_at')->orderByDesc('id')->get();
         $rows = $statistics->rows();
         $byPlayer = $rows->groupBy('player_id');
         $data = $players->map(fn($player) => [
@@ -30,7 +32,7 @@ class PlayerStatisticsController extends Controller
 
     public function show(int $id, PlayerStatistics $statistics): JsonResponse
     {
-        $player = DB::table('players')->where('id', $id)->first();
+        $player = app(PlayerAccess::class)->scopePlayers(DB::table('players'), request()->user())->where('id', $id)->first();
         abort_if(!$player, 404, 'Joueur introuvable.');
         return response()->json($statistics->detail($player, $statistics->rows($id)));
     }

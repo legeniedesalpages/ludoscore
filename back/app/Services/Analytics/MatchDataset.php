@@ -3,6 +3,7 @@
 namespace App\Services\Analytics;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -20,9 +21,10 @@ class MatchDataset
         return 'J' . $playerId;
     }
 
-    public function rows(?Carbon $from = null, ?Carbon $to = null): Collection
+    public function rows(?Carbon $from = null, ?Carbon $to = null, ?User $user = null): Collection
     {
-        $raw = DB::table('team_players as tp')
+        $query = app(\App\Services\PlayerAccess::class)->scopeMatches(DB::table('team_players as tp'), 'm.id', $user);
+        $raw = $query
             ->join('teams as t', 't.id', '=', 'tp.team_id')
             ->join('matches as m', 'm.id', '=', 't.match_id')
             ->join('games as g', 'g.id', '=', 'm.game_id')

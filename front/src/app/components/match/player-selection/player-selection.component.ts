@@ -89,7 +89,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.playerService.listAllPlayers().subscribe(allPlayers => {
+    this.playerService.listSelectablePlayers().subscribe(allPlayers => {
       this.loading = false
       this.changeDetectorRef.markForCheck()
 

@@ -85,7 +85,8 @@ class NewsletterBuilder
 
     private function facts(?int $userId): array
     {
-        $rows = (new MatchDataset())->rows();
+        $recipient = $userId === null ? null : \App\Models\User::findOrFail($userId);
+        $rows = (new MatchDataset())->rows(user: $recipient);
         $since = now()->subDays(7);
         $week = $rows->filter(fn($r) => $r['started_at'] >= $since);
         $matches = $week->groupBy('match_id');

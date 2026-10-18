@@ -89,9 +89,8 @@ Un echec renvoie HTTP 500 et permet une nouvelle tentative apres correction.
 Le rollback restaure la ludotheque historique ; il refuse de supprimer la table
 si d'autres comptes y ont ajoute des associations, pour eviter une perte.
 
-Ce changement isole les ludotheques uniquement : les fiches de jeux, les parties,
-les joueurs et les statistiques restent partages. Ce n'est pas encore une
-isolation complete de toutes les donnees de l'application.
+Les fiches de jeux restent communes. Les acces aux joueurs, aux parties et aux
+statistiques sont maintenant regis par les associations de joueurs ci-dessous.
 
 ## Createur des joueurs
 
@@ -100,6 +99,22 @@ L'API le renvoie dans `createdByUserId`. A la creation, le serveur utilise le
 compte authentifie, jamais une valeur fournie par le client. Le createur reste
 inchange lors d'une modification ou d'une association a un autre compte.
 La suppression d'un compte createur est refusee tant que ses joueurs existent.
+
+La liste de gestion affiche les joueurs associes au compte connecte ; le choix
+des participants ne conserve que ceux autorises a etre ajoutes a une partie.
+Les administrateurs voient tous les joueurs. Ce filtrage est applique par l'API.
+Le cache des joueurs et la partie memorisee localement sont vides a la connexion
+et a la deconnexion. Le choix des participants recharge toujours les droits.
+Pour un administrateur, les joueurs sans compte associe affichent aussi
+l'adresse du compte createur et le pseudo de son joueur associe, s'il existe.
+Ces informations de createur ne sont renvoyees par la liste API qu'aux
+administrateurs et uniquement pour les joueurs sans compte associe.
+En haut de l'edition d'un joueur, le nombre de parties terminees non annulees
+accessibles auxquelles il a participe est affiche (une fois par partie).
+Sans participation, le message indique qu'il n'a jamais participe ; lorsque
+les droits limitent l'historique, il indique plutot qu'aucune participation
+n'est visible avec les droits actuels.
+Ce resume n'apparait pas lors de la creation d'un joueur.
 
 La migration `2026_10_18_100000_add_created_by_user_to_players` attribue les
 joueurs existants au compte qui les reference via `users.player_id`, sinon a
@@ -115,6 +130,61 @@ deploiement du backend et l'execution des migrations. Le deploiement existant
 applique cette migration via `/finir_installation`. En local :
 `docker compose exec -u devuser laravel-app php artisan migrate`.
 Le rollback retire uniquement la donnee de createur, pas les joueurs.
+
+## Associations entre joueurs et utilisateurs
+
+`users.player_id` conserve l'identite personnelle du compte (« ce joueur est
+moi »). La table `player_user` permet en plus de partager un joueur avec plusieurs
+comptes, avec une paire unique `(player_id, user_id)` et les proprietes :
+
+- `is_creator` : createur historique, unique et non modifiable par l'API ;
+- `can_view_personal_info` : voir le prenom, le nom et le compte/e-mail associe ;
+- `can_view_other_matches` : voir les parties de ce joueur sans y avoir joue ;
+- `can_add_to_match` : ajouter ce joueur a une nouvelle partie ;
+- `associated_at` : date de l'association, conservee lors des changements de droits.
+
+Le pseudo, l'avatar et la couleur preferee restent visibles. Sans droit sur les
+informations personnelles, celles-ci sont exclues des reponses API, y compris
+des participants de l'historique. Les fiches de joueurs non associes sont
+inaccessibles. Un lien de partage n'accorde pas le droit de modifier un joueur :
+ce droit reste au createur, au compte personnel et aux administrateurs.
+Sans droit personnel, une modification publique ne remplace pas le nom/prenom.
+
+Une partie est accessible si le joueur personnel du compte y participe **ou**
+si au moins un participant est associe au compte avec `can_view_other_matches`.
+Ce filtre couvre l'historique, les photos, les parties en cours, les equipes,
+les precedentes parties/couleurs, les compteurs, les statistiques et les donnees
+de l'assistant IA. Les compteurs de jeu auparavant globaux portent desormais sur
+les parties accessibles. Les newsletters sont filtrees selon leur destinataire.
+Les analyses IA pregenerees, calculees globalement, restent reservees aux
+administrateurs ; l'assistant interactif utilise les donnees accessibles.
+Une partie sans participation personnelle ni permission de consultation ne
+peut pas etre creee par ce compte. L'ajout de chaque participant est aussi
+verifie cote serveur, meme si le client contourne le selecteur.
+
+Seuls les administrateurs gerent les associations et leurs droits dans
+l'edition du joueur (section « Utilisateurs associes »). Les trois permissions
+sont refusees par defaut pour un nouveau partage. Les administrateurs conservent
+tous les acces. Le lien du createur et celui de l'identite personnelle ne peuvent
+pas etre retires via l'editeur de partage. Retirer d'abord l'identite personnelle
+permet ensuite de retirer son lien s'il ne s'agit pas du createur.
+
+La migration `2026_10_18_140000_create_player_user_table` cree les liens du
+createur historique et du compte personnel associe (sans doublon), avec les trois
+permissions accordees. Elle ne modifie ni les joueurs, ni leurs identites, ni
+les parties. La date de creation du joueur sert de date de reprise, faute de
+date historique d'association. Une reprise n'ecrase pas les droits deja presents.
+`players.created_by_user_id` est conserve comme reference historique immuable et
+contrainte d'integrite ; `is_creator` le reflete, sans changer l'origine du joueur.
+
+Sauvegarder la base, suspendre les ecritures et deployer backend/frontend ensemble.
+Appliquer toutes les migrations dans l'ordre avant de rouvrir l'application :
+`docker compose exec -T laravel-app php artisan migrate --force` en local Docker
+(en production, utiliser l'environnement PHP du deploiement habituel).
+Le rollback refuse de supprimer la table si des partages supplementaires ou des
+permissions modifiees seraient perdus ; exporter et traiter ces donnees avant
+tout retour en arriere. Ne pas annuler la migration des createurs tant que
+celle des associations est en place.
 
 ## Statistiques des jeux
 

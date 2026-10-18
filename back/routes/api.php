@@ -73,6 +73,9 @@ Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::c
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create']]);
+Route::middleware('auth:sanctum')->get('/player/{id}/associations', [PlayerController::class, 'associations']);
+Route::middleware('auth:sanctum')->put('/player/{id}/associations/{userId}', [PlayerController::class, 'saveAssociation']);
+Route::middleware('auth:sanctum')->delete('/player/{id}/associations/{userId}', [PlayerController::class, 'deleteAssociation']);
 
 /*
 |--------------------------------------------------------------------------

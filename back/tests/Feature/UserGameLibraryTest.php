@@ -82,8 +82,8 @@ class UserGameLibraryTest extends TestCase
             $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('player_id');
         });
-        $this->owner = User::create(['email' => 'renaud_balu@hotmail.com', 'password' => 'unused']);
-        $this->other = User::create(['email' => 'other@example.test', 'password' => 'unused']);
+        $this->owner = User::create(['email' => 'renaud_balu@hotmail.com', 'password' => 'unused', 'is_admin' => true]);
+        $this->other = User::create(['email' => 'other@example.test', 'password' => 'unused', 'is_admin' => true]);
     }
 
     protected function tearDown(): void

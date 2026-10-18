@@ -25,3 +25,23 @@
 .visual img {
   border-radius: 100%;
 }
+
+.result-list .content {
+  height: auto;
+  min-height: 80px;
+  min-width: 0;
+}
+
+.result-list .supporting {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.result-list .visual {
+  flex-shrink: 0;
+}
+
+.creator,
+.creator-player {
+  display: block;
+}

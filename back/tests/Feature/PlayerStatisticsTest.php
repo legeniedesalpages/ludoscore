@@ -41,7 +41,7 @@ class PlayerStatisticsTest extends TestCase
 
     public function test_directory_includes_inactive_players_and_counts_global_time_once(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $players = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('players')->once()->andReturn($players);
         $players->shouldReceive('orderByDesc')->with('created_at')->once()->andReturnSelf();
@@ -66,7 +66,7 @@ class PlayerStatisticsTest extends TestCase
 
     public function test_detail_has_results_activity_and_player_scoped_dimensions(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $player = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('players')->once()->andReturn($player);
         $player->shouldReceive('where')->with('id', 1)->once()->andReturnSelf();
@@ -112,7 +112,7 @@ class PlayerStatisticsTest extends TestCase
 
     public function test_empty_directory_and_unknown_player(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $players = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('players')->twice()->andReturn($players);
         $players->shouldReceive('orderByDesc')->andReturnSelf();

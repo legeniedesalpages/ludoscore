@@ -23,6 +23,14 @@
                         <span class="compte" [hidden]="player?.user?.email == undefined || !isAdmin">
                             Associé au compte: <span class="email">{{ player?.user?.email}}</span>
                         </span>
+                        @if (isAdmin && !player.user && player.creator; as creator) {
+                            <span class="creator">
+                                Créé par : {{ creator.email }}
+                                @if (creator.player; as creatorPlayer) {
+                                    <span class="creator-player">Joueur du créateur : {{ creatorPlayer.pseudo }}</span>
+                                }
+                            </span>
+                        }
                     </div>
                 </div>
             </div>

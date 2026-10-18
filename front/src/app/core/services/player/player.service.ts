@@ -44,13 +44,19 @@ export class PlayerService {
         this.cachePlayers = undefined
     }
 
+    public listSelectablePlayers(): Observable<Player[]> {
+        return this.playerCrudService.findForMatch().pipe(
+            map(players => players.map(player => this.playerEntityToPlayer(player)))
+        )
+    }
+
     private playerEntityToPlayer(playerEntity: PlayerEntity): Player {
         const preferedColor = COLORS.find(color => color.name == playerEntity.preferedColor)
         return {
             id: playerEntity.id,
             pseudo: playerEntity.pseudo,
-            lastName: playerEntity.lastName,
-            firstName: playerEntity.firstName,
+            lastName: playerEntity.lastName ?? '',
+            firstName: playerEntity.firstName ?? '',
             preferedColor: preferedColor ? preferedColor : NO_COLOR,
             gravatarUrl: "https://www.gravatar.com/avatar/" + playerEntity.gravatar + "?d=identicon&r=pg"
         }

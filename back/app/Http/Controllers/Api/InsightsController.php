@@ -13,6 +13,8 @@ class InsightsController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        // Stored insights were generated globally and cannot be safely filtered per match.
+        abort_unless($request->user()->is_admin, 403, 'Les analyses pregenerees sont reservees aux administrateurs. Utilisez l assistant pour vos donnees accessibles.');
         $data = $request->validate([
             'scope' => 'required|in:player,game',
             'id' => 'required|integer',
@@ -41,6 +43,10 @@ class InsightsController extends Controller
             'scope' => 'nullable|in:player,game',
             'id' => 'required_with:scope|nullable|integer',
         ]);
+        if (($data['scope'] ?? null) === 'player') {
+            app(\App\Services\PlayerAccess::class)->scopePlayers(\App\Models\Player::query(), $request->user())
+                ->findOrFail($data['id']);
+        }
 
         try {
             return response()->json($assistant->answer($data['question'], $data['scope'] ?? null, $data['id'] ?? null));

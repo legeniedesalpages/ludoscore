@@ -15,6 +15,7 @@ class StatisticsController extends Controller
         [$from, $to] = $this->periodRange((string) $request->query('period', 'all'));
 
         $matches = DB::table('matches as m')
+            ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query, 'm.id'))
             ->leftJoin('games as g', 'g.id', '=', 'm.game_id')
             ->leftJoin('teams as w', 'w.id', '=', 'm.winner_team_id')
             ->select(
@@ -33,11 +34,14 @@ class StatisticsController extends Controller
         $inPeriod = fn($match) => !$from || ($match->started_at && $match->started_at >= $from && $match->started_at <= $to);
         $periodMatches = $matches->filter($inPeriod);
 
-        $applyPeriod = fn($query) => $from ? $query->whereBetween('m.started_at', [$from, $to]) : $query;
+        $applyPeriod = function ($query) use ($from, $to) {
+            app(\App\Services\PlayerAccess::class)->scopeMatches($query, 'm.id');
+            return $from ? $query->whereBetween('m.started_at', [$from, $to]) : $query;
+        };
 
         $totalMatches = $periodMatches->count();
         $totalGames = DB::table('games')->count();
-        $totalPlayers = DB::table('players')->count();
+        $totalPlayers = app(\App\Services\PlayerAccess::class)->scopePlayers(DB::table('players'), $request->user())->count();
 
         $durationValues = [];
         foreach ($periodMatches as $match) {
@@ -178,6 +182,7 @@ class StatisticsController extends Controller
     public function games(): JsonResponse
     {
         $matches = DB::table('matches as m')
+            ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query, 'm.id'))
             ->join('games as g', 'g.id', '=', 'm.game_id')
             ->select('m.id', 'm.started_at', 'm.finished_at', 'm.game_id', 'm.winner_team_id', 'g.title as game_title')
             ->orderBy('m.started_at', 'desc')
@@ -234,7 +239,7 @@ class StatisticsController extends Controller
         $result = [];
         foreach ($stats as $data) {
             $waitDays = [];
-            $gameMatches = DB::table('matches')->where('game_id', function ($query) use ($data) {
+            $gameMatches = app(\App\Services\PlayerAccess::class)->scopeMatches(DB::table('matches'))->where('game_id', function ($query) use ($data) {
                 $query->select('id')->from('games')->where('title', $data['title'])->limit(1);
             })->orderBy('started_at')->pluck('started_at')->all();
 
@@ -271,8 +276,9 @@ class StatisticsController extends Controller
 
     public function players(): JsonResponse
     {
-        $players = DB::table('players')->select('id', 'pseudo')->get();
+        $players = app(\App\Services\PlayerAccess::class)->scopePlayers(DB::table('players'), request()->user())->select('id', 'pseudo')->get();
         $matches = DB::table('matches as m')
+            ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query, 'm.id'))
             ->join('teams as t', 't.match_id', '=', 'm.id')
             ->join('team_players as tp', 'tp.team_id', '=', 't.id')
             ->select('m.id as match_id', 'm.game_id', 'm.winner_team_id', 't.id as team_id', 't.score', 'tp.player_id', 'm.started_at', 'm.finished_at')

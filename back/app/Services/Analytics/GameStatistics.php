@@ -10,7 +10,8 @@ class GameStatistics
 {
     public function matches(?int $gameId = null): Collection
     {
-        return DB::table('matches')
+        $query = app(\App\Services\PlayerAccess::class)->scopeMatches(DB::table('matches'));
+        return $query
             ->where('canceled', false)->where('running', false)
             ->when($gameId !== null, fn($q) => $q->where('game_id', $gameId))
             ->orderBy('started_at')->orderBy('id')->get();

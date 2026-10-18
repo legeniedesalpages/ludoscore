@@ -26,6 +26,7 @@ class GameController extends Controller
                 $query->select('teams.name')
                     ->from('teams')
                     ->leftJoin('matches', 'matches.winner_team_id', '=', 'teams.id')
+                    ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query))
                     ->whereColumn('matches.game_id', 'games.id')
                     ->orderByDesc('matches.started_at')
                     ->limit(1);
@@ -33,12 +34,14 @@ class GameController extends Controller
             ->selectSub(function($query) {
                 $query->select('matches.started_at')
                     ->from('matches')
+                    ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query))
                     ->whereColumn('matches.game_id', 'games.id')
                     ->orderByDesc('matches.started_at')
                     ->limit(1);
             }, 'last_played')
             ->selectSub(function($query) {
                 $query->from('matches')
+                    ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query))
                     ->whereColumn('matches.game_id', 'games.id')
                     ->where('matches.canceled', false)
                     ->where('matches.running', false)

@@ -6,7 +6,19 @@
 
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement du joueur"></loading-spinner>
-        <div class="edit-player" [hidden]="loading">
+        @if (loadError) {
+            <p role="alert">{{ loadError }}</p>
+        }
+        <div class="edit-player" [hidden]="loading || !!loadError">
+            @if (!creating && playedMatchCount !== undefined) {
+                <p class="participation-count">
+                    @if (playedMatchCount === 0) {
+                        {{ canViewOtherMatches ? "N'a jamais participé à une partie." : "Aucune participation visible avec vos droits actuels." }}
+                    } @else {
+                        A participé à {{ playedMatchCount }} partie{{ playedMatchCount > 1 ? 's' : '' }}{{ canViewOtherMatches ? '' : ' visible' + (playedMatchCount > 1 ? 's' : '') }}.
+                    }
+                </p>
+            }
             <form [formGroup]="playerEditorForm">
                 <fieldset [disabled]="saving">
 
@@ -19,6 +31,7 @@
                         </div>
                     </div>
 
+                    @if (canViewPersonalInfo) {
                     <div class="row">
                         <div class="column">
                             <mat-form-field appearance="fill">
@@ -36,6 +49,7 @@
                             </mat-form-field>
                         </div>
                     </div>
+                    }
 
                     <div class="row">
                         <div class="column">
@@ -50,6 +64,7 @@
                         </div>
                     </div>
 
+                    @if (canViewPersonalInfo) {
                     <div class="row">
                         <div class="column">
                             <mat-form-field appearance="fill" >
@@ -63,6 +78,7 @@
                             </mat-form-field>
                         </div>
                     </div>
+                    }
 
                     <div class="row button_row">
                         <div class="column">
@@ -73,6 +89,45 @@
                 </fieldset>
             </form>
 
+            @if (isAdmin && !creating) {
+                <section class="associations" aria-labelledby="associations-title">
+                    <h2 id="associations-title">Utilisateurs associés</h2>
+                    <p>Ces liens de partage sont distincts du compte personnel du joueur.</p>
+                    @if (associationError) {
+                        <p role="alert">{{ associationError }}</p>
+                        <button mat-button type="button" (click)="loadAssociations()">Recharger</button>
+                    }
+                    <loading-spinner [loading]="associationsLoading" caption="Chargement des associations"></loading-spinner>
+                    @for (association of associations; track association.userId) {
+                        <fieldset [disabled]="associationSaving || associationsLoading">
+                            <legend>{{ association.email }}{{ association.isCreator ? ' — Créateur' : '' }}</legend>
+                            <p>Associé le {{ association.associatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+                            <label><input type="checkbox" [(ngModel)]="association.canViewPersonalInfo"> Voir les informations personnelles</label>
+                            <label><input type="checkbox" [(ngModel)]="association.canViewOtherMatches"> Voir les parties sans y avoir participé</label>
+                            <label><input type="checkbox" [(ngModel)]="association.canAddToMatch"> Ajouter ce joueur à une partie</label>
+                            <button mat-button type="button" (click)="saveAssociation(association.userId, association)">Enregistrer les droits</button>
+                            @if (!association.isCreator) {
+                                <button mat-button type="button" (click)="deleteAssociation(association.userId)">Retirer l'association</button>
+                            }
+                        </fieldset>
+                    }
+                    <fieldset [disabled]="associationSaving || associationsLoading || !!associationError">
+                        <legend>Ajouter une association</legend>
+                        <label>Compte
+                            <select [(ngModel)]="associationUserId">
+                                <option [ngValue]="null">Choisir un utilisateur</option>
+                                @for (user of users; track user.id) {
+                                    <option [ngValue]="user.id" [disabled]="hasAssociation(user.id)">{{ user.email }}</option>
+                                }
+                            </select>
+                        </label>
+                        <label><input type="checkbox" [(ngModel)]="newRights.canViewPersonalInfo"> Voir les informations personnelles</label>
+                        <label><input type="checkbox" [(ngModel)]="newRights.canViewOtherMatches"> Voir les parties sans y avoir participé</label>
+                        <label><input type="checkbox" [(ngModel)]="newRights.canAddToMatch"> Ajouter ce joueur à une partie</label>
+                        <button mat-button type="button" [disabled]="associationUserId === null" (click)="associationUserId !== null && saveAssociation(associationUserId, newRights)">Associer</button>
+                    </fieldset>
+                </section>
+            }
         </div>
     </ng-container>
 </app-layout>

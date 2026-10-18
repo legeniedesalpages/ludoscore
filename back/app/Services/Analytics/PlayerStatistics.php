@@ -13,7 +13,8 @@ class PlayerStatistics
 
     public function rows(?int $playerId = null): Collection
     {
-        return DB::table('matches as m')
+        $query = app(\App\Services\PlayerAccess::class)->scopeMatches(DB::table('matches as m'), 'm.id');
+        return $query
             ->join('teams as t', 't.match_id', '=', 'm.id')
             ->join('team_players as tp', 'tp.team_id', '=', 't.id')
             ->join('games as g', 'g.id', '=', 'm.game_id')

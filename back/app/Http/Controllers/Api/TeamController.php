@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Team;
+use App\Services\PlayerAccess;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -17,13 +18,15 @@ class TeamController extends Controller
     public function index()
     {
         Log::debug("Team list");
-        return Team::get();
+        return Team::whereIn('match_id', app(PlayerAccess::class)->scopeMatches(\Illuminate\Support\Facades\DB::table('matches'))->select('id'))->get();
     }
 
     public function show($id)
     {
         Log::debug("Get team of id : " . $id);
-        return Team::find($id);
+        $team = Team::findOrFail($id);
+        app(PlayerAccess::class)->authorizeMatch($team->match_id);
+        return $team;
     }
 
     public function update(Request $request, $id)
@@ -31,7 +34,8 @@ class TeamController extends Controller
         Log::info("Update team of id: " . $id. ", score:".$request->score);
         Log::debug($request);
 
-        $team = Team::find($id);
+        $team = Team::findOrFail($id);
+        app(PlayerAccess::class)->authorizeMatch($team->match_id);
         $team->name = $request->name;
         $team->color = $request->color;
         $team->tags = $request->tags;

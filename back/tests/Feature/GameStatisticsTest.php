@@ -42,7 +42,7 @@ class GameStatisticsTest extends TestCase
 
     public function test_library_includes_unplayed_games_and_breaks_ties_by_newest_addition(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $games = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('games')->once()->andReturn($games);
         $games->shouldReceive('orderByDesc')->with('created_at')->once()->andReturnSelf();
@@ -71,7 +71,7 @@ class GameStatisticsTest extends TestCase
 
     public function test_detail_counts_distinct_players_and_team_victories_and_fills_months(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $game = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('games')->once()->andReturn($game);
         $game->shouldReceive('where')->with('id', 7)->once()->andReturnSelf();
@@ -125,7 +125,7 @@ class GameStatisticsTest extends TestCase
 
     public function test_empty_library_has_zero_counts_and_no_average(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $games = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('games')->once()->andReturn($games);
         $games->shouldReceive('orderByDesc')->andReturnSelf();
@@ -141,7 +141,7 @@ class GameStatisticsTest extends TestCase
 
     public function test_missing_game_returns_not_found(): void
     {
-        Sanctum::actingAs(new User());
+        Sanctum::actingAs(new User(['is_admin' => true]));
         $query = Mockery::mock(Builder::class);
         DB::shouldReceive('table')->with('games')->once()->andReturn($query);
         $query->shouldReceive('where')->with('id', 999)->once()->andReturnSelf();

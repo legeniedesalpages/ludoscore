@@ -16,7 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { PlayerEntity } from 'src/app/core/entity/player-entity.model'
+import { PlayerAssociation, PlayerAssociationRights, PlayerEntity } from 'src/app/core/entity/player-entity.model'
 import { UserEntity } from 'src/app/core/entity/user-entity.model'
 import { COLORS } from 'src/app/core/model/tag.model'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
@@ -43,6 +43,19 @@ export class EditPlayerComponent implements OnInit {
   public colors = COLORS
   public currentPlayerId: number = 0
   public isEditable: boolean = false
+  public playedMatchCount?: number
+  public isAdmin = false
+  public canViewPersonalInfo = true
+  public canViewOtherMatches = true
+  public associations: PlayerAssociation[] = []
+  public associationsLoading = false
+  public associationSaving = false
+  public associationError = ''
+  public loadError = ''
+  public associationUserId: number | null = null
+  public newRights: PlayerAssociationRights = {
+    canViewPersonalInfo: false, canViewOtherMatches: false, canAddToMatch: false,
+  }
 
   constructor(private store: Store, private route: ActivatedRoute, private playerService: PlayerCrudService, private playerListService: PlayerService, private userCrudService: UserCrudService, private snackBar: MatSnackBar, private changeDetectorRef: ChangeDetectorRef) {
     this.playerEditorForm = new FormGroup({
@@ -56,7 +69,12 @@ export class EditPlayerComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
+      this.loading = true
+      this.loadError = ''
+      this.isEditable = false
+      this.associations = []
       this.currentPlayerId = Number(params.get('id'))
+      this.playedMatchCount = undefined
       this.changeDetectorRef.markForCheck()
       console.debug("Id: ", this.currentPlayerId)
       this.creating = (this.currentPlayerId === 0)
@@ -68,6 +86,7 @@ export class EditPlayerComponent implements OnInit {
         this.changeDetectorRef.markForCheck()
         
         let loggedUser: UserEntity = this.users.find(user => user.id === loggedUserId)!
+        this.isAdmin = loggedUser.isAdmin
 
         console.debug("Logged user: ", loggedUser)
         if (loggedUser.isAdmin) {
@@ -77,7 +96,17 @@ export class EditPlayerComponent implements OnInit {
 
         if (!this.creating) {        
           
-          this.playerService.findOne(this.currentPlayerId).subscribe(playerEntity => {
+          this.playerService.findOne(this.currentPlayerId).subscribe({ next: playerEntity => {
+            this.playedMatchCount = playerEntity.playedMatchCount
+            this.canViewPersonalInfo = playerEntity.permissions?.canViewPersonalInfo ?? true
+            this.canViewOtherMatches = playerEntity.permissions?.canViewOtherMatches ?? true
+            if (playerEntity.permissions) {
+              this.isEditable = playerEntity.permissions.canEdit
+            }
+            for (const field of ['prenom', 'nom']) {
+              if (this.canViewPersonalInfo) this.playerEditorForm.get(field)?.enable()
+              else this.playerEditorForm.get(field)?.disable()
+            }
             let userId = null
             if (playerEntity.user) {
               userId = playerEntity.user.id
@@ -88,16 +117,25 @@ export class EditPlayerComponent implements OnInit {
 
             this.playerEditorForm.setValue({
               pseudo: playerEntity.pseudo,
-              prenom: playerEntity.firstName,
-              nom: playerEntity.lastName,
+              prenom: playerEntity.firstName ?? '',
+              nom: playerEntity.lastName ?? '',
               couleur: playerEntity.preferedColor,
               user: userId
             })
             this.loading = false
+            if (this.isAdmin) this.loadAssociations()
             this.changeDetectorRef.markForCheck()
-          })
+          }, error: () => {
+            this.loadError = "Impossible de charger ce joueur : il n'existe plus ou vous n'y avez pas accès."
+            this.loading = false
+            this.changeDetectorRef.markForCheck()
+          } })
         } else {
           this.isEditable = true
+          this.canViewPersonalInfo = true
+          this.canViewOtherMatches = true
+          this.playerEditorForm.get('prenom')?.enable()
+          this.playerEditorForm.get('nom')?.enable()
           
           if (!this.users.find(user => user.id === loggedUserId)?.playerId) {
             this.playerEditorForm.get('user')?.setValue(loggedUserId)
@@ -112,6 +150,69 @@ export class EditPlayerComponent implements OnInit {
 
   public returnToList() { 
     this.store.dispatch(new Navigate(['/manage-player']))
+  }
+
+  public loadAssociations() {
+    this.associationsLoading = true
+    this.associationError = ''
+    this.playerService.associations(this.currentPlayerId).subscribe({
+      next: associations => {
+        this.associations = associations
+        this.associationsLoading = false
+        this.changeDetectorRef.markForCheck()
+      },
+      error: () => {
+        this.associationError = 'Impossible de charger les associations.'
+        this.associationsLoading = false
+        this.changeDetectorRef.markForCheck()
+      },
+    })
+  }
+
+  public hasAssociation(userId: number): boolean {
+    return this.associations.some(association => association.userId === userId)
+  }
+
+  public saveAssociation(userId: number, rights: PlayerAssociationRights) {
+    this.associationSaving = true
+    this.associationError = ''
+    this.playerService.saveAssociation(this.currentPlayerId, userId, {
+      canViewPersonalInfo: rights.canViewPersonalInfo,
+      canViewOtherMatches: rights.canViewOtherMatches,
+      canAddToMatch: rights.canAddToMatch,
+    }).subscribe({
+      next: associations => {
+        this.associations = associations
+        this.associationSaving = false
+        this.associationUserId = null
+        this.newRights = { canViewPersonalInfo: false, canViewOtherMatches: false, canAddToMatch: false }
+        this.playerListService.invalidateCache()
+        this.snackBar.open('Association enregistrée', 'Fermer', { duration: 5000 })
+        this.changeDetectorRef.markForCheck()
+      },
+      error: () => {
+        this.associationSaving = false
+        this.associationError = "Impossible d'enregistrer cette association."
+        this.changeDetectorRef.markForCheck()
+      },
+    })
+  }
+
+  public deleteAssociation(userId: number) {
+    this.associationSaving = true
+    this.associationError = ''
+    this.playerService.deleteAssociation(this.currentPlayerId, userId).subscribe({
+      next: () => {
+        this.associationSaving = false
+        this.playerListService.invalidateCache()
+        this.loadAssociations()
+      },
+      error: () => {
+        this.associationSaving = false
+        this.associationError = "Impossible de retirer ce lien : le créateur et l'identité personnelle doivent être conservés."
+        this.changeDetectorRef.markForCheck()
+      },
+    })
   }
 
   public save() {

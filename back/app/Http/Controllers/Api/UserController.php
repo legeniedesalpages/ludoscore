@@ -18,7 +18,10 @@ class UserController extends Controller
     public function index()
     {
         Log::debug("Liste les utilisateurs");
-        return User::get();
+        if (Auth::user()->is_admin) {
+            return User::get();
+        }
+        return User::where('id', Auth::id())->get();
     }
 
     /**
