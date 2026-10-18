@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -16,6 +17,11 @@ class User extends Authenticatable
     public function games(): BelongsToMany
     {
         return $this->belongsToMany(Game::class)->withPivot('in_library', 'ownership_date')->withTimestamps();
+    }
+
+    public function createdPlayers(): HasMany
+    {
+        return $this->hasMany(Player::class, 'created_by_user_id');
     }
 
     /**

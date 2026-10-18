@@ -57,6 +57,7 @@ class PlayerController extends Controller
         Log::debug($request);
         
         $player = new Player();
+        $player->created_by_user_id = $request->user()->id;
         $player->pseudo = $request->pseudo;
         $player->last_name = $request->last_name;
         $player->first_name = $request->first_name;

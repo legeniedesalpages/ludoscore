@@ -93,6 +93,29 @@ Ce changement isole les ludotheques uniquement : les fiches de jeux, les parties
 les joueurs et les statistiques restent partages. Ce n'est pas encore une
 isolation complete de toutes les donnees de l'application.
 
+## Createur des joueurs
+
+Chaque joueur a un `created_by_user_id` obligatoire, cle etrangere vers `users`.
+L'API le renvoie dans `createdByUserId`. A la creation, le serveur utilise le
+compte authentifie, jamais une valeur fournie par le client. Le createur reste
+inchange lors d'une modification ou d'une association a un autre compte.
+La suppression d'un compte createur est refusee tant que ses joueurs existent.
+
+La migration `2026_10_18_100000_add_created_by_user_to_players` attribue les
+joueurs existants au compte qui les reference via `users.player_id`, sinon a
+`renaud_balu@hotmail.com`. Elle refuse les associations ambigues (plusieurs
+comptes pour le meme joueur) et l'absence du compte de reprise lorsqu'il est
+necessaire. Elle conserve les joueurs, leurs associations et leurs dates.
+La colonne temporairement nullable est remplie avant de devenir obligatoire ;
+une execution interrompue peut reprendre sans remplacer les createurs deja
+renseignes.
+
+En production, sauvegarder la base et suspendre les ecritures avant le
+deploiement du backend et l'execution des migrations. Le deploiement existant
+applique cette migration via `/finir_installation`. En local :
+`docker compose exec -u devuser laravel-app php artisan migrate`.
+Le rollback retire uniquement la donnee de createur, pas les joueurs.
+
 ## Statistiques des jeux
 
 Depuis la carte « Stats par jeux », l'ecran `/statistics/games` affiche le
