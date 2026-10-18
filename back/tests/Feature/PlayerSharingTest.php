@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\GameMatch;
 use App\Models\Player;
 use App\Models\User;
 use App\Services\Analytics\GameStatistics;
@@ -299,6 +300,47 @@ class PlayerSharingTest extends TestCase
         $this->postJson('/api/game-match', $payload)->assertCreated();
         $this->assertDatabaseCount('matches', 1);
         $this->assertSame($this->self, $this->viewer->refresh()->player_id);
+    }
+
+    public function test_match_creation_preserves_team_and_player_id_order_in_response(): void
+    {
+        $this->link(['can_add_to_match' => true]);
+        $response = $this->actingAs($this->viewer)->postJson('/api/game-match', [
+            'match' => ['gameId' => 1, 'tags' => '[]'],
+            'teams' => [
+                [
+                    'name' => 'First', 'color' => 'blue', 'tags' => '[]',
+                    'players' => [['playerId' => $this->self], ['playerId' => $this->player]],
+                ],
+                [
+                    'name' => 'Second', 'color' => 'red', 'tags' => '[]',
+                    'players' => [['playerId' => $this->player]],
+                ],
+            ],
+        ])->assertCreated()->assertJsonPath('gameId', 1)
+            ->assertJsonPath('running', true)->assertJsonPath('canceled', false)
+            ->assertJsonPath('tags', '[]');
+
+        $match = GameMatch::findOrFail($response->json('id'));
+        $teams = $match->teams()->orderBy('position')->get();
+        $expected = $teams->map(fn ($team) => [
+            $team->id,
+            $team->teamplayers()->orderBy('position')->pluck('id')->all(),
+        ])->all();
+
+        $this->assertCount(2, $expected);
+        $this->assertCount(2, $expected[0][1]);
+        $this->assertCount(1, $expected[1][1]);
+        $response->assertJsonPath('teams', $expected);
+        $this->assertNotEmpty($response->json('startedAt'));
+        $this->assertSame(['First', 'Second'], $teams->pluck('name')->all());
+        $this->assertSame(
+            [$this->self, $this->player],
+            $teams->first()->teamplayers()->orderBy('position')->pluck('player_id')->all(),
+        );
+        $this->assertDatabaseCount('matches', 1);
+        $this->assertDatabaseCount('teams', 2);
+        $this->assertDatabaseCount('team_players', 3);
     }
 
     public function test_statistics_and_analytical_dataset_cannot_include_hidden_matches(): void

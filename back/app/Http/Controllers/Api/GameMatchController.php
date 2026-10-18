@@ -11,6 +11,7 @@ use App\Models\TeamPlayer;
 use App\Services\Analytics\LocationService;
 use App\Services\PlayerAccess;
 use App\Models\Player;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -207,7 +208,7 @@ class GameMatchController extends Controller
         return response()->json(['id' => $gameMatch->id]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
             'teams' => ['required', 'array', 'min:1'],
@@ -232,7 +233,7 @@ class GameMatchController extends Controller
 
         $returnedteams = [];
         $gameMatch = new GameMatch();
-        DB::transaction(function () use (&$gameMatch, $match, $request, $returnedteams) {
+        DB::transaction(function () use ($gameMatch, $match, $request, &$returnedteams) {
 
             Log::debug("Game Id:" . $match['gameId']);
             $gameMatch->game_id = $match['gameId'];
@@ -282,22 +283,23 @@ class GameMatchController extends Controller
                 $position_equipe++;
 
                 array_push($returnedteams, [$team->id, $returnPlayers]);
-                Log::debug($returnedteams);
+                Log::debug('Teams created so far', ['teams' => $returnedteams]);
             }
-
-            $gameMatch->teams = $returnedteams;
         });
 
         $gameMatchId = $gameMatch->id;
         Log::debug("Newly created match id : " . $gameMatchId);
-        Log::debug($returnedteams);
-        return $gameMatch;
+        Log::debug('Teams created for match', ['match_id' => $gameMatchId, 'teams' => $returnedteams]);
+        return response()->json([
+            ...$gameMatch->attributesToArray(),
+            'teams' => $returnedteams,
+        ], 201);
     }
 
     public function findRunning()
     {
         Log::info("Recherche du match en cours");
-        return app(PlayerAccess::class)->scopeMatches(GameMatch::where('running', true))->first();
+        return app(PlayerAccess::class)->scopeMatches(GameMatch::query()->where('running', true))->first();
     }
 
     public function previousMatch($playerid, $gameid)
