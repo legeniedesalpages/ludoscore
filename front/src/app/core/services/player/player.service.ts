@@ -55,6 +55,8 @@ export class PlayerService {
         return {
             id: playerEntity.id,
             pseudo: playerEntity.pseudo,
+            creatorPseudo: playerEntity.creatorPseudo,
+            canAccessMatches: playerEntity.permissions?.canAccessMatches ?? playerEntity.permissions?.can_access_matches ?? false,
             lastName: playerEntity.lastName ?? '',
             firstName: playerEntity.firstName ?? '',
             preferedColor: preferedColor ? preferedColor : NO_COLOR,

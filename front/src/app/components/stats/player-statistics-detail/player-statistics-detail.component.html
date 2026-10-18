@@ -10,7 +10,7 @@
       }
       @if (!loading()) {
         @if (statistics(); as stats) {
-          <h1>{{ stats.name }}</h1>
+          <h1>{{ stats.name }}@if (stats.creatorPseudo) { <small class="player-creator-pseudo">({{ stats.creatorPseudo }})</small> }</h1>
           <dl class="summary">
             <div><dt>Parties terminées</dt><dd>{{ stats.matches }}</dd></div>
             <div><dt>Victoires</dt><dd>{{ stats.wins }}</dd></div>

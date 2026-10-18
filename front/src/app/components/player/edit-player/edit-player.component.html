@@ -10,6 +10,40 @@
             <p role="alert">{{ loadError }}</p>
         }
         <div class="edit-player" [hidden]="loading || !!loadError">
+            @if (replacedByPlayerId) {
+                <p role="status">Ce joueur a le statut « remplacé » par le joueur n° {{ replacedByPlayerId }}. Cette fiche est conservée en lecture seule.</p>
+            }
+            @if (creating) {
+                <section class="ludotag" aria-labelledby="join-title">
+                    <h2 id="join-title">Ajouter un joueur par ludotag</h2>
+                    <p>Saisissez le code reçu pour associer un joueur existant à votre compte et l'ajouter à vos parties.</p>
+                    <form (ngSubmit)="associateLudotag()">
+                        <fieldset [disabled]="joining || saving">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Ludotag</mat-label>
+                            <input matInput [formControl]="ludotagInput" placeholder="ABCD-EFGH-JK23"
+                                autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32">
+                            <mat-hint>12 lettres et chiffres, avec ou sans tirets</mat-hint>
+                            @if (ludotagInput.invalid && ludotagInput.touched) {
+                                <mat-error>Saisissez les 12 caractères du ludotag.</mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Pseudo personnel (facultatif)</mat-label>
+                            <input matInput [formControl]="joinPseudoInput" maxlength="255">
+                            <mat-hint>Visible uniquement pour vous</mat-hint>
+                        </mat-form-field>
+                        <button mat-raised-button type="submit" [disabled]="joining || saving || ludotagInput.invalid || joinPseudoInput.invalid">
+                            {{ joining ? 'Association en cours…' : 'Associer ce joueur' }}
+                        </button>
+                        </fieldset>
+                    </form>
+                    @if (joinError) {
+                        <p role="alert">{{ joinError }}</p>
+                    }
+                    <h2>Ou créer un nouveau joueur</h2>
+                </section>
+            }
             @if (!creating && playedMatchCount !== undefined) {
                 <p class="participation-count">
                     @if (playedMatchCount === 0) {
@@ -20,7 +54,7 @@
                 </p>
             }
             <form [formGroup]="playerEditorForm">
-                <fieldset [disabled]="saving">
+                <fieldset [disabled]="saving || joining || mergeLoading || personalPseudoSaving || !isEditable || !!replacedByPlayerId">
 
                     <div class="row">
                         <div class="column">
@@ -82,52 +116,153 @@
 
                     <div class="row button_row">
                         <div class="column">
-                            <button mat-raised-button [hidden]="saving || !isEditable" (click)="save()">Enregistrer le joueur</button>
+                            <button mat-raised-button type="button" [hidden]="saving || !isEditable" [disabled]="playerEditorForm.invalid" (click)="save()">Enregistrer le joueur</button>
                             <loading-spinner [loading]="saving" caption="Enregistrement du joueur"></loading-spinner>
                         </div>
                     </div>
                 </fieldset>
             </form>
 
-            @if (isAdmin && !creating) {
+            <mat-accordion class="player-actions" [multi]="true" displayMode="flat">
+            @if (!creating && canPersonalize) {
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title><h2 id="personal-pseudo-title">Votre pseudo pour ce joueur</h2></mat-panel-title>
+                    </mat-expansion-panel-header>
+                <section class="ludotag personal-pseudo" aria-labelledby="personal-pseudo-title">
+                    <p>Ce nom est visible uniquement pour vous. Laissez vide pour utiliser le pseudo du créateur : {{ canonicalPseudo }}.</p>
+                    <form (ngSubmit)="savePersonalPseudo()">
+                        <fieldset [disabled]="personalPseudoSaving || saving || mergeLoading">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Pseudo personnel</mat-label>
+                            <input matInput [formControl]="personalPseudoInput" maxlength="255">
+                        </mat-form-field>
+                        <button mat-raised-button type="submit" [disabled]="personalPseudoSaving || saving || mergeLoading || personalPseudoInput.invalid">
+                            Enregistrer mon pseudo
+                        </button>
+                        </fieldset>
+                    </form>
+                    @if (personalPseudoError) { <p role="alert">{{ personalPseudoError }}</p> }
+                </section>
+                </mat-expansion-panel>
+            }
+
+            @if (!creating && !replacedByPlayerId) {
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title><h2 id="share-title">Partager ce joueur</h2></mat-panel-title>
+                    </mat-expansion-panel-header>
+                <section class="ludotag" aria-labelledby="share-title">
+                    <p>Communiquez son ludotag à un autre utilisateur : il pourra associer ce joueur à son compte et l'ajouter à ses parties.</p>
+                    <p>L'association par ce code ne donne accès ni aux informations personnelles ni aux parties auxquelles cet utilisateur n'a pas participé. Une fois associé, il pourra lui aussi transmettre le code.</p>
+                    <p>Ce ludotag permet aussi à un utilisateur de remplacer sa propre fiche par ce joueur. Votre fiche, votre ludotag et vos participations existantes sont conservés.</p>
+                    @if (ludotag) {
+                        <p class="ludotag-code">{{ ludotag }}</p>
+                        <button mat-raised-button type="button" (click)="copyLudotag()">Copier le ludotag</button>
+                    } @else {
+                        <button mat-raised-button type="button" [disabled]="ludotagLoading" (click)="showLudotag()">
+                            {{ ludotagLoading ? 'Chargement…' : 'Afficher le ludotag' }}
+                        </button>
+                    }
+                    @if (ludotagError) {
+                        <p role="alert">{{ ludotagError }}</p>
+                    }
+                </section>
+                </mat-expansion-panel>
+            }
+
+            @if (!creating && canMerge) {
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title><h2 id="merge-title">Remplacer ce joueur par un autre</h2></mat-panel-title>
+                    </mat-expansion-panel-header>
+                <section class="ludotag merge-player" aria-labelledby="merge-title">
+                    <p>Cette fiche passera au statut « remplacé ». Saisissez le ludotag du joueur à conserver : toutes les participations de cette fiche, y compris celles enregistrées par d'autres utilisateurs, seront réattribuées au joueur dont vous saisissez le ludotag.</p>
+                    <p>La fiche remplacée, les anciens identifiants et le journal des changements seront conservés. Il n'y a pas d'annulation automatique.</p>
+                    @if (!mergePreview) {
+                        <form (ngSubmit)="previewMerge()">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Ludotag du joueur à conserver</mat-label>
+                                <input matInput [formControl]="mergeLudotagInput" [readonly]="mergeLoading || saving || associationSaving || personalPseudoSaving"
+                                    autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32">
+                                @if (mergeLudotagInput.invalid && mergeLudotagInput.touched) {
+                                    <mat-error>Saisissez les 12 caractères du ludotag.</mat-error>
+                                }
+                            </mat-form-field>
+                            <button mat-raised-button type="submit" [disabled]="mergeLoading || saving || associationSaving || personalPseudoSaving || mergeLudotagInput.invalid">Vérifier la fusion</button>
+                        </form>
+                    } @else {
+                        <div aria-live="polite">
+                            <p><strong>{{ mergePreview.replaced.pseudo }}</strong> (n° {{ mergePreview.replaced.id }}) sera remplacé par <strong>{{ mergePreview.survivor.pseudo }}</strong> (n° {{ mergePreview.survivor.id }}).</p>
+                            <p>{{ mergePreview.participationCount }} participation(s) dans {{ mergePreview.matchCount }} partie(s) seront réattribuées.</p>
+                            <p>Les utilisateurs associés seront aussi liés à la fiche conservée, sans aucun droit par défaut pour les nouveaux liens. Aucun droit de l'ancienne fiche ne sera transféré. Les droits déjà présents, les créateurs et les identités personnelles ne seront pas modifiés.</p>
+                            <p>Votre ancien pseudo sera conservé comme pseudo personnel s'il diffère de celui du créateur, sauf si vous avez déjà choisi un pseudo personnel sur la fiche conservée.</p>
+                            @if (mergePreview.conflictMatchIds.length) {
+                                <p role="alert">Fusion bloquée : les deux joueurs figurent dans les parties n° {{ mergePreview.conflictMatchIds.join(', ') }}. Aucune donnée n'a été modifiée.</p>
+                            } @else {
+                                <label><input type="checkbox" [formControl]="mergeConfirmed"> Je confirme que ces deux fiches représentent la même personne et que je souhaite fusionner toutes leurs participations.</label>
+                                <button mat-raised-button type="button" [disabled]="!mergeConfirmed.value || mergeLoading || saving || associationSaving" (click)="confirmMerge()">Confirmer la fusion</button>
+                            }
+                            <button mat-button type="button" [disabled]="mergeLoading" (click)="cancelMergePreview()">Annuler</button>
+                        </div>
+                    }
+                    @if (mergeError) {
+                        <p role="alert">{{ mergeError }}</p>
+                    }
+                </section>
+                </mat-expansion-panel>
+            }
+
+            @if (canManageAssociations && !creating && !replacedByPlayerId) {
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title><h2 id="associations-title">Utilisateurs associés</h2></mat-panel-title>
+                    </mat-expansion-panel-header>
                 <section class="associations" aria-labelledby="associations-title">
-                    <h2 id="associations-title">Utilisateurs associés</h2>
-                    <p>Ces liens de partage sont distincts du compte personnel du joueur.</p>
+                    <p>Retrouvez les utilisateurs ayant récupéré ce joueur et accordez-leur des droits supplémentaires. La liste inclut tous les utilisateurs associés, quel que soit le mode d'association.</p>
+                    <button mat-button type="button" [disabled]="associationSaving || associationsLoading || mergeLoading" (click)="loadAssociations()">Actualiser la liste</button>
                     @if (associationError) {
                         <p role="alert">{{ associationError }}</p>
                         <button mat-button type="button" (click)="loadAssociations()">Recharger</button>
                     }
                     <loading-spinner [loading]="associationsLoading" caption="Chargement des associations"></loading-spinner>
                     @for (association of associations; track association.userId) {
-                        <fieldset [disabled]="associationSaving || associationsLoading">
-                            <legend>{{ association.email }}{{ association.isCreator ? ' — Créateur' : '' }}</legend>
+                        @if (!association.isCreator) {
+                        <fieldset [disabled]="associationSaving || associationsLoading || mergeLoading">
+                            <legend>{{ association.email }}{{ association.isSelf ? ' — Compte personnel' : '' }}</legend>
                             <p>Associé le {{ association.associatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
                             <label><input type="checkbox" [(ngModel)]="association.canViewPersonalInfo"> Voir les informations personnelles</label>
                             <label><input type="checkbox" [(ngModel)]="association.canViewOtherMatches"> Voir les parties sans y avoir participé</label>
                             <label><input type="checkbox" [(ngModel)]="association.canAddToMatch"> Ajouter ce joueur à une partie</label>
-                            <button mat-button type="button" (click)="saveAssociation(association.userId, association)">Enregistrer les droits</button>
-                            @if (!association.isCreator) {
+                            <button mat-raised-button type="button" (click)="saveAssociation(association.userId, association)">Enregistrer les droits</button>
+                            @if (isAdmin && !association.isSelf) {
                                 <button mat-button type="button" (click)="deleteAssociation(association.userId)">Retirer l'association</button>
                             }
                         </fieldset>
+                        }
                     }
-                    <fieldset [disabled]="associationSaving || associationsLoading || !!associationError">
+                    @if (isAdmin) {
+                    <fieldset [disabled]="associationSaving || associationsLoading || mergeLoading || !!associationError">
                         <legend>Ajouter une association</legend>
-                        <label>Compte
-                            <select [(ngModel)]="associationUserId">
-                                <option [ngValue]="null">Choisir un utilisateur</option>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Compte</mat-label>
+                            <mat-select [(ngModel)]="associationUserId" [disabled]="associationSaving || associationsLoading || mergeLoading || !!associationError">
+                                <mat-option [value]="null">Choisir un utilisateur</mat-option>
                                 @for (user of users; track user.id) {
-                                    <option [ngValue]="user.id" [disabled]="hasAssociation(user.id)">{{ user.email }}</option>
+                                    <mat-option [value]="user.id" [disabled]="hasAssociation(user.id)">{{ user.email }}</mat-option>
                                 }
-                            </select>
-                        </label>
+                            </mat-select>
+                        </mat-form-field>
                         <label><input type="checkbox" [(ngModel)]="newRights.canViewPersonalInfo"> Voir les informations personnelles</label>
                         <label><input type="checkbox" [(ngModel)]="newRights.canViewOtherMatches"> Voir les parties sans y avoir participé</label>
                         <label><input type="checkbox" [(ngModel)]="newRights.canAddToMatch"> Ajouter ce joueur à une partie</label>
-                        <button mat-button type="button" [disabled]="associationUserId === null" (click)="associationUserId !== null && saveAssociation(associationUserId, newRights)">Associer</button>
+                        <button mat-raised-button type="button" [disabled]="associationUserId === null" (click)="associationUserId !== null && saveAssociation(associationUserId, newRights)">Associer</button>
                     </fieldset>
+                    }
                 </section>
+                </mat-expansion-panel>
             }
+            </mat-accordion>
         </div>
     </ng-container>
 </app-layout>

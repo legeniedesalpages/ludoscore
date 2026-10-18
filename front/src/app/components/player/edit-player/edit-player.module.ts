@@ -29,6 +29,7 @@ import { MatChipsModule } from '@angular/material/chips'
 import { EditPlayerComponent } from './edit-player.component'
 import { MatSelectModule } from '@angular/material/select'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { MatExpansionModule } from '@angular/material/expansion'
 import { LayoutComponent } from '../../layout/layout.component'
 
 const routes: Routes = [
@@ -57,6 +58,7 @@ const routes: Routes = [
     MatChipsModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatExpansionModule,
     LayoutComponent
   ],
   exports: [EditPlayerComponent],

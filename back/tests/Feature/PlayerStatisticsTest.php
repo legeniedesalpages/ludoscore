@@ -43,6 +43,7 @@ class PlayerStatisticsTest extends TestCase
     {
         Sanctum::actingAs(new User(['is_admin' => true]));
         $players = Mockery::mock(Builder::class);
+        $players->shouldReceive('whereNull')->with('players.replaced_by_player_id')->once()->andReturnSelf();
         DB::shouldReceive('table')->with('players')->once()->andReturn($players);
         $players->shouldReceive('orderByDesc')->with('created_at')->once()->andReturnSelf();
         $players->shouldReceive('orderByDesc')->with('id')->once()->andReturnSelf();
@@ -68,6 +69,7 @@ class PlayerStatisticsTest extends TestCase
     {
         Sanctum::actingAs(new User(['is_admin' => true]));
         $player = Mockery::mock(Builder::class);
+        $player->shouldReceive('whereNull')->with('players.replaced_by_player_id')->once()->andReturnSelf();
         DB::shouldReceive('table')->with('players')->once()->andReturn($player);
         $player->shouldReceive('where')->with('id', 1)->once()->andReturnSelf();
         $player->shouldReceive('first')->once()->andReturn((object) ['id' => 1, 'pseudo' => 'Alice']);
@@ -114,6 +116,7 @@ class PlayerStatisticsTest extends TestCase
     {
         Sanctum::actingAs(new User(['is_admin' => true]));
         $players = Mockery::mock(Builder::class);
+        $players->shouldReceive('whereNull')->with('players.replaced_by_player_id')->twice()->andReturnSelf();
         DB::shouldReceive('table')->with('players')->twice()->andReturn($players);
         $players->shouldReceive('orderByDesc')->andReturnSelf();
         $players->shouldReceive('get')->once()->andReturn(collect());

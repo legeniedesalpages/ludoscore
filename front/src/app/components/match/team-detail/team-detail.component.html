@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{team.name}}</h2>
+<h2 mat-dialog-title>{{team.displayName ?? team.name}} @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }</h2>
 
 <mat-dialog-content class="dialog row">
     <fieldset>

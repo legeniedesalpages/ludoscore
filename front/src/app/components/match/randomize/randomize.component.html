@@ -56,7 +56,7 @@
             </h2>
 
             <div *ngFor="let team of (matchState | async)?.match!.teams">
-                <h3>{{ team.name }}</h3>
+                <h3>{{ team.displayName ?? team.name }} @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }</h3>
                 <div class="list-tag-container">
                     <team-tags-selection phase="initial" [teamIndex]="(matchState | async)!.match!.teams.indexOf(team)"
                         [saving]="saving" [randomize]="randomizeAllTeamTagObservable" [teamChoosenTags]="teamChoosenTags"/>

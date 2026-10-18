@@ -55,6 +55,6 @@ class PlayerStatistics
             'rows' => $matches->groupBy('game_id')->sortByDesc(fn($items) => $items->count())
                 ->map(fn($items) => [$items->first()->game_title, $items->count()])->values()->all(),
         ];
-        return $summary + $activity + ['id' => (int) $player->id, 'name' => $player->pseudo ?: 'Joueur ' . $player->id];
+        return $summary + $activity + ['id' => (int) $player->id, 'name' => $player->pseudo ?: 'Joueur ' . $player->id, 'creatorPseudo' => $player->creator_pseudo ?? null];
     }
 }

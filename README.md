@@ -167,9 +167,12 @@ Une partie sans participation personnelle ni permission de consultation ne
 peut pas etre creee par ce compte. L'ajout de chaque participant est aussi
 verifie cote serveur, meme si le client contourne le selecteur.
 
-Seuls les administrateurs gerent les associations et leurs droits dans
-l'edition du joueur (section « Utilisateurs associes »). Les trois permissions
-sont refusees par defaut pour un nouveau partage. Les administrateurs conservent
+Le createur, le compte personnel du joueur et les administrateurs gerent les
+droits des comptes deja associes dans l'edition du joueur (section
+« Utilisateurs associes »). L'ajout manuel et la suppression des liens restent
+reserves aux administrateurs. Les trois permissions sont refusees par defaut
+pour un ajout manuel ; le ludotag accorde uniquement l'ajout aux parties.
+Les administrateurs conservent
 tous les acces. Le lien du createur et celui de l'identite personnelle ne peuvent
 pas etre retires via l'editeur de partage. Retirer d'abord l'identite personnelle
 permet ensuite de retirer son lien s'il ne s'agit pas du createur.
@@ -209,6 +212,157 @@ Le rollback refuse de supprimer la table si des partages supplementaires ou des
 permissions modifiees seraient perdus ; exporter et traiter ces donnees avant
 tout retour en arriere. Ne pas annuler la migration des createurs tant que
 celle des associations est en place.
+
+## Partage de joueurs par ludotag
+
+Chaque joueur a un ludotag permanent de 12 caracteres aleatoires, genere par
+un generateur cryptographique et protege par un index unique en base.
+Il utilise les chiffres 2 a 9 et les lettres A a Z, sauf I, L et O pour eviter
+les confusions. Il est affiche sous la forme `ABCD-EFGH-JK23` ; les tirets ne
+font pas partie de l'identifiant. La saisie accepte les minuscules/majuscules,
+les tirets et les espaces. Le code n'est pas derive de l'identifiant du joueur.
+
+Dans la fiche d'un joueur, « Afficher le ludotag » puis « Copier le ludotag »
+permettent de le transmettre par le moyen de son choix. Tous les comptes deja
+associes au joueur, ainsi que les administrateurs, peuvent consulter ce code
+et le repartager. Les autres comptes ne peuvent pas le consulter, meme s'ils
+connaissent l'identifiant numerique du joueur. Le ludotag n'est pas expose dans
+les listes, l'historique des parties ou les reponses habituelles des joueurs.
+
+Dans l'ecran d'ajout d'un joueur, la section « Ajouter un joueur par ludotag »
+associe un joueur existant au compte connecte, sans creer de doublon. Le
+nouveau lien accorde uniquement `can_add_to_match` : pas d'acces aux informations
+personnelles, ni aux parties sans participation personnelle, ni de droit de
+modification. Il ne change ni le createur ni l'identite personnelle. Si le
+lien existe deja, ses droits et sa date restent inchanges, meme si les droits
+avaient ete retires. Les tentatives sont limitees a 10 par minute par compte
+et 30 par minute par adresse IP, en plus de la limite API generale.
+
+La possession du ludotag suffit pour creer ce lien, sans approbation du
+createur. Il faut donc le communiquer uniquement aux personnes souhaitees ;
+le code est reutilisable et aucun renouvellement n'est propose a ce stade.
+Il permet aussi a un utilisateur de remplacer sa propre fiche par celle qui
+porte ce ludotag, sans validation supplementaire du createur de la fiche conservee.
+La section « Utilisateurs associes » de la fiche du joueur est accessible a son
+createur, a son compte personnel et aux administrateurs. Elle affiche les comptes
+associes, leur date d'association et leurs droits ; « Actualiser la liste »
+permet de retrouver les nouveaux destinataires du ludotag. Le createur est
+entierement masque dans cette liste, sans modifier son lien ni ses permissions
+en base. Les autres liens sont affiches, sans pretendre identifier qui a
+transmis le code ou comment le lien
+a ete cree. Ces responsables peuvent accorder ou retirer les trois droits
+des comptes deja associes, sans changer le createur, l'identite personnelle
+ni la date d'association. Recevoir ou retransmettre le ludotag ne donne pas
+ce pouvoir. L'ajout manuel et la suppression des liens restent reserves aux
+administrateurs. Aucune migration supplementaire n'est necessaire.
+
+La migration `2026_10_18_180000_add_ludotag_to_players` attribue un ludotag a
+chaque joueur existant sans modifier les joueurs, les parties, les identites
+ou les associations. Une reprise conserve les codes deja attribues. Comme pour
+les migrations precedentes, sauvegarder la base et suspendre les ecritures
+pendant le deploiement. Le rollback supprime uniquement les ludotags : les
+associations creees avec eux sont conservees, mais les codes devront etre
+redistribues si la migration est ensuite reappliquee.
+
+## Pseudos personnels
+
+Le pseudo de reference reste dans `players.pseudo`. Un utilisateur associe qui
+n'est pas le createur peut choisir son propre pseudo dans
+`player_user.personal_pseudo`, sans obtenir aucun droit supplementaire.
+Il peut le saisir lors de l'ajout par ludotag ou le modifier ensuite dans
+« Votre pseudo pour ce joueur », meme sans droit de modification de la fiche.
+Les champs de la fiche de reference sont desactives lorsque l'utilisateur
+ne peut pas les enregistrer ; seul le pseudo personnel reste modifiable
+si cette permission est accordee. Les champs et actions principales de ces
+formulaires occupent la largeur disponible, comme les autres formulaires.
+Les actions secondaires (pseudo personnel, partage, fusion et utilisateurs
+associes) sont regroupees dans des panneaux Material replies par defaut.
+Pour lancer une partie, il faut y inclure son joueur personnel ou un joueur
+dont on peut consulter les parties sans y participer (sauf administrateur).
+Le seul droit d'ajouter un joueur copie ne suffit pas : la selection explique
+ce blocage et desactive le lancement tant que cette condition n'est pas remplie.
+Un champ vide remet le pseudo du createur ; un pseudo identique n'est pas
+stocke en double. Un nouvel ajout du meme ludotag ne remplace pas un choix existant.
+
+Seul le compte concerne voit son pseudo personnel. Les listes, participants,
+historiques et statistiques utilisent ce nom ; les principales vues ajoutent
+le pseudo actuel du createur entre parentheses, plus petit et grise, lorsqu'il
+est different. L'avatar et les noms d'equipes en base ne sont pas renommes.
+Les noms d'equipe personnalises restent distincts du pseudo du joueur.
+
+La migration `2026_10_18_200000_add_personal_pseudo_to_player_user` ajoute
+uniquement une colonne nullable : les pseudos et les droits existants sont
+conserves, sans reinterpretation des fusions passees. Appliquer les migrations
+avant de deployer le nouveau code, apres sauvegarde et pendant l'arret des
+ecritures : `docker compose exec -T laravel-app php artisan migrate --force`.
+La reprise conserve les pseudos personnels deja saisis ; le rollback est refuse
+tant que cette colonne contient des pseudos, pour eviter leur perte.
+
+## Fusion de joueurs
+
+Dans la fiche du joueur a remplacer, « Remplacer ce joueur par un autre »
+permet de saisir le ludotag du joueur a conserver. Celui qui donne son tag
+conserve donc sa fiche, son ludotag et ses participations existantes ; la fiche
+du demandeur passe au statut « remplace » et ses participations sont reattribuees.
+Seul le createur du joueur a remplacer peut demander cette operation
+(etre administrateur ou simplement associe ne suffit pas).
+Un joueur qui represente le compte personnel d'un utilisateur (`is_self`)
+ne peut jamais etre remplace, meme par son createur ou un administrateur.
+Il peut en revanche etre le joueur conserve lors de la fusion.
+La connaissance du ludotag du joueur a conserver vaut autorisation :
+aucune validation supplementaire de son createur n'est demandee.
+Cela peut modifier des parties enregistrees par d'autres utilisateurs.
+
+Un apercu indique le sens du remplacement, le nombre de parties et de
+participations concernees. Une case de confirmation et un second bouton sont
+necessaires avant l'execution. Toutes les participations sont concernees :
+parties terminees, annulees et en cours. Si les deux joueurs figurent dans une
+meme partie, meme dans des equipes differentes, la fusion entiere est bloquee.
+Les identifiants des parties en conflit sont affiches, sans exposer leur contenu
+prive. Les conflits sont verifies de nouveau lors de la confirmation.
+
+La fusion est transactionnelle. Aucun joueur, aucune equipe et aucune
+participation n'est supprime. Les scores, positions et dates des participations
+restent inchanges. `team_players.player_id` prend l'identifiant du joueur
+conserve ; `original_player_id` memorise le premier joueur remplace et n'est
+jamais ecrase lors d'une fusion suivante. Le journal `player_merges` memorise
+les deux joueurs, le demandeur, la date et les associations avant l'operation.
+`player_merge_participations` conserve chaque etape de remplacement, avec les
+identifiants de participation, d'equipe et de partie. Ce journal reste present
+meme si une partie est ensuite supprimee.
+
+Le joueur remplace conserve sa fiche, son ludotag et ses associations. Son
+statut API `replaced` est derive de `replaced_by_player_id` ; `replaced_at`
+date le remplacement. Il ne peut plus etre modifie, associe par ludotag ou
+selectionne pour une nouvelle partie. Les administrateurs le voient dans
+leur liste avec son statut ; les comptes deja associes peuvent encore consulter
+sa fiche en lecture seule. Les listes et statistiques actives l'excluent.
+Son ancien ludotag n'est pas redirige automatiquement : demander celui de la
+fiche active. Les fusions successives sont possibles entre joueurs actifs,
+sans cycle ni reutilisation d'un joueur deja remplace.
+
+Les utilisateurs du joueur remplace sont aussi associes au joueur conserve.
+Pour un nouveau lien, les trois permissions de partage sont toutes refusees,
+y compris l'ajout aux parties : aucun droit de l'ancienne fiche n'est transfere,
+ni `is_creator` ni `is_self`. Le createur, le compte personnel du joueur conserve
+ou un administrateur peut ensuite accorder les droits depuis sa fiche.
+Si le lien existe deja, aucun droit ni aucune date
+n'est modifie. Les liens historiques restent intacts. En particulier, une
+identite personnelle portee par la fiche remplacee n'est pas transferee :
+l'administrateur peut la reattribuer separement a une fiche active si necessaire.
+Le joueur conserve garde ses informations personnelles et son createur.
+Si les pseudos different, le nom utilise sur l'ancienne fiche devient le
+pseudo personnel de chaque utilisateur transfere (son ancien pseudo personnel,
+s'il en avait un, sinon le pseudo de l'ancienne fiche). Un pseudo personnel
+deja choisi sur la fiche conservee reste prioritaire. Le createur de cette
+fiche conserve toujours son propre pseudo. Cette reprise des noms ne transfere
+aucun droit.
+
+La migration `2026_10_18_190000_add_player_merges` ajoute les champs et journaux
+sans lancer de fusion ni modifier les participations existantes. Appliquer avec
+les autres migrations, apres sauvegarde et pendant l'arret des ecritures.
+Son rollback est refuse si une fusion existe, pour ne pas detruire la trace
+des changements. Il n'y a pas d'annulation automatique de fusion dans l'interface.
 
 ## Statistiques des jeux
 

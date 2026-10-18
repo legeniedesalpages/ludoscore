@@ -16,7 +16,10 @@
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
                 </div>
                 <div class="content">
-                    <div class="heading">{{ player.pseudo }}<span class="supporting" *ngIf="player.firstName || player.lastName">({{ player.firstName }} {{ player.lastName }})</span></div>
+                    <div class="heading">{{ player.pseudo }}@if (player.creatorPseudo) { <small class="player-creator-pseudo">({{ player.creatorPseudo }})</small> }<span class="supporting" *ngIf="player.firstName || player.lastName">({{ player.firstName }} {{ player.lastName }})</span></div>
+                    @if (player.status === 'replaced') {
+                        <div class="supporting">Remplacé par le joueur n° {{ player.replacedByPlayerId }}</div>
+                    }
                     <div class="supporting">
                         Nous a rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
                         <br/>

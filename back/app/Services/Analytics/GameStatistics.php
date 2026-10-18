@@ -42,7 +42,8 @@ class GameStatistics
             ->leftJoin('players as p', 'p.id', '=', 'tp.player_id')
             ->whereIn('t.match_id', $matches->pluck('id'))
             ->select('t.match_id', 't.id as team_id', 't.name', 't.color', 't.position', 't.tags', 'tp.player_id', 'p.pseudo')
-            ->get()->groupBy('match_id');
+            ->get();
+        $participants = app(\App\Services\PlayerNames::class)->present($participants, 'player_id')->groupBy('match_id');
         $winners = [];
         $playerCounts = [];
         $weekdays = array_fill_keys(['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'], 0);

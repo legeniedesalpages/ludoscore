@@ -116,6 +116,7 @@ class GameMatchController extends Controller
             $match->teams = DB::table('teams')
                 ->where('teams.match_id', $match->id_match)
                 ->get();
+            app(\App\Services\PlayerNames::class)->teams($match->teams);
         });
 
         return $matches;
@@ -223,7 +224,7 @@ class GameMatchController extends Controller
             || $ids->contains($request->user()->player_id)
             || DB::table('player_user')->where('user_id', $request->user()->id)
                 ->whereIn('player_id', $ids)->where('can_view_other_matches', true)->exists();
-        abort_unless($visible, 403, 'Vous ne pouvez pas creer une partie a laquelle vous n aurez pas acces.');
+        abort_unless($visible, 403, 'Ajoutez votre joueur personnel ou un joueur dont vous pouvez consulter les parties sans y participer. Le droit d’ajouter un joueur copié ne suffit pas à consulter cette partie.');
         Log::info("Request");
         Log::debug($request);
         $match = $request->match;
@@ -233,7 +234,14 @@ class GameMatchController extends Controller
 
         $returnedteams = [];
         $gameMatch = new GameMatch();
-        DB::transaction(function () use ($gameMatch, $match, $request, &$returnedteams) {
+        DB::transaction(function () use (&$gameMatch, $match, $request, $ids, &$returnedteams) {
+            $gameMatch = new GameMatch();
+            $returnedteams = [];
+            $players = Player::whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get();
+            abort_if($players->contains(fn ($player) => $player->replaced_by_player_id !== null), 422, 'Un joueur a ete remplace. Rechargez la selection des participants.');
+            $allowed = app(PlayerAccess::class)->scopePlayers(Player::query(), $request->user(), 'players.id', 'can_add_to_match')
+                ->whereIn('players.id', $ids)->count();
+            abort_unless($allowed === $ids->count(), 403, 'Ajout de certains joueurs a une partie refuse.');
 
             Log::debug("Game Id:" . $match['gameId']);
             $gameMatch->game_id = $match['gameId'];
@@ -285,7 +293,7 @@ class GameMatchController extends Controller
                 array_push($returnedteams, [$team->id, $returnPlayers]);
                 Log::debug('Teams created so far', ['teams' => $returnedteams]);
             }
-        });
+        }, 3);
 
         $gameMatchId = $gameMatch->id;
         Log::debug("Newly created match id : " . $gameMatchId);
@@ -366,12 +374,16 @@ class GameMatchController extends Controller
         $returnedMatch->teams = DB::table('teams')
                 ->where('teams.match_id', $returnedMatch->id_match)
                 ->get();
+        app(\App\Services\PlayerNames::class)->teams($returnedMatch->teams);
 
         $returnedMatch->teams->each(function ($team) {
             $team->players = DB::table('players')
                 ->join('team_players', 'team_players.player_id', '=', 'players.id')
                 ->where('team_players.team_id', $team->id)
-                ->get()->map(function ($player) {
+                ->get();
+            app(\App\Services\PlayerNames::class)->present($team->players, 'player_id');
+            $team->players = $team->players->map(function ($player) {
+                    unset($player->ludotag);
                     $permissions = app(PlayerAccess::class)->permissions(Player::findOrFail($player->player_id), request()->user());
                     if (!$permissions['can_view_personal_info']) {
                         unset($player->first_name, $player->last_name);

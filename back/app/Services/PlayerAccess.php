@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class PlayerAccess
 {
-    public function scopePlayers(Builder|EloquentBuilder $query, User $user, string $column = 'players.id', ?string $permission = null): Builder|EloquentBuilder
+    public function scopePlayers(Builder|EloquentBuilder $query, User $user, string $column = 'players.id', ?string $permission = null, bool $includeReplaced = false): Builder|EloquentBuilder
     {
+        if (!$includeReplaced) {
+            $query->whereNull('players.replaced_by_player_id');
+        }
         if ($user->is_admin) {
             return $query;
         }
@@ -66,17 +69,22 @@ class PlayerAccess
     public function permissions(Player $player, User $user): array
     {
         $link = $player->users()->where('users.id', $user->id)->first()?->pivot;
+        $active = $player->replaced_by_player_id === null;
 
         return [
             'is_creator' => (bool) $link?->is_creator,
             'can_view_personal_info' => (bool) ($user->is_admin || $link?->can_view_personal_info),
             'can_view_other_matches' => (bool) ($user->is_admin || $link?->can_view_other_matches),
-            'can_add_to_match' => (bool) ($user->is_admin || $link?->can_add_to_match),
-            'can_edit' => (bool) ($user->is_admin || $user->player_id == $player->id || $link?->is_creator),
+            'can_access_matches' => (bool) ($user->is_admin || $link?->can_view_other_matches || $user->player_id == $player->id),
+            'can_add_to_match' => $active && (bool) ($user->is_admin || $link?->can_add_to_match),
+            'can_edit' => $active && (bool) ($user->is_admin || $user->player_id == $player->id || $link?->is_creator),
+            'can_merge' => $active && (bool) $link?->is_creator && $player->personalUsers->isEmpty(),
+            'can_manage_associations' => $active && (bool) ($user->is_admin || $link?->is_self || $link?->is_creator),
+            'can_personalize' => $active && $link !== null && ! $link->is_creator,
         ];
     }
 
-    public function present(Player $player, User $user): Player
+    public function present(Player $player, User $user, bool $personalize = true): Player
     {
         $permissions = $this->permissions($player, $user);
         $player->loadMissing(['personalUsers:users.id,email', 'creators:users.id,email']);
@@ -84,6 +92,9 @@ class PlayerAccess
         $player->setAttribute('permissions', $permissions);
         if (! $permissions['can_view_personal_info']) {
             $player->makeHidden(['first_name', 'last_name', 'user']);
+        }
+        if ($personalize) {
+            app(PlayerNames::class)->present(collect([$player]), user: $user);
         }
 
         return $player;

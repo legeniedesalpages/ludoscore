@@ -80,15 +80,19 @@ class UserGameLibraryTest extends TestCase
         Schema::create('team_players', function (Blueprint $table) {
             $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('player_id');
+            $table->unsignedBigInteger('original_player_id')->nullable();
         });
         Schema::create('players', function (Blueprint $table) {
             $table->id();
+            $table->string('pseudo')->nullable();
         });
         Schema::create('player_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('player_id')->constrained('players');
             $table->foreignId('user_id')->constrained('users');
             $table->boolean('is_self')->default(false);
+            $table->boolean('is_creator')->default(false);
+            $table->string('personal_pseudo')->nullable();
         });
         $this->owner = User::create(['email' => 'renaud_balu@hotmail.com', 'password' => 'unused', 'is_admin' => true]);
         $this->other = User::create(['email' => 'other@example.test', 'password' => 'unused', 'is_admin' => true]);

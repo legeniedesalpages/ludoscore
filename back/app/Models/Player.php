@@ -5,13 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Services\Ludotag;
 
 class Player extends Model
 {
     use HasFactory;
 
-    protected $appends = ['gravatar', 'user', 'created_by_user_id'];
-    protected $hidden = ['creators', 'personalUsers'];
+    protected $appends = ['gravatar', 'user', 'created_by_user_id', 'status'];
+    protected $hidden = ['creators', 'personalUsers', 'ludotag'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Player $player): void {
+            $player->ludotag = Ludotag::generate();
+        });
+    }
+
+    public function getStatusAttribute(): string
+    {
+        return $this->replaced_by_player_id === null ? 'active' : 'replaced';
+    }
 
     public function creators(): BelongsToMany
     {
@@ -31,7 +44,7 @@ class Player extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot(
-            'is_creator', 'is_self', 'can_view_personal_info', 'can_view_other_matches', 'can_add_to_match', 'associated_at'
+            'is_creator', 'is_self', 'can_view_personal_info', 'can_view_other_matches', 'can_add_to_match', 'associated_at', 'personal_pseudo'
         )->withTimestamps('associated_at', 'updated_at');
     }
 
@@ -48,7 +61,7 @@ class Player extends Model
     public function getGravatarAttribute()
     {
         if ($this->user == null) {
-            return md5(strtolower(trim($this->pseudo)));
+            return md5(strtolower(trim($this->getRawOriginal('pseudo') ?? $this->pseudo)));
         } else {
             return md5(strtolower(trim($this->user->email)));
         }

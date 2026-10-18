@@ -110,6 +110,9 @@ class PlayerSharingTest extends TestCase
         DB::table('games')->insert(['id' => 1, 'title' => 'Test']);
         $this->migration()->up();
         $this->normalization()->up();
+        (require database_path('migrations/2026_10_18_180000_add_ludotag_to_players.php'))->up();
+        (require database_path('migrations/2026_10_18_190000_add_player_merges.php'))->up();
+        (require database_path('migrations/2026_10_18_200000_add_personal_pseudo_to_player_user.php'))->up();
     }
 
     protected function tearDown(): void
@@ -235,12 +238,12 @@ class PlayerSharingTest extends TestCase
         $this->assertDatabaseHas('players', ['id' => $this->player, 'pseudo' => 'Guest']);
     }
 
-    public function test_only_admin_can_manage_rights_and_neither_creator_nor_date_can_be_spoofed(): void
+    public function test_only_admin_can_create_links_and_neither_creator_nor_date_can_be_spoofed(): void
     {
         $path = '/api/player/'.$this->player.'/associations/'.$this->viewer->id;
         $rights = ['canViewPersonalInfo' => false, 'canViewOtherMatches' => false, 'canAddToMatch' => true];
         $this->actingAs($this->creator)->putJson($path, $rights)->assertForbidden();
-        $this->getJson('/api/player/'.$this->player.'/associations')->assertForbidden();
+        $this->getJson('/api/player/'.$this->player.'/associations')->assertOk()->assertJsonCount(1);
         $this->actingAs($this->admin)->putJson($path, $rights)->assertOk();
         $date = DB::table('player_user')->where('player_id', $this->player)->where('user_id', $this->viewer->id)->value('associated_at');
         $this->putJson($path, $rights + ['isCreator' => true])->assertUnprocessable();
@@ -257,6 +260,91 @@ class PlayerSharingTest extends TestCase
         $this->actingAs($this->viewer)->getJson('/api/player/'.$this->player)->assertNotFound();
     }
 
+    public function test_creator_sees_ludotag_recipient_and_can_grant_and_revoke_rights_without_changing_identity_or_dates(): void
+    {
+        $otherMatch = $this->matchWith([$this->player]);
+        $tag = DB::table('players')->where('id', $this->player)->value('ludotag');
+        $this->actingAs($this->viewer)->postJson('/api/player/associate-ludotag', ['ludotag' => $tag])->assertOk();
+        $link = DB::table('player_user')->where('player_id', $this->player)->where('user_id', $this->viewer->id)->first();
+        $this->getJson('/api/player/'.$this->player)->assertOk()
+            ->assertJsonPath('permissions.canManageAssociations', false)->assertJsonMissingPath('firstName');
+        $this->getJson('/api/game-match/'.$otherMatch)->assertForbidden();
+
+        $this->actingAs($this->creator)->getJson('/api/player/'.$this->player)->assertOk()
+            ->assertJsonPath('permissions.canManageAssociations', true);
+        $response = $this->getJson('/api/player/'.$this->player.'/associations')->assertOk()->assertJsonCount(2);
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+        $response->assertJsonFragment(['userId' => $this->viewer->id, 'email' => $this->viewer->email, 'isCreator' => false, 'isSelf' => false]);
+        $path = '/api/player/'.$this->player.'/associations/'.$this->viewer->id;
+        $this->putJson($path, [
+            'canViewPersonalInfo' => true, 'canViewOtherMatches' => true, 'canAddToMatch' => true,
+        ])->assertOk();
+        $this->assertDatabaseHas('player_user', [
+            'id' => $link->id, 'is_creator' => false, 'is_self' => false, 'associated_at' => $link->associated_at,
+        ]);
+        $this->actingAs($this->viewer)->getJson('/api/player/'.$this->player)->assertOk()->assertJsonPath('firstName', 'PrivateFirst')
+            ->assertJsonPath('permissions.canManageAssociations', false);
+        $this->getJson('/api/game-match/'.$otherMatch)->assertOk();
+        $this->actingAs($this->creator)->putJson($path, [
+            'canViewPersonalInfo' => false, 'canViewOtherMatches' => false, 'canAddToMatch' => false,
+        ])->assertOk();
+        $this->actingAs($this->viewer)->getJson('/api/player/'.$this->player)->assertOk()->assertJsonMissingPath('firstName');
+        $this->getJson('/api/game-match/'.$otherMatch)->assertForbidden();
+        $this->assertDatabaseHas('player_user', [
+            'id' => $link->id, 'is_creator' => false, 'is_self' => false, 'associated_at' => $link->associated_at,
+        ]);
+    }
+
+    public function test_personal_account_can_manage_existing_associations_without_being_creator(): void
+    {
+        $this->actingAs($this->viewer)->getJson('/api/player/'.$this->self)->assertOk()
+            ->assertJsonPath('permissions.isCreator', false)->assertJsonPath('permissions.canManageAssociations', true);
+        $this->getJson('/api/player/'.$this->self.'/associations')->assertOk()->assertJsonCount(2)
+            ->assertJsonFragment(['userId' => $this->viewer->id, 'isSelf' => true]);
+        $this->putJson('/api/player/'.$this->self.'/associations/'.$this->creator->id, [
+            'canViewPersonalInfo' => false, 'canViewOtherMatches' => true, 'canAddToMatch' => true,
+        ])->assertOk();
+        $this->assertDatabaseHas('player_user', [
+            'player_id' => $this->self, 'user_id' => $this->creator->id,
+            'is_creator' => true, 'is_self' => false, 'can_view_personal_info' => false,
+        ]);
+    }
+
+    public function test_associated_users_cannot_manage_links_and_managers_cannot_create_or_delete_them(): void
+    {
+        $this->link(['can_view_personal_info' => true, 'can_view_other_matches' => true, 'can_add_to_match' => true]);
+        $rights = ['canViewPersonalInfo' => true, 'canViewOtherMatches' => true, 'canAddToMatch' => true];
+        $base = '/api/player/'.$this->player.'/associations';
+        $before = DB::table('player_user')->orderBy('id')->get()->toJson();
+        foreach ([$this->viewer, User::create(['email' => 'outsider@example.test', 'password' => 'unused'])] as $user) {
+            $this->actingAs($user)->getJson($base)->assertForbidden();
+            $this->putJson($base.'/'.$this->viewer->id, $rights)->assertForbidden();
+        }
+        $this->actingAs($this->creator)->putJson($base.'/'.$this->admin->id, $rights)->assertForbidden();
+        $this->deleteJson($base.'/'.$this->viewer->id)->assertForbidden();
+        foreach (['isCreator', 'isSelf', 'associatedAt'] as $field) {
+            $this->putJson($base.'/'.$this->viewer->id, $rights + [$field => true])->assertUnprocessable();
+        }
+        $this->putJson($base.'/'.$this->viewer->id, ['canViewPersonalInfo' => 'invalid'])->assertUnprocessable();
+        $this->assertSame($before, DB::table('player_user')->orderBy('id')->get()->toJson());
+    }
+
+    public function test_replaced_player_associations_remain_read_only_for_managers(): void
+    {
+        $this->link();
+        DB::table('players')->where('id', $this->player)->update(['replaced_by_player_id' => $this->self, 'replaced_at' => now()]);
+        $before = DB::table('player_user')->orderBy('id')->get()->toJson();
+        foreach ([$this->creator, $this->admin] as $user) {
+            $this->actingAs($user)->getJson('/api/player/'.$this->player)->assertOk()
+                ->assertJsonPath('permissions.canManageAssociations', false);
+            $this->getJson('/api/player/'.$this->player.'/associations')->assertForbidden();
+            $this->putJson('/api/player/'.$this->player.'/associations/'.$this->viewer->id, [
+                'canViewPersonalInfo' => true, 'canViewOtherMatches' => true, 'canAddToMatch' => true,
+            ])->assertUnprocessable();
+        }
+        $this->assertSame($before, DB::table('player_user')->orderBy('id')->get()->toJson());
+    }
+
     public function test_match_visibility_counts_and_photos_follow_participation_or_explicit_permission(): void
     {
         $this->link();
@@ -270,9 +358,10 @@ class PlayerSharingTest extends TestCase
         $this->getJson('/api/game-match/'.$other)->assertForbidden();
         $this->getJson('/api/game-match/'.$other.'/photo')->assertForbidden();
         $this->deleteJson('/api/game-match/'.$other)->assertForbidden();
-        $this->getJson('/api/game-match/'.$own)->assertOk()
+        $match = $this->getJson('/api/game-match/'.$own)->assertOk()
             ->assertJsonMissingPath('teams.0.players.1.firstName')
             ->assertJsonMissingPath('teams.0.players.1.lastName');
+        $this->assertStringNotContainsString('ludotag', $match->getContent());
         $this->getJson('/api/game-match?page=0&size=10')->assertOk()->assertJsonCount(1)->assertJsonPath('0.idMatch', $own);
         $this->getJson('/api/player/'.$this->player)->assertOk()->assertJsonPath('playedMatchCount', 1);
         $this->link(['can_view_other_matches' => true]);
@@ -343,6 +432,47 @@ class PlayerSharingTest extends TestCase
         $this->assertDatabaseCount('team_players', 3);
     }
 
+    public function test_copied_player_is_selectable_but_requires_a_participant_granting_match_access(): void
+    {
+        $this->link(['can_add_to_match' => true]);
+        $payload = [
+            'match' => ['gameId' => 1, 'tags' => null],
+            'teams' => [[
+                'name' => 'Copied player', 'color' => 'blue', 'tags' => null,
+                'players' => [['playerId' => $this->player]],
+            ]],
+        ];
+        $this->actingAs($this->viewer);
+        $players = $this->getJson('/api/player?purpose=match')->assertOk()->json();
+        $byId = collect($players)->keyBy('id');
+        $this->assertFalse($byId[$this->player]['permissions']['can_access_matches']);
+        $this->assertTrue($byId[$this->self]['permissions']['can_access_matches']);
+        $this->postJson('/api/game-match', $payload)->assertForbidden()
+            ->assertJsonPath('message', 'Ajoutez votre joueur personnel ou un joueur dont vous pouvez consulter les parties sans y participer. Le droit d’ajouter un joueur copié ne suffit pas à consulter cette partie.');
+        $this->assertDatabaseCount('matches', 0);
+        $this->assertDatabaseCount('teams', 0);
+
+        $this->link(['can_add_to_match' => true, 'can_view_other_matches' => true]);
+        $players = collect($this->getJson('/api/player?purpose=match')->assertOk()->json())->keyBy('id');
+        $this->assertTrue($players[$this->player]['permissions']['can_access_matches']);
+        $created = $this->postJson('/api/game-match', $payload)->assertCreated();
+        $this->getJson('/api/game-match/'.$created->json('id'))->assertOk();
+        $this->assertDatabaseCount('matches', 1);
+    }
+
+    public function test_personal_participation_and_administration_grant_access_without_extended_player_rights(): void
+    {
+        DB::table('player_user')->where('user_id', $this->viewer->id)->where('player_id', $this->self)
+            ->update(['can_view_other_matches' => false]);
+        $players = collect($this->actingAs($this->viewer)->getJson('/api/player?purpose=match')->assertOk()->json())->keyBy('id');
+        $this->assertTrue($players[$this->self]['permissions']['can_access_matches']);
+        $this->assertFalse($players[$this->self]['permissions']['can_view_other_matches']);
+        $players = $this->actingAs($this->admin)->getJson('/api/player?purpose=match')->assertOk()->json();
+        foreach ($players as $player) {
+            $this->assertTrue($player['permissions']['can_access_matches']);
+        }
+    }
+
     public function test_statistics_and_analytical_dataset_cannot_include_hidden_matches(): void
     {
         $this->link();
@@ -376,6 +506,98 @@ class PlayerSharingTest extends TestCase
         $this->assertDatabaseHas('player_user', [
             'player_id' => $this->player, 'user_id' => $this->creator->id, 'is_creator' => true,
         ]);
+    }
+
+    public function test_merge_updates_history_counts_statistics_and_running_participants_without_changing_teams(): void
+    {
+        $old = $this->matchWith([$this->player]);
+        $running = $this->matchWith([$this->player], true);
+        $own = $this->matchWith([$this->self]);
+        $beforeTeams = DB::table('teams')->orderBy('id')->get()->toJson();
+        $tag = DB::table('players')->where('id', $this->self)->value('ludotag');
+        $this->actingAs($this->creator)->postJson('/api/player/'.$this->player.'/merge', [
+            'ludotag' => $tag, 'confirmed' => true,
+        ])->assertOk()->assertJsonPath('matchCount', 2);
+        $this->assertSame($beforeTeams, DB::table('teams')->orderBy('id')->get()->toJson());
+        $this->actingAs($this->viewer)->getJson('/api/game-match-count')->assertOk()->assertContent('3');
+        $this->getJson('/api/player/'.$this->self)->assertOk()->assertJsonPath('playedMatchCount', 2);
+        $this->getJson('/api/game-match/'.$old)->assertOk()
+            ->assertJsonPath('teams.0.players.0.player_id', $this->self)
+            ->assertJsonPath('teams.0.players.0.original_player_id', $this->player);
+        $this->getJson('/api/running-match')->assertOk()->assertJsonPath('id', $running);
+        $this->getJson('/api/statistics/overview')->assertOk()->assertJsonPath('totalPlayers', 1);
+        $this->getJson('/api/statistics/player-directory')->assertOk()->assertJsonPath('summary.totalPlayers', 1);
+        $this->getJson('/api/player?purpose=match')->assertOk()->assertJsonCount(1)->assertJsonPath('0.id', $this->self);
+    }
+
+    public function test_personal_pseudo_is_private_and_does_not_change_identity_permissions_or_association_date(): void
+    {
+        $this->link();
+        $link = (array) DB::table('player_user')->where('player_id', $this->player)->where('user_id', $this->viewer->id)->first();
+        $this->actingAs($this->viewer)->putJson('/api/player/'.$this->player.'/personal-pseudo', [
+            'personalPseudo' => '  My friend  ', 'isCreator' => true, 'canAddToMatch' => true,
+        ])->assertOk()->assertJsonPath('pseudo', 'My friend')->assertJsonPath('creatorPseudo', 'Guest')
+            ->assertJsonPath('personalPseudo', 'My friend')->assertJsonMissingPath('firstName')
+            ->assertJsonPath('permissions.canAddToMatch', false)->assertJsonPath('permissions.canPersonalize', true);
+        $link['personal_pseudo'] = 'My friend';
+        unset($link['updated_at']);
+        $this->assertDatabaseHas('player_user', $link);
+        $this->assertDatabaseHas('players', ['id' => $this->player, 'pseudo' => 'Guest']);
+        $this->getJson('/api/player')->assertOk()->assertJsonFragment(['pseudo' => 'My friend', 'creatorPseudo' => 'Guest']);
+        $this->getJson('/api/player/'.$this->player)->assertOk()->assertJsonPath('pseudo', 'My friend');
+        $this->putJson('/api/player/'.$this->player, ['pseudo' => 'Global overwrite'])->assertForbidden();
+        foreach ([$this->creator, $this->admin] as $user) {
+            $this->actingAs($user)->getJson('/api/player/'.$this->player)->assertOk()
+                ->assertJsonPath('pseudo', 'Guest')->assertJsonPath('creatorPseudo', null)->assertJsonPath('personalPseudo', null);
+            $this->putJson('/api/player/'.$this->player.'/personal-pseudo', ['personalPseudo' => 'Forbidden'])->assertForbidden();
+        }
+        $this->actingAs($this->creator)->putJson('/api/player/'.$this->player, ['pseudo' => 'New canonical'])->assertOk();
+        $this->actingAs($this->viewer)->getJson('/api/player/'.$this->player)->assertOk()
+            ->assertJsonPath('pseudo', 'My friend')->assertJsonPath('creatorPseudo', 'New canonical');
+        $this->putJson('/api/player/'.$this->player.'/personal-pseudo', ['personalPseudo' => null])->assertOk()
+            ->assertJsonPath('pseudo', 'New canonical')->assertJsonPath('creatorPseudo', null);
+    }
+
+    public function test_ludotag_can_set_a_personal_pseudo_without_overwriting_existing_alias_or_rights(): void
+    {
+        $tag = DB::table('players')->where('id', $this->player)->value('ludotag');
+        $this->actingAs($this->viewer)->postJson('/api/player/associate-ludotag', [
+            'ludotag' => $tag, 'personalPseudo' => 'Nickname',
+        ])->assertOk()->assertJsonPath('pseudo', 'Nickname');
+        $link = (array) DB::table('player_user')->where('player_id', $this->player)->where('user_id', $this->viewer->id)->first();
+        $this->assertFalse((bool) $link['can_view_personal_info']);
+        $this->assertFalse((bool) $link['can_view_other_matches']);
+        $this->assertTrue((bool) $link['can_add_to_match']);
+        $this->postJson('/api/player/associate-ludotag', ['ludotag' => $tag, 'personalPseudo' => 'Overwrite'])->assertOk()
+            ->assertJsonPath('pseudo', 'Nickname');
+        $this->assertDatabaseHas('player_user', $link);
+        $this->putJson('/api/player/'.$this->player.'/personal-pseudo', ['personalPseudo' => 'Guest'])->assertOk()
+            ->assertJsonPath('pseudo', 'Guest')->assertJsonPath('personalPseudo', null)->assertJsonPath('creatorPseudo', null);
+        $this->putJson('/api/player/'.$this->player.'/personal-pseudo', ['personalPseudo' => '   '])->assertOk()->assertJsonPath('personalPseudo', null);
+        foreach ([[], ['personalPseudo' => []], ['personalPseudo' => str_repeat('A', 256)]] as $invalid) {
+            $this->putJson('/api/player/'.$this->player.'/personal-pseudo', $invalid)->assertUnprocessable();
+        }
+        DB::table('players')->where('id', $this->player)->update(['replaced_by_player_id' => $this->self]);
+        $this->putJson('/api/player/'.$this->player.'/personal-pseudo', ['personalPseudo' => 'Archived'])->assertUnprocessable();
+    }
+
+    public function test_personal_pseudo_is_used_in_match_participants_history_and_statistics_without_renaming_teams(): void
+    {
+        $this->link(['can_view_other_matches' => true, 'can_add_to_match' => true]);
+        $match = $this->matchWith([$this->player]);
+        DB::table('teams')->where('match_id', $match)->update(['name' => 'Guest']);
+        $this->actingAs($this->viewer)->putJson('/api/player/'.$this->player.'/personal-pseudo', ['personalPseudo' => 'Local name'])->assertOk();
+        $this->getJson('/api/game-match/'.$match)->assertOk()->assertJsonPath('teams.0.players.0.pseudo', 'Local name')
+            ->assertJsonPath('teams.0.players.0.creator_pseudo', 'Guest')
+            ->assertJsonPath('teams.0.display_name', 'Local name')->assertJsonPath('teams.0.creator_pseudo', 'Guest')
+            ->assertJsonPath('teams.0.name', 'Guest');
+        $this->getJson('/api/game-match?page=0&size=10')->assertOk()->assertJsonPath('0.teams.0.display_name', 'Local name');
+        $this->getJson('/api/player?purpose=match')->assertOk()->assertJsonFragment(['pseudo' => 'Local name', 'creatorPseudo' => 'Guest']);
+        $this->getJson('/api/statistics/player-directory')->assertOk()->assertJsonFragment(['name' => 'Local name', 'creatorPseudo' => 'Guest']);
+        $this->getJson('/api/statistics/players/'.$this->player)->assertOk()->assertJsonPath('name', 'Local name')->assertJsonPath('creatorPseudo', 'Guest');
+        DB::table('teams')->where('match_id', $match)->update(['name' => 'Custom team']);
+        $this->getJson('/api/game-match/'.$match)->assertOk()->assertJsonPath('teams.0.display_name', 'Custom team');
+        $this->actingAs($this->creator)->getJson('/api/game-match/'.$match)->assertOk()->assertJsonPath('teams.0.players.0.pseudo', 'Guest');
     }
 
     public function test_non_admin_cannot_assign_their_new_player_to_someone_elses_account(): void

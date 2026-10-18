@@ -3,6 +3,7 @@ import { PlaySummary, StatisticsChart } from './game-statistics.model'
 export interface PlayerStatistics extends PlaySummary {
   id: number
   name: string
+  creatorPseudo?: string | null
   createdAt: string | null
   wins: number
   decidedMatches: number

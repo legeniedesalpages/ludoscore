@@ -61,14 +61,20 @@ export class MatchFormatterService {
   public teamLine(match: MatchModel): string {
       let headline: string
 
-      headline = match.teams.map(team => 
-        team.id == match.winningTeam?.id  
-          ? '<b>' + team.name + '</b>' 
-          : team.name
-      ).join(', ')
+      headline = match.teams.map(team => {
+        const name = this.escapeText(team.displayName ?? team.name)
+        const label = team.id == match.winningTeam?.id ? '<b>' + name + '</b>' : name
+        return label + (team.creatorPseudo
+          ? ' <small class="player-creator-pseudo">(' + this.escapeText(team.creatorPseudo) + ')</small>' : '')
+      }).join(', ')
     
     return headline
 }
+
+  private escapeText(value: string): string {
+    return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;').replaceAll("'", '&#39;')
+  }
 
   /**
    * Calculates and formats the elapsed time between two dates.

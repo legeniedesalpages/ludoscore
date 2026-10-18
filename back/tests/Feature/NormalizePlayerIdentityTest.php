@@ -45,6 +45,7 @@ class NormalizePlayerIdentityTest extends TestCase
         ]);
         DB::table('users')->where('id', 2)->update(['player_id' => 10]);
         (require database_path('migrations/2026_10_18_140000_create_player_user_table.php'))->up();
+        (require database_path('migrations/2026_10_18_200000_add_personal_pseudo_to_player_user.php'))->up();
         DB::table('player_user')->where('user_id', 2)->update(['can_view_other_matches' => false]);
     }
 

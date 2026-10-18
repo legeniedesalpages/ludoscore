@@ -15,7 +15,30 @@
 }
 
 .button_row {
-  height: 50px;
+  min-height: 50px;
+}
+
+.edit-player mat-form-field,
+.edit-player button {
+  width: 100%;
+}
+
+.edit-player fieldset,
+.edit-player .column {
+  min-width: 0;
+}
+
+.edit-player fieldset {
+  margin: 0;
+  padding: 0;
+}
+
+.edit-player > form {
+  padding: 0 16px;
+}
+
+.edit-player button + button {
+  margin-top: 12px;
 }
 
 .associations {
@@ -36,6 +59,61 @@
   margin: 12px 0;
 }
 
-.associations select {
+.ludotag {
+  padding: 0 16px 16px;
+}
+
+.ludotag form,
+.ludotag form fieldset {
+  display: grid;
+  gap: 16px;
+}
+
+.ludotag form {
+  margin-bottom: 24px;
+}
+
+.ludotag mat-form-field {
   max-width: 100%;
+}
+
+.ludotag-code {
+  font-family: monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.merge-player label {
+  display: block;
+  margin: 16px 0;
+}
+
+.player-actions {
+  display: grid;
+  gap: 8px;
+  margin: 16px;
+}
+
+.player-actions mat-expansion-panel {
+  min-width: 0;
+  box-shadow: none;
+}
+
+.player-actions mat-expansion-panel-header {
+  height: auto;
+  min-height: 64px;
+  padding: 0 16px;
+}
+
+.player-actions h2 {
+  margin: 16px 0;
+  font: inherit;
+  overflow-wrap: anywhere;
+}
+
+.player-actions .ludotag,
+.player-actions .associations {
+  padding: 0;
 }

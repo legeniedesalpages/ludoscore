@@ -35,6 +35,8 @@ export interface MatchModel {
 export interface Team {
     id?: number
     name: string
+    displayName?: string
+    creatorPseudo?: string | null
     choosenTags: ChoosenTag[]
     color: ColorTag
     score: number | undefined

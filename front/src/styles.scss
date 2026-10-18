@@ -19,6 +19,14 @@ html {
   @include mat.all-component-themes($ludoscore-theme);
 }
 
+.player-actions {
+  @include mat.expansion-overrides((
+    container-background-color: mat.get-theme-color($ludoscore-theme, surface-container-low),
+    container-text-color: mat.get-theme-color($ludoscore-theme, on-surface),
+    container-shape: 12px
+  ));
+}
+
 /* Layout */
 html,
 body {
@@ -33,6 +41,13 @@ body {
 
 .menu-spacer {
   flex: 1 1 auto;
+}
+
+.player-creator-pseudo {
+  font-size: 0.8em;
+  font-weight: normal;
+  color: mat.get-theme-color($ludoscore-theme, on-surface-variant);
+  overflow-wrap: anywhere;
 }
 
 .row {

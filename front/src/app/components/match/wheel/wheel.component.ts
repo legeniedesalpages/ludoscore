@@ -62,7 +62,7 @@ export class WheelComponent implements AfterViewInit {
     this.sectors = store.selectSnapshot<Team[]>(MatchState.teams).map(team => {
       return {
         color: team.color,
-        label: this.truncateString(team.name, 8),
+        label: this.truncateString(team.displayName ?? team.name, 8),
         team: team
       }
     })

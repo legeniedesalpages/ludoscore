@@ -73,6 +73,7 @@ class StatisticsController extends Controller
             ->limit(8)
             ->get();
 
+        app(\App\Services\PlayerNames::class)->present($playerWins);
         $bestPlayer = $playerWins->first();
 
         $winnerDistribution = $applyPeriod(DB::table('matches as m')
@@ -139,10 +140,13 @@ class StatisticsController extends Controller
             ->join('matches as m', 'm.id', '=', 't.match_id')
             ->join('players as p', 'p.id', '=', 'tp.player_id'))
             ->where('m.canceled', false)
-            ->select('p.pseudo', DB::raw('COUNT(DISTINCT ' . DB::getTablePrefix() . 'm.id) as matches'))
+            ->select('p.id', 'p.pseudo', DB::raw('COUNT(DISTINCT ' . DB::getTablePrefix() . 'm.id) as matches'))
             ->groupBy('p.id', 'p.pseudo')
             ->orderByDesc('matches')
             ->first();
+        if ($mostActivePlayer !== null) {
+            app(\App\Services\PlayerNames::class)->present(collect([$mostActivePlayer]));
+        }
 
         return response()->json([
             'totalMatches' => $totalMatches,
@@ -155,11 +159,12 @@ class StatisticsController extends Controller
             'longestMatch' => $longestMatch,
             'neverPlayedGames' => $neverPlayedGames,
             'mostActivePlayer' => $mostActivePlayer
-                ? ['name' => $mostActivePlayer->pseudo, 'matches' => (int) $mostActivePlayer->matches]
+                ? ['name' => $mostActivePlayer->pseudo, 'creatorPseudo' => $mostActivePlayer->creator_pseudo, 'matches' => (int) $mostActivePlayer->matches]
                 : null,
             'bestPlayerWins' => $bestPlayer ? (int) $bestPlayer->wins : 0,
             'mostPlayedGame' => $mostPlayedGame,
             'bestPlayer' => $bestPlayer?->pseudo ?: 'Aucun',
+            'bestPlayerCreatorPseudo' => $bestPlayer?->creator_pseudo,
             'gameRanking' => $gameRanking,
             'winnerDistribution' => $winnerDistribution,
             'status' => 'success',
@@ -192,8 +197,8 @@ class StatisticsController extends Controller
             ->leftJoin('team_players as tp', 'tp.team_id', '=', 't.id')
             ->leftJoin('players as p', 'p.id', '=', 'tp.player_id')
             ->select('t.match_id', 't.id as team_id', 't.name as team_name', 't.score', 'tp.player_id', 'p.pseudo')
-            ->get()
-            ->groupBy('match_id');
+            ->get();
+        $teamsByMatch = app(\App\Services\PlayerNames::class)->present($teamsByMatch, 'player_id')->groupBy('match_id');
 
         $stats = [];
         foreach ($matches as $match) {
@@ -277,6 +282,7 @@ class StatisticsController extends Controller
     public function players(): JsonResponse
     {
         $players = app(\App\Services\PlayerAccess::class)->scopePlayers(DB::table('players'), request()->user())->select('id', 'pseudo')->get();
+        app(\App\Services\PlayerNames::class)->present($players);
         $matches = DB::table('matches as m')
             ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query, 'm.id'))
             ->join('teams as t', 't.match_id', '=', 'm.id')

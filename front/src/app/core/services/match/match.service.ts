@@ -88,7 +88,8 @@ export class MatchService {
             teams: matchModel.teams.map(team => ({
                 color: team.color.name,
                 tags: JSON.stringify(team.choosenTags),
-                name: team.name,
+                name: team.teamPlayers.length === 1 && team.name === team.teamPlayers[0].player.pseudo
+                    ? team.teamPlayers[0].player.creatorPseudo ?? team.name : team.name,
                 players: team.teamPlayers.map(teamPlayer => ({
                     playerId: teamPlayer.player.id
                 }))
@@ -212,6 +213,8 @@ export class MatchService {
                 const team: Team = {
                     id: teamEntity.id,
                     name: teamEntity.name,
+                    displayName: teamEntity.displayName ?? teamEntity.display_name,
+                    creatorPseudo: teamEntity.creatorPseudo ?? teamEntity.creator_pseudo,
                     choosenTags: teamEntity.tags ? JSON.parse(teamEntity.tags) : [] as Tag[],
                     color: COLORS.find(color => color.name === teamEntity.color) ?? NO_COLOR,
                     score: teamEntity.score,

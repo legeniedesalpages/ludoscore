@@ -22,7 +22,8 @@ class PlayerController extends Controller
     {
         Log::debug("Liste les joueurs");
         $access = app(PlayerAccess::class);
-        $players = $access->scopePlayers(Player::with(['personalUsers:users.id,email', 'creators:users.id,email']), $request->user());
+        $players = $access->scopePlayers(Player::with(['personalUsers:users.id,email', 'creators:users.id,email']), $request->user(),
+            includeReplaced: $request->user()->is_admin && $request->query('purpose') !== 'match');
         if ($request->query('purpose') === 'match') {
             $access->scopePlayers($players, $request->user(), 'players.id', 'can_add_to_match');
         }
@@ -45,14 +46,15 @@ class PlayerController extends Controller
             }
         }
 
-        return $players->map(fn (Player $player) => $access->present($player, $request->user()));
+        app(\App\Services\PlayerNames::class)->present($players, user: $request->user());
+        return $players->map(fn (Player $player) => $access->present($player, $request->user(), personalize: false));
     }
 
     public function show(Request $request, $id)
     {
         Log::debug("Recherche le joueur d'id : " . $id);
         $access = app(PlayerAccess::class);
-        $player = $access->scopePlayers(Player::query(), $request->user())->select('players.*')->selectSub(function ($query) use ($access) {
+        $player = $access->scopePlayers(Player::query(), $request->user(), includeReplaced: true)->select('players.*')->selectSub(function ($query) use ($access) {
             $access->scopeMatches($query);
             $query->from('matches')
                 ->where('matches.canceled', false)
@@ -77,6 +79,8 @@ class PlayerController extends Controller
         $permissions = $access->permissions($player, $request->user());
         abort_unless($permissions['can_edit'], 403, 'Modification de ce joueur refusee.');
         return DB::transaction(function () use ($request, $player, $permissions, $access, $id) {
+            $player = Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
+            abort_if($player->replaced_by_player_id !== null, 422, 'Ce joueur est remplace et ne peut plus etre modifie.');
             $player->pseudo = $request->pseudo;
             if ($permissions['can_view_personal_info']) {
                 $player->last_name = $request->last_name;
@@ -129,9 +133,9 @@ class PlayerController extends Controller
 
     public function associations(Request $request, int $id)
     {
-        abort_unless($request->user()->is_admin, 403, 'Acces reserve aux administrateurs.');
         $player = Player::findOrFail($id);
-        return $player->users()->get()->map(fn (User $user) => [
+        abort_unless(app(PlayerAccess::class)->permissions($player, $request->user())['can_manage_associations'], 403, 'Gestion des associations de ce joueur refusee.');
+        return response()->json($player->users()->orderBy('player_user.associated_at', 'desc')->get()->map(fn (User $user) => [
             'user_id' => $user->id, 'email' => $user->email,
             'is_creator' => (bool) $user->pivot->is_creator,
             'is_self' => (bool) $user->pivot->is_self,
@@ -139,12 +143,29 @@ class PlayerController extends Controller
             'can_view_other_matches' => (bool) $user->pivot->can_view_other_matches,
             'can_add_to_match' => (bool) $user->pivot->can_add_to_match,
             'associated_at' => $user->pivot->associated_at,
-        ]);
+        ]))->header('Cache-Control', 'private, no-store');
+    }
+
+    public function savePersonalPseudo(Request $request, int $id): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate(['personal_pseudo' => ['present', 'nullable', 'string', 'max:255']]);
+        return DB::transaction(function () use ($request, $id, $data) {
+            $player = Player::whereKey($id)->lockForUpdate()->firstOrFail();
+            abort_if($player->replaced_by_player_id !== null, 422, 'Ce joueur est remplace.');
+            $link = $player->users()->where('users.id', $request->user()->id)->first()?->pivot;
+            abort_unless($link !== null && ! $link->is_creator, 403, 'Le pseudo personnel est reserve aux autres utilisateurs associes.');
+            $pseudo = trim($data['personal_pseudo'] ?? '');
+            $player->users()->updateExistingPivot($request->user()->id, [
+                'personal_pseudo' => $pseudo === '' || $pseudo === $player->pseudo ? null : $pseudo,
+            ]);
+
+            return response()->json(app(PlayerAccess::class)->present($player, $request->user()))
+                ->header('Cache-Control', 'private, no-store');
+        }, 3);
     }
 
     public function saveAssociation(Request $request, int $id, int $userId)
     {
-        abort_unless($request->user()->is_admin, 403, 'Acces reserve aux administrateurs.');
         $data = $request->validate([
             'can_view_personal_info' => ['required', 'boolean'],
             'can_view_other_matches' => ['required', 'boolean'],
@@ -153,7 +174,15 @@ class PlayerController extends Controller
         ]);
         $player = Player::findOrFail($id);
         User::findOrFail($userId);
-        $player->users()->syncWithoutDetaching([$userId => $data]);
+        DB::transaction(function () use ($request, $player, $userId, $data) {
+            $locked = Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
+            abort_if($locked->replaced_by_player_id !== null, 422, 'Ce joueur est remplace.');
+            abort_unless(app(PlayerAccess::class)->permissions($locked, $request->user())['can_manage_associations'], 403, 'Gestion des associations de ce joueur refusee.');
+            if (! $request->user()->is_admin) {
+                abort_unless($locked->users()->where('users.id', $userId)->exists(), 403, 'Seuls les droits des utilisateurs deja associes peuvent etre modifies.');
+            }
+            $player->users()->syncWithoutDetaching([$userId => $data]);
+        }, 3);
         return $this->associations($request, $id);
     }
 
@@ -162,7 +191,8 @@ class PlayerController extends Controller
         abort_unless($request->user()->is_admin, 403, 'Acces reserve aux administrateurs.');
         $player = Player::findOrFail($id);
         DB::transaction(function () use ($player, $userId) {
-            Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
+            $locked = Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
+            abort_if($locked->replaced_by_player_id !== null, 422, 'Ce joueur est remplace.');
             $link = $player->users()->where('users.id', $userId)->first()?->pivot;
             abort_if($link?->is_creator, 422, 'Le lien du createur ne peut pas etre supprime.');
             abort_if($link?->is_self, 422, 'Retirer d abord l identite personnelle de ce compte.');

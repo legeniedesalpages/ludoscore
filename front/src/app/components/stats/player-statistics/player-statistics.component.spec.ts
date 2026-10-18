@@ -14,7 +14,7 @@ describe('PlayerStatisticsComponent', () => {
   const directory: PlayerStatisticsDirectory = {
     summary: { ...summary, totalPlayers: 2, activePlayers: 1 },
     data: [
-      { ...summary, id: 1, name: 'Alice', createdAt: '2026-01-01', wins: 1, decidedMatches: 2, winRate: 50, gamesPlayed: 2 },
+      { ...summary, id: 1, name: 'Alice', creatorPseudo: 'Canonical', createdAt: '2026-01-01', wins: 1, decidedMatches: 2, winRate: 50, gamesPlayed: 2 },
       { ...summary, id: 2, name: 'Bob', createdAt: '2026-01-02', matches: 0, wins: 0, decidedMatches: 0, winRate: null, gamesPlayed: 0 },
     ],
   }
@@ -33,6 +33,7 @@ describe('PlayerStatisticsComponent', () => {
     expect(links.length).toBe(2)
     expect(links[0].getAttribute('href')).toBe('/statistics/players/1')
     expect(links[0].textContent).toContain('50 % de victoires')
+    expect(links[0].querySelector('small.player-creator-pseudo')?.textContent).toBe('(Canonical)')
     expect(links[1].textContent).toContain('Taux non déterminé')
   })
 

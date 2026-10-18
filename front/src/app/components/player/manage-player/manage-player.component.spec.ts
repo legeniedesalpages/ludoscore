@@ -12,9 +12,10 @@ import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.modul
 import { ManagePlayerComponent } from './manage-player.component'
 
 describe('ManagePlayerComponent creator attribution', () => {
-  async function setup(isAdmin: boolean, linkedAccount: boolean, hasCreatorPlayer: boolean) {
+  async function setup(isAdmin: boolean, linkedAccount: boolean, hasCreatorPlayer: boolean, personalized = false) {
     const player = {
       id: 1, pseudo: 'Guest', firstName: '', lastName: '', gravatar: '',
+      creatorPseudo: personalized ? 'Canonical name' : null,
       preferedColor: '', createdAt: undefined,
       user: linkedAccount ? { id: 3, email: 'linked@example.test' } : null,
       creator: {
@@ -60,5 +61,11 @@ describe('ManagePlayerComponent creator attribution', () => {
     expect(element.textContent).not.toContain('creator@example.test')
     expect(element.textContent).not.toContain('Creator pseudo')
     expect(element.querySelector('.creator')).toBeNull()
+  })
+
+  it('shows the personal nickname with the canonical name in smaller supporting text', async () => {
+    const element = await setup(false, false, false, true)
+    expect(element.querySelector('.heading')?.textContent).toContain('Guest')
+    expect(element.querySelector('small.player-creator-pseudo')?.textContent).toBe('(Canonical name)')
   })
 })

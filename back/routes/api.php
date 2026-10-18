@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\GameStatisticsController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VersionController;
+use App\Http\Controllers\Api\LudotagController;
+use App\Http\Controllers\Api\PlayerMergeController;
 
 Route::get('/version', [VersionController::class, 'show']);
 
@@ -72,6 +74,11 @@ Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::c
 | Player
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth:sanctum', 'throttle:ludotag'])->post('/player/associate-ludotag', [LudotagController::class, 'associate']);
+Route::middleware(['auth:sanctum', 'throttle:ludotag'])->post('/player/{id}/merge/preview', [PlayerMergeController::class, 'preview'])->whereNumber('id');
+Route::middleware(['auth:sanctum', 'throttle:ludotag'])->post('/player/{id}/merge', [PlayerMergeController::class, 'store'])->whereNumber('id');
+Route::middleware('auth:sanctum')->get('/player/{id}/ludotag', [LudotagController::class, 'show'])->whereNumber('id');
+Route::middleware('auth:sanctum')->put('/player/{id}/personal-pseudo', [PlayerController::class, 'savePersonalPseudo'])->whereNumber('id');
 Route::middleware('auth:sanctum')->resource('player', PlayerController::class, ['except' => ['edit', 'create']]);
 Route::middleware('auth:sanctum')->get('/player/{id}/associations', [PlayerController::class, 'associations']);
 Route::middleware('auth:sanctum')->put('/player/{id}/associations/{userId}', [PlayerController::class, 'saveAssociation']);

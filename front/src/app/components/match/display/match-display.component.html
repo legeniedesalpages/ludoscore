@@ -51,7 +51,7 @@
                 <h3>Joueurs</h3>
                 <div *ngFor="let teamIndex of order; let position = index; trackBy: trackByIndex" class="edit-team">
                     <div class="edit-team-header">
-                        <span class="edit-team-name">{{ (matchState | async)!.match!.teams[teamIndex].name }}</span>
+                        <span class="edit-team-name">{{ (matchState | async)!.match!.teams[teamIndex].displayName ?? (matchState | async)!.match!.teams[teamIndex].name }}</span>
                         <button mat-icon-button [disabled]="position == 0" (click)="move(position, -1)">
                             <mat-icon>arrow_upward</mat-icon>
                         </button>
@@ -77,7 +77,8 @@
                                 </div>
                                 <div class="line">
                                     <div class="pseudo">
-                                        {{team.name}}
+                                        {{team.displayName ?? team.name}}
+                                        @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }
                                         <div class="color">
                                             <span [hidden]="team.color.name == 'Aucune'">
                                                 <span class="dot"

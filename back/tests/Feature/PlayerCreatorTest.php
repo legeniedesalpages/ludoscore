@@ -72,6 +72,9 @@ class PlayerCreatorTest extends TestCase
     {
         (require database_path('migrations/2026_10_18_140000_create_player_user_table.php'))->up();
         (require database_path('migrations/2026_10_18_170000_normalize_player_user_identity.php'))->up();
+        (require database_path('migrations/2026_10_18_180000_add_ludotag_to_players.php'))->up();
+        (require database_path('migrations/2026_10_18_190000_add_player_merges.php'))->up();
+        (require database_path('migrations/2026_10_18_200000_add_personal_pseudo_to_player_user.php'))->up();
     }
 
     private function player(string $pseudo = 'Test'): int

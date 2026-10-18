@@ -13,6 +13,7 @@
 import { A11yModule } from '@angular/cdk/a11y'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 import { CommonModule } from '@angular/common'
+import { HttpErrorResponse } from '@angular/common/http'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
@@ -79,6 +80,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public loading: boolean = true
   public saving: boolean = false
   public canContinue: boolean = false
+  public matchAccessError: string | null = null
   public canAddTeam: boolean = false
   public lessThan2Teams: boolean = true
   public currentSwapOrderIsDownward: boolean = true
@@ -99,7 +101,12 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
           console.debug("Match have been erased")
           return
         }
-        this.canContinue = match.teams.length >= match.game?.minPlayers!
+        const participants = match.teams.flatMap(team => team.teamPlayers.map(teamPlayer => teamPlayer.player.id))
+        const grantsAccess = allPlayers.some(player => participants.includes(player.id) && player.canAccessMatches)
+        this.matchAccessError = participants.length > 0 && !grantsAccess
+          ? 'Ajoutez votre joueur personnel ou un joueur dont vous pouvez consulter les parties sans y participer. Le droit d’ajouter un joueur copié ne suffit pas à consulter cette partie.'
+          : null
+        this.canContinue = match.teams.length >= match.game?.minPlayers! && grantsAccess
         this.canAddTeam = match.teams.length < match.game?.maxPlayers!
         this.numberOfTeams = match.teams.length
         this.lessThan2Teams = match.teams.length < 2
@@ -139,6 +146,7 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       const team: Team = {
         id: undefined,
         name: player.pseudo,
+        creatorPseudo: player.creatorPseudo,
         choosenTags: [],
         color: NO_COLOR,
         score: undefined,
@@ -237,6 +245,9 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   }
 
   public launchMatch() {
+    if (!this.canContinue || this.saving) {
+      return
+    }
     this.saving = true
     this.store.dispatch(new LaunchMatch()).subscribe({
 
@@ -250,7 +261,10 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
       },
 
       error: (error) => {
-        this.snackBar.open("Erreur lors de la création du match:" + error, 'Fermer', {
+        const message = error instanceof HttpErrorResponse && typeof error.error?.message === 'string'
+          ? error.error.message
+          : 'Impossible de créer la partie. Veuillez réessayer.'
+        this.snackBar.open(message, 'Fermer', {
           duration: 15000
         })
         this.saving = false

@@ -25,7 +25,8 @@
             [team]="team"
             [myFormGroup]="categoryScoreFormGroup"
             (valueChange)="onValueChange($event, team)">
-            {{ team.name }}
+            {{ team.displayName ?? team.name }}
+            @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }
           </ls-input-category-score>
         }
 

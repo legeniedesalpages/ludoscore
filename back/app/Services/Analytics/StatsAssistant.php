@@ -161,8 +161,7 @@ class StatsAssistant
     /** Remplace les codes anonymes (J12) par les pseudos pour l'affichage. */
     public function restore(string $text): string
     {
-        static $pseudos = null;
-        $pseudos ??= DB::table('players')->pluck('pseudo', 'id');
+        $pseudos = app(\App\Services\PlayerNames::class)->present(DB::table('players')->select('id', 'pseudo')->get())->pluck('pseudo', 'id');
 
         return preg_replace_callback('/\bJ(\d+)\b/', fn($m) => $pseudos[(int) $m[1]] ?? $m[0], $text);
     }

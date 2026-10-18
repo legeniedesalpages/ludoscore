@@ -14,7 +14,8 @@ class PlayerIdentity
             if ($user !== null) {
                 User::whereKey($user->id)->lockForUpdate()->firstOrFail();
             }
-            Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
+            $locked = Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
+            abort_if($locked->replaced_by_player_id !== null, 422, 'Ce joueur est remplace.');
             DB::table('player_user')->where('player_id', $player->id)->where('is_self', true)->update(['is_self' => false]);
             if ($user !== null) {
                 DB::table('player_user')->where('user_id', $user->id)->where('is_self', true)->update(['is_self' => false]);

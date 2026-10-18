@@ -16,10 +16,11 @@ class PlayerStatisticsController extends Controller
         $players = app(PlayerAccess::class)->scopePlayers(DB::table('players'), request()->user())
             ->orderByDesc('created_at')->orderByDesc('id')->get();
         $rows = $statistics->rows();
+        app(\App\Services\PlayerNames::class)->present($players);
         $byPlayer = $rows->groupBy('player_id');
         $data = $players->map(fn($player) => [
             'id' => (int) $player->id, 'name' => $player->pseudo ?: 'Joueur ' . $player->id,
-            'createdAt' => $player->created_at,
+            'createdAt' => $player->created_at, 'creatorPseudo' => $player->creator_pseudo,
         ] + $statistics->summary($byPlayer->get($player->id, collect())))
             ->sortByDesc('matches')->values();
         return response()->json([
@@ -34,6 +35,7 @@ class PlayerStatisticsController extends Controller
     {
         $player = app(PlayerAccess::class)->scopePlayers(DB::table('players'), request()->user())->where('id', $id)->first();
         abort_if(!$player, 404, 'Joueur introuvable.');
+        app(\App\Services\PlayerNames::class)->present(collect([$player]));
         return response()->json($statistics->detail($player, $statistics->rows($id)));
     }
 }

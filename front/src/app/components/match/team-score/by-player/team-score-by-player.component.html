@@ -13,7 +13,7 @@
     </div>
     <div class="divider"></div>
     <div class="container" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
-      <div class="score">Score pour <b>{{ team.name }}</b></div>
+      <div class="score">Score pour <b>{{ team.displayName ?? team.name }}</b> @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }</div>
 
       <form [formGroup]="teamScoreFormGroup" (ngSubmit)="onSubmit()">
 

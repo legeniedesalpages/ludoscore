@@ -15,6 +15,8 @@ import { ColorTag } from "./tag.model"
 export interface Player {
     id: number
     pseudo: string
+    creatorPseudo?: string | null
+    canAccessMatches?: boolean
     lastName: string
     firstName: string
     preferedColor: ColorTag
