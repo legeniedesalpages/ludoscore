@@ -16,7 +16,7 @@ export interface GameEntity {
     imageId: string
     thumbnailId: string
     isOnlyCooperative: boolean
-    ownershipDate: Date
+    ownershipDate: Date | null
     inLibrary: boolean
     minPlayers: number
     maxPlayers: number
@@ -33,4 +33,6 @@ export interface GameEntity {
     estimatedDurationInMinutes: number
     createdAt: string
     playedMatchCount: number
+    personalPlayedMatchCount: number
+    libraryUserCount: number
 }

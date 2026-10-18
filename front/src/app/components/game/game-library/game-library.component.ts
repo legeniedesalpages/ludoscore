@@ -2,17 +2,18 @@ import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core'
 import { A11yModule } from '@angular/cdk/a11y'
 import { FormsModule } from '@angular/forms'
-import { MatButtonToggleModule } from '@angular/material/button-toggle'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { Game } from 'src/app/core/model/game.model'
+import { Game, SelectingGame } from 'src/app/core/model/game.model'
 import { GameService } from 'src/app/core/services/game/game.service'
 import { LayoutComponent } from '../../layout/layout.component'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 
-type LibraryFilter = 'all' | 'in' | 'out'
+type LibraryFilter = 'in' | 'played' | 'unplayed'
 
 @Component({
   templateUrl: './game-library.component.html',
@@ -20,7 +21,7 @@ type LibraryFilter = 'all' | 'in' | 'out'
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, FormsModule, A11yModule,
-    MatButtonModule, MatButtonToggleModule, MatIconModule,
+    MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule,
     LoadingSpinnerModule,
     LayoutComponent
   ]
@@ -32,8 +33,8 @@ export class GameLibraryComponent {
   private changeDetectorRef = inject(ChangeDetectorRef)
 
   public loading = true
-  public games = signal<Game[]>([])
-  public filter = signal<LibraryFilter>('all')
+  public games = signal<SelectingGame[]>([])
+  public filter = signal<LibraryFilter>('in')
   public searching = signal(false)
   public searchText = signal('')
 
@@ -41,7 +42,9 @@ export class GameLibraryComponent {
     const text = this.searchText().trim().toLowerCase()
     const filter = this.filter()
     return this.games()
-      .filter(game => filter === 'all' || (filter === 'in') === game.inLibrary)
+      .filter(game => filter === 'in'
+        ? game.inLibrary
+        : !game.inLibrary && (filter === 'played' ? game.personalPlayedMatchCount > 0 : game.personalPlayedMatchCount === 0))
       .filter(game => !text || game.title.toLowerCase().includes(text))
       .sort((a, b) => a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' }))
   })

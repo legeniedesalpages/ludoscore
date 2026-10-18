@@ -65,7 +65,9 @@ export class GameService {
                     lastPlayed: gameEntity.lastPlayed,
                     lastWinner: gameEntity.lastWinner,
                     createdAt: gameEntity.createdAt,
-                    playedMatchCount: gameEntity.playedMatchCount
+                    playedMatchCount: gameEntity.playedMatchCount,
+                    personalPlayedMatchCount: gameEntity.personalPlayedMatchCount,
+                    libraryUserCount: gameEntity.libraryUserCount
                 }
                 return game
             })

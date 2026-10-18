@@ -33,6 +33,7 @@ class UserGameLibraryTest extends TestCase
             $table->id();
             $table->string('email')->unique();
             $table->string('password');
+            $table->unsignedBigInteger('player_id')->nullable();
             $table->boolean('is_admin')->default(false);
             $table->string('confirmation_key')->nullable();
             $table->boolean('newsletter_subscribed')->default(false);
@@ -116,6 +117,67 @@ class UserGameLibraryTest extends TestCase
             'scoreTemplate' => '[]', 'drawBreaker' => '[]',
             'quantifiableScore' => true, 'highestScoreWin' => true, 'drawAllowed' => true,
         ];
+    }
+
+    public function test_personal_play_count_only_counts_completed_participations_of_the_linked_player(): void
+    {
+        $played = $this->game(['in_library' => false]);
+        $unplayed = $this->game(['bgg_id' => 43, 'in_library' => false]);
+        $this->migration()->up();
+        $this->owner->forceFill(['player_id' => 101])->save();
+        $this->other->forceFill(['player_id' => 202])->save();
+
+        foreach ([
+            [$played->id, 101, false, false],
+            [$played->id, 101, false, false],
+            [$played->id, 101, true, false],
+            [$played->id, 101, false, true],
+            [$unplayed->id, 202, false, false],
+        ] as [$gameId, $playerId, $canceled, $running]) {
+            $matchId = DB::table('matches')->insertGetId([
+                'game_id' => $gameId, 'canceled' => $canceled, 'running' => $running,
+            ]);
+            $teamId = DB::table('teams')->insertGetId(['match_id' => $matchId]);
+            DB::table('team_players')->insert([
+                ['team_id' => $teamId, 'player_id' => $playerId],
+                ['team_id' => $teamId, 'player_id' => $playerId],
+            ]);
+        }
+
+        foreach ([
+            [$this->owner, [$played->id => 2, $unplayed->id => 0]],
+            [$this->other, [$played->id => 0, $unplayed->id => 1]],
+        ] as [$user, $expected]) {
+            $games = collect($this->actingAs($user)->getJson('/api/game')->assertOk()->json())->keyBy('id');
+            foreach ($expected as $gameId => $count) {
+                $this->assertSame($count, $games[$gameId]['personalPlayedMatchCount']);
+            }
+            $this->assertSame(2, $games[$played->id]['playedMatchCount']);
+            $this->assertSame(1, $games[$unplayed->id]['playedMatchCount']);
+        }
+
+        $this->owner->forceFill(['player_id' => null])->save();
+        $games = $this->actingAs($this->owner)->getJson('/api/game')->assertOk()->json();
+        $this->assertSame([0, 0], array_column($games, 'personalPlayedMatchCount'));
+    }
+
+    public function test_library_user_count_only_includes_users_with_the_game_in_their_library(): void
+    {
+        $shared = $this->game();
+        $outside = $this->game(['bgg_id' => 43, 'in_library' => false]);
+        $this->migration()->up();
+        $this->other->games()->attach($shared->id, ['in_library' => true]);
+        $this->other->games()->attach($outside->id, ['in_library' => false]);
+
+        foreach ([$this->owner, $this->other] as $user) {
+            $games = collect($this->actingAs($user)->getJson('/api/game')->assertOk()->json())->keyBy('id');
+            $this->assertSame(2, $games[$shared->id]['libraryUserCount']);
+            $this->assertSame(0, $games[$outside->id]['libraryUserCount']);
+        }
+
+        $this->other->games()->updateExistingPivot($shared->id, ['in_library' => false]);
+        $games = collect($this->getJson('/api/game')->assertOk()->json())->keyBy('id');
+        $this->assertSame(1, $games[$shared->id]['libraryUserCount']);
     }
 
     public function test_migration_preserves_all_legacy_entries_and_dates_for_only_the_owner(): void

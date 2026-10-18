@@ -24,6 +24,8 @@ export interface SelectingGame extends Game {
     lastWinner: string
     createdAt: string
     playedMatchCount: number
+    personalPlayedMatchCount: number
+    libraryUserCount: number
 }
 
 export interface GameToSave extends GameDetail {
@@ -37,7 +39,7 @@ export interface GameDetail {
     isOnlyCooperative: boolean
     minPlayers: number
     maxPlayers: number
-    ownershipDate: Date
+    ownershipDate: Date | null
     inLibrary: boolean
     matchTags: Tag[]
     playerTags: Tag[]

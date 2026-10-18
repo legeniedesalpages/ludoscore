@@ -10,7 +10,7 @@
     * - Author          : renau
     * - Modification    : 
 **/
-import { Component, Inject, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { Component, Inject, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { COLORS, ColorTag } from 'src/app/core/model/tag.model'
 
@@ -29,7 +29,7 @@ export class ColorTagEditorComponent implements OnInit {
     @Input()
     public title: string = ''
 
-    constructor(private dialog: MatDialog) { }
+    constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) { }
 
     ngOnInit(): void {
     }
@@ -46,6 +46,8 @@ export class ColorTagEditorComponent implements OnInit {
             data: {
                 colorTags: this.tags
             }
+        }).afterClosed().subscribe(() => {
+            this.changeDetectorRef.markForCheck()
         })
     }
 }

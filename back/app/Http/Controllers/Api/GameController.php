@@ -44,6 +44,26 @@ class GameController extends Controller
                     ->where('matches.running', false)
                     ->selectRaw('COUNT(*)');
             }, 'played_match_count')
+            ->selectSub(function ($query) use ($request) {
+                $query->from('matches')
+                    ->whereColumn('matches.game_id', 'games.id')
+                    ->where('matches.canceled', false)
+                    ->where('matches.running', false)
+                    ->whereExists(function ($participants) use ($request) {
+                        $participants->selectRaw('1')->from('teams')
+                            ->join('team_players', 'team_players.team_id', '=', 'teams.id')
+                            ->whereColumn('teams.match_id', 'matches.id')
+                            ->whereNotNull('team_players.player_id')
+                            ->where('team_players.player_id', $request->user()->player_id);
+                    })
+                    ->selectRaw('COUNT(*)');
+            }, 'personal_played_match_count')
+            ->selectSub(function ($query) {
+                $query->from('game_user as owners')
+                    ->whereColumn('owners.game_id', 'games.id')
+                    ->where('owners.in_library', true)
+                    ->selectRaw('COUNT(*)');
+            }, 'library_user_count')
             ->orderBy('games.created_at', 'desc')
             ->toBase()
             ->get();

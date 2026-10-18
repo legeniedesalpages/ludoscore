@@ -32,6 +32,12 @@
   width: 100%;
 }
 
+.library-filter {
+  width: 100%;
+  max-width: 400px;
+  min-width: 0;
+}
+
 .search-input::placeholder {
   color: white;
   opacity: 0.2;
@@ -42,24 +48,23 @@
   opacity: 0.7;
 }
 
-.in-library {
-  color: green;
-  font-weight: bold;
-}
-
-.in-library mat-icon {
-  font-size: 14px;
-  height: 14px;
-  width: 14px;
-  vertical-align: middle;
-}
-
-.out-library {
-  font-style: italic;
-}
-
 .empty {
   text-align: center;
   padding: 24px;
   opacity: 0.7;
+}
+
+:host .result-list .visual {
+  flex-shrink: 0;
+}
+
+:host .result-list .content {
+  min-width: 0;
+  height: auto;
+  min-height: 80px;
+}
+
+:host .result-list .supporting {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }

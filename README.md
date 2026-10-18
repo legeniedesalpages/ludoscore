@@ -51,6 +51,24 @@ catalogue, ni les parties, ni l'association des autres comptes.
 La recherche distingue `registered` (present au catalogue) et `owned`
 (dans la ludotheque du compte), pour reutiliser les fiches existantes.
 
+La bibliotheque propose une liste deroulante adaptee aux petits ecrans
+avec trois filtres exclusifs : dans la ludotheque
+(selectionne par defaut), hors ludotheque deja joue, et hors ludotheque
+jamais joue. Le statut « deja joue » repose sur les parties terminees et non
+annulees auxquelles le player lie au compte connecte a participe, et non sur
+les parties des autres utilisateurs. Sans player lie, aucun jeu n'est considere
+comme deja joue. L'API expose ce compteur dans `personalPlayedMatchCount`,
+sans modifier le compteur global `playedMatchCount`.
+Les lignes affichent la date d'obtention lorsqu'elle est renseignee et le nombre de
+parties personnelles pour les jeux de la ludotheque. Hors ludotheque, elles
+affichent le nombre de comptes possedant le jeu (`libraryUserCount`, uniquement
+les associations avec `in_library = true`), puis le nombre de parties personnelles
+si le compte y a deja joue, sinon le nombre global de parties. Chaque partie
+terminee non annulee compte une seule fois, meme avec plusieurs participants.
+Un compteur nul est affiche sous la forme « Aucune partie jouee ».
+Le compteur de parties est sur une ligne dediee ; les informations peuvent
+revenir a la ligne et la hauteur des jeux s'adapte aux petits ecrans.
+
 La migration `2026_10_18_000000_move_game_library_to_users` :
 
 - copie tous les jeux existants, y compris hors ludotheque, avec leurs dates

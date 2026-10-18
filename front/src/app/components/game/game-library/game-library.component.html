@@ -18,11 +18,14 @@
         </div>
 
         <div class="toolbar">
-            <mat-button-toggle-group [value]="filter()" (change)="filter.set($event.value)" aria-label="Filtre">
-                <mat-button-toggle value="all">Tous</mat-button-toggle>
-                <mat-button-toggle value="in">Dans la ludothèque</mat-button-toggle>
-                <mat-button-toggle value="out">Hors ludothèque</mat-button-toggle>
-            </mat-button-toggle-group>
+            <mat-form-field appearance="outline" class="library-filter">
+                <mat-label>Afficher les jeux</mat-label>
+                <select matNativeControl [ngModel]="filter()" (ngModelChange)="filter.set($event)">
+                    <option value="in">Dans la ludothèque</option>
+                    <option value="played">Hors ludothèque · déjà joué</option>
+                    <option value="unplayed">Hors ludothèque · jamais joué</option>
+                </select>
+            </mat-form-field>
 
             <div class="summary">
                 {{ filteredGames().length }} jeu(x) affiché(s) — {{ countInLibrary() }} dans la ludothèque sur {{ games().length }}
@@ -42,11 +45,19 @@
                         {{ playersLabel(game) }}
                         @if (game.isOnlyCooperative) { · coopératif }
                         @if (game.inLibrary) {
-                            · <span class="in-library"><mat-icon>star</mat-icon> Dans la ludothèque</span>
-                            @if (game.ownershipDate) { depuis le {{ game.ownershipDate | date:'dd/MM/yyyy' }} }
+                            @if (game.ownershipDate) {
+                                · Obtenu le {{ game.ownershipDate | date:'dd/MM/yyyy' }}
+                            }
                         } @else {
-                            · <span class="out-library">Hors ludothèque</span>
+                            · Dans la ludothèque de {{ game.libraryUserCount }} {{ game.libraryUserCount > 1 ? 'utilisateurs' : 'utilisateur' }}
                         }
+                        <div class="play-count">
+                            @if (game.inLibrary || game.personalPlayedMatchCount > 0) {
+                                {{ game.personalPlayedMatchCount === 0 ? 'Aucune' : game.personalPlayedMatchCount }} {{ game.personalPlayedMatchCount > 1 ? 'parties jouées' : 'partie jouée' }} par vous
+                            } @else {
+                                {{ game.playedMatchCount === 0 ? 'Aucune' : game.playedMatchCount }} {{ game.playedMatchCount > 1 ? 'parties jouées' : 'partie jouée' }} au total, tous utilisateurs
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
