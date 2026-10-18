@@ -50,7 +50,7 @@ describe('MatchService personal player names', () => {
   it('uses personalized historical display names without overwriting persisted team names', async () => {
     TestBed.configureTestingModule({ providers: [
       { provide: MatchCrudService, useValue: { findOne: () => of({
-        idMatch: 1, gameId: 1, teams: [{
+        idMatch: 1, gameId: 1, story: 'Une histoire conservee.', teams: [{
           id: 2, name: 'Canonical', display_name: 'My nickname', creator_pseudo: 'Canonical',
         }],
       }) } },
@@ -58,11 +58,23 @@ describe('MatchService personal player names', () => {
       { provide: GeolocationService, useValue: {} },
     ] })
     const match = await firstValueFrom(TestBed.inject(MatchService).getMatch(1))
+    expect(match.story).toBe('Une histoire conservee.')
     expect(match.teams[0]).toMatchObject({
       name: 'Canonical', displayName: 'My nickname', creatorPseudo: 'Canonical',
     })
     expect(new MatchFormatterService().teamLine(match)).toBe('My nickname <small class="player-creator-pseudo">(Canonical)</small>')
     match.teams[0].displayName = '<b>Private & nickname</b>'
     expect(new MatchFormatterService().teamLine(match)).toContain('&lt;b&gt;Private &amp; nickname&lt;/b&gt;')
+  })
+
+  it('returns the generated story from the API', async () => {
+    const generateStory = vi.fn(() => of({ story: 'Un final serre.' }))
+    TestBed.configureTestingModule({ providers: [
+      { provide: MatchCrudService, useValue: { generateStory } },
+      { provide: TeamCrudService, useValue: {} },
+      { provide: GeolocationService, useValue: {} },
+    ] })
+    expect(await firstValueFrom(TestBed.inject(MatchService).generateMatchStory(7))).toBe('Un final serre.')
+    expect(generateStory).toHaveBeenCalledExactlyOnceWith(7)
   })
 })

@@ -45,6 +45,9 @@ class TeamController extends Controller
         $team->score = $request->score;
         $team->score_details = $request->score_details;
         $team->save();
+        if ($team->wasChanged(['name', 'color', 'tags', 'score', 'score_details'])) {
+            \App\Models\GameMatch::whereKey($team->match_id)->update(['story' => null]);
+        }
         return $team;
     }
 

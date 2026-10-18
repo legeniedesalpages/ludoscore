@@ -53,6 +53,10 @@ export class MatchService {
         return this.matchCrudService.getPhoto(matchId)
     }
 
+    public generateMatchStory(matchId: number): Observable<string> {
+        return this.matchCrudService.generateStory(matchId).pipe(map(result => result.story))
+    }
+
     public findRunningMatch(): Observable<MatchEntity> {
         return this.matchCrudService.findRunningMatch()
     }
@@ -187,6 +191,7 @@ export class MatchService {
             matchId: matchEntity.idMatch,
             canceled: matchEntity.canceled,
             running: !!matchEntity.running,
+            story: matchEntity.story ?? null,
             game: {
                 id: matchEntity.gameId,
                 title: matchEntity.title,

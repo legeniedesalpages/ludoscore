@@ -22,6 +22,7 @@ export interface MatchEntity {
     winnerTeamId?: number
     drawBreaker?: string
     cancelReason?: string
+    story?: string | null
 }
 
 export interface MatchTeamEntity {

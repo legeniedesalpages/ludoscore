@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property string|float|null $latitude
  * @property string|float|null $longitude
  * @property string|null $location_name
+ * @property string|null $story
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Team> $teams

@@ -12,7 +12,8 @@
 **/
 import { A11yModule } from '@angular/cdk/a11y'
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, signal } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
 import { MatButtonToggleModule } from '@angular/material/button-toggle'
@@ -38,6 +39,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { MatchService } from 'src/app/core/services/match/match.service'
 import { resizeImage } from 'src/app/core/utils/image-resize'
 import { GameEditorNavigationService } from 'src/app/core/services/game/game-editor-navigation.service'
+import { StoryDialogComponent } from '../story-dialog/story-dialog.component'
 
 
 @Component({
@@ -62,6 +64,7 @@ export class MatchEndComponent implements OnInit {
   public photoUrl?: SafeUrl
 
   private photo?: Blob
+  private savedMatchId?: number
   private rawPhotoUrl?: string
   private sanitizer: DomSanitizer = inject(DomSanitizer)
   private matchService: MatchService = inject(MatchService)
@@ -73,6 +76,7 @@ export class MatchEndComponent implements OnInit {
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute)
   private changeDetectorRef = inject(ChangeDetectorRef)
   private gameEditorNavigation = inject(GameEditorNavigationService)
+  private destroyRef = inject(DestroyRef)
 
 
   ngOnInit(): void {
@@ -88,11 +92,11 @@ export class MatchEndComponent implements OnInit {
       }
     });
 
-    this.activatedRoute.queryParams.subscribe((params: { [x: string]: any }) => {
+    this.activatedRoute.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: { [x: string]: any }) => {
       this.typeDeSaisie.set(params['mode'] || 'player');
     });
     
-    this.actions.pipe(ofActionErrored(SaveMatchResult)).subscribe(({ result }) => {
+    this.actions.pipe(ofActionErrored(SaveMatchResult), takeUntilDestroyed(this.destroyRef)).subscribe(({ result }) => {
       this.saving = false
       this.changeDetectorRef.markForCheck()
       const error = result.error as any
@@ -111,16 +115,31 @@ export class MatchEndComponent implements OnInit {
         })
     })
 
-    this.actions.pipe(ofActionSuccessful(SaveMatchResult)).subscribe(() => {
+    this.actions.pipe(ofActionSuccessful(SaveMatchResult), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.saving = false
       this.changeDetectorRef.markForCheck()
       this.snackBar.open("Partie enregistrée ! à bientôt sur Ludoscore ;-)", 'Fermer', {
         duration: 5000
       })
-      this.store.dispatch(new Navigate(['/']))
+      const matchId = this.savedMatchId
+      // La navigation détruit cet écran ; la popup prend ensuite en charge la génération.
+      this.store.dispatch(new Navigate(['/'])).subscribe({
+        next: () => this.dialog.open(StoryDialogComponent, {
+          data: { matchId },
+          width: '640px',
+          maxWidth: '95vw',
+          disableClose: true,
+          autoFocus: 'dialog',
+          restoreFocus: false
+        }),
+        error: (error: unknown) => {
+          console.error("Impossible de revenir à l'accueil après l'enregistrement", error)
+          this.snackBar.open("Les scores sont enregistrés, mais le retour à l'accueil a échoué. Le récit pourra être généré dans l'historique.", 'Fermer', { duration: 10000 })
+        }
+      })
     })
 
-    this.actions.pipe(ofActionCompleted(MatchAborted)).subscribe(() => {
+    this.actions.pipe(ofActionCompleted(MatchAborted), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.saving = false
       this.changeDetectorRef.markForCheck()
       this.snackBar.open("Partie abandonnée !", 'Fermer', {
@@ -129,7 +148,7 @@ export class MatchEndComponent implements OnInit {
       this.store.dispatch(new Navigate(['/']))
     })
 
-    this.actions.pipe(ofActionCompleted(MatchContinued)).subscribe(() => {
+    this.actions.pipe(ofActionCompleted(MatchContinued), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.saving = false
       this.changeDetectorRef.markForCheck()
       this.snackBar.open("Reprise de la partie !", 'Fermer', {
@@ -226,6 +245,7 @@ export class MatchEndComponent implements OnInit {
   // La photo est envoyée avant le résultat car la sauvegarde réinitialise l'état de la partie
   private save() {
     const matchId = this.store.selectSnapshot(MatchState.match)?.matchId
+    this.savedMatchId = matchId
     this.saving = true
 
     if (!this.photo || matchId == undefined) {

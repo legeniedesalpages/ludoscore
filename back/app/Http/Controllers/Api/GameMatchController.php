@@ -142,6 +142,9 @@ class GameMatchController extends Controller
         }
         Log::info("winner_team_id : " . $gameMatch->winner_team_id);
         $gameMatch->finished_at = now(); //Carbon::createFromFormat('Y-m-d\TH:i:s+', $request->finished_at);
+        if ($gameMatch->isDirty()) {
+            $gameMatch->story = null;
+        }
         $gameMatch->save();
 
         return $gameMatch;
@@ -187,23 +190,32 @@ class GameMatchController extends Controller
 
         Log::info("Update history of match id : " . $id);
         DB::transaction(function () use ($gameMatch, $data, $winnerTeamId) {
+            $gameMatch = GameMatch::lockForUpdate()->findOrFail($gameMatch->id);
             $gameMatch->started_at = $data['started_at'];
             $gameMatch->finished_at = $data['finished_at'] ?? null;
             $gameMatch->winner_team_id = $winnerTeamId;
             $gameMatch->running = $data['running'];
             $gameMatch->canceled = $data['canceled'];
-            $gameMatch->save();
+            $invalidateStory = $gameMatch->isDirty(['started_at', 'finished_at', 'winner_team_id'])
+                || (bool) $gameMatch->getRawOriginal('running') !== $data['running']
+                || (bool) $gameMatch->getRawOriginal('canceled') !== $data['canceled'];
 
             foreach ($data['teams'] as $teamData) {
                 $team = Team::find($teamData['id']);
                 $team->score = $teamData['score'] ?? null;
                 if (array_key_exists('score_details', $teamData)) {
-                    $team->score_details = $teamData['score_details'] === null
-                        ? null
-                        : json_encode($teamData['score_details']);
+                    $details = $teamData['score_details'];
+                    if (json_decode($team->score_details ?? 'null', true) !== $details) {
+                        $team->score_details = $details === null ? null : json_encode($details);
+                    }
                 }
+                $invalidateStory = $invalidateStory || $team->isDirty();
                 $team->save();
             }
+            if ($invalidateStory) {
+                $gameMatch->story = null;
+            }
+            $gameMatch->save();
         });
 
         return response()->json(['id' => $gameMatch->id]);

@@ -9,6 +9,24 @@
   height: 100%;
 }
 
+.match-story {
+  margin: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  color: #222;
+}
+
+.match-story h2 {
+  margin-top: 0;
+}
+
+.story-text {
+  white-space: pre-line;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 .elapsedtime {
   text-align: center;
   color: white;

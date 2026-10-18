@@ -30,6 +30,7 @@ export interface MatchModel {
     canceled?: boolean
     running?: boolean
     cancelReason?: string
+    story?: string | null
 }
 
 export interface Team {

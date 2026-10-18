@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VersionController;
 use App\Http\Controllers\Api\LudotagController;
 use App\Http\Controllers\Api\PlayerMergeController;
+use App\Http\Controllers\Api\MatchStoryController;
 
 Route::get('/version', [VersionController::class, 'show']);
 
@@ -67,6 +68,7 @@ Route::middleware('auth:sanctum')->get('/game-match/{id}/photo', [GameMatchContr
 Route::middleware('auth:sanctum')->delete('/game-match/{id}/photo', [GameMatchController::class, 'destroyPhoto']);
 
 Route::middleware('auth:sanctum')->put('/game-match/{id}/history', [GameMatchController::class, 'updateHistory']);
+Route::middleware(['auth:sanctum', 'throttle:6,1'])->post('/game-match/{id}/story', [MatchStoryController::class, 'store'])->whereNumber('id');
 
 Route::middleware('auth:sanctum')->resource('game-match', GameMatchController::class, ['except' => ['edit', 'create']]);
 /*

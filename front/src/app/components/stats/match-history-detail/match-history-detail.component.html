@@ -9,8 +9,8 @@
                 <button mat-raised-button class="validate-button" [disabled]="saving() || form?.invalid" (click)="save()">Enregistrer les modifications</button>
                 <button mat-button class="validate-button" [disabled]="saving()" (click)="cancelEditing()">Annuler</button>
             } @else {
-                <button mat-raised-button class="validate-button" [disabled]="!matchModel()" (click)="startEditing()">Modifier</button>
-                <button mat-raised-button class="validate-button" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
+                <button mat-raised-button class="validate-button" [disabled]="!matchModel() || generatingStory()" (click)="startEditing()">Modifier</button>
+                <button mat-raised-button class="validate-button" [disabled]="generatingStory()" (click)="deteleMatchHistory()">Supprimer cette partie de l'historique</button>
             }
         </div>
     </ng-container>
@@ -38,6 +38,25 @@
                     <div class="elapsedtime">
                         <span [innerHtml]="formatter.line(match)"></span>
                     </div>
+
+                    @if (!editing() && !match.running && !match.canceled) {
+                        <section class="match-story" aria-labelledby="match-story-title" [attr.aria-busy]="generatingStory()">
+                            <h2 id="match-story-title">L'histoire de la partie</h2>
+                            @if (match.story) {
+                                <p class="story-text">{{ match.story }}</p>
+                            } @else if (generatingStory()) {
+                                <p role="status">Le récit de votre partie prend forme…</p>
+                            } @else {
+                                @if (storyError(); as error) {
+                                    <p role="alert">{{ error }}</p>
+                                }
+                                <button mat-stroked-button type="button" (click)="generateStory()">
+                                    <mat-icon>auto_stories</mat-icon>
+                                    {{ storyError() ? 'Réessayer de générer le récit' : 'Générer le récit de la partie' }}
+                                </button>
+                            }
+                        </section>
+                    }
 
                     @if (editing() && form) {
                         <form class="edit-form" [formGroup]="form">

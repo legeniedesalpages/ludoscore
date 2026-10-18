@@ -2,7 +2,7 @@
   <h2>Une question sur vos statistiques ?</h2>
   <form (submit)="ask($event)">
     <mat-form-field appearance="outline">
-      <mat-label>Votre question à l’IA</mat-label>
+      <mat-label>Votre question</mat-label>
       <textarea matInput [formField]="questionForm.question" rows="2"
         placeholder="Quels jeux ont été les plus joués chaque mois ?"></textarea>
       <mat-hint>Entre 3 et 500 caractères. Réponse en texte, tableau ou graphique.</mat-hint>

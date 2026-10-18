@@ -11,6 +11,7 @@
     * - Modification    : 
 **/
 import { CommonModule, NgStyle } from '@angular/common'
+import { HttpErrorResponse } from '@angular/common/http'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { MatDialog } from '@angular/material/dialog'
@@ -27,7 +28,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, RouterModule } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { BehaviorSubject, catchError, combineLatest, filter, of, switchMap } from 'rxjs'
+import { BehaviorSubject, catchError, combineLatest, filter, finalize, of, switchMap } from 'rxjs'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { LoadingSpinnerModule } from 'src/app/components/layout/spinner/loading-spinner.module'
 import { MatchModel } from 'src/app/core/model/match.model'
@@ -100,6 +101,8 @@ export class MatchHistoryDetailComponent implements OnInit {
   public loading: boolean = true
   public editing = signal(false)
   public saving = signal(false)
+  public generatingStory = signal(false)
+  public storyError = signal<string | null>(null)
   public form?: FormGroup
 
   private refresh$ = new BehaviorSubject<void>(undefined)
@@ -141,6 +144,28 @@ export class MatchHistoryDetailComponent implements OnInit {
     if (url) {
       URL.revokeObjectURL(url)
     }
+  }
+
+  public generateStory(): void {
+    const match = this.matchModel()
+    if (!match?.matchId || match.story || match.running || match.canceled || this.generatingStory()) {
+      return
+    }
+    this.generatingStory.set(true)
+    this.storyError.set(null)
+    this.matchService.generateMatchStory(match.matchId).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.generatingStory.set(false))
+    ).subscribe({
+      next: story => this.matchModel.update(current =>
+        current && current.matchId === match.matchId ? { ...current, story } : current),
+      error: (error: unknown) => {
+        console.error('Impossible de générer le récit de la partie', error)
+        this.storyError.set(error instanceof HttpErrorResponse && typeof error.error?.message === 'string'
+          ? error.error.message
+          : 'Le récit est indisponible pour le moment. Les scores sont enregistrés. Vous pouvez réessayer.')
+      }
+    })
   }
 
   public get teamsArray(): FormArray {

@@ -58,6 +58,10 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         return this.http.put<void>(`${this.apiUrl}${this.base}/${matchId}/history`, payload)
     }
 
+    generateStory(matchId: number): Observable<{ story: string }> {
+        return this.http.post<{ story: string }>(`${this.apiUrl}${this.base}/${matchId}/story`, {})
+    }
+
     findAllCount(): Observable<number> {
         var url = `${this.apiUrl}/game-match-count`
         return this.http.get<number>(url).pipe(tap(res => console.debug("find all count " + url + " => ", res)))
