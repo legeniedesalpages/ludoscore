@@ -71,6 +71,7 @@ class PlayerCreatorTest extends TestCase
     private function migrateAccess(): void
     {
         (require database_path('migrations/2026_10_18_140000_create_player_user_table.php'))->up();
+        (require database_path('migrations/2026_10_18_170000_normalize_player_user_identity.php'))->up();
     }
 
     private function player(string $pseudo = 'Test'): int
@@ -95,9 +96,7 @@ class PlayerCreatorTest extends TestCase
         foreach ($before as $row) {
             $this->assertDatabaseHas('players', $row);
         }
-        $this->assertSame($associated, $this->other->refresh()->player_id);
-        $this->assertSame($this->other->id, Player::findOrFail($associated)->creator->id);
-        $this->assertSame([$unassociated], $this->owner->createdPlayers()->pluck('id')->all());
+        $this->assertSame($associated, DB::table('users')->where('id', $this->other->id)->value('player_id'));
         $this->migration()->up();
         $this->assertDatabaseCount('players', 2);
 
@@ -207,8 +206,10 @@ class PlayerCreatorTest extends TestCase
 
         $this->actingAs($this->other)->putJson('/api/player/'.$id, [
             'pseudo' => 'Updated', 'createdByUserId' => $this->owner->id,
+            'user' => null,
         ])->assertOk()->assertJsonPath('createdByUserId', $this->other->id);
-        $this->assertDatabaseHas('players', ['id' => $id, 'pseudo' => 'Updated', 'created_by_user_id' => $this->other->id]);
+        $this->assertDatabaseHas('players', ['id' => $id, 'pseudo' => 'Updated']);
+        $this->assertDatabaseHas('player_user', ['player_id' => $id, 'user_id' => $this->other->id, 'is_creator' => true]);
         $this->assertNull($this->owner->refresh()->player_id);
     }
 
@@ -228,8 +229,7 @@ class PlayerCreatorTest extends TestCase
         $this->other->forceFill(['player_id' => $foreign])->save();
         $this->migration()->up();
         $this->migrateAccess();
-        $this->owner->forceFill(['player_id' => $foreign])->save();
-        $this->other->forceFill(['player_id' => $owned])->save();
+        DB::table('player_user')->where('user_id', $this->other->id)->update(['is_self' => false]);
 
         $this->actingAs($this->owner)->getJson('/api/player?created_by_user_id='.$this->other->id.'&is_admin=1')
             ->assertOk()->assertJsonCount(1)

@@ -94,8 +94,9 @@ statistiques sont maintenant regis par les associations de joueurs ci-dessous.
 
 ## Createur des joueurs
 
-Chaque joueur a un `created_by_user_id` obligatoire, cle etrangere vers `users`.
-L'API le renvoie dans `createdByUserId`. A la creation, le serveur utilise le
+Chaque joueur a un createur obligatoire, porte uniquement par l'association
+`player_user.is_creator`. L'API conserve `createdByUserId`, calcule depuis ce
+lien et non stocke dans `players`. A la creation, le serveur utilise le
 compte authentifie, jamais une valeur fournie par le client. Le createur reste
 inchange lors d'une modification ou d'une association a un autre compte.
 La suppression d'un compte createur est refusee tant que ses joueurs existent.
@@ -129,15 +130,19 @@ En production, sauvegarder la base et suspendre les ecritures avant le
 deploiement du backend et l'execution des migrations. Le deploiement existant
 applique cette migration via `/finir_installation`. En local :
 `docker compose exec -u devuser laravel-app php artisan migrate`.
-Le rollback retire uniquement la donnee de createur, pas les joueurs.
+Le rollback de cette migration historique retire uniquement la donnee de
+createur, pas les joueurs, apres annulation des migrations suivantes.
 
 ## Associations entre joueurs et utilisateurs
 
-`users.player_id` conserve l'identite personnelle du compte (« ce joueur est
-moi »). La table `player_user` permet en plus de partager un joueur avec plusieurs
-comptes, avec une paire unique `(player_id, user_id)` et les proprietes :
+La table `player_user` est la seule source des liens entre joueurs et comptes,
+y compris l'identite personnelle (« ce joueur est moi »). Elle permet aussi de
+partager un joueur avec plusieurs comptes, avec une paire unique
+`(player_id, user_id)` et les proprietes :
 
 - `is_creator` : createur historique, unique et non modifiable par l'API ;
+- `is_self` : identite personnelle, au plus un joueur personnel par compte et
+  un compte personnel par joueur, geree via le selecteur « Compte associe » ;
 - `can_view_personal_info` : voir le prenom, le nom et le compte/e-mail associe ;
 - `can_view_other_matches` : voir les parties de ce joueur sans y avoir joue ;
 - `can_add_to_match` : ajouter ce joueur a une nouvelle partie ;
@@ -174,8 +179,27 @@ createur historique et du compte personnel associe (sans doublon), avec les troi
 permissions accordees. Elle ne modifie ni les joueurs, ni leurs identites, ni
 les parties. La date de creation du joueur sert de date de reprise, faute de
 date historique d'association. Une reprise n'ecrase pas les droits deja presents.
-`players.created_by_user_id` est conserve comme reference historique immuable et
-contrainte d'integrite ; `is_creator` le reflete, sans changer l'origine du joueur.
+La migration suivante `2026_10_18_170000_normalize_player_user_identity` verifie
+que chaque joueur a exactement un createur coherent, et que chaque identite
+historique a une association non ambigue. Elle renseigne `is_self` depuis
+`users.player_id`, sans changer les droits ni les dates, puis supprime
+`players.created_by_user_id` et `users.player_id`. Toute incoherence bloque la
+migration avec une erreur explicite au lieu de choisir arbitrairement un compte.
+Elle retire aussi la mise a jour automatique implicite de `associated_at` sur
+MySQL 5.7, pour conserver cette date lors des modifications de droits ou d'identite.
+Les migrations historiques restent necessaires pour les installations neuves
+et les bases de production qui n'ont pas encore recu ces evolutions.
+
+Des index uniques sur trois colonnes generees (`creator_player_key`,
+`self_player_key`, `self_user_key`) garantissent au plus un createur par joueur
+et l'unicite de l'identite personnelle dans les deux sens. Ces colonnes sont
+calculees automatiquement, pas des donnees a synchroniser. L'API cree le joueur
+et son lien createur dans la meme transaction et interdit de retirer ce lien.
+Un changement d'identite personnelle conserve les anciens liens de partage et
+leurs permissions ; il ne change jamais le createur. Les champs API `playerId`
+du compte et `createdByUserId` du joueur restent disponibles, calcules a la lecture.
+Le rollback de cette normalisation reconstruit les anciennes colonnes depuis
+les associations courantes, sans supprimer les liens ni les droits.
 
 Sauvegarder la base, suspendre les ecritures et deployer backend/frontend ensemble.
 Appliquer toutes les migrations dans l'ordre avant de rouvrir l'application :
@@ -242,8 +266,11 @@ GitHub Actions. La diffusion Laravel est desactivee, meme si un ancien
 environnement definit encore `BROADCAST_DRIVER=pusher`.
 
 La migration historique `create_websockets_statistics_entries_table` est
-conservee pour ne pas modifier l'historique des migrations. La table existante
-n'est plus utilisee ; ce nettoyage ne supprime aucune donnee.
+conservee pour ne pas modifier l'historique des migrations. La migration
+`2026_10_18_160000_drop_websockets_statistics_entries_table` supprime la table
+inutilisee `websockets_statistics_entries` et ses anciennes statistiques techniques.
+Elle est appliquee au deploiement habituel ; sauvegarder la base au prealable.
+Le rollback recree uniquement la structure vide, pas les statistiques supprimees.
 
 ## Abonnement a la newsletter
 

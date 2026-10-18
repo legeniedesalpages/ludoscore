@@ -108,6 +108,7 @@ class PlayerSharingTest extends TestCase
         $this->viewer->forceFill(['player_id' => $this->self])->save();
         DB::table('games')->insert(['id' => 1, 'title' => 'Test']);
         $this->migration()->up();
+        $this->normalization()->up();
     }
 
     protected function tearDown(): void
@@ -119,6 +120,11 @@ class PlayerSharingTest extends TestCase
     private function migration(): Migration
     {
         return require database_path('migrations/2026_10_18_140000_create_player_user_table.php');
+    }
+
+    private function normalization(): Migration
+    {
+        return require database_path('migrations/2026_10_18_170000_normalize_player_user_identity.php');
     }
 
     private function makePlayer(string $pseudo): int
@@ -165,7 +171,7 @@ class PlayerSharingTest extends TestCase
         $this->assertSame($this->self, $this->viewer->refresh()->player_id);
         $before = DB::table('players')->get()->toJson();
         $this->link(['can_add_to_match' => true]);
-        $this->migration()->up();
+        $this->normalization()->up();
         $this->assertDatabaseCount('player_user', 4);
         $this->assertDatabaseHas('player_user', [
             'player_id' => $this->player, 'user_id' => $this->viewer->id,
@@ -192,6 +198,7 @@ class PlayerSharingTest extends TestCase
 
     public function test_rollback_preserves_original_data_but_refuses_to_lose_sharing_changes(): void
     {
+        $this->normalization()->down();
         $this->migration()->down();
         $this->assertDatabaseCount('players', 2);
         $this->assertFalse(Schema::hasTable('player_user'));
@@ -236,6 +243,7 @@ class PlayerSharingTest extends TestCase
         $this->actingAs($this->admin)->putJson($path, $rights)->assertOk();
         $date = DB::table('player_user')->where('player_id', $this->player)->where('user_id', $this->viewer->id)->value('associated_at');
         $this->putJson($path, $rights + ['isCreator' => true])->assertUnprocessable();
+        $this->putJson($path, $rights + ['isSelf' => true])->assertUnprocessable();
         $this->putJson($path, $rights + ['associatedAt' => '2000-01-01'])->assertUnprocessable();
         $this->putJson($path, array_replace($rights, ['canViewPersonalInfo' => true]))->assertOk();
         $this->assertDatabaseHas('player_user', [
@@ -321,7 +329,6 @@ class PlayerSharingTest extends TestCase
         $this->assertDatabaseHas('players', [
             'id' => $this->player, 'pseudo' => 'Public update',
             'first_name' => 'PrivateFirst', 'last_name' => 'PrivateLast',
-            'created_by_user_id' => $this->creator->id,
         ]);
         $this->getJson('/api/player?purpose=match')->assertOk()->assertJsonCount(1);
         $this->assertDatabaseHas('player_user', [
@@ -337,5 +344,41 @@ class PlayerSharingTest extends TestCase
         $this->assertDatabaseCount('players', 2);
         $this->assertDatabaseCount('player_user', 3);
         $this->assertNull($this->creator->refresh()->player_id);
+    }
+
+    public function test_identity_api_preserves_omitted_identity_transfers_it_and_removes_only_its_flag(): void
+    {
+        $this->actingAs($this->admin)->putJson('/api/player/'.$this->self, [
+            'pseudo' => 'Still me',
+        ])->assertOk()->assertJsonPath('user.id', $this->viewer->id)
+            ->assertJsonPath('user.playerId', $this->self)->assertJsonMissingPath('user.pivot')
+            ->assertJsonMissingPath('personalUsers')->assertJsonMissingPath('creators');
+        $this->putJson('/api/player/'.$this->player, [
+            'pseudo' => 'Now me', 'user' => ['id' => $this->viewer->id],
+        ])->assertOk()->assertJsonPath('user.id', $this->viewer->id)
+            ->assertJsonPath('user.playerId', $this->player)
+            ->assertJsonPath('createdByUserId', $this->creator->id);
+        $this->assertSame($this->player, $this->viewer->refresh()->player_id);
+        $this->assertNull(Player::findOrFail($this->self)->user);
+        $this->assertDatabaseHas('player_user', [
+            'player_id' => $this->self, 'user_id' => $this->viewer->id, 'is_self' => false,
+        ]);
+        $this->putJson('/api/player/'.$this->player, [
+            'pseudo' => 'No identity', 'user' => null,
+        ])->assertOk()->assertJsonPath('user', null);
+        $this->assertNull($this->viewer->refresh()->player_id);
+        $this->assertDatabaseHas('player_user', [
+            'player_id' => $this->player, 'user_id' => $this->viewer->id, 'is_self' => false,
+        ]);
+    }
+
+    public function test_non_admin_cannot_replace_their_existing_identity_by_creating_another_player(): void
+    {
+        $this->actingAs($this->viewer)->postJson('/api/player', [
+            'pseudo' => 'Duplicate me', 'user' => ['id' => $this->viewer->id],
+        ])->assertUnprocessable();
+        $this->assertDatabaseCount('players', 2);
+        $this->assertDatabaseCount('player_user', 3);
+        $this->assertSame($this->self, $this->viewer->refresh()->player_id);
     }
 }

@@ -22,7 +22,10 @@
   margin-bottom: 10px;
 }
 
-.visual img {
+:host .result-list .visual img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
   border-radius: 100%;
 }
 
@@ -38,6 +41,8 @@
 }
 
 .result-list .visual {
+  display: flex;
+  justify-content: center;
   flex-shrink: 0;
 }
 

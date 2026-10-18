@@ -79,7 +79,7 @@ class PlayerAccess
     public function present(Player $player, User $user): Player
     {
         $permissions = $this->permissions($player, $user);
-        $player->loadMissing('user:id,email,player_id');
+        $player->loadMissing(['personalUsers:users.id,email', 'creators:users.id,email']);
         $player->getAttribute('gravatar');
         $player->setAttribute('permissions', $permissions);
         if (! $permissions['can_view_personal_info']) {

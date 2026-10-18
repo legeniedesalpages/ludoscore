@@ -33,7 +33,6 @@ class UserGameLibraryTest extends TestCase
             $table->id();
             $table->string('email')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('player_id')->nullable();
             $table->boolean('is_admin')->default(false);
             $table->string('confirmation_key')->nullable();
             $table->boolean('newsletter_subscribed')->default(false);
@@ -82,6 +81,15 @@ class UserGameLibraryTest extends TestCase
             $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('player_id');
         });
+        Schema::create('players', function (Blueprint $table) {
+            $table->id();
+        });
+        Schema::create('player_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('player_id')->constrained('players');
+            $table->foreignId('user_id')->constrained('users');
+            $table->boolean('is_self')->default(false);
+        });
         $this->owner = User::create(['email' => 'renaud_balu@hotmail.com', 'password' => 'unused', 'is_admin' => true]);
         $this->other = User::create(['email' => 'other@example.test', 'password' => 'unused', 'is_admin' => true]);
     }
@@ -124,8 +132,11 @@ class UserGameLibraryTest extends TestCase
         $played = $this->game(['in_library' => false]);
         $unplayed = $this->game(['bgg_id' => 43, 'in_library' => false]);
         $this->migration()->up();
-        $this->owner->forceFill(['player_id' => 101])->save();
-        $this->other->forceFill(['player_id' => 202])->save();
+        DB::table('players')->insert([['id' => 101], ['id' => 202]]);
+        DB::table('player_user')->insert([
+            ['player_id' => 101, 'user_id' => $this->owner->id, 'is_self' => true],
+            ['player_id' => 202, 'user_id' => $this->other->id, 'is_self' => true],
+        ]);
 
         foreach ([
             [$played->id, 101, false, false],
@@ -156,7 +167,7 @@ class UserGameLibraryTest extends TestCase
             $this->assertSame(1, $games[$unplayed->id]['playedMatchCount']);
         }
 
-        $this->owner->forceFill(['player_id' => null])->save();
+        DB::table('player_user')->where('user_id', $this->owner->id)->update(['is_self' => false]);
         $games = $this->actingAs($this->owner)->getJson('/api/game')->assertOk()->json();
         $this->assertSame([0, 0], array_column($games, 'personalPlayedMatchCount'));
     }

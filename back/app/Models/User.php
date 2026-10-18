@@ -8,33 +8,43 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $appends = ['player_id'];
 
     public function games(): BelongsToMany
     {
         return $this->belongsToMany(Game::class)->withPivot('in_library', 'ownership_date')->withTimestamps();
     }
 
-    public function createdPlayers(): HasMany
+    public function createdPlayers(): BelongsToMany
     {
-        return $this->hasMany(Player::class, 'created_by_user_id');
+        return $this->players()->wherePivot('is_creator', true);
     }
 
     public function players(): BelongsToMany
     {
         return $this->belongsToMany(Player::class)->withPivot(
-            'is_creator', 'can_view_personal_info', 'can_view_other_matches', 'can_add_to_match', 'associated_at'
+            'is_creator', 'is_self', 'can_view_personal_info', 'can_view_other_matches', 'can_add_to_match', 'associated_at'
         )->withTimestamps('associated_at', 'updated_at');
     }
 
-    public function player(): BelongsTo
+    public function selfPlayers(): BelongsToMany
     {
-        return $this->belongsTo(Player::class);
+        return $this->players()->wherePivot('is_self', true);
+    }
+
+    public function getPlayerAttribute(): ?Player
+    {
+        return $this->selfPlayers->first();
+    }
+
+    public function getPlayerIdAttribute(): ?int
+    {
+        return $this->selfPlayers()->value('players.id');
     }
 
     /**
@@ -58,7 +68,9 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token'
+        'remember_token',
+        'pivot',
+        'selfPlayers',
     ];
 
     /**
