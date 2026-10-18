@@ -16,6 +16,7 @@ import { AuthStateModel } from "./auth.model"
 import { AuthService } from "../../services/auth/auth.service"
 import { Injectable } from '@angular/core'
 import { DoLogin, DoLogout } from "./auth.actions"
+import { FindGameService } from "../../services/game/find-game.service"
 
 @State<AuthStateModel>({
     name: 'auth',
@@ -39,12 +40,13 @@ export class AuthState {
         return state.id
     }
 
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService, private findGameService: FindGameService) { }
 
     @Action(DoLogin)
     login({ patchState }: StateContext<AuthStateModel>, { email, password }: DoLogin) {
         return this.authService.login(email, password).pipe(
             tap(returnData => {
+                this.findGameService.resetSearch()
                 console.log("returnData", returnData)
                 patchState({
                     id: returnData.id,
@@ -58,6 +60,7 @@ export class AuthState {
     logout({ patchState }: StateContext<AuthStateModel>) {
         return this.authService.logout().pipe(
             tap(() => {
+                this.findGameService.resetSearch()
                 patchState({
                     id: 0,
                     email: ""

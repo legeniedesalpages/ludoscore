@@ -195,7 +195,7 @@ export class MatchService {
                 minPlayers: matchEntity.minPlayers,
                 maxPlayers: matchEntity.maxPlayers,
                 ownershipDate: matchEntity.ownershipDate,
-                inLibrary: matchEntity.inLibrary == null ? true : !!Number(matchEntity.inLibrary),
+                inLibrary: !!Number(matchEntity.inLibrary),
                 matchTags: matchEntity.matchTags ? JSON.parse(matchEntity.matchTags) : [] as Tag[],
                 playerTags: matchEntity.playerTags ? JSON.parse(matchEntity.playerTags) : [] as Tag[],
                 playerColors: matchEntity.playerColors ? JSON.parse(matchEntity.playerColors) : [] as ColorTag[],

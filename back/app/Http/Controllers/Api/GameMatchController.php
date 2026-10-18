@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Game;
 use App\Models\GameMatch;
 use App\Models\MatchPhoto;
 use App\Models\Team;
@@ -93,12 +94,13 @@ class GameMatchController extends Controller
         $size = $request->query('size');
         Log::info("Liste des match, page : " . $page . " size : " . $size);
 
-        $matches = DB::table('matches')
-            ->select('matches.*', 'games.*', 'matches.id as id_match')
-            ->join('games', 'games.id', '=', 'matches.game_id')
+        $matches = Game::select('matches.*')->forUser($request->user()->id)
+            ->addSelect('matches.id as id_match')
+            ->join('matches', 'games.id', '=', 'matches.game_id')
             ->orderBy('matches.started_at', 'desc')
             ->offset($page * $size)
             ->limit($size)
+            ->toBase()
             ->get();
 
         $matches->each(function ($match) {
@@ -322,14 +324,15 @@ class GameMatchController extends Controller
         return response()->json(['color' => $color]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         Log::debug("Recherche le match d'id : " . $id);
 
-        $returnedMatch = DB::table('matches')
-        ->select('matches.*', 'games.*', 'matches.id as id_match')
-        ->join('games', 'games.id', '=', 'matches.game_id')
+        $returnedMatch = Game::select('matches.*')->forUser($request->user()->id)
+        ->addSelect('matches.id as id_match')
+        ->join('matches', 'games.id', '=', 'matches.game_id')
         ->where('matches.id', $id)
+        ->toBase()
         ->first();
 
         $returnedMatch->teams = DB::table('teams')

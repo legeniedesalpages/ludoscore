@@ -21,13 +21,15 @@ class NewsletterController extends Controller
             return response()->json(['message' => 'Accès réservé aux administrateurs.'], 403);
         }
 
+        $userId = $request->user()->id;
+        $cacheKey = self::CACHE_KEY.'.'.$userId;
         if ($request->boolean('refresh')) {
-            Cache::forget(self::CACHE_KEY);
+            Cache::forget($cacheKey);
         }
 
         try {
-            $preview = Cache::remember(self::CACHE_KEY, now()->addHours(6), function () use ($builder) {
-                $newsletter = $builder->build();
+            $preview = Cache::remember($cacheKey, now()->addHours(6), function () use ($builder, $userId) {
+                $newsletter = $builder->build($userId);
 
                 return [
                     'subject' => $newsletter['subject'],

@@ -193,6 +193,7 @@ export class GameEditorComponent implements OnInit {
     this.gameService.save(gameToSave).subscribe({
 
       next: (game) => {
+        this.findGameService.resetSearch()
         console.debug("Game id :" + game.id)
         this.snackBar.open("Jeu enregistré", 'Fermer', {
           duration: 5000

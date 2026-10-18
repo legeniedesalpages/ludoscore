@@ -40,6 +40,41 @@ Avant de deployer sur OVH :
 - verifier une connexion, la consultation des statistiques et le cron avec
   `--help` (sans envoi d'e-mail).
 
+## Ludotheques par utilisateur
+
+La table `games` reste le catalogue commun. La table d'association `game_user`
+relie un **user**, et non un player, a un jeu ; elle contient `in_library` et
+`ownership_date`. Sans association, un jeu est hors de la ludotheque du compte.
+Les listes et fiches API exposent toujours `inLibrary` et `ownershipDate`, mais
+pour l'utilisateur authentifie uniquement. Retirer un jeu ne supprime ni le
+catalogue, ni les parties, ni l'association des autres comptes.
+La recherche distingue `registered` (present au catalogue) et `owned`
+(dans la ludotheque du compte), pour reutiliser les fiches existantes.
+
+La migration `2026_10_18_000000_move_game_library_to_users` :
+
+- copie tous les jeux existants, y compris hors ludotheque, avec leurs dates
+  d'acquisition vers le compte `renaud_balu@hotmail.com` ;
+- refuse de migrer une base contenant des jeux si ce compte est absent ;
+- supprime les deux anciennes colonnes de `games` seulement apres la copie ;
+- n'attribue aucun jeu aux autres comptes, existants ou nouveaux.
+
+Avant le deploiement, sauvegarder la base, verifier la presence de ce compte
+et suspendre les ecritures (mode maintenance). Deployer ensemble le backend
+et le frontend, puis appliquer les migrations avec `php artisan migrate --force`
+dans l'environnement PHP de production, avant de rouvrir le site.
+En local : `docker compose exec -u devuser laravel-app php artisan migrate`.
+La migration peut reprendre apres une interruption de DDL MySQL.
+Le point d'entree de deploiement `/finir_installation` lance les migrations
+avec `--force` et ne les marque comme terminees qu'apres leur reussite.
+Un echec renvoie HTTP 500 et permet une nouvelle tentative apres correction.
+Le rollback restaure la ludotheque historique ; il refuse de supprimer la table
+si d'autres comptes y ont ajoute des associations, pour eviter une perte.
+
+Ce changement isole les ludotheques uniquement : les fiches de jeux, les parties,
+les joueurs et les statistiques restent partages. Ce n'est pas encore une
+isolation complete de toutes les donnees de l'application.
+
 ## Statistiques des jeux
 
 Depuis la carte « Stats par jeux », l'ecran `/statistics/games` affiche le
@@ -111,6 +146,10 @@ La commande `newsletter:send` n'envoie qu'aux comptes confirmes, abonnes
 L'option `--to` restreint ces destinataires sans contourner le consentement.
 Sans destinataire eligible, aucun appel IA n'est effectue.
 L'option `--dry` et l'apercu administrateur n'envoient aucun e-mail.
+Les suggestions sont generees separement avec la ludotheque de chaque
+destinataire. L'apercu utilise celle de l'administrateur connecte, avec un cache
+par compte. Pour un apercu CLI avec une ludotheque, utiliser
+`--dry --to=adresse` ; sans `--to`, aucune ludotheque n'est incluse.
 L'interface de gestion de cet abonnement n'est pas encore disponible.
 
 ## Envoi hebdomadaire sur OVH (PHP 8.5)

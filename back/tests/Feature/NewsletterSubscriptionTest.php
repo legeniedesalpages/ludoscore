@@ -38,12 +38,12 @@ class NewsletterSubscriptionTest extends TestCase
     public function test_only_confirmed_subscribers_with_non_empty_email_receive_newsletter(): void
     {
         DB::table('users')->update(['newsletter_subscribed' => false]);
-        $this->user('yes@example.test', true);
+        $subscriber = $this->user('yes@example.test', true);
         $this->user('no@example.test', false);
         $this->user('pending@example.test', true, 'pending');
         $this->user('   ', true);
 
-        $this->mock(NewsletterBuilder::class)->shouldReceive('build')->once()->andReturn(['subject' => 'Test']);
+        $this->mock(NewsletterBuilder::class)->shouldReceive('build')->with($subscriber->id)->once()->andReturn(['subject' => 'Test']);
         $this->mock(MailDelivery::class)->shouldReceive('send')
             ->with('yes@example.test', Mockery::type(WeeklyNewsletter::class))->once();
 
@@ -63,9 +63,46 @@ class NewsletterSubscriptionTest extends TestCase
 
     public function test_dry_run_only_builds_content(): void
     {
-        $this->mock(NewsletterBuilder::class)->shouldReceive('build')->once()->andReturn(['subject' => 'Test']);
+        $this->mock(NewsletterBuilder::class)->shouldReceive('build')->with(null)->once()->andReturn(['subject' => 'Test']);
         $this->mock(MailDelivery::class)->shouldNotReceive('send');
 
         $this->artisan('newsletter:send', ['--dry' => true])->assertExitCode(0);
+    }
+
+    public function test_each_subscriber_gets_content_built_for_their_own_library(): void
+    {
+        DB::table('users')->update(['newsletter_subscribed' => false]);
+        $first = $this->user('first@example.test', true);
+        $second = $this->user('second@example.test', true);
+        $builder = $this->mock(NewsletterBuilder::class);
+        $builder->shouldReceive('build')->with($first->id)->once()->andReturn(['subject' => 'First']);
+        $builder->shouldReceive('build')->with($second->id)->once()->andReturn(['subject' => 'Second']);
+        $delivery = $this->mock(MailDelivery::class);
+        $delivery->shouldReceive('send')->with($first->email, Mockery::on(
+            fn($mail) => $mail instanceof WeeklyNewsletter && $mail->newsletter['subject'] === 'First'
+        ))->once();
+        $delivery->shouldReceive('send')->with($second->email, Mockery::on(
+            fn($mail) => $mail instanceof WeeklyNewsletter && $mail->newsletter['subject'] === 'Second'
+        ))->once();
+
+        $this->artisan('newsletter:send')->assertExitCode(0);
+    }
+
+    public function test_dry_run_with_to_uses_that_accounts_library_without_sending(): void
+    {
+        $user = $this->user('preview@example.test', false);
+        $this->mock(NewsletterBuilder::class)->shouldReceive('build')->with($user->id)->once()->andReturn(['subject' => 'Test']);
+        $this->mock(MailDelivery::class)->shouldNotReceive('send');
+
+        $this->artisan('newsletter:send', ['--dry' => true, '--to' => $user->email])->assertExitCode(0);
+    }
+
+    public function test_dry_run_with_unknown_account_reports_an_error_without_calling_ai(): void
+    {
+        $this->mock(NewsletterBuilder::class)->shouldNotReceive('build');
+        $this->mock(MailDelivery::class)->shouldNotReceive('send');
+
+        $this->artisan('newsletter:send', ['--dry' => true, '--to' => 'missing@example.test'])
+            ->expectsOutput('Compte introuvable pour cet apercu.')->assertExitCode(1);
     }
 }

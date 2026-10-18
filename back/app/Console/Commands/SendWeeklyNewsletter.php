@@ -17,7 +17,16 @@ class SendWeeklyNewsletter extends Command
     public function handle(NewsletterBuilder $builder): int
     {
         if ($this->option('dry')) {
-            $newsletter = $builder->build();
+            $userId = null;
+            if ($this->option('to')) {
+                $userId = DB::table('users')->where('email', $this->option('to'))->value('id');
+                if (!$userId) {
+                    $this->error('Compte introuvable pour cet apercu.');
+
+                    return self::FAILURE;
+                }
+            }
+            $newsletter = $builder->build($userId);
             $this->line(json_encode($newsletter, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
             return self::SUCCESS;
@@ -33,17 +42,16 @@ class SendWeeklyNewsletter extends Command
             $query->where('email', $this->option('to'));
         }
 
-        $recipients = $query->distinct()->pluck('email')->all();
-        if (!$recipients) {
+        $recipients = $query->get(['id', 'email']);
+        if ($recipients->isEmpty()) {
             $this->info('Aucun destinataire éligible : aucun e-mail envoyé.');
 
             return self::SUCCESS;
         }
 
-        $newsletter = $builder->build();
-
-        foreach ($recipients as $email) {
-            app(MailDelivery::class)->send($email, new WeeklyNewsletter($newsletter));
+        foreach ($recipients as $recipient) {
+            $newsletter = $builder->build($recipient->id);
+            app(MailDelivery::class)->send($recipient->email, new WeeklyNewsletter($newsletter));
         }
 
         $this->info(count($recipients) . " e-mail(s) envoyé(s).");

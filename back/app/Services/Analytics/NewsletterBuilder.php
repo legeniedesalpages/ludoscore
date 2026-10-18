@@ -15,9 +15,9 @@ class NewsletterBuilder
     {
     }
 
-    public function build(): array
+    public function build(?int $userId = null): array
     {
-        $facts = $this->facts();
+        $facts = $this->facts($userId);
         $context = [
             'lune' => $this->moon(now()),
             'meteo' => $this->weather($facts['position_actuelle']),
@@ -83,7 +83,7 @@ class NewsletterBuilder
         ];
     }
 
-    private function facts(): array
+    private function facts(?int $userId): array
     {
         $rows = (new MatchDataset())->rows();
         $since = now()->subDays(7);
@@ -116,8 +116,11 @@ class NewsletterBuilder
         }
 
         $lastPlayed = $rows->groupBy('game_id')->map(fn($g) => $g->max('started_at'));
-        $library = DB::table('games')->where('in_library', true)->where('is_expansion', false)
-            ->get(['id', 'title', 'min_players', 'max_players', 'is_only_cooperative'])
+        $library = DB::table('games')
+            ->join('game_user', 'game_user.game_id', '=', 'games.id')
+            ->where('game_user.user_id', $userId)
+            ->where('game_user.in_library', true)->where('games.is_expansion', false)
+            ->get(['games.id', 'games.title', 'games.min_players', 'games.max_players', 'games.is_only_cooperative'])
             ->map(fn($g) => [
                 'title' => $g->title,
                 'joueurs' => $g->min_players . '-' . $g->max_players,

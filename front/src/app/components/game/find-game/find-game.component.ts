@@ -76,7 +76,7 @@ export class FindGameComponent {
 
   public goToGameDetail(gameFound: GameSearchResult) {
     console.info("Go to edition page for id :" + gameFound.id)
-    if (!gameFound.owned) {
+    if (!gameFound.registered) {
       this.store.dispatch(new Navigate(['/game-editor', 'bgg', gameFound.id]))
     } else {
       this.store.dispatch(new Navigate(['/game-editor', 'owned', gameFound.id]))

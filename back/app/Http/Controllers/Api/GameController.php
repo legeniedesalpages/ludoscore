@@ -17,12 +17,11 @@ class GameController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         Log::debug("Get list of all games");
 
-        $result = DB::table('games')
-            ->select('games.*')
+        $result = Game::forUser($request->user()->id)
             ->selectSub(function($query) {
                 $query->select('teams.name')
                     ->from('teams')
@@ -46,6 +45,7 @@ class GameController extends Controller
                     ->selectRaw('COUNT(*)');
             }, 'played_match_count')
             ->orderBy('games.created_at', 'desc')
+            ->toBase()
             ->get();
 
         return $result;
@@ -56,10 +56,29 @@ class GameController extends Controller
         return preg_replace('/[^A-Za-z0-9\_]/', '', $string); // Removes special chars.
      }
 
-    public function getByBggId($id)
+    public function getByBggId(Request $request, $id)
     {
         Log::debug("Get by bgg id : ".$id);
-        return Game::where('bgg_id', $id)->first();
+        return Game::forUser($request->user()->id)->where('games.bgg_id', $id)->firstOrFail();
+    }
+
+    public function show(Request $request, $id)
+    {
+        return Game::forUser($request->user()->id)->where('games.id', $id)->firstOrFail();
+    }
+
+    private function saveForUser(Game $game, Request $request): void
+    {
+        DB::transaction(function () use ($game, $request) {
+            $game->save();
+            $inLibrary = $request->has('in_library') ? $request->boolean('in_library') : true;
+            $request->user()->games()->syncWithoutDetaching([
+                $game->id => [
+                    'in_library' => $inLibrary,
+                    'ownership_date' => $inLibrary ? $request->ownership_date : null,
+                ],
+            ]);
+        });
     }
 
     /**
@@ -70,6 +89,11 @@ class GameController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'bgg_id' => ['required', 'integer', 'min:1'],
+            'in_library' => ['sometimes', 'boolean'],
+            'ownership_date' => ['nullable', 'date_format:Y-m-d'],
+        ]);
         Log::debug("Saving game : ".$request);
 
         $existingGame = Game::where('bgg_id', $request->bgg_id)->first();
@@ -99,17 +123,12 @@ class GameController extends Controller
         }
 
 
-        // absent de la requête = comportement historique (dans la ludothèque)
-        $inLibrary = $request->has('in_library') ? $request->boolean('in_library') : true;
-
         if ($existingGame) {
             $existingGame->title = $request->name;
             $existingGame->is_expansion = false;
             $existingGame->is_only_cooperative = $is_only_cooperative;
             $existingGame->min_players = $request->min_players;
             $existingGame->max_players = $request->max_players;
-            $existingGame->in_library = $inLibrary;
-            $existingGame->ownership_date = $inLibrary ? $request->ownership_date : null;
             $existingGame->thumbnail_id = $uuid_thumbnail;
             $existingGame->image_id = $uuid_image;
             $existingGame->match_tags = $request->match_tags;
@@ -123,7 +142,7 @@ class GameController extends Controller
             $existingGame->draw_allowed = $request->draw_allowed;
             $existingGame->draw_breaker = $request->draw_breaker;
 
-            $existingGame->save();
+            $this->saveForUser($existingGame, $request);
             Log::info("Game updated : ".$existingGame);
             return response(['id'=> $existingGame->id], 200);
 
@@ -134,8 +153,6 @@ class GameController extends Controller
             $game->is_only_cooperative = $is_only_cooperative;
             $game->min_players = $request->min_players;
             $game->max_players = $request->max_players;
-            $game->in_library = $inLibrary;
-            $game->ownership_date = $inLibrary ? $request->ownership_date : null;
             $game->thumbnail_id = $uuid_thumbnail;
             $game->image_id = $uuid_image;
             $game->match_tags = $request->match_tags;
@@ -149,7 +166,7 @@ class GameController extends Controller
             $game->draw_allowed = $request->draw_allowed;
             $game->draw_breaker = $request->draw_breaker;
 
-            $game->save();
+            $this->saveForUser($game, $request);
             Log::info("Game created : ".$game);
             return response(['id'=> $game->id], 201);
         }

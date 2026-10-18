@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Game;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class GameSearchController extends Controller
 {
@@ -90,15 +90,15 @@ class GameSearchController extends Controller
         Log::debug("Board game list :");
         Log::debug($idList);
 
-        $games = DB::table('games')->whereIn('bgg_id', $idList)->get();
+        $games = Game::forUser(auth()->id())->whereIn('games.bgg_id', $idList)->get()->keyBy('bgg_id');
 
         $newList = array();
         foreach($list as $returnedGame) {
-            if (array_search($returnedGame['id'], array_column($games->toArray(), 'bgg_id')) !== false) {
-                array_push($newList, array_merge($returnedGame, array('owned' => true)));
-            } else {
-                array_push($newList, array_merge($returnedGame, array('owned' => false)));
-            }
+            $game = $games->get($returnedGame['id']);
+            $newList[] = array_merge($returnedGame, [
+                'registered' => $game !== null,
+                'owned' => $game !== null && (bool) $game->in_library,
+            ]);
         }
         return $newList;
     }

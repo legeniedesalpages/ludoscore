@@ -17,6 +17,7 @@ export interface GameSearchResult {
     year: number
     popularity: number
     owned: boolean
+    registered: boolean
 }
 
 export interface GameSearchDetail {

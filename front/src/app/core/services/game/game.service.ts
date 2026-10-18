@@ -94,7 +94,7 @@ export class GameService {
             minPlayers: gameEntity.minPlayers,
             maxPlayers: gameEntity.maxPlayers,
             ownershipDate: gameEntity.ownershipDate,
-            inLibrary: gameEntity.inLibrary == null ? true : !!Number(gameEntity.inLibrary),
+            inLibrary: !!Number(gameEntity.inLibrary),
             matchTags: gameEntity.matchTags ? JSON.parse(gameEntity.matchTags) : [] as Tag[],
             playerTags: gameEntity.playerTags ? JSON.parse(gameEntity.playerTags) : [] as Tag[],
             playerColors: gameEntity.playerColors ? JSON.parse(gameEntity.playerColors) : [] as ColorTag[],
