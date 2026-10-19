@@ -31,9 +31,12 @@ import { TagsSelectionModule } from '../tags-selection/tags-selection.module'
 
 
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @NgModule({
   declarations: [TeamDetailComponent],
   imports: [
+    PlayerNamePipe,
     CommonModule,
     MatButtonModule,
     MatCardModule,

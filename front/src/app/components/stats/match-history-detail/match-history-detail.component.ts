@@ -71,12 +71,15 @@ function endAfterStart(group: AbstractControl): ValidationErrors | null {
   return start && end && end < start ? { endBeforeStart: true } : null
 }
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   templateUrl: './match-history-detail.component.html',
   styleUrls: ['./match-history-detail.component.css', '../../../core/css/list.css'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+      PlayerNamePipe,
     CommonModule, NgStyle,
     RouterModule, ReactiveFormsModule,
     MatButtonModule, MatCardModule, MatDividerModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSelectModule,

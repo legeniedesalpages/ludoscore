@@ -46,11 +46,14 @@ import { TeamDetailComponent } from '../team-detail/team-detail.component'
 import { TeamDetailModule } from '../team-detail/team-detail.module'
 import { LayoutComponent } from '../../layout/layout.component'
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   templateUrl: './player-selection.component.html',
   styleUrls: ['./player-selection.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule,
     MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatDialogModule, MatSelectModule, MatDividerModule,

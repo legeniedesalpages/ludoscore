@@ -37,11 +37,14 @@ import { LayoutComponent } from '../../../layout/layout.component'
 import { CategoryComponent } from '../category/category.component'
 
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   templateUrl: './team-score-by-category.component.html',
   styleUrls: ['./team-score-by-category.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule,
     FormsModule, ReactiveFormsModule,

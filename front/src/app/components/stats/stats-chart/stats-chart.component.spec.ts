@@ -55,4 +55,29 @@ describe('StatsChartComponent', () => {
     expect(fixture.nativeElement.querySelector('script, img, b')).toBeNull()
     expect(fixture.nativeElement.textContent).toContain('<b>Commentaire</b>')
   })
+
+  it.each(['Joueur', 'Vainqueur'])('formats %s labels in both charts and tables without altering data', async column => {
+    const chart: StatisticsChart = {
+      title: 'Victoires', type: 'bar', columns: [column, 'Victoires'], rows: [['élodieMc', 3]],
+    }
+    const fixture = await render(chart)
+    expect(fixture.componentInstance.series()[0].points[0].label).toBe('ÉlodieMc')
+    expect(fixture.nativeElement.querySelector('td').textContent).toBe('ÉlodieMc')
+    expect(chart.rows[0][0]).toBe('élodieMc')
+  })
+
+  it('preserves game label capitalization', async () => {
+    const fixture = await render({
+      title: 'Jeux', type: 'bar', columns: ['Jeu', 'Parties'], rows: [['eXit', 3]],
+    })
+    expect(fixture.componentInstance.series()[0].points[0].label).toBe('eXit')
+    expect(fixture.nativeElement.querySelector('td').textContent).toBe('eXit')
+  })
+
+  it('formats assistant chart labels when every measure is grouped by player', async () => {
+    const fixture = await render({
+      title: 'Résultats', type: 'bar', columns: ['Libellé', 'Victoires par joueur'], rows: [['renoMc', 3]],
+    })
+    expect(fixture.componentInstance.series()[0].points[0].label).toBe('RenoMc')
+  })
 })

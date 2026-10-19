@@ -51,7 +51,7 @@ describe('MatchService personal player names', () => {
     TestBed.configureTestingModule({ providers: [
       { provide: MatchCrudService, useValue: { findOne: () => of({
         idMatch: 1, gameId: 1, story: 'Une histoire conservee.', teams: [{
-          id: 2, name: 'Canonical', display_name: 'My nickname', creator_pseudo: 'Canonical',
+          id: 2, name: 'canonicalCase', display_name: 'my nickname', creator_pseudo: 'canonicalCase',
         }],
       }) } },
       { provide: TeamCrudService, useValue: {} },
@@ -60,9 +60,11 @@ describe('MatchService personal player names', () => {
     const match = await firstValueFrom(TestBed.inject(MatchService).getMatch(1))
     expect(match.story).toBe('Une histoire conservee.')
     expect(match.teams[0]).toMatchObject({
-      name: 'Canonical', displayName: 'My nickname', creatorPseudo: 'Canonical',
+      name: 'canonicalCase', displayName: 'my nickname', creatorPseudo: 'canonicalCase',
     })
-    expect(new MatchFormatterService().teamLine(match)).toBe('My nickname <small class="player-creator-pseudo">(Canonical)</small>')
+    expect(new MatchFormatterService().teamLine(match)).toBe('My nickname <small class="player-creator-pseudo">(CanonicalCase)</small>')
+    expect(match.teams[0].name).toBe('canonicalCase')
+    expect(match.teams[0].displayName).toBe('my nickname')
     match.teams[0].displayName = '<b>Private & nickname</b>'
     expect(new MatchFormatterService().teamLine(match)).toContain('&lt;b&gt;Private &amp; nickname&lt;/b&gt;')
   })

@@ -48,11 +48,14 @@ import { LayoutComponent } from '../../../layout/layout.component'
 import { SidenavModule } from '../../../layout/sidenav/sidenav.module'
 
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   templateUrl: './team-score-by-player.component.html',
   styleUrls: ['./team-score-by-player.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule,
     FormsModule, ReactiveFormsModule,

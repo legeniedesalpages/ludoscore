@@ -29,8 +29,8 @@
                                         } @else {
                                             <div><mat-icon class="cancel">cancel</mat-icon></div>
                                         }
-                                        {{ team.displayName ?? team.name }}
-                                        @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }
+                                        {{ (team.displayName ?? team.name) | playerName }}
+                                        @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo | playerName }})</small> }
                                         @if (team.score) {
                                             <span>(score: {{ team.score }})</span>
                                         }
@@ -60,8 +60,8 @@
                     <mat-select (selectionChange)="selectWiningTeam($event.value)" [disabled]="saving" [value]="match.winningTeam">
                         @for (winningTeam of match.teams; track winningTeam.id) {
                             <mat-option [value]="winningTeam">
-                                {{winningTeam.displayName ?? winningTeam.name}}
-                                @if (winningTeam.creatorPseudo) { <small class="player-creator-pseudo">({{ winningTeam.creatorPseudo }})</small> }
+                                {{(winningTeam.displayName ?? winningTeam.name) | playerName}}
+                                @if (winningTeam.creatorPseudo) { <small class="player-creator-pseudo">({{ winningTeam.creatorPseudo | playerName }})</small> }
                             </mat-option>
                         }
                     </mat-select>

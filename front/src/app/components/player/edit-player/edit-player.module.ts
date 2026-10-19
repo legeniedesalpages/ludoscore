@@ -11,6 +11,7 @@
     * - Modification    : 
 **/
 import { NgModule } from '@angular/core'
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
 import { CommonModule } from '@angular/common'
 
 import { Routes, RouterModule } from '@angular/router'
@@ -43,6 +44,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [EditPlayerComponent],
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule.forChild(routes),
     MatButtonModule,

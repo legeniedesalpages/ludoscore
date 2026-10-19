@@ -87,8 +87,8 @@
                                 @for (teamGroup of teamsArray.controls; track $index; let i = $index) {
                                     <div class="team-edit" [formGroupName]="i">
                                         <div class="team-name">
-                                            {{ match.teams[i].displayName ?? match.teams[i].name }}
-                                            @if (match.teams[i].creatorPseudo) { <small class="player-creator-pseudo">({{ match.teams[i].creatorPseudo }})</small> }
+                                            {{ (match.teams[i].displayName ?? match.teams[i].name) | playerName }}
+                                            @if (match.teams[i].creatorPseudo) { <small class="player-creator-pseudo">({{ match.teams[i].creatorPseudo | playerName }})</small> }
                                             @if (match.teams[i].id == match.winningTeam?.id) {
                                                 <span class="accent">(Gagnant)</span>
                                             }
@@ -127,7 +127,7 @@
                                     <mat-select formControlName="winnerTeamId">
                                         <mat-option [value]="null">Aucun</mat-option>
                                         @for (team of match.teams; track team.id) {
-                                            <mat-option [value]="team.id">{{ team.displayName ?? team.name }}</mat-option>
+                                            <mat-option [value]="team.id">{{ (team.displayName ?? team.name) | playerName }}</mat-option>
                                         }
                                     </mat-select>
                                 </mat-form-field>
@@ -173,8 +173,8 @@
                                         }
                                         <div class="line">
                                             <div class="team-name">
-                                                {{team.displayName ?? team.name}}
-                                                @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }
+                                                {{(team.displayName ?? team.name) | playerName}}
+                                                @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo | playerName }})</small> }
                                                 @if (team.id == match.winningTeam?.id) {
                                                     <span class="accent">(Gagnant)</span>
                                                 }

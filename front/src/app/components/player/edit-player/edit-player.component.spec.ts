@@ -15,7 +15,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { MatExpansionPanelHarness } from '@angular/material/expansion/testing'
 
 describe('EditPlayerComponent participation count', () => {
-  async function setup(count: number, id = 1, admin = true, personalInfo = true, denied = false, canMerge = false, archived = false, canManageAssociations = admin, personalizable = false, editable = admin, birth: Pick<PlayerEntity, 'birthDate' | 'birthYear'> = {}) {
+  async function setup(count: number, id = 1, admin = true, personalInfo = true, denied = false, canMerge = false, archived = false, canManageAssociations = admin, personalizable = false, editable = admin, birth: Pick<PlayerEntity, 'birthDate' | 'birthYear'> = {}, names: Pick<PlayerEntity, 'pseudo' | 'creatorPseudo'> = { pseudo: 'Test' }) {
     const associations: PlayerAssociation[] = [{
       userId: 3, email: 'shared@example.test', isCreator: false, isSelf: false,
       canViewPersonalInfo: false, canViewOtherMatches: false, canAddToMatch: false,
@@ -42,7 +42,7 @@ describe('EditPlayerComponent participation count', () => {
     const save = vi.fn(() => of({ id, pseudo: 'Test' }))
     const update = vi.fn(() => of({ id, pseudo: 'Test' }))
     const findOne = vi.fn(() => denied ? throwError(() => new Error('Denied')) : of({
-      id, pseudo: 'Test', firstName: '', lastName: '', preferedColor: '',
+      id, ...names, firstName: '', lastName: '', preferedColor: '',
       user: null, playedMatchCount: count,
       ...birth,
       replacedByPlayerId: archived ? 9 : null, status: archived ? 'replaced' : 'active',
@@ -173,13 +173,14 @@ describe('EditPlayerComponent participation count', () => {
   })
 
   it.each([
-    [0, "N'a jamais participé à une partie."],
-    [1, 'A participé à 1 partie.'],
-    [12, 'A participé à 12 parties.'],
+    [0, 'Test n’a pas encore participé à une partie.'],
+    [1, 'Test a participé à 1 partie.'],
+    [12, 'Test a participé à 12 parties.'],
   ])('displays the correct participation message for %s matches above the form', async (count, message) => {
     const { element } = await setup(count)
     const summary = element.querySelector('.participation-count')
-    expect(summary?.textContent?.trim()).toBe(message)
+    expect(summary?.querySelector('.participation-title')?.textContent?.trim()).toBe(message)
+    expect(summary?.querySelector('mat-icon')).toBeNull()
     expect(summary?.nextElementSibling?.tagName).toBe('FORM')
   })
 
@@ -187,6 +188,22 @@ describe('EditPlayerComponent participation count', () => {
     const { element, findOne } = await setup(0, 0)
     expect(element.querySelector('.participation-count')).toBeNull()
     expect(findOne).not.toHaveBeenCalled()
+  })
+
+  it('uses the displayed personal nickname in the summary without changing the canonical input', async () => {
+    const { element, fixture } = await setup(2, 1, true, true, false, false, false, true, true, true, {}, {
+      pseudo: 'élodieMc', creatorPseudo: 'canonicalCase',
+    })
+    expect(element.querySelector('.participation-title')?.textContent?.trim()).toBe('ÉlodieMc a participé à 2 parties.')
+    expect(fixture.componentInstance.playerEditorForm.get('pseudo')?.value).toBe('canonicalCase')
+  })
+
+  it('updates the participation name after saving a personal nickname', async () => {
+    const { element, fixture } = await setup(2, 1, false, false, false, false, false, false, true)
+    fixture.componentInstance.personalPseudoInput.setValue('My nickname')
+    fixture.componentInstance.savePersonalPseudo()
+    await fixture.whenStable()
+    expect(element.querySelector('.participation-title')?.textContent?.trim()).toBe('My nickname a participé à 2 parties.')
   })
 
   it('lets an administrator change association rights without changing creator or association date', async () => {
@@ -263,7 +280,8 @@ describe('EditPlayerComponent participation count', () => {
 
   it('does not claim a player never played when their match history is restricted', async () => {
     const { element } = await setup(0, 1, false, false)
-    expect(element.querySelector('.participation-count')?.textContent).toContain('Aucune participation visible avec vos droits actuels')
+    expect(element.querySelector('.participation-title')?.textContent).toContain('Test n’a aucune participation visible.')
+    expect(element.querySelector('.participation-caption')?.textContent).toContain('Sont comptabilisées uniquement les parties visibles avec vos droits actuels.')
   })
 
   it('reports loss of access rather than leaving the loading spinner running', async () => {

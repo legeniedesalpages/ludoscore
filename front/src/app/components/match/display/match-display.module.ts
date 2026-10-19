@@ -32,9 +32,12 @@ import { TagsSelectionModule } from '../tags-selection/tags-selection.module';
 
 const routes: Routes = [ { path: '', component: MatchDisplayComponent, canActivate: [AuthGuardService] }];
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @NgModule({
   declarations: [MatchDisplayComponent],
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule.forChild(routes),
     MatIconModule,

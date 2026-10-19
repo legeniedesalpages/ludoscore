@@ -27,6 +27,8 @@ import { ChangeFirstTeam } from "src/app/core/state/match/match.action"
 import { MatchState } from "src/app/core/state/match/match.state"
 
 
+import { displayPlayerName } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   selector: "app-wheel",
   templateUrl: "./wheel.component.html",
@@ -62,7 +64,7 @@ export class WheelComponent implements AfterViewInit {
     this.sectors = store.selectSnapshot<Team[]>(MatchState.teams).map(team => {
       return {
         color: team.color,
-        label: this.truncateString(team.displayName ?? team.name, 8),
+        label: this.truncateString(displayPlayerName(team.displayName ?? team.name), 8),
         team: team
       }
     })

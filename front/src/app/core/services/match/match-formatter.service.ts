@@ -17,6 +17,7 @@
 import { DatePipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { MatchModel } from '../../model/match.model'
+import { displayPlayerName } from '../../pipes/player-name.pipe'
 
 export const NOT_DETERMINED = '(non déterminé)'
 
@@ -62,10 +63,10 @@ export class MatchFormatterService {
       let headline: string
 
       headline = match.teams.map(team => {
-        const name = this.escapeText(team.displayName ?? team.name)
+        const name = this.escapeText(displayPlayerName(team.displayName ?? team.name))
         const label = team.id == match.winningTeam?.id ? '<b>' + name + '</b>' : name
         return label + (team.creatorPseudo
-          ? ' <small class="player-creator-pseudo">(' + this.escapeText(team.creatorPseudo) + ')</small>' : '')
+          ? ' <small class="player-creator-pseudo">(' + this.escapeText(displayPlayerName(team.creatorPseudo)) + ')</small>' : '')
       }).join(', ')
     
     return headline

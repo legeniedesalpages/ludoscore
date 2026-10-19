@@ -1,5 +1,5 @@
 <app-layout [withBackButton]="true">
-  <ng-container role="header"><span class="title">{{ statistics()?.name ?? 'Statistiques du joueur' }}</span></ng-container>
+  <ng-container role="header"><span class="title">{{ (statistics()?.name ?? 'Statistiques du joueur') | playerName }}</span></ng-container>
   <ng-container role="body">
     <main class="statistics-shell">
       <a mat-button routerLink="/statistics/players">Tous les joueurs</a>
@@ -10,7 +10,7 @@
       }
       @if (!loading()) {
         @if (statistics(); as stats) {
-          <h1>{{ stats.name }}@if (stats.creatorPseudo) { <small class="player-creator-pseudo">({{ stats.creatorPseudo }})</small> }</h1>
+          <h1>{{ stats.name | playerName }}@if (stats.creatorPseudo) { <small class="player-creator-pseudo">({{ stats.creatorPseudo | playerName }})</small> }</h1>
           <dl class="summary">
             <div><dt>Parties terminées</dt><dd>{{ stats.matches }}</dd></div>
             <div><dt>Victoires</dt><dd>{{ stats.wins }}</dd></div>

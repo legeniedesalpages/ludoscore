@@ -31,9 +31,12 @@ import { LayoutComponent } from '../../layout/layout.component'
 
 const routes: Routes = [ { path: '', component: RandomizeComponent, canActivate: [AuthGuardService] }]
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @NgModule({
   declarations: [RandomizeComponent],
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule.forChild(routes),
     MatIconModule,

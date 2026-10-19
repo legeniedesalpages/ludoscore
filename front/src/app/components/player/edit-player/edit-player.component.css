@@ -9,6 +9,24 @@
   padding-top: 10px;
 }
 
+.participation-count {
+  margin: 8px 16px 24px;
+}
+
+.participation-count mat-card-content {
+  padding: 16px;
+}
+
+.participation-title,
+.participation-caption {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.participation-caption {
+  margin-top: 4px;
+}
+
 .couleur {
   width: 100%;
   height: 100%;

@@ -1,6 +1,7 @@
 import { Component, computed, input } from '@angular/core'
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common'
 import { StatisticsChart } from 'src/app/core/model/game-statistics.model'
+import { displayPlayerName } from 'src/app/core/pipes/player-name.pipe'
 
 @Component({
   imports: [DecimalPipe, NgTemplateOutlet],
@@ -13,7 +14,7 @@ export class StatsChartComponent {
   readonly colors = ['#2457a7', '#28734d', '#aa5500', '#b02f45', '#7350a2', '#087886']
   readonly series = computed(() => this.chart().columns.slice(1).map((title, column) => {
     const values = this.chart().rows.map((row, index) => ({
-      label: String(row[0] ?? ''),
+      label: String(this.displayCell(row[0], 0) ?? ''),
       value: typeof row[column + 1] === 'number' && Number.isFinite(row[column + 1]) ? Number(row[column + 1]) : null,
       color: this.colors[index % this.colors.length],
     }))
@@ -56,4 +57,12 @@ export class StatsChartComponent {
     if (segment.length) segments.push(segment.join(' '))
     return { title, points, segments, total, nonNegative: values.every(p => p.value === null || p.value >= 0) }
   }))
+
+  displayCell(value: string | number | null, column: number): string | number | null {
+    const columns = this.chart().columns
+    const playerColumn = /^(joueur|vainqueur)$/i.test(columns[column] ?? '')
+      || (column === 0 && columns[0] === 'Libellé' && columns.length > 1
+        && columns.slice(1).every(label => label.endsWith(' par joueur')))
+    return playerColumn && typeof value === 'string' ? displayPlayerName(value) : value
+  }
 }

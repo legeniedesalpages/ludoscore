@@ -20,7 +20,7 @@
                 <button type="button" class="personal-player-card" (click)="editPlayer(player.id)">
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg" alt="">
                     <span class="personal-player-content">
-                        <span class="personal-player-name">{{ player.pseudo }}</span>
+                        <span class="personal-player-name">{{ player.pseudo | playerName }}</span>
                         <span class="personal-player-caption">
                             @if (player.createdAt) {
                                 C’est vous, vous êtes ici depuis le {{ player.createdAt | date: 'dd/MM/yyyy' }}
@@ -41,14 +41,14 @@
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
                 </div>
                 <div class="content">
-                    <div class="heading">{{ player.pseudo }}@if (player.creatorPseudo) { <small class="player-creator-pseudo">({{ player.creatorPseudo }})</small> }<span class="supporting" *ngIf="player.firstName || player.lastName">({{ player.firstName }} {{ player.lastName }})</span></div>
+                    <div class="heading">{{ player.pseudo | playerName }}@if (player.creatorPseudo) { <small class="player-creator-pseudo">({{ player.creatorPseudo | playerName }})</small> }<span class="supporting" *ngIf="player.firstName || player.lastName">({{ player.firstName }} {{ player.lastName }})</span></div>
                     @if (player.status === 'replaced') {
                         <div class="supporting">Remplacé par le joueur n° {{ player.replacedByPlayerId }}</div>
                     }
                     @if (player.permissions?.canPersonalize ?? player.permissions?.can_personalize) {
                         <div class="supporting player-association">
                             @if (player.creatorName) {
-                                Copié depuis le compte de {{ player.creatorName }}
+                                Copié depuis le compte de {{ player.creatorName | playerName }}
                             } @else {
                                 Joueur associé à votre compte (copié depuis un autre compte)
                             }
@@ -66,7 +66,7 @@
                             <span class="creator">
                                 Créé par :
                                 @if (creator.player; as creatorPlayer) {
-                                    {{ creatorPlayer.pseudo }} ({{ creator.email }})
+                                    {{ creatorPlayer.pseudo | playerName }} ({{ creator.email }})
                                 } @else {
                                     {{ creator.email }}
                                 }

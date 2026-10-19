@@ -10,8 +10,10 @@ import { StatsChartComponent } from '../stats-chart/stats-chart.component'
 import { StatsQuestionComponent } from '../stats-question/stats-question.component'
 import { StatsDurationPipe } from '../stats-duration.pipe'
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
-  imports: [RouterLink, MatButtonModule, LayoutComponent, StatsChartComponent, StatsQuestionComponent, StatsDurationPipe],
+  imports: [PlayerNamePipe, RouterLink, MatButtonModule, LayoutComponent, StatsChartComponent, StatsQuestionComponent, StatsDurationPipe],
   selector: 'app-player-statistics-detail',
   styleUrl: '../game-statistics-detail/game-statistics-detail.component.css',
   templateUrl: './player-statistics-detail.component.html',

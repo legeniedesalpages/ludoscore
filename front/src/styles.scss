@@ -27,6 +27,24 @@ html {
   ));
 }
 
+.participation-count {
+  @include mat.card-overrides((
+    outlined-container-color: mat.get-theme-color($ludoscore-theme, surface),
+    outlined-outline-color: mat.get-theme-color($ludoscore-theme, outline-variant),
+    outlined-container-shape: 12px
+  ));
+  color: mat.get-theme-color($ludoscore-theme, on-surface);
+
+  .participation-title {
+    font: mat.get-theme-typography($ludoscore-theme, title-medium);
+  }
+
+  .participation-caption {
+    font: mat.get-theme-typography($ludoscore-theme, body-small);
+    color: mat.get-theme-color($ludoscore-theme, on-surface-variant);
+  }
+}
+
 /* Layout */
 html,
 body {

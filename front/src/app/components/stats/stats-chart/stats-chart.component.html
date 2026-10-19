@@ -68,7 +68,7 @@
         <thead><tr>@for (column of chart().columns; track $index) { <th scope="col">{{ column }}</th> }</tr></thead>
         <tbody>
           @for (row of chart().rows; track $index) {
-            <tr>@for (cell of row; track $index) { <td>{{ cell ?? '—' }}</td> }</tr>
+            <tr>@for (cell of row; track $index) { <td>{{ displayCell(cell, $index) ?? '—' }}</td> }</tr>
           }
         </tbody>
       </table>

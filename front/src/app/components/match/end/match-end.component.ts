@@ -42,11 +42,14 @@ import { GameEditorNavigationService } from 'src/app/core/services/game/game-edi
 import { StoryDialogComponent } from '../story-dialog/story-dialog.component'
 
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   templateUrl: './match-end.component.html',
   styleUrls: ['./match-end.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    PlayerNamePipe,
     CommonModule,
     MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule, 
     MatSelectModule, MatDividerModule, MatButtonToggleModule,

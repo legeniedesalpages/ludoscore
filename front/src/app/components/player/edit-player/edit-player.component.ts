@@ -26,6 +26,7 @@ import { AuthState } from 'src/app/core/state/auth/auth.state'
 import { Clipboard } from '@angular/cdk/clipboard'
 import { HttpErrorResponse } from '@angular/common/http'
 import { CancelMatchCreation } from 'src/app/core/state/match/match.action'
+import { displayPlayerName } from 'src/app/core/pipes/player-name.pipe'
 
 const LUDOTAG_VALIDATORS = [Validators.required, Validators.maxLength(32), Validators.pattern(/^\s*(?:[2-9A-HJKMNP-Z]{4}[- ]?){2}[2-9A-HJKMNP-Z]{4}\s*$/i)]
 
@@ -69,6 +70,7 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
   public canMerge = false
   public canPersonalize = false
   public canonicalPseudo = ''
+  public displayPseudo = ''
   public personalPseudoSaving = false
   public personalPseudoError = ''
   public readonly personalPseudoInput = new FormControl('', { nonNullable: true, validators: [Validators.maxLength(255)] })
@@ -165,6 +167,7 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
         if (!this.creating) {        
           
           this.playerService.findOne(this.currentPlayerId).subscribe({ next: playerEntity => {
+            this.displayPseudo = playerEntity.pseudo
             this.playedMatchCount = playerEntity.playedMatchCount
             this.canViewPersonalInfo = playerEntity.permissions?.canViewPersonalInfo ?? true
             this.canViewOtherMatches = playerEntity.permissions?.canViewOtherMatches ?? true
@@ -336,7 +339,7 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
       next: player => {
         this.joining = false
         this.playerListService.invalidateCache()
-        this.snackBar.open(`${player.pseudo} est associé à votre compte`, 'Fermer', { duration: 5000 })
+        this.snackBar.open(`${displayPlayerName(player.pseudo)} est associé à votre compte`, 'Fermer', { duration: 5000 })
         this.returnToList()
         this.changeDetectorRef.markForCheck()
       },
@@ -359,6 +362,7 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
       next: player => {
         if (version !== this.personalPseudoRequestVersion) return
         this.personalPseudoInput.setValue(player.personalPseudo ?? '')
+        this.displayPseudo = player.pseudo
         this.canonicalPseudo = player.creatorPseudo ?? player.pseudo
         this.personalPseudoSaving = false
         this.playerListService.invalidateCache()

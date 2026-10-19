@@ -12,6 +12,8 @@ import { BehaviorSubject, Subject, switchMap, takeUntil } from 'rxjs'
 import { LayoutComponent } from 'src/app/components/layout/layout.component'
 import { StatisticsDashboard, StatisticsService } from 'src/app/core/services/stats/statistics.service'
 
+import { displayPlayerName } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   selector: 'app-statistics',
   templateUrl: './statistics.component.html',
@@ -108,9 +110,9 @@ export class StatisticsComponent implements OnInit, OnDestroy {
         : this.withPeriod('personne n’a remporté de victoire : la place de champion est à prendre.', true)
     }
     if (active.name === stats.bestPlayer) {
-      return this.withPeriod(`${stats.bestPlayer} règne sur la table avec ${this.plural(stats.bestPlayerWins, 'victoire')} en ${this.plural(active.matches, 'partie')}, et personne n’a trouvé comment le détrôner.`, false)
+      return this.withPeriod(`${displayPlayerName(stats.bestPlayer)} règne sur la table avec ${this.plural(stats.bestPlayerWins, 'victoire')} en ${this.plural(active.matches, 'partie')}, et personne n’a trouvé comment le détrôner.`, false)
     }
-    return this.withPeriod(`${stats.bestPlayer} règne sur la table avec ${this.plural(stats.bestPlayerWins, 'victoire')}, mais ${active.name} ne lâche rien avec ${this.plural(active.matches, 'partie')} disputées.`, false)
+    return this.withPeriod(`${displayPlayerName(stats.bestPlayer)} règne sur la table avec ${this.plural(stats.bestPlayerWins, 'victoire')}, mais ${displayPlayerName(active.name)} ne lâche rien avec ${this.plural(active.matches, 'partie')} disputées.`, false)
   }
 
   private withPeriod(text: string, lowerFirst: boolean): string {

@@ -59,8 +59,8 @@
                                 <mat-divider></mat-divider>-->
                                 @for (choosingPlayer of choosablePlayers; track choosingPlayer.id) {
                                     <mat-option [value]="choosingPlayer">
-                                        {{choosingPlayer.pseudo}}
-                                        @if (choosingPlayer.creatorPseudo) { <small class="player-creator-pseudo">({{ choosingPlayer.creatorPseudo }})</small> }
+                                        {{choosingPlayer.pseudo | playerName}}
+                                        @if (choosingPlayer.creatorPseudo) { <small class="player-creator-pseudo">({{ choosingPlayer.creatorPseudo | playerName }})</small> }
                                     </mat-option>
                                 }
                             </mat-select>
@@ -101,7 +101,7 @@
                                         <img src="{{team.teamPlayers[0].player.gravatarUrl}}">
                                     </div>
                                     <div class="detail">
-                                        <div class="pseudo">{{team.name}} @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo }})</small> }</div>
+                                        <div class="pseudo">{{team.name | playerName}} @if (team.creatorPseudo) { <small class="player-creator-pseudo">({{ team.creatorPseudo | playerName }})</small> }</div>
                                         <div class="tags">
                                             @for (tag of categoryOrder(team.choosenTags); track tag.category; let j = $index) {
                                                 @if (j < 3) {

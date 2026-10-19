@@ -11,6 +11,7 @@ import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.servic
 import { UserCrudService } from 'src/app/core/services/crud/user-crud.service'
 import { LayoutComponent } from '../../layout/layout.component'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
 import { ManagePlayerComponent } from './manage-player.component'
 
 describe('ManagePlayerComponent creator attribution', () => {
@@ -30,7 +31,7 @@ describe('ManagePlayerComponent creator attribution', () => {
     }
     TestBed.configureTestingModule({
       declarations: [ManagePlayerComponent],
-      imports: [CommonModule, MatButtonModule, MatCheckboxModule, LayoutComponent, LoadingSpinnerModule],
+      imports: [PlayerNamePipe, CommonModule, MatButtonModule, MatCheckboxModule, LayoutComponent, LoadingSpinnerModule],
       providers: [
         provideRouter([]),
         { provide: Store, useValue: { selectSnapshot: () => 2, dispatch: vi.fn() } },
@@ -104,7 +105,7 @@ describe('ManagePlayerComponent replaced player filter', () => {
     const findAll = vi.fn((includeReplaced = false): Observable<PlayerEntity[]> => of(includeReplaced ? [active, replaced] : [active]))
     TestBed.configureTestingModule({
       declarations: [ManagePlayerComponent],
-      imports: [CommonModule, MatButtonModule, MatCheckboxModule, LayoutComponent, LoadingSpinnerModule],
+      imports: [PlayerNamePipe, CommonModule, MatButtonModule, MatCheckboxModule, LayoutComponent, LoadingSpinnerModule],
       providers: [
         provideRouter([]),
         { provide: Store, useValue: { selectSnapshot: () => 2, dispatch: vi.fn() } },
@@ -182,7 +183,7 @@ describe('ManagePlayerComponent personal player priority', () => {
     }))
     TestBed.configureTestingModule({
       declarations: [ManagePlayerComponent],
-      imports: [CommonModule, MatButtonModule, MatCheckboxModule, LayoutComponent, LoadingSpinnerModule],
+      imports: [PlayerNamePipe, CommonModule, MatButtonModule, MatCheckboxModule, LayoutComponent, LoadingSpinnerModule],
       providers: [
         provideRouter([]),
         { provide: Store, useValue: { selectSnapshot: () => 2, dispatch: vi.fn() } },

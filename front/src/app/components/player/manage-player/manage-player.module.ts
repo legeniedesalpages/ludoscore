@@ -38,9 +38,12 @@ const routes: Routes = [
   }
 ];
 
+import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+
 @NgModule({
   declarations: [ManagePlayerComponent],
   imports: [
+    PlayerNamePipe,
     CommonModule,
     RouterModule.forChild(routes),
     MatButtonModule,

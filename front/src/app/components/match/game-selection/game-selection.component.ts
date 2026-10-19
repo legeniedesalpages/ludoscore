@@ -22,6 +22,8 @@ import { CreateMatch } from 'src/app/core/state/match/match.action'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { formatTimeDifference } from 'src/app/core/services/misc/date.format'
 
+import { displayPlayerName } from 'src/app/core/pipes/player-name.pipe'
+
 @Component({
   templateUrl: './game-selection.component.html',
   styleUrls: ['./game-selection.component.css', '../../../core/css/list.css'],
@@ -112,7 +114,7 @@ export class GameSelectionComponent implements OnInit {
 
     if (game.lastPlayed) {
       if (game.lastWinner) {
-        line2 = `Dernier gagnant : <b>${game.lastWinner}</b>`
+        line2 = `Dernier gagnant : <b>${displayPlayerName(game.lastWinner)}</b>`
       } else {
         line2 = "Dernière partie"
       }

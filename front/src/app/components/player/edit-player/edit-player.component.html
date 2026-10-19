@@ -45,13 +45,20 @@
                 </section>
             }
             @if (!creating && playedMatchCount !== undefined) {
-                <p class="participation-count">
-                    @if (playedMatchCount === 0) {
-                        {{ canViewOtherMatches ? "N'a jamais participé à une partie." : "Aucune participation visible avec vos droits actuels." }}
-                    } @else {
-                        A participé à {{ playedMatchCount }} partie{{ playedMatchCount > 1 ? 's' : '' }}{{ canViewOtherMatches ? '' : ' visible' + (playedMatchCount > 1 ? 's' : '') }}.
-                    }
-                </p>
+                <mat-card appearance="outlined" class="participation-count">
+                    <mat-card-content>
+                        <div>
+                            <p class="participation-title">
+                                @if (playedMatchCount === 0) {
+                                    {{ displayPseudo | playerName }} {{ canViewOtherMatches ? "n’a pas encore participé à une partie." : "n’a aucune participation visible." }}
+                                } @else {
+                                    {{ displayPseudo | playerName }} a participé à {{ playedMatchCount }} partie{{ playedMatchCount > 1 ? 's' : '' }}.
+                                }
+                            </p>
+                            <p class="participation-caption">{{ canViewOtherMatches ? 'Parties terminées, hors parties annulées.' : 'Sont comptabilisées uniquement les parties visibles avec vos droits actuels.' }}</p>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
             }
             <form [formGroup]="playerEditorForm">
                 <fieldset [disabled]="saving || joining || mergeLoading || personalPseudoSaving || !isEditable || !!replacedByPlayerId">
@@ -162,7 +169,7 @@
                         <mat-panel-title><h2 id="personal-pseudo-title">Votre pseudo pour ce joueur</h2></mat-panel-title>
                     </mat-expansion-panel-header>
                 <section class="ludotag personal-pseudo" aria-labelledby="personal-pseudo-title">
-                    <p>Ce nom est visible uniquement pour vous. Laissez vide pour utiliser le pseudo du créateur : {{ canonicalPseudo }}.</p>
+                    <p>Ce nom est visible uniquement pour vous. Laissez vide pour utiliser le pseudo du créateur : {{ canonicalPseudo | playerName }}.</p>
                     <form (ngSubmit)="savePersonalPseudo()">
                         <fieldset [disabled]="personalPseudoSaving || saving || mergeLoading">
                         <mat-form-field appearance="fill">
@@ -225,7 +232,7 @@
                         </form>
                     } @else {
                         <div aria-live="polite">
-                            <p><strong>{{ mergePreview.replaced.pseudo }}</strong> (n° {{ mergePreview.replaced.id }}) sera remplacé par <strong>{{ mergePreview.survivor.pseudo }}</strong> (n° {{ mergePreview.survivor.id }}).</p>
+                            <p><strong>{{ mergePreview.replaced.pseudo | playerName }}</strong> (n° {{ mergePreview.replaced.id }}) sera remplacé par <strong>{{ mergePreview.survivor.pseudo | playerName }}</strong> (n° {{ mergePreview.survivor.id }}).</p>
                             <p>{{ mergePreview.participationCount }} participation(s) dans {{ mergePreview.matchCount }} partie(s) seront réattribuées.</p>
                             <p>Les utilisateurs associés seront aussi liés à la fiche conservée, sans aucun droit par défaut pour les nouveaux liens. Aucun droit de l'ancienne fiche ne sera transféré. Les droits déjà présents, les créateurs et les identités personnelles ne seront pas modifiés.</p>
                             <p>Votre ancien pseudo sera conservé comme pseudo personnel s'il diffère de celui du créateur, sauf si vous avez déjà choisi un pseudo personnel sur la fiche conservée.</p>
