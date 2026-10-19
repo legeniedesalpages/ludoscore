@@ -71,6 +71,8 @@ class PlayerSharingTest extends TestCase
             $table->string('location_name')->nullable();
             $table->timestamps();
         });
+        (require database_path('migrations/2026_10_19_000000_create_game_expansion_table.php'))->up();
+        (require database_path('migrations/2026_10_19_200000_recreate_match_expansions_table.php'))->up();
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('match_id');

@@ -27,6 +27,11 @@ export class UpdateMatchGame {
     constructor(public game: Game) { }
 }
 
+export class SetMatchExpansions {
+    static readonly type: string = '[Match] SetMatchExpansions'
+    constructor(public expansions: Game[], public hasAvailableExpansions: boolean = expansions.length > 0) { }
+}
+
 export class CancelMatchCreation {
     static readonly type: string = '[Match] CancelMatchCreation'
 }

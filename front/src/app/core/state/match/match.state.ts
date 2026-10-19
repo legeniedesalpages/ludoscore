@@ -13,13 +13,15 @@
 import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store"
 import { MatchStateModel } from "./match.model"
 import { Injectable } from '@angular/core'
-import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, ReorderTeams, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory, UpdateMatchGame } from "./match.action"
+import { AddTeam, AddScoreToTeam, CancelMatchCreation, ChangeFirstTeam, ChangeTeamColor, CreateMatch, LaunchMatch, MatchAborted, MatchEnded, RemoveTeam, SaveMatchResult, SwapTeamPosition, ReorderTeams, UpdateTeamTags, UpdateGameTags, AddGameTags, RemoveGameTags, SetWinningTeam, MatchContinued, AddFinalScoreToTeam, AddScoreToCategory, UpdateMatchGame, SetMatchExpansions } from "./match.action"
 import { MatchService } from "../../services/match/match.service"
 import { catchError, tap } from 'rxjs/operators'
 import { ChoosenTag, MatchModel, Team, TeamPlayer } from "../../model/match.model"
 import { MatchEntity } from "../../entity/match-entity.model"
 import { lastValueFrom } from "rxjs"
 import { determineWinner } from "../../utils/winner"
+import { Game } from "../../model/game.model"
+import { mergeGameWithExpansions } from "../../utils/game-expansions"
 
 const MATCH_STATE_TOKEN = new StateToken<MatchStateModel>('match')
 
@@ -28,6 +30,48 @@ export enum MatchStateEnum {
     STARTED,
     FINISHED,
     NONE
+}
+
+/** Applies new game rules (base game and expansions) to a match, keeping the choices that are still valid. */
+export function withGameRules(match: MatchModel, baseGame: Game, expansions: Game[]): MatchModel {
+    const game = mergeGameWithExpansions(baseGame, expansions)
+    const matchTagsByCategory = new Map<string, { names: string[] }>(game.matchTags.map(tag => [tag.category, tag] as const))
+    const playerTagsByCategory = new Map<string, { names: string[] }>(game.playerTags.map(tag => [tag.category, tag] as const))
+    const scoreCategories = new Set(game.scoreTags.map(tag => tag.category))
+    const retainTags = (tags: ChoosenTag[], availableTags: Map<string, { names: string[] }>) =>
+        tags.flatMap(tag => {
+            const definition = availableTags.get(tag.category)
+            const names = tag.names.filter(name => definition?.names.includes(name))
+            return definition && names.length > 0 ? [{ ...tag, names }] : []
+        })
+
+    const teams = match.teams.map(team => {
+        const scoreDetails = game.scoreTags.length > 0
+            ? team.scoreDetails.filter(score => scoreCategories.has(score.categoryName))
+            : match.game.scoreTags.length > 0 ? [] : team.scoreDetails
+
+        return {
+            ...team,
+            choosenTags: retainTags(team.choosenTags, playerTagsByCategory),
+            scoreDetails,
+            score: game.scoreTags.length > 0
+                ? scoreDetails.reduce((total, detail) => total + (detail.value ?? 0), 0)
+                : match.game.scoreTags.length > 0 ? undefined : team.score
+        }
+    })
+    const winningTeamId = match.winningTeam?.id
+
+    return {
+        ...match,
+        game,
+        baseGame,
+        expansions,
+        choosenTags: retainTags(match.choosenTags, matchTagsByCategory),
+        teams,
+        winningTeam: winningTeamId === undefined
+            ? undefined
+            : teams.find(team => team.id === winningTeamId)
+    }
 }
 
 const defaultMatchModel = {
@@ -75,6 +119,7 @@ export class MatchState {
         setState({
             match: {
                 game: createMatch.game,
+                baseGame: createMatch.game,
                 teams: [],
                 started: false,
                 creating: true,
@@ -86,47 +131,25 @@ export class MatchState {
     @Action(UpdateMatchGame)
     updateMatchGame({ setState, getState }: StateContext<MatchStateModel>, update: UpdateMatchGame) {
         const match = getState().match
-        if (!match || match.game.id !== update.game.id) {
+        if (!match) {
             return
         }
+        const baseGame = match.baseGame ?? match.game
+        const expansions = match.expansions ?? []
+        if (baseGame.id === update.game.id) {
+            setState({ match: withGameRules(match, update.game, expansions) })
+        } else if (expansions.some(expansion => expansion.id === update.game.id)) {
+            setState({ match: withGameRules(match, baseGame, expansions.map(expansion => expansion.id === update.game.id ? update.game : expansion)) })
+        }
+    }
 
-        const matchTagsByCategory = new Map<string, { names: string[] }>(update.game.matchTags.map(tag => [tag.category, tag] as const))
-        const playerTagsByCategory = new Map<string, { names: string[] }>(update.game.playerTags.map(tag => [tag.category, tag] as const))
-        const scoreCategories = new Set(update.game.scoreTags.map(tag => tag.category))
-        const retainTags = (tags: ChoosenTag[], availableTags: Map<string, { names: string[] }>) =>
-            tags.flatMap(tag => {
-                const definition = availableTags.get(tag.category)
-                const names = tag.names.filter(name => definition?.names.includes(name))
-                return definition && names.length > 0 ? [{ ...tag, names }] : []
-            })
-
-        const teams = match.teams.map(team => {
-            const scoreDetails = update.game.scoreTags.length > 0
-                ? team.scoreDetails.filter(score => scoreCategories.has(score.categoryName))
-                : match.game.scoreTags.length > 0 ? [] : team.scoreDetails
-
-            return {
-                ...team,
-                choosenTags: retainTags(team.choosenTags, playerTagsByCategory),
-                scoreDetails,
-                score: update.game.scoreTags.length > 0
-                    ? scoreDetails.reduce((total, detail) => total + (detail.value ?? 0), 0)
-                    : match.game.scoreTags.length > 0 ? undefined : team.score
-            }
-        })
-        const winningTeamId = match.winningTeam?.id
-
-        setState({
-            match: {
-                ...match,
-                game: update.game,
-                choosenTags: retainTags(match.choosenTags, matchTagsByCategory),
-                teams,
-                winningTeam: winningTeamId === undefined
-                    ? undefined
-                    : teams.find(team => team.id === winningTeamId)
-            }
-        })
+    @Action(SetMatchExpansions)
+    setMatchExpansions({ setState, getState }: StateContext<MatchStateModel>, action: SetMatchExpansions) {
+        const match = getState().match
+        if (!match || !match.creating) {
+            return
+        }
+        setState({ match: { ...withGameRules(match, match.baseGame ?? match.game, action.expansions), hasAvailableExpansions: action.hasAvailableExpansions } })
     }
 
     @Action(LaunchMatch)

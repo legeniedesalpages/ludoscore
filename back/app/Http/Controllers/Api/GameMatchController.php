@@ -9,6 +9,7 @@ use App\Models\MatchPhoto;
 use App\Models\Team;
 use App\Models\TeamPlayer;
 use App\Services\Analytics\LocationService;
+use App\Services\MatchExpansions;
 use App\Services\PlayerAccess;
 use App\Models\Player;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +25,10 @@ class GameMatchController extends Controller
         Log::info("Suppression du match id : " . $id);
         DB::transaction(function () use ($id) {
             DB::table('match_photos')
+                ->where('match_id', $id)
+                ->delete();
+
+            DB::table('match_expansions')
                 ->where('match_id', $id)
                 ->delete();
 
@@ -111,8 +116,10 @@ class GameMatchController extends Controller
             ->toBase()
             ->get();
 
-        $matches->each(function ($match) {
+        $expansions = app(MatchExpansions::class)->byMatch($matches->pluck('id_match')->map(fn ($id) => (int) $id)->all());
+        $matches->each(function ($match) use ($expansions) {
             $match->match_id = $match->id;
+            $match->expansions = $expansions->get($match->id_match, collect())->all();
             $match->teams = DB::table('teams')
                 ->where('teams.match_id', $match->id_match)
                 ->get();
@@ -240,6 +247,11 @@ class GameMatchController extends Controller
         $request->validate(['match.gameId' => ['required', 'integer', 'exists:games,id']]);
         $game = Game::findOrFail($request->input('match.gameId'));
         abort_if((bool) $game->is_expansion, 422, "Une partie doit être démarrée depuis un jeu de base, pas depuis une extension.");
+        $request->validate([
+            'match.expansionIds' => ['sometimes', 'array', 'max:100'],
+            'match.expansionIds.*' => ['integer', 'distinct'],
+        ]);
+        $expansionIds = app(MatchExpansions::class)->validatedIds($game, $request->input('match.expansionIds', []));
         Log::info("Request");
         Log::debug($request);
         $match = $request->match;
@@ -249,7 +261,7 @@ class GameMatchController extends Controller
 
         $returnedteams = [];
         $gameMatch = new GameMatch();
-        DB::transaction(function () use (&$gameMatch, $match, $request, $ids, &$returnedteams) {
+        DB::transaction(function () use (&$gameMatch, $match, $request, $ids, $expansionIds, &$returnedteams) {
             $gameMatch = new GameMatch();
             $returnedteams = [];
             $players = Player::whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get();
@@ -273,7 +285,7 @@ class GameMatchController extends Controller
                 $gameMatch->location_name = app(LocationService::class)->reverse((float) $lat, (float) $lon);
             }
             $gameMatch->save();
-
+            $gameMatch->expansions()->sync($expansionIds);
 
             $position_equipe = 0;
             foreach ($request->teams as $t) {
@@ -315,8 +327,17 @@ class GameMatchController extends Controller
         Log::debug('Teams created for match', ['match_id' => $gameMatchId, 'teams' => $returnedteams]);
         return response()->json([
             ...$gameMatch->attributesToArray(),
+            'expansionIds' => $expansionIds,
             'teams' => $returnedteams,
         ], 201);
+    }
+
+    public function lastExpansions(Request $request, int $gameid): JsonResponse
+    {
+        $game = Game::findOrFail($gameid);
+        abort_if((bool) $game->is_expansion, 422, "Une partie doit être démarrée depuis un jeu de base, pas depuis une extension.");
+
+        return response()->json(app(MatchExpansions::class)->lastUsed($request->user(), $game));
     }
 
     public function findRunning()
@@ -386,6 +407,8 @@ class GameMatchController extends Controller
         ->toBase()
         ->first();
 
+        $returnedMatch->expansions = app(MatchExpansions::class)
+            ->byMatch([(int) $returnedMatch->id_match], true)->get($returnedMatch->id_match, collect())->all();
         $returnedMatch->teams = DB::table('teams')
                 ->where('teams.match_id', $returnedMatch->id_match)
                 ->get();

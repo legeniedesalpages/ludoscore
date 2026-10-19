@@ -44,6 +44,7 @@ class MatchStoryTest extends TestCase
             $table->timestamps();
         });
         (require database_path('migrations/2026_10_18_210000_add_story_to_matches.php'))->up();
+        (require database_path('migrations/2026_10_19_200000_recreate_match_expansions_table.php'))->up();
         Schema::create('teams', function (Blueprint $table): void {
             $table->id();
             $table->integer('match_id');

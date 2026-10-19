@@ -18,7 +18,11 @@ import { ColorTag } from "./tag.model"
 
 export interface MatchModel {
     matchId?: number
+    // Rules used during the match: the base game merged with the selected expansions
     game: Game
+    baseGame?: Game
+    expansions?: Game[]
+    hasAvailableExpansions?: boolean
     creating: boolean
     started: boolean
     startedAt?: Date

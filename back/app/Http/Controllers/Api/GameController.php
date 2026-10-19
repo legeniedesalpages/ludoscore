@@ -25,6 +25,12 @@ class GameController extends Controller
     {
         Log::debug("Get list of all games");
 
+        // Matches of a base game, or matches where an expansion was used
+        $playedWithGame = fn ($query) => $query->whereColumn('matches.game_id', 'games.id')
+            ->orWhereExists(fn ($expansions) => $expansions->selectRaw('1')->from('match_expansions')
+                ->whereColumn('match_expansions.match_id', 'matches.id')
+                ->whereColumn('match_expansions.game_id', 'games.id'));
+
         $result = Game::forUser($request->user()->id)
             ->selectSub(function($query) {
                 $query->select('teams.name')
@@ -43,17 +49,17 @@ class GameController extends Controller
                     ->orderByDesc('matches.started_at')
                     ->limit(1);
             }, 'last_played')
-            ->selectSub(function($query) {
+            ->selectSub(function($query) use ($playedWithGame) {
                 $query->from('matches')
                     ->tap(fn ($query) => app(\App\Services\PlayerAccess::class)->scopeMatches($query))
-                    ->whereColumn('matches.game_id', 'games.id')
+                    ->where($playedWithGame)
                     ->where('matches.canceled', false)
                     ->where('matches.running', false)
                     ->selectRaw('COUNT(*)');
             }, 'played_match_count')
-            ->selectSub(function ($query) use ($request) {
+            ->selectSub(function ($query) use ($request, $playedWithGame) {
                 $query->from('matches')
-                    ->whereColumn('matches.game_id', 'games.id')
+                    ->where($playedWithGame)
                     ->where('matches.canceled', false)
                     ->where('matches.running', false)
                     ->whereExists(function ($participants) use ($request) {

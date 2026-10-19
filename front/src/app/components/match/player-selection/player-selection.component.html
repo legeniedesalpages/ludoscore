@@ -36,6 +36,12 @@
             <div class="headline" (click)="editGameConfiguration()">
                 <span class="choice">{{ (match$ | async)!.game.title }}</span>
             </div>
+            @if ((match$ | async)!.hasAvailableExpansions || (match$ | async)!.expansions?.length) {
+                <button type="button" class="expansions-line" (click)="editExpansions()">
+                    <mat-icon inline>extension</mat-icon>
+                    <span>{{ expansionsLabel((match$ | async)!) }}</span>
+                </button>
+            }
 
             <div class="game-category" (click)="goToGameDetail()">
                 <ul>

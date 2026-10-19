@@ -17,9 +17,10 @@ import { MatchEntity } from '../../entity/match-entity.model'
 import { MatchModel, Team } from '../../model/match.model'
 import { TeamCrudService } from '../crud/team-crud.service'
 import { environment } from 'src/environments/environment'
-import { COLORS, ColorTag, NO_COLOR, Tag } from '../../model/tag.model'
-import { Score, ScoreTag } from '../../model/score.model'
-import { DrawBreaker } from '../../model/game.model'
+import { COLORS, ColorTag, NO_COLOR, Tag, TagValueChange } from '../../model/tag.model'
+import { Score, ScoreTag, ScoreTagChange } from '../../model/score.model'
+import { DrawBreaker, Game } from '../../model/game.model'
+import { mergeGameWithExpansions } from '../../utils/game-expansions'
 import { GeolocationService, Position } from '../misc/geolocation.service'
 
 // Dates au format serveur "YYYY-MM-DD HH:mm:ss" ; finishedAt peut être nul (durée non déterminée)
@@ -31,6 +32,11 @@ export interface MatchHistoryUpdate {
     running: boolean
     canceled: boolean
     teams: { id: number, score: number | null, scoreDetails: Score[] }[]
+}
+
+export interface LastMatchExpansions {
+    hasPreviousMatch: boolean
+    expansionIds: number[]
 }
 
 @Injectable({ providedIn: 'root' })
@@ -69,6 +75,13 @@ export class MatchService {
         )
     }
 
+    // Extensions de la dernière partie du jeu (celles du joueur de l'utilisateur en priorité)
+    public findLastExpansions(gameId: number): Observable<LastMatchExpansions> {
+        return this.matchCrudService.getLastExpansions(gameId).pipe(
+            catchError(() => of({ hasPreviousMatch: false, expansionIds: [] }))
+        )
+    }
+
     public deleteMatch(matchId: number): Observable<void> {
         return this.matchCrudService.delete(matchId).pipe(map(_ => { }))
     }
@@ -82,7 +95,8 @@ export class MatchService {
     private saveNewMatch(matchModel: MatchModel, position: Position | null): Observable<MatchEntity> {
         const aggregatedMatchEntity = {
             match: {
-                gameId: matchModel.game.id,
+                gameId: (matchModel.baseGame ?? matchModel.game).id,
+                expansionIds: (matchModel.expansions ?? []).map(expansion => expansion.id),
                 canceled: false,
                 running: true,
                 tags: JSON.stringify(matchModel.choosenTags),
@@ -130,7 +144,7 @@ export class MatchService {
             switchMap(_ => {
                 return this.matchCrudService.update(match.matchId!, {
                     id: match.matchId,
-                    gameId: match.game.id,
+                    gameId: (match.baseGame ?? match.game).id,
                     canceled: false,
                     running: false,
                     tags: JSON.stringify(match.choosenTags),
@@ -184,6 +198,39 @@ export class MatchService {
                 score_details: team.scoreDetails
             }))
         })
+    }
+
+    private parseJson<T>(raw: unknown, fallback: T): T {
+        if (raw === null || raw === undefined || raw === '') {
+            return fallback
+        }
+        if (typeof raw !== 'string') {
+            return raw as T
+        }
+        try {
+            return JSON.parse(raw) ?? fallback
+        } catch {
+            return fallback
+        }
+    }
+
+    private expansionEntityToGame(entity: any, base: Game): Game {
+        return {
+            ...base,
+            id: entity.id,
+            title: entity.title,
+            bggId: entity.bggId,
+            imageUrl: environment.imagesURL + '/' + entity.imageId,
+            thumbnailUrl: environment.imagesURL + '/' + entity.thumbnailId,
+            isExpansion: true,
+            additionalPlayers: Number(entity.additionalPlayers ?? 0),
+            matchTags: this.parseJson<Tag[]>(entity.matchTags, []),
+            playerTags: this.parseJson<Tag[]>(entity.playerTags, []),
+            playerColors: this.parseJson<ColorTag[]>(entity.playerColors, []),
+            scoreTags: this.parseJson<ScoreTag[]>(entity.scoreTags, []),
+            expansionTagChanges: this.parseJson<TagValueChange[]>(entity.expansionTagChanges, []),
+            expansionScoreChanges: this.parseJson<ScoreTagChange[]>(entity.expansionScoreChanges, []),
+        }
     }
 
     private matchEntityToModel(matchEntity: any): MatchModel {
@@ -242,6 +289,8 @@ export class MatchService {
                 teamPlayers: []
             } : undefined,
         }
-        return matchModel
+        const baseGame = matchModel.game
+        const expansions = (matchEntity.expansions ?? []).map((entity: any) => this.expansionEntityToGame(entity, baseGame))
+        return { ...matchModel, game: mergeGameWithExpansions(baseGame, expansions), baseGame, expansions }
     }
 }

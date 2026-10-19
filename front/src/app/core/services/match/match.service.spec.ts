@@ -79,4 +79,66 @@ describe('MatchService personal player names', () => {
     expect(await firstValueFrom(TestBed.inject(MatchService).generateMatchStory(7))).toBe('Un final serre.')
     expect(generateStory).toHaveBeenCalledExactlyOnceWith(7)
   })
+
+  it('sends the base game and selected expansions when a match starts', async () => {
+    const save = vi.fn(() => of({ id: 1 }))
+    TestBed.configureTestingModule({ providers: [
+      { provide: MatchCrudService, useValue: { save } },
+      { provide: TeamCrudService, useValue: {} },
+      { provide: GeolocationService, useValue: { currentPosition: () => of(null) } },
+    ] })
+    const base = {
+      id: 1, title: 'Base', imageUrl: '', thumbnailUrl: '', isOnlyCooperative: false,
+      minPlayers: 1, maxPlayers: 4, ownershipDate: null, inLibrary: true,
+      matchTags: [], playerTags: [], playerColors: [], scoreTags: [], bggId: 42,
+      drawAllowed: false, drawBreaker: [], quantifiableScore: true, highestScoreWin: true,
+      estimatedDurationInMinutes: 30,
+    }
+    const match: MatchModel = {
+      creating: true, started: false, choosenTags: [], teams: [],
+      game: { ...base, id: 99 }, baseGame: base, expansions: [{ ...base, id: 5 }, { ...base, id: 6 }],
+    }
+    await firstValueFrom(TestBed.inject(MatchService).createMatch(match))
+    expect(save.mock.calls[0]).toEqual([expect.objectContaining({
+      match: expect.objectContaining({ gameId: 1, expansionIds: [5, 6] }),
+    })])
+  })
+
+  it('rebuilds the match rules from the expansions of the history detail', async () => {
+    TestBed.configureTestingModule({ providers: [
+      { provide: MatchCrudService, useValue: { findOne: () => of({
+        idMatch: 1, gameId: 1, title: 'Base', bggId: 42, maxPlayers: 4,
+        playerTags: JSON.stringify([{ category: 'Faction', names: ['Rouge'], unique: true, minOcurrences: 0, maxOcurrences: 1 }]),
+        scoreTemplate: JSON.stringify([{ category: 'Attrait', max: 10, negatif: false, complex: false }]),
+        teams: [],
+        expansions: [{
+          id: 2, title: 'Mondes Marins', bggId: 50, thumbnailId: 't.jpg', imageId: 'i.jpg', additionalPlayers: 1,
+          matchTags: [], playerTags: [], playerColors: [],
+          scoreTags: [{ category: 'Récifs', negatif: false, complex: false }],
+          expansionTagChanges: [{ baseGameBggId: 42, scope: 'player', category: 'Faction', addedValues: ['Bleu'], removedValues: [] }],
+          expansionScoreChanges: [{ baseGameBggId: 42, category: 'Attrait', properties: { max: 20 } }],
+        }],
+      }) } },
+      { provide: TeamCrudService, useValue: {} },
+      { provide: GeolocationService, useValue: {} },
+    ] })
+    const match = await firstValueFrom(TestBed.inject(MatchService).getMatch(1))
+    expect(match.baseGame?.maxPlayers).toBe(4)
+    expect(match.expansions?.map(expansion => expansion.title)).toEqual(['Mondes Marins'])
+    expect(match.expansions?.[0].thumbnailUrl).toContain('t.jpg')
+    expect(match.game.maxPlayers).toBe(5)
+    expect(match.game.playerTags[0].names).toEqual(['Rouge', 'Bleu'])
+    expect(match.game.scoreTags.map(tag => [tag.category, tag.max])).toEqual([['Attrait', 20], ['Récifs', undefined]])
+  })
+
+  it('treats a summary without expansions as a match without expansions', async () => {
+    TestBed.configureTestingModule({ providers: [
+      { provide: MatchCrudService, useValue: { findOne: () => of({ idMatch: 1, gameId: 1, teams: [] }) } },
+      { provide: TeamCrudService, useValue: {} },
+      { provide: GeolocationService, useValue: {} },
+    ] })
+    const match = await firstValueFrom(TestBed.inject(MatchService).getMatch(1))
+    expect(match.expansions).toEqual([])
+    expect(match.game).toBe(match.baseGame)
+  })
 })

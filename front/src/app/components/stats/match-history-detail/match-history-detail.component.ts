@@ -32,6 +32,7 @@ import { BehaviorSubject, catchError, combineLatest, filter, finalize, of, switc
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { LoadingSpinnerModule } from 'src/app/components/layout/spinner/loading-spinner.module'
 import { MatchModel } from 'src/app/core/model/match.model'
+import { expansionTitles } from 'src/app/core/utils/game-expansions'
 import { Score } from 'src/app/core/model/score.model'
 import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
 import { MatchService } from 'src/app/core/services/match/match.service'
@@ -88,6 +89,9 @@ import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
   ]
 })
 export class MatchHistoryDetailComponent implements OnInit {
+
+  protected readonly expansionTitles = expansionTitles
+
 
   private store = inject(Store);
   private route = inject(ActivatedRoute);

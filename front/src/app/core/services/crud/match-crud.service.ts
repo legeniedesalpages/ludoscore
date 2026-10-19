@@ -39,6 +39,10 @@ export class MatchCrudService extends CrudService<MatchEntity, number> {
         return this.http.get<{ color: string | null }>(url, { params: { with: withPlayerIds.join(',') } })
     }
 
+    getLastExpansions(gameId: number): Observable<{ hasPreviousMatch: boolean, expansionIds: number[] }> {
+        return this.http.get<{ hasPreviousMatch: boolean, expansionIds: number[] }>(`${this.apiUrl}/match-expansions/last/${gameId}`)
+    }
+
     uploadPhoto(matchId: number, photo: Blob): Observable<void> {
         const formData = new FormData()
         formData.append('photo', photo, 'photo.jpg')

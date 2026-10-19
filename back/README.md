@@ -98,7 +98,7 @@ not required). `Game::baseGames()` and `Game::expansions()` resolve additional
 parents when they are added. Neither creation of other parents nor addition to
 any user's library is automatic. The editor offers links to add missing base
 games. Expansions are excluded from match selection and cannot start a match
-through the API; selecting expansions for a base-game match is not yet supported.
+through the API; expansions are selected for a base-game match instead (see below).
 
 The catalogue list includes `baseGameBggIds` for each entry. The library groups
 extensions under each registered base game with a compact two-line row and an
@@ -109,6 +109,26 @@ under each base game, but counters count each entry only once.
 
 Game creation, links, and personal library membership are saved in one database
 transaction. BGG lookup failures abort before writing the game.
+
+### Match expansions
+
+`POST /api/game-match` accepts `match.expansionIds`. Each ID must be a distinct
+expansion linked to the match's base game; otherwise the request is rejected with
+422 and nothing is written. Links are stored in `match_expansions` (unique
+`(match_id, game_id)`, cascade on match deletion, restricted on game deletion).
+
+`GET /api/match-expansions/last/{gameId}` returns
+`{hasPreviousMatch, expansionIds}` for the most recent match of that base game:
+matches with the user's own player first, otherwise the latest match visible to
+the user. Only expansions still linked to the base game are returned.
+
+The history list exposes expansion summaries (`id`, `title`, `bggId`,
+`thumbnailId`, `imageId`). The match detail adds the expansion rules
+(`additionalPlayers`, tags, colours, score categories and inherited changes) so
+the client can rebuild the merged game. AI stories receive the expansion titles.
+
+In the catalogue list, `playedMatchCount` and `personalPlayedMatchCount` of an
+expansion count the finished matches in which it was used.
 
 ## About Laravel
 

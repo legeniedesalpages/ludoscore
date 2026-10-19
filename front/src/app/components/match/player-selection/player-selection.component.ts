@@ -47,6 +47,7 @@ import { TeamDetailModule } from '../team-detail/team-detail.module'
 import { LayoutComponent } from '../../layout/layout.component'
 
 import { PlayerNamePipe } from 'src/app/core/pipes/player-name.pipe'
+import { expansionTitles } from 'src/app/core/utils/game-expansions'
 
 @Component({
   templateUrl: './player-selection.component.html',
@@ -309,6 +310,14 @@ export class PlayerSelectionComponent implements OnInit, OnDestroy {
   public editGameConfiguration(): void {
     const game = this.store.selectSnapshot<MatchModel>(MatchState.match).game
     this.gameEditorNavigation.open(game)
+  }
+
+  public expansionsLabel(match: MatchModel): string {
+    return match.expansions?.length ? `Extensions : ${expansionTitles(match.expansions)}` : 'Sans extension'
+  }
+
+  public editExpansions(): void {
+    this.store.dispatch(new Navigate(['expansion-selection']))
   }
 
   public cancelGameSelection() {

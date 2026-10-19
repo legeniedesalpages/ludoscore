@@ -15,7 +15,7 @@
                 }
                 @if (match) {
                 <div class="content">
-                    <span class="heading">{{ match.game.title }}</span>
+                    <span class="heading">{{ match.game.title }}@if (match.expansions?.length) {<span class="expansions"> + {{ expansionTitles(match.expansions) }}</span>}</span>
                     <span class="supporting" [innerHtml]="line(match)"></span>
                 </div>
                 } @else {

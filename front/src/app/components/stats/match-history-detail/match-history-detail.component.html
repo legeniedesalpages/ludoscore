@@ -24,6 +24,9 @@
                 <div class="game"
                     [ngStyle]="{'background': 'linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.4)), url(' + match.game.imageUrl + ') no-repeat top / cover'}">
                     <div class="heading">{{ match.game.title }}</div>
+                    @if (match.expansions?.length) {
+                        <div class="expansions"><mat-icon inline>extension</mat-icon> <span>Extensions : {{ expansionTitles(match.expansions) }}</span></div>
+                    }
 
                     @if (match.choosenTags && match.choosenTags.length > 0) {
                         <ul class="game-category">

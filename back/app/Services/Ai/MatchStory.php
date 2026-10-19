@@ -143,6 +143,7 @@ PROMPT;
 
         return [
             'game' => $game->title,
+            'expansions' => $match->expansions()->orderBy('games.title')->pluck('games.title')->all(),
             'cooperative' => (bool) $game->is_only_cooperative,
             'highest_score_wins' => $higherWins,
             'quantifiable_score' => (bool) $game->quantifiable_score,

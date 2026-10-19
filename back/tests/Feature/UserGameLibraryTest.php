@@ -73,6 +73,7 @@ class UserGameLibraryTest extends TestCase
             $table->boolean('canceled')->default(false);
             $table->boolean('running')->default(false);
         });
+        (require database_path('migrations/2026_10_19_200000_recreate_match_expansions_table.php'))->up();
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();

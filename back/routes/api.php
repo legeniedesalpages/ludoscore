@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->get('/running-match', [GameMatchController::c
 Route::middleware('auth:sanctum')->get('/previous-match/{playerid}/{gameid}', [GameMatchController::class, 'previousMatch']);
 
 Route::middleware('auth:sanctum')->get('/previous-team-color/{gameid}/{playerid}', [GameMatchController::class, 'previousTeamColor']);
+Route::middleware('auth:sanctum')->get('/match-expansions/last/{gameid}', [GameMatchController::class, 'lastExpansions'])->whereNumber('gameid');
 
 Route::middleware('auth:sanctum')->get('/game-match-count', [GameMatchController::class, 'matchCount']);
 

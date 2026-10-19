@@ -14,11 +14,12 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { ActivatedRoute, Router } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { Observable, tap } from 'rxjs'
+import { Observable, of, switchMap, tap } from 'rxjs'
 import { Game, SelectingGame } from 'src/app/core/model/game.model'
 import { MatchModel } from 'src/app/core/model/match.model'
 import { GameService } from 'src/app/core/services/game/game.service'
-import { CreateMatch } from 'src/app/core/state/match/match.action'
+import { CreateMatch, SetMatchExpansions } from 'src/app/core/state/match/match.action'
+import { expansionCandidates } from 'src/app/core/utils/game-expansions'
 import { MatchState } from 'src/app/core/state/match/match.state'
 import { formatTimeDifference } from 'src/app/core/services/misc/date.format'
 
@@ -38,6 +39,7 @@ export class GameSelectionComponent implements OnInit {
   public searchText: string = ""
   public isFilterMenuOpen: boolean = false
   public gameList$!: Observable<SelectingGame[]>
+  private games: SelectingGame[] = []
 
   public onlyInLibraryFilter: boolean = true
   public onlyCooperativeFilter: boolean = false
@@ -64,10 +66,11 @@ export class GameSelectionComponent implements OnInit {
     const match = this.store.selectSnapshot<MatchModel>(MatchState.match)
     if (match) {
       console.debug("Game already selected", match.game)
-      this.store.dispatch(new Navigate(['player-selection']))
+      this.store.dispatch(new Navigate([match.expansions === undefined ? 'expansion-selection' : 'player-selection']))
     } else {
       console.debug("Game not selected, fetch game list")
-      this.gameList$ = this.gameService.listAllGames().pipe(tap(_ => {
+      this.gameList$ = this.gameService.listAllGames().pipe(tap(games => {
+        this.games = games
         this.loading = false
         this.changeDetectorRef.markForCheck()
       }))
@@ -80,9 +83,12 @@ export class GameSelectionComponent implements OnInit {
       return
     }
     this.loading = true
-    this.store.dispatch(new CreateMatch(game)).subscribe(_ => {
+    const withExpansions = expansionCandidates(this.games, game).length > 0
+    this.store.dispatch(new CreateMatch(game)).pipe(
+      switchMap(() => withExpansions ? of(undefined) : this.store.dispatch(new SetMatchExpansions([], false)))
+    ).subscribe(_ => {
       // TODO : ajouter ici le joueur correspondant à l'utilisateur connecté
-      this.store.dispatch(new Navigate(['player-selection']))
+      this.store.dispatch(new Navigate([withExpansions ? 'expansion-selection' : 'player-selection']))
       this.changeDetectorRef.markForCheck()
     })
   }

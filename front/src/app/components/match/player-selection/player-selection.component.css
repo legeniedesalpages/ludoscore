@@ -176,3 +176,4 @@ ul {
   opacity: 0.7;
   font-style: italic;
 }
+.expansions-line{display:flex;gap:6px;width:100%;padding:4px 5px 0;border:0;background:none;font:inherit;font-size:small;opacity:.75;cursor:pointer}

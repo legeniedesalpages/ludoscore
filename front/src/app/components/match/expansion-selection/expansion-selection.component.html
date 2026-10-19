@@ -1,0 +1,42 @@
+<app-layout [withBackButton]="true" (backButtonAction)="back()">
+    <ng-container role="header">
+        <span class="title">Choix des extensions</span>
+    </ng-container>
+
+    <ng-container role="footer">
+        <div class="footer">
+            <button mat-flat-button [disabled]="loading()" (click)="validate()">Continuer</button>
+        </div>
+    </ng-container>
+
+    <ng-container role="body">
+        <loading-spinner [loading]="loading()" caption="Chargement des extensions"></loading-spinner>
+
+        @if (!loading()) {
+            <div class="headline">
+                <span class="choice">{{ baseGame()?.title }}</span>
+                <span class="hint">
+                    @if (fromPreviousMatch()) {
+                        Sélection reprise de la dernière partie
+                    } @else {
+                        Sélectionnez les extensions utilisées pour cette partie
+                    }
+                </span>
+            </div>
+
+            @for (expansion of candidates(); track expansion.id) {
+                <div class="result-list" [class.selected]="selectedIds().has(expansion.id)" (click)="toggle(expansion)">
+                    <mat-checkbox [checked]="selectedIds().has(expansion.id)" (click)="$event.preventDefault()"
+                        [attr.aria-label]="expansion.title"></mat-checkbox>
+                    <div class="visual">
+                        <img [src]="expansion.thumbnailUrl" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="heading">{{ expansion.title }}</div>
+                        <div class="supporting">{{ details(expansion) }}</div>
+                    </div>
+                </div>
+            }
+        }
+    </ng-container>
+</app-layout>

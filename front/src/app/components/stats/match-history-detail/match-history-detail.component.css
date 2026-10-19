@@ -53,6 +53,8 @@
   font-weight: bold;
 }
 
+.expansions{text-align:center;padding:4px 10px 0;font-weight:500}
+
 .game-category {
   opacity: 0.7;
   margin: 0;

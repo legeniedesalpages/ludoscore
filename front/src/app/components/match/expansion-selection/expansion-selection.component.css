@@ -1,0 +1,40 @@
+:host {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.headline {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 5px;
+}
+
+.choice {
+  font-weight: 500;
+  font-size: large;
+}
+
+.hint {
+  font-size: small;
+  opacity: 0.7;
+}
+
+.result-list mat-checkbox {
+  flex: none;
+}
+
+.result-list:not(.selected) .visual {
+  opacity: 0.5;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 50px;
+  width: 100%;
+  padding-right: 10px;
+  box-sizing: border-box;
+}

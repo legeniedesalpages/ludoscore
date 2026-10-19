@@ -20,6 +20,7 @@ import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
 import { BehaviorSubject, map, Observable, Subscription, tap } from 'rxjs'
 import { MatchModel } from 'src/app/core/model/match.model'
+import { expansionTitles } from 'src/app/core/utils/game-expansions'
 import { MatchService } from 'src/app/core/services/match/match.service'
 import { MatchFormatterService } from 'src/app/core/services/match/match-formatter.service'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
@@ -39,6 +40,9 @@ import { LayoutComponent } from '../../layout/layout.component'
   ]
 })
 export class MatchHistoryComponent {
+
+  protected readonly expansionTitles = expansionTitles
+
 
   private store = inject(Store)
   private matchService = inject(MatchService)
