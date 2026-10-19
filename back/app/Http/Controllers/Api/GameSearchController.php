@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
+use App\Services\BggCatalog;
 use Illuminate\Support\Facades\Log;
 
 class GameSearchController extends Controller
 {
+    public function __construct(private readonly BggCatalog $catalog)
+    {
+    }
 
     public function searchById($id)
     {
@@ -31,8 +33,6 @@ class GameSearchController extends Controller
     private const BGG_URL = 'https://boardgamegeek.com/xmlapi2/';
     private const MAX_THING_IDS = 20;
     private const MAX_DISPLAYED_EXPANSIONS = 10;
-    private const THING_CACHE_HOURS = 24;
-    private const THING_CACHE_PREFIX = 'bgg.thing.versions.v1.';
 
     public function searchByName($searchText, $type = self::TYPE_GAME)
     {
@@ -161,14 +161,10 @@ class GameSearchController extends Controller
      */
     private function baseGamesOf(array $expansions, array $knownItems = []): array
     {
-        $links = array_map(fn($item) => $this->expansionLinks($item, true), $expansions);
-        $parentIds = array_unique(array_merge([], ...array_map(fn($itemLinks) => array_column($itemLinks, 'id'), array_values($links))));
-        $parents = $knownItems + $this->fetchThings(array_diff($parentIds, array_keys($knownItems)));
-
-        return array_map(fn($itemLinks) => array_values(array_map(
-            fn($link) => $this->fullEntry($parents[$link['id']]),
-            array_filter($itemLinks, fn($link) => isset($parents[$link['id']]) && $this->itemType($parents[$link['id']]) === self::TYPE_GAME)
-        )), $links);
+        return array_map(
+            fn($parents) => array_map(fn($parent) => $this->fullEntry($parent), $parents),
+            $this->catalog->baseGamesOf($expansions, $knownItems)
+        );
     }
 
     private function searchIds(string $searchText, string $bggType): array
@@ -179,26 +175,7 @@ class GameSearchController extends Controller
 
     private function fetchThings(array $ids): array
     {
-        $items = [];
-        $missingIds = [];
-        foreach (array_unique($ids) as $id) {
-            $cached = Cache::get(self::THING_CACHE_PREFIX . $id);
-            if ($cached !== null) {
-                $items[$id] = $cached;
-            } else {
-                $missingIds[] = $id;
-            }
-        }
-
-        foreach (array_chunk($missingIds, self::MAX_THING_IDS) as $chunk) {
-            $data = $this->requester(self::BGG_URL . 'thing?stats=1&id=' . implode(',', $chunk) . '&versions=1');
-            foreach ($this->asList($data['item'] ?? []) as $item) {
-                $id = (int) $item['@attributes']['id'];
-                $items[$id] = $item;
-                Cache::put(self::THING_CACHE_PREFIX . $id, $item, now()->addHours(self::THING_CACHE_HOURS));
-            }
-        }
-        return $items;
+        return $this->catalog->things($ids);
     }
 
     private function fullEntry(array $item): array
@@ -233,15 +210,7 @@ class GameSearchController extends Controller
      */
     private function expansionLinks(array $item, bool $inbound): array
     {
-        $links = [];
-        foreach ($this->asList($item['link'] ?? []) as $link) {
-            $attributes = $link['@attributes'] ?? [];
-            if (($attributes['type'] ?? null) === 'boardgameexpansion'
-                && (($attributes['inbound'] ?? null) === 'true') === $inbound) {
-                $links[] = ['id' => (int) $attributes['id'], 'name' => $attributes['value'] ?? ''];
-            }
-        }
-        return $links;
+        return $this->catalog->expansionLinks($item, $inbound);
     }
 
     private function itemType(array $item): string
@@ -297,11 +266,21 @@ class GameSearchController extends Controller
 
     private function extractDetail($item)
     {
+        $isExpansion = $this->itemType($item) === self::TYPE_EXPANSION;
+        $baseGames = $isExpansion
+            ? $this->applyLibraryStatus($this->baseGamesOf([(int) $item['@attributes']['id'] => $item])[(int) $item['@attributes']['id']])
+            : [];
+
         return array(
             'id' => $item['@attributes']['id'],
             'thumbnail_url_from_bgg' => $this->extractThumbnail($item),
             'image_url_from_bgg' => $this->extractImage($item),
             'name' => $this->extractName($item),
+            'is_expansion' => $isExpansion,
+            'base_games' => $baseGames,
+            'base_game_colors' => $isExpansion ? Game::baseGameColorGroups(array_column($baseGames, 'id')) : [],
+            'base_game_tags' => $isExpansion ? Game::baseGameTagGroups(array_column($baseGames, 'id')) : [],
+            'can_add_expansion' => !$isExpansion || Game::whereIn('bgg_id', array_column($baseGames, 'id'))->where('is_expansion', false)->exists(),
             'year' => $this->extractYear($item),
             'popularity' => $this->extractPopularity($item),
             'minplayers' => $this->extractMinPlayer($item),
@@ -389,15 +368,6 @@ class GameSearchController extends Controller
 
     private function requester($request)
     {
-        Log::debug("Execute request: " . $request);
-
-        $headers = [];
-        $token = config('services.boardgamegeek.token');
-
-        if (!empty($token)) {
-            $headers['Authorization'] = 'Bearer ' . $token;
-        }
-
-        return json_decode(json_encode(simplexml_load_string(Http::withHeaders($headers)->get($request))), true);
+        return $this->catalog->request($request);
     }
 }

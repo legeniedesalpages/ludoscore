@@ -10,10 +10,13 @@ import { FindGameComponent } from './find-game.component'
 
 describe('FindGameComponent library navigation', () => {
   it.each([
-    { registered: true, owned: false, route: 'owned' },
-    { registered: true, owned: true, route: 'owned' },
-    { registered: false, owned: false, route: 'bgg' },
-  ])('uses the $route editor when registered=$registered and owned=$owned', ({ registered, owned, route }) => {
+    { type: 'game', registered: true, owned: false, route: 'owned' },
+    { type: 'game', registered: true, owned: true, route: 'owned' },
+    { type: 'game', registered: false, owned: false, route: 'bgg' },
+    { type: 'expansion', registered: true, owned: false, route: 'owned' },
+    { type: 'expansion', registered: true, owned: true, route: 'owned' },
+    { type: 'expansion', registered: false, owned: false, route: 'bgg' },
+  ] as const)('uses the $route editor for $type when registered=$registered and owned=$owned', ({ type, registered, owned, route }) => {
     const dispatch = vi.fn()
     TestBed.configureTestingModule({ providers: [
       FindGameComponent,
@@ -23,30 +26,13 @@ describe('FindGameComponent library navigation', () => {
       { provide: ChangeDetectorRef, useValue: { markForCheck: vi.fn() } },
     ] })
     const result: GameSearchResult = {
-      id: 42, type: 'game', name: 'Test', thumbnailUrlFromBgg: '', year: 2020, popularity: 10,
+      id: 42, type, name: 'Test', thumbnailUrlFromBgg: '', year: 2020, popularity: 10,
       registered, owned, matched: true,
     }
     TestBed.inject(FindGameComponent).goToGameDetail(result)
     expect(dispatch).toHaveBeenCalledWith(new Navigate(['/game-editor', route, 42]))
   })
 
-  it('does not open the editor for an expansion', () => {
-    const dispatch = vi.fn()
-    const open = vi.fn()
-    TestBed.configureTestingModule({ providers: [
-      FindGameComponent,
-      { provide: Store, useValue: { dispatch } },
-      { provide: MatSnackBar, useValue: { open } },
-      { provide: FindGameService, useValue: {} },
-      { provide: ChangeDetectorRef, useValue: { markForCheck: vi.fn() } },
-    ] })
-    TestBed.inject(FindGameComponent).goToGameDetail({
-      id: 50, type: 'expansion', name: 'Extension', thumbnailUrlFromBgg: null, year: null, popularity: null,
-      registered: false, owned: false, matched: false,
-    })
-    expect(dispatch).not.toHaveBeenCalled()
-    expect(open).toHaveBeenCalled()
-  })
 })
 
 describe('FindGameService rows', () => {

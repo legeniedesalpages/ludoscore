@@ -34,16 +34,25 @@
 
         <loading-spinner [loading]="loading" caption="Chargement de la bibliothèque"></loading-spinner>
 
-        @for (game of filteredGames(); track game.id) {
-            <div class="result-list" (click)="edit(game)">
+        @for (row of rows(); track row.key) {
+            @let game = row.game;
+            <div class="result-list" [class.extension-row]="game.isExpansion" [class.context-row]="row.context"
+                (click)="edit(game)" role="button" tabindex="0" (keydown.enter)="edit(game)"
+                (keydown.space)="$event.preventDefault(); edit(game)">
                 <div class="visual">
-                    <img [src]="game.thumbnailUrl">
+                    <img [src]="game.thumbnailUrl" alt="">
                 </div>
                 <div class="content">
-                    <div class="heading">{{ game.title }}</div>
+                    <div class="heading" [title]="game.title">
+                        @if (game.isExpansion) {
+                            <mat-icon class="extension-icon" aria-label="Extension">extension</mat-icon>
+                        }
+                        {{ game.title }}
+                    </div>
                     <div class="supporting">
                         {{ playersLabel(game) }}
-                        @if (game.isOnlyCooperative) { · coopératif }
+                        @if (row.context) { · Jeu de base (hors filtre) }
+                        @if (!game.isExpansion && game.isOnlyCooperative) { · coopératif }
                         @if (game.inLibrary) {
                             @if (game.ownershipDate) {
                                 · Obtenu le {{ game.ownershipDate | date:'dd/MM/yyyy' }}
@@ -51,13 +60,15 @@
                         } @else {
                             · Dans la ludothèque de {{ game.libraryUserCount }} {{ game.libraryUserCount > 1 ? 'utilisateurs' : 'utilisateur' }}
                         }
-                        <div class="play-count">
-                            @if (game.inLibrary || game.personalPlayedMatchCount > 0) {
-                                {{ game.personalPlayedMatchCount === 0 ? 'Aucune' : game.personalPlayedMatchCount }} {{ game.personalPlayedMatchCount > 1 ? 'parties jouées' : 'partie jouée' }} par vous
-                            } @else {
-                                {{ game.playedMatchCount === 0 ? 'Aucune' : game.playedMatchCount }} {{ game.playedMatchCount > 1 ? 'parties jouées' : 'partie jouée' }} au total, tous utilisateurs
-                            }
-                        </div>
+                        @if (!game.isExpansion) {
+                            <div class="play-count">
+                                @if (game.inLibrary || game.personalPlayedMatchCount > 0) {
+                                    {{ game.personalPlayedMatchCount === 0 ? 'Aucune' : game.personalPlayedMatchCount }} {{ game.personalPlayedMatchCount > 1 ? 'parties jouées' : 'partie jouée' }} par vous
+                                } @else {
+                                    {{ game.playedMatchCount === 0 ? 'Aucune' : game.playedMatchCount }} {{ game.playedMatchCount > 1 ? 'parties jouées' : 'partie jouée' }} au total, tous utilisateurs
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

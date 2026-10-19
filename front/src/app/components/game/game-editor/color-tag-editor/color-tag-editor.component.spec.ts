@@ -11,7 +11,7 @@ import { COLORS, ColorTag } from 'src/app/core/model/tag.model'
 import { ColorTagEditorComponent, DialogColorTagEditorComponent } from './color-tag-editor.component'
 
 describe('ColorTagEditorComponent', () => {
-  async function setup(tags: ColorTag[] = []) {
+  async function setup(tags: ColorTag[] = [], readonly = false, excludedTags: ColorTag[] = []) {
     TestBed.configureTestingModule({
       declarations: [ColorTagEditorComponent, DialogColorTagEditorComponent],
       imports: [CommonModule, MatButtonModule, MatChipsModule, MatDialogModule, MatFormFieldModule, MatIconModule],
@@ -19,6 +19,8 @@ describe('ColorTagEditorComponent', () => {
     const fixture = TestBed.createComponent(ColorTagEditorComponent)
     fixture.componentRef.setInput('tags', tags)
     fixture.componentRef.setInput('title', 'Couleurs')
+    fixture.componentRef.setInput('readonly', readonly)
+    fixture.componentRef.setInput('excludedTags', excludedTags)
     await fixture.whenStable()
     return fixture
   }
@@ -76,5 +78,35 @@ describe('ColorTagEditorComponent', () => {
     await fixture.whenStable()
     expect(tags).toEqual([COLORS[1]])
     expect(fixture.nativeElement.querySelector('mat-chip-row').textContent).toContain(COLORS[1].name)
+  })
+
+  it('shows inherited colors without editing controls', async () => {
+    const tags = [COLORS[0]]
+    const fixture = await setup(tags, true)
+    expect(fixture.nativeElement.querySelector('mat-chip-row').textContent).toContain(COLORS[0].name)
+    expect(fixture.nativeElement.querySelector('[matChipRemove]')).toBeNull()
+    expect(fixture.nativeElement.querySelector('.color-add')).toBeNull()
+    fixture.componentInstance.removeTag(tags[0])
+    fixture.componentInstance.addColorTag()
+    expect(tags).toEqual([COLORS[0]])
+    expect(TestBed.inject(MatDialog).openDialogs).toHaveLength(0)
+  })
+
+  it('excludes inherited and already selected colors from the picker', async () => {
+    const tags = [COLORS[1]]
+    const fixture = await setup(tags, false, [COLORS[0]])
+    fixture.nativeElement.querySelector('.color-add').click()
+    await fixture.whenStable()
+    const dialog = TestBed.inject(MatDialog).openDialogs[0]
+    expect(dialog.componentInstance.filteredColors()).not.toContain(COLORS[0])
+    expect(dialog.componentInstance.filteredColors()).not.toContain(COLORS[1])
+    dialog.componentInstance.chooseColor(COLORS[0])
+    dialog.componentInstance.chooseColor(COLORS[1])
+    expect(tags).toEqual([COLORS[1]])
+    dialog.componentInstance.chooseColor(COLORS[2])
+    expect(tags).toEqual([COLORS[1], COLORS[2]])
+    const closed = firstValueFrom(dialog.afterClosed())
+    dialog.close()
+    await closed
   })
 })

@@ -14,16 +14,16 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { ColorTag, Tag } from 'src/app/core/model/tag.model'
-import { DrawBreaker, Game, GameToSave } from 'src/app/core/model/game.model'
+import { BaseGameTags, ColorTag, Tag, TagValueChange } from 'src/app/core/model/tag.model'
+import { BaseGameColors, DrawBreaker, Game, GameToSave } from 'src/app/core/model/game.model'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 import { DateValidator } from 'src/app/core/services/misc/date.validator'
 import { GameService } from 'src/app/core/services/game/game.service'
 import { environment } from 'src/environments/environment'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { GameSearchDetail } from 'src/app/core/model/game-search.model'
-import { ScoreTag } from 'src/app/core/model/score.model'
+import { BaseGameReference, GameSearchDetail } from 'src/app/core/model/game-search.model'
+import { ScoreTag, ScoreTagChange } from 'src/app/core/model/score.model'
 import { UpdateMatchGame } from 'src/app/core/state/match/match.action'
 
 @Component({
@@ -44,6 +44,14 @@ export class GameEditorComponent implements OnInit {
   public gameEditorForm: FormGroup
   public gameId?: number
   public editingExistingGame: boolean = false
+  public isExpansion: boolean = false
+  public canAddExpansion: boolean = true
+  public baseGames: BaseGameReference[] = []
+  public baseGameColors: BaseGameColors[] = []
+  public inheritedColors: ColorTag[] = []
+  public baseGameTags: BaseGameTags[] = []
+  public expansionTagChanges: TagValueChange[] = []
+  public expansionScoreChanges: ScoreTagChange[] = []
   public bggId?: number
   public imageUrlFromBgg?: string
   public thumbnailUrlFromBgg?: string
@@ -67,6 +75,7 @@ export class GameEditorComponent implements OnInit {
       cooperative: new FormControl(false, Validators.required),
       minPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
       maxPlayer: new FormControl('', [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]),
+      additionalPlayers: new FormControl(0, [Validators.required, Validators.min(0), Validators.max(65535), Validators.pattern(/^\d+$/)]),
       inLibrary: new FormControl(true),
       ownership: new FormControl('', DateValidator.dateValidator),
     })
@@ -99,6 +108,7 @@ export class GameEditorComponent implements OnInit {
         console.info("Game details: [" + game.title + "]")
         this.gameId = game.id
         this.editingExistingGame = true
+        this.isExpansion = !!game.isExpansion
 
         this.backgroundImageUrl = `'${game.imageUrl}'`
 
@@ -109,6 +119,7 @@ export class GameEditorComponent implements OnInit {
           drawAllowed: game.drawAllowed,
           minPlayer: game.minPlayers,
           maxPlayer: game.maxPlayers,
+          additionalPlayers: game.additionalPlayers ?? 0,
           cooperative: game.isOnlyCooperative,
           inLibrary: game.inLibrary,
           ownership: game.ownershipDate,
@@ -120,12 +131,17 @@ export class GameEditorComponent implements OnInit {
         this.tagsColor = game.playerColors
         this.tagsScore = game.scoreTags
         this.tagsDraw = game.drawBreaker
+        this.baseGameTags = game.baseGameTags ?? []
+        this.expansionTagChanges = game.expansionTagChanges ?? []
+        this.expansionScoreChanges = game.expansionScoreChanges ?? []
+        this.configureExpansion(game.baseGameColors ?? [])
         this.changeDetectorRef.markForCheck()
       },
       complete: () => {
         this.loading = false
         this.changeDetectorRef.markForCheck()
-      }
+      },
+      error: (error) => this.handleLoadError(error)
     })
   }
 
@@ -137,6 +153,10 @@ export class GameEditorComponent implements OnInit {
       next: (gameSearchDetail: GameSearchDetail) => {
         console.info("Game details: [" + gameSearchDetail.name + "]")
         this.gameId = undefined
+        this.editingExistingGame = false
+        this.isExpansion = gameSearchDetail.isExpansion
+        this.canAddExpansion = gameSearchDetail.canAddExpansion
+        this.baseGames = gameSearchDetail.baseGames
 
         this.backgroundImageUrl = `'${gameSearchDetail.imageUrlFromBgg}'`
 
@@ -147,6 +167,7 @@ export class GameEditorComponent implements OnInit {
           highestScoreWin: true,
           minPlayer: gameSearchDetail.minplayers,
           maxPlayer: gameSearchDetail.maxplayers,
+          additionalPlayers: 0,
           cooperative: false,
           inLibrary: true,
           ownership: null,
@@ -155,22 +176,98 @@ export class GameEditorComponent implements OnInit {
 
         this.imageUrlFromBgg = gameSearchDetail.imageUrlFromBgg
         this.thumbnailUrlFromBgg = gameSearchDetail.thumbnailUrlFromBgg
+        this.tagsGame = []
+        this.tagsPlayer = []
+        this.tagsColor = []
+        this.tagsScore = []
+        this.tagsDraw = []
+        this.baseGameTags = gameSearchDetail.baseGameTags ?? []
+        this.expansionTagChanges = []
+        this.expansionScoreChanges = []
+        this.configureExpansion(gameSearchDetail.baseGameColors ?? [])
         this.changeDetectorRef.markForCheck()
 
       },
       complete: () => {
         this.loading = false
         this.changeDetectorRef.markForCheck()
-      }
+      },
+      error: (error) => this.handleLoadError(error)
     })
   }
 
+  private configureExpansion(baseGameColors: BaseGameColors[]): void {
+    this.baseGameColors = this.isExpansion ? baseGameColors : []
+    this.inheritedColors = this.baseGameColors.flatMap(game => game.playerColors)
+    if (this.isExpansion) {
+      const codes = new Set(this.inheritedColors.map(color => color.code.toLowerCase()))
+      this.tagsColor = this.tagsColor.filter(color => !codes.has(color.code.toLowerCase()))
+    }
+    for (const name of ['estimatedDurationInMinutes', 'minPlayer', 'maxPlayer', 'cooperative', 'quantifiableScore', 'highestScoreWin']) {
+      if (this.isExpansion) {
+        this.gameEditorForm.get(name)!.disable()
+      } else {
+        this.gameEditorForm.get(name)!.enable()
+      }
+    }
+    if (this.isExpansion) {
+      this.gameEditorForm.get('additionalPlayers')!.enable()
+    } else {
+      this.gameEditorForm.get('additionalPlayers')!.disable()
+    }
+  }
+
+  private handleLoadError(error: unknown): void {
+    console.error('Error loading game', error)
+    this.loading = false
+    this.snackBar.open("Impossible de charger la fiche du jeu ou de l'extension. Réessayez plus tard.", 'Fermer', {
+      duration: 10000
+    })
+    this.changeDetectorRef.markForCheck()
+  }
+
+  public unavailableTagChanges(): TagValueChange[] {
+    return this.expansionTagChanges.filter(change => {
+      const parent = this.baseGameTags.find(game => game.bggId === change.baseGameBggId)
+      const tags = change.scope === 'player' ? parent?.playerTags : parent?.matchTags
+      return !tags?.some(tag => tag.category === change.category)
+    })
+  }
+
+  public resetTagChange(change: TagValueChange): void {
+    const index = this.expansionTagChanges.indexOf(change)
+    if (index >= 0) this.expansionTagChanges.splice(index, 1)
+  }
+
+  public unavailableScoreChanges(): ScoreTagChange[] {
+    return this.expansionScoreChanges.filter(change => !this.baseGameTags
+      .find(game => game.bggId === change.baseGameBggId)?.scoreTags?.some(tag => tag.category === change.category))
+  }
+
+  public resetScoreChange(change: ScoreTagChange): void {
+    const index = this.expansionScoreChanges.indexOf(change)
+    if (index >= 0) this.expansionScoreChanges.splice(index, 1)
+  }
+
   public saveGame(): void {
+    if (this.isExpansion && !this.canAddExpansion) {
+      this.snackBar.open("Ajoutez d'abord un jeu de base dans le catalogue.", 'Fermer', { duration: 5000 })
+      return
+    }
+    if (this.isExpansion && this.gameEditorForm.get('additionalPlayers')!.invalid) {
+      this.gameEditorForm.get('additionalPlayers')!.markAsTouched()
+      this.snackBar.open('Le nombre de joueurs supplémentaires doit être un entier positif ou nul (maximum 65535).', 'Fermer', { duration: 5000 })
+      return
+    }
     this.saving = true
 
     const gameToSave: GameToSave = {
       id: this.gameId,
       title: this.gameEditorForm.get('name')?.value,
+      isExpansion: this.isExpansion,
+      additionalPlayers: this.gameEditorForm.get('additionalPlayers')?.value,
+      expansionTagChanges: this.expansionTagChanges,
+      expansionScoreChanges: this.expansionScoreChanges,
       isOnlyCooperative: this.gameEditorForm.get('cooperative')?.value,
       minPlayers: this.gameEditorForm.get('minPlayer')?.value,
       maxPlayers: this.gameEditorForm.get('maxPlayer')?.value,
@@ -195,7 +292,7 @@ export class GameEditorComponent implements OnInit {
       next: (game) => {
         this.findGameService.resetSearch()
         console.debug("Game id :" + game.id)
-        this.snackBar.open("Jeu enregistré", 'Fermer', {
+        this.snackBar.open(this.isExpansion ? "Extension enregistrée" : "Jeu enregistré", 'Fermer', {
           duration: 5000
         })
         this.saving = false
@@ -204,7 +301,9 @@ export class GameEditorComponent implements OnInit {
       },
 
       error: (err) => {
-        this.snackBar.open("Impossible d'enregistrer le jeu: " + err, 'Fermer', {
+        const errors: Record<string, string[]> | undefined = err.error?.errors
+        const message = errors ? Object.values(errors).flat().join(' ') : err.error?.message ?? String(err)
+        this.snackBar.open((this.isExpansion ? "Impossible d'enregistrer l'extension: " : "Impossible d'enregistrer le jeu: ") + message, 'Fermer', {
           duration: 10000
         })
         console.error('Error saving game', err)
@@ -212,6 +311,10 @@ export class GameEditorComponent implements OnInit {
         this.changeDetectorRef.markForCheck()
       }
     })
+  }
+
+  public addBaseGame(baseGame: BaseGameReference): void {
+    this.store.dispatch(new Navigate(['/game-editor', baseGame.registered ? 'owned' : 'bgg', baseGame.id]))
   }
 
   private cameFromLibrary(): boolean {

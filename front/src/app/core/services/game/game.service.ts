@@ -37,9 +37,19 @@ export class GameService {
         return this.http.post<{ id: number }>(this.gameUrl, {
             id: gameToSave.id,
             name: gameToSave.title,
-            isOnlyCooperative: gameToSave.isOnlyCooperative,
-            minPlayers: gameToSave.minPlayers,
-            maxPlayers: gameToSave.maxPlayers,
+            isExpansion: gameToSave.isExpansion ?? false,
+            ...(gameToSave.isExpansion ? {
+                additionalPlayers: gameToSave.additionalPlayers ?? 0,
+                expansionTagChanges: gameToSave.expansionTagChanges ?? [],
+                expansionScoreChanges: gameToSave.expansionScoreChanges ?? [],
+            } : {
+                isOnlyCooperative: gameToSave.isOnlyCooperative,
+                minPlayers: gameToSave.minPlayers,
+                maxPlayers: gameToSave.maxPlayers,
+                quantifiableScore: gameToSave.quantifiableScore,
+                highestScoreWin: gameToSave.highestScoreWin,
+                estimatedDurationInMinutes: gameToSave.estimatedDurationInMinutes,
+            }),
             inLibrary: gameToSave.inLibrary,
             ownershipDate: gameToSave.inLibrary && gameToSave.ownershipDate ? moment(gameToSave.ownershipDate).format('YYYY-MM-DD') : null,
             matchTags: JSON.stringify(gameToSave.matchTags),
@@ -49,11 +59,8 @@ export class GameService {
             bggId: gameToSave.bggId,
             drawAllowed: gameToSave.drawAllowed,
             drawBreaker: JSON.stringify(gameToSave.drawBreaker),
-            quantifiableScore: gameToSave.quantifiableScore,
-            highestScoreWin: gameToSave.highestScoreWin,
             imageUrlFromBgg: gameToSave.imageUrlFromBgg,
-            thumbnailUrlFromBgg: gameToSave.thumbnailUrlFromBgg,
-            estimatedDurationInMinutes: gameToSave.estimatedDurationInMinutes
+            thumbnailUrlFromBgg: gameToSave.thumbnailUrlFromBgg
         }).pipe(switchMap(() => this.getFromBgg(gameToSave.bggId)))
     }
 
@@ -62,6 +69,7 @@ export class GameService {
             gameEntities.map((gameEntity: any) => {
                 const game: SelectingGame = {
                     ...this.gameEntityToGame(gameEntity),
+                    baseGameBggIds: gameEntity.baseGameBggIds ?? [],
                     lastPlayed: gameEntity.lastPlayed,
                     lastWinner: gameEntity.lastWinner,
                     createdAt: gameEntity.createdAt,
@@ -90,6 +98,14 @@ export class GameService {
         return {
             id: gameEntity.id,
             title: gameEntity.title,
+            isExpansion: !!Number(gameEntity.isExpansion),
+            additionalPlayers: gameEntity.additionalPlayers ?? 0,
+            baseGameColors: gameEntity.baseGameColors ?? [],
+            baseGameTags: gameEntity.baseGameTags ?? [],
+            expansionTagChanges: typeof gameEntity.expansionTagChanges === 'string'
+                ? JSON.parse(gameEntity.expansionTagChanges) : gameEntity.expansionTagChanges ?? [],
+            expansionScoreChanges: typeof gameEntity.expansionScoreChanges === 'string'
+                ? JSON.parse(gameEntity.expansionScoreChanges) : gameEntity.expansionScoreChanges ?? [],
             imageUrl: environment.imagesURL + '/' + gameEntity.imageId,
             thumbnailUrl: environment.imagesURL + '/' + gameEntity.thumbnailId,
             isOnlyCooperative: gameEntity.isOnlyCooperative,

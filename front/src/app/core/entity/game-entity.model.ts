@@ -10,9 +10,20 @@
     * - Author          : renau
     * - Modification    : 
 **/
+import { BaseGameColors } from '../model/game.model'
+import { BaseGameTags, TagValueChange } from '../model/tag.model'
+import { ScoreTagChange } from '../model/score.model'
+
 export interface GameEntity {
     id: number
     title: string
+    isExpansion?: boolean | number
+    baseGameBggIds?: number[]
+    additionalPlayers?: number
+    baseGameColors?: BaseGameColors[]
+    baseGameTags?: BaseGameTags[]
+    expansionTagChanges?: TagValueChange[] | string | null
+    expansionScoreChanges?: ScoreTagChange[] | string | null
     imageId: string
     thumbnailId: string
     isOnlyCooperative: boolean

@@ -32,7 +32,7 @@
                     </div>
                     <div *ngIf="row.kind === 'item'" class="result-list"
                         [class.expansion-row]="row.level === 1" [class.compact]="!row.result.thumbnailUrlFromBgg"
-                        [class.not-clickable]="row.result.type === 'expansion'" (click)="goToGameDetail(row.result)">
+                        (click)="goToGameDetail(row.result)">
                         <div class="visual">
                             <img *ngIf="row.result.thumbnailUrlFromBgg" [src]="row.result.thumbnailUrlFromBgg" />
                             <mat-icon *ngIf="!row.result.thumbnailUrlFromBgg">

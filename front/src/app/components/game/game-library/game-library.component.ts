@@ -14,6 +14,11 @@ import { LayoutComponent } from '../../layout/layout.component'
 import { LoadingSpinnerModule } from '../../layout/spinner/loading-spinner.module'
 
 type LibraryFilter = 'in' | 'played' | 'unplayed'
+interface LibraryRow {
+  game: SelectingGame
+  context: boolean
+  key: string
+}
 
 @Component({
   templateUrl: './game-library.component.html',
@@ -41,12 +46,44 @@ export class GameLibraryComponent {
   public filteredGames = computed(() => {
     const text = this.searchText().trim().toLowerCase()
     const filter = this.filter()
+    const parents = new Map(this.games().filter(game => !game.isExpansion).map(game => [game.bggId, game]))
     return this.games()
       .filter(game => filter === 'in'
         ? game.inLibrary
         : !game.inLibrary && (filter === 'played' ? game.personalPlayedMatchCount > 0 : game.personalPlayedMatchCount === 0))
-      .filter(game => !text || game.title.toLowerCase().includes(text))
+      .filter(game => !text || game.title.toLowerCase().includes(text) ||
+        (game.isExpansion && game.baseGameBggIds?.some(id => parents.get(id)?.title.toLowerCase().includes(text))))
       .sort((a, b) => a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' }))
+  })
+
+  public rows = computed<LibraryRow[]>(() => {
+    const filtered = this.filteredGames()
+    const selectedIds = new Set(filtered.map(game => game.id))
+    const parents = new Map(this.games().filter(game => !game.isExpansion).map(game => [game.bggId, game]))
+    const groups = new Map<number, { game: SelectingGame, extensions: SelectingGame[] }>()
+    for (const game of filtered) {
+      if (!game.isExpansion) {
+        const group = groups.get(game.bggId)
+        groups.set(game.bggId, group ?? { game, extensions: [] })
+        continue
+      }
+      const baseGames = [...new Set(game.baseGameBggIds ?? [])]
+        .map(id => parents.get(id)).filter((parent): parent is SelectingGame => parent !== undefined)
+      if (baseGames.length === 0) {
+        groups.set(game.bggId, { game, extensions: [] })
+      }
+      for (const parent of baseGames) {
+        const group = groups.get(parent.bggId) ?? { game: parent, extensions: [] }
+        group.extensions.push(game)
+        groups.set(parent.bggId, group)
+      }
+    }
+    return [...groups.values()]
+      .sort((a, b) => a.game.title.localeCompare(b.game.title, 'fr', { sensitivity: 'base' }))
+      .flatMap(({ game, extensions }) => [
+        { game, context: !selectedIds.has(game.id), key: `game-${game.id}` },
+        ...extensions.map(extension => ({ game: extension, context: false, key: `${game.id}-${extension.id}` }))
+      ])
   })
 
   public countInLibrary = computed(() => this.games().filter(game => game.inLibrary).length)
@@ -66,6 +103,10 @@ export class GameLibraryComponent {
   }
 
   public playersLabel(game: Game): string {
+    if (game.isExpansion) {
+      const count = game.additionalPlayers ?? 0
+      return count === 0 ? 'Aucun joueur supplémentaire' : `+${count} joueur${count > 1 ? 's' : ''} supplémentaire${count > 1 ? 's' : ''}`
+    }
     return game.minPlayers === game.maxPlayers ? `${game.minPlayers} joueurs` : `${game.minPlayers} à ${game.maxPlayers} joueurs`
   }
 

@@ -29,12 +29,19 @@ export class ColorTagEditorComponent implements OnInit {
     @Input()
     public title: string = ''
 
+    @Input()
+    public readonly = false
+
+    @Input()
+    public excludedTags: ColorTag[] = []
+
     constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) { }
 
     ngOnInit(): void {
     }
 
     public removeTag(tag: ColorTag): void {
+        if (this.readonly) return
         const index = this.tags.indexOf(tag)
         if (index >= 0) {
             this.tags.splice(index, 1)
@@ -42,9 +49,11 @@ export class ColorTagEditorComponent implements OnInit {
     }
 
     public addColorTag() {
+        if (this.readonly) return
         this.dialog.open(DialogColorTagEditorComponent, {
             data: {
-                colorTags: this.tags
+                colorTags: this.tags,
+                excludedTags: this.excludedTags,
             }
         }).afterClosed().subscribe(() => {
             this.changeDetectorRef.markForCheck()
@@ -63,18 +72,22 @@ export class DialogColorTagEditorComponent {
 
     public tags: ColorTag[]
 
-    constructor(public dialogRef: MatDialogRef<DialogColorTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+    constructor(public dialogRef: MatDialogRef<DialogColorTagEditorComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: { colorTags: ColorTag[], excludedTags?: ColorTag[] }) {
         this.tags = this.data.colorTags
         console.log(this.tags)
     }
 
     public chooseColor(colorTag: ColorTag) {
-        this.tags.push(colorTag)
+        if (this.filteredColors().some(color => color.code === colorTag.code)) {
+            this.tags.push(colorTag)
+        }
     }
 
     public filteredColors(): ColorTag[] {
         return COLORS.filter(x => {
-            return !this.tags.map(c => c.code).includes(x.code)
+            return ![...this.tags, ...(this.data.excludedTags ?? [])]
+                .some(color => color.code.toLowerCase() === x.code.toLowerCase())
         })
     }
 }

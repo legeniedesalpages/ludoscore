@@ -31,3 +31,20 @@
   vertical-align: top;
   margin-top: -40px;
 }
+
+.inherited-changes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 0 5px;
+  overflow-wrap: anywhere;
+}
+
+.inherited-changes .added {
+  color: #2e7d32;
+}
+
+.inherited-changes .removed {
+  color: #c62828;
+}

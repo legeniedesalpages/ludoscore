@@ -98,10 +98,6 @@ export class FindGameComponent {
   }
 
   public goToGameDetail(gameFound: GameSearchResult) {
-    if (gameFound.type === 'expansion') {
-      this.snackBar.open("La gestion des extensions arrive bientôt", 'Fermer', { duration: 3000 })
-      return
-    }
     console.info("Go to edition page for id :" + gameFound.id)
     if (!gameFound.registered) {
       this.store.dispatch(new Navigate(['/game-editor', 'bgg', gameFound.id]))

@@ -10,6 +10,9 @@
     * - Author          : renau
     * - Modification    : 
 **/
+import { BaseGameColors } from './game.model'
+import { BaseGameTags } from './tag.model'
+
 export type GameSearchType = 'game' | 'expansion' | 'all'
 
 export type BggItemType = 'game' | 'expansion'
@@ -44,6 +47,11 @@ export type GameSearchRow =
 
 export interface GameSearchDetail {
     id: number
+    isExpansion: boolean
+    baseGames: BaseGameReference[]
+    canAddExpansion: boolean
+    baseGameColors?: BaseGameColors[]
+    baseGameTags?: BaseGameTags[]
     name: string
     imageUrlFromBgg: string
     thumbnailUrlFromBgg: string

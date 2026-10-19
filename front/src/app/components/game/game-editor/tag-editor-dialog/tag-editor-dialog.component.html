@@ -9,13 +9,13 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" *ngIf="!data.valuesOnly">
       <div class="column">
         <mat-checkbox formControlName="revealedLater">À renseigner plus tard (révélée pendant la partie)</mat-checkbox>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" *ngIf="!data.valuesOnly">
       <div class="column">
         <mat-checkbox formControlName="unique">Unique</mat-checkbox>
       </div>
@@ -44,7 +44,7 @@
                   (edited)="edit(value, $event)"
                   >
               {{value}}
-              <button matChipRemove [attr.aria-label]="'remove ' + value">
+              <button type="button" matChipRemove [attr.aria-label]="'remove ' + value">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip-row>
@@ -58,10 +58,18 @@
       </div>
     </div>
 
+    @if (data.valuesOnly && (addedValues.length || removedValues.length)) {
+      <div class="inherited-changes">
+        @if (addedValues.length) { <span class="added">Ajoutées : {{ addedValues.join(', ') }}</span> }
+        @if (removedValues.length) { <span class="removed">Retirées : {{ removedValues.join(', ') }}</span> }
+        <button type="button" mat-button class="reset-values" (click)="resetValues()">Réinitialiser</button>
+      </div>
+    }
+
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button (click)="cancelTagDialog()" mat-button [mat-dialog-close]="false">abandonner</button>
-  <button (click)="closeTagDialog()" mat-button [mat-dialog-close]="false" [disabled]="!tagEditorForm.valid">Ok</button>
+  <button type="button" (click)="cancelTagDialog()" mat-button>abandonner</button>
+  <button type="button" (click)="closeTagDialog()" mat-button [disabled]="!data.valuesOnly && !tagEditorForm.valid">Ok</button>
 </mat-dialog-actions>

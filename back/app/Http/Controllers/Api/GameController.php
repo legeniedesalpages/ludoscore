@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Services\BggCatalog;
+use App\Services\ExpansionScoreChanges;
+use App\Services\ExpansionTagChanges;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class GameController extends Controller
 {
@@ -71,6 +75,13 @@ class GameController extends Controller
             ->toBase()
             ->get();
 
+        $parentLinks = DB::table('game_expansion')->whereIn('extension_id', $result->pluck('id'))
+            ->get(['extension_id', 'base_game_bgg_id'])->groupBy('extension_id');
+        foreach ($result as $game) {
+            $game->base_game_bgg_ids = $parentLinks->get($game->id, collect())
+                ->pluck('base_game_bgg_id')->map(fn ($id) => (int) $id)->values()->all();
+        }
+
         return $result;
     }
 
@@ -82,18 +93,31 @@ class GameController extends Controller
     public function getByBggId(Request $request, $id)
     {
         Log::debug("Get by bgg id : ".$id);
-        return Game::forUser($request->user()->id)->where('games.bgg_id', $id)->firstOrFail();
+        return $this->withBaseGameProperties(Game::forUser($request->user()->id)->where('games.bgg_id', $id)->firstOrFail());
     }
 
     public function show(Request $request, $id)
     {
-        return Game::forUser($request->user()->id)->where('games.id', $id)->firstOrFail();
+        return $this->withBaseGameProperties(Game::forUser($request->user()->id)->where('games.id', $id)->firstOrFail());
     }
 
-    private function saveForUser(Game $game, Request $request): void
+    private function withBaseGameProperties(Game $game): Game
     {
-        DB::transaction(function () use ($game, $request) {
+        $parentIds = $game->is_expansion ? $game->baseGames()->pluck('games.bgg_id')->all() : [];
+        $game->base_game_colors = $game->is_expansion
+            ? Game::baseGameColorGroups($parentIds) : [];
+        $game->base_game_tags = $game->is_expansion ? Game::baseGameTagGroups($parentIds) : [];
+
+        return $game;
+    }
+
+    private function saveForUser(Game $game, Request $request, ?array $baseGameIds = null): void
+    {
+        DB::transaction(function () use ($game, $request, $baseGameIds) {
             $game->save();
+            if ($baseGameIds !== null) {
+                $game->baseGames()->sync($baseGameIds);
+            }
             $inLibrary = $request->has('in_library') ? $request->boolean('in_library') : true;
             $request->user()->games()->syncWithoutDetaching([
                 $game->id => [
@@ -116,10 +140,63 @@ class GameController extends Controller
             'bgg_id' => ['required', 'integer', 'min:1'],
             'in_library' => ['sometimes', 'boolean'],
             'ownership_date' => ['nullable', 'date_format:Y-m-d'],
+            'is_expansion' => ['sometimes', 'boolean'],
+            'additional_players' => ['sometimes', 'integer', 'min:0', 'max:65535'],
         ]);
         Log::debug("Saving game : ".$request);
 
         $existingGame = Game::where('bgg_id', $request->bgg_id)->first();
+        $isExpansion = $existingGame ? (bool) $existingGame->is_expansion : $request->boolean('is_expansion');
+        $baseGameIds = !$existingGame && $isExpansion
+            ? app(BggCatalog::class)->expansionBaseGameIds((int) $request->bgg_id)
+            : null;
+        $tagChanges = null;
+        $scoreChanges = null;
+        if ($isExpansion) {
+            $parentIds = $baseGameIds ?? DB::table('game_expansion')
+                ->where('extension_id', $existingGame->id)->pluck('base_game_bgg_id')->all();
+            if (!Game::whereIn('bgg_id', $parentIds)->where('is_expansion', false)->exists()) {
+                throw ValidationException::withMessages([
+                    'is_expansion' => "Ajoutez d'abord au moins un jeu de base dans le catalogue avant d'ajouter cette extension.",
+                ]);
+            }
+            $request->validate(['player_colors' => ['required', 'json']]);
+            if (!is_array(json_decode($request->player_colors, false, 512, JSON_THROW_ON_ERROR))) {
+                throw ValidationException::withMessages([
+                    'player_colors' => 'Les couleurs supplémentaires doivent être une liste.',
+                ]);
+            }
+            $colors = json_decode($request->player_colors, true, 512, JSON_THROW_ON_ERROR);
+            validator(['player_colors' => $colors], [
+                'player_colors' => ['present', 'array', 'list'],
+                'player_colors.*.code' => ['required', 'string', 'distinct:ignore_case'],
+                'player_colors.*.name' => ['required', 'string'],
+                'player_colors.*.invert' => ['required', 'string'],
+                'player_colors.*.fallback' => ['present', 'array'],
+                'player_colors.*.fallback.*' => ['string'],
+            ])->validate();
+            $baseCodes = collect(Game::baseGameColorGroups($parentIds))
+                ->pluck('playerColors')->flatten(1)->pluck('code')->map(fn ($code) => strtolower($code));
+            if (collect($colors)->contains(fn ($color) => $baseCodes->contains(strtolower($color['code'])))) {
+                throw ValidationException::withMessages([
+                    'player_colors' => "Les couleurs du jeu de base ne peuvent pas être ajoutées ou modifiées dans l'extension.",
+                ]);
+            }
+            if ($request->has('expansion_tag_changes')) {
+                $tagChanges = app(ExpansionTagChanges::class)->validate($request->input('expansion_tag_changes'), $parentIds);
+            }
+            if ($request->has('expansion_score_changes')) {
+                $scoreChanges = app(ExpansionScoreChanges::class)->validate($request->input('expansion_score_changes'), $parentIds);
+            }
+        } elseif ($request->has('expansion_tag_changes') && $request->input('expansion_tag_changes') !== []) {
+            throw ValidationException::withMessages([
+                'expansion_tag_changes' => 'Seule une extension peut modifier les valeurs des tags d’un jeu de base.',
+            ]);
+        } elseif ($request->has('expansion_score_changes') && $request->input('expansion_score_changes') !== []) {
+            throw ValidationException::withMessages([
+                'expansion_score_changes' => 'Seule une extension peut modifier les catégories de score d’un jeu de base.',
+            ]);
+        }
 
         $clean_name = Str::limit($this->clean($request->name), 20, '');
 
@@ -140,58 +217,46 @@ class GameController extends Controller
         Log::debug("Thumbnail : ".$uuid_thumbnail);
 
 
-        $is_only_cooperative = false;
-        if ($request->is_only_cooperative) {
-            $is_only_cooperative = true;
+        $game = $existingGame ?? new Game;
+        $game->title = $request->name;
+        $game->is_expansion = $isExpansion;
+        $game->thumbnail_id = $uuid_thumbnail;
+        $game->image_id = $uuid_image;
+        $game->match_tags = $request->match_tags;
+        $game->player_tags = $request->player_tags;
+        $game->player_colors = $request->player_colors;
+        $game->bgg_id = $request->bgg_id;
+        $game->score_template = $request->score_template;
+        $game->draw_allowed = $request->draw_allowed;
+        $game->draw_breaker = $request->draw_breaker;
+        if ($isExpansion) {
+            $game->additional_players = $request->input('additional_players', $existingGame?->additional_players ?? 0);
+            if ($tagChanges !== null) {
+                $game->expansion_tag_changes = $tagChanges;
+            }
+            if ($scoreChanges !== null) {
+                $game->expansion_score_changes = $scoreChanges;
+            }
+        }
+        foreach ([
+            'is_only_cooperative' => false,
+            'min_players' => 0,
+            'max_players' => 0,
+            'estimated_duration_in_minutes' => 0,
+            'quantifiable_score' => true,
+            'highest_score_win' => true,
+        ] as $property => $default) {
+            if (!$isExpansion) {
+                $game->{$property} = $property === 'is_only_cooperative' ? $request->boolean($property) : $request->input($property);
+            } elseif (!$existingGame) {
+                // Compatibility columns are unused for extensions; match rules belong to the selected base game.
+                $game->{$property} = $default;
+            }
         }
 
+        $this->saveForUser($game, $request, $baseGameIds);
+        Log::info(($existingGame ? 'Game updated : ' : 'Game created : ').$game);
 
-        if ($existingGame) {
-            $existingGame->title = $request->name;
-            $existingGame->is_expansion = false;
-            $existingGame->is_only_cooperative = $is_only_cooperative;
-            $existingGame->min_players = $request->min_players;
-            $existingGame->max_players = $request->max_players;
-            $existingGame->thumbnail_id = $uuid_thumbnail;
-            $existingGame->image_id = $uuid_image;
-            $existingGame->match_tags = $request->match_tags;
-            $existingGame->player_tags = $request->player_tags;
-            $existingGame->player_colors = $request->player_colors;
-            $existingGame->bgg_id = $request->bgg_id;
-            $existingGame->score_template = $request->score_template;
-            $existingGame->estimated_duration_in_minutes = $request->estimated_duration_in_minutes;
-            $existingGame->quantifiable_score = $request->quantifiable_score;
-            $existingGame->highest_score_win = $request->highest_score_win;
-            $existingGame->draw_allowed = $request->draw_allowed;
-            $existingGame->draw_breaker = $request->draw_breaker;
-
-            $this->saveForUser($existingGame, $request);
-            Log::info("Game updated : ".$existingGame);
-            return response(['id'=> $existingGame->id], 200);
-
-        } else {
-            $game = new Game;
-            $game->title = $request->name;
-            $game->is_expansion = false;
-            $game->is_only_cooperative = $is_only_cooperative;
-            $game->min_players = $request->min_players;
-            $game->max_players = $request->max_players;
-            $game->thumbnail_id = $uuid_thumbnail;
-            $game->image_id = $uuid_image;
-            $game->match_tags = $request->match_tags;
-            $game->player_tags = $request->player_tags;
-            $game->player_colors = $request->player_colors;
-            $game->bgg_id = $request->bgg_id;
-            $game->score_template = $request->score_template;
-            $game->estimated_duration_in_minutes = $request->estimated_duration_in_minutes;
-            $game->quantifiable_score = $request->quantifiable_score;
-            $game->highest_score_win = $request->highest_score_win;
-            $game->draw_allowed = $request->draw_allowed;
-            $game->draw_breaker = $request->draw_breaker;
-
-            $this->saveForUser($game, $request);
-            Log::info("Game created : ".$game);
-            return response(['id'=> $game->id], 201);
-        }
+        return response(['id' => $game->id], $existingGame ? 200 : 201);
     }
 }

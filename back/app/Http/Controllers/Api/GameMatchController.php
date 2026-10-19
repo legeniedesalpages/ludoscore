@@ -237,6 +237,9 @@ class GameMatchController extends Controller
             || DB::table('player_user')->where('user_id', $request->user()->id)
                 ->whereIn('player_id', $ids)->where('can_view_other_matches', true)->exists();
         abort_unless($visible, 403, 'Ajoutez votre joueur personnel ou un joueur dont vous pouvez consulter les parties sans y participer. Le droit d’ajouter un joueur copié ne suffit pas à consulter cette partie.');
+        $request->validate(['match.gameId' => ['required', 'integer', 'exists:games,id']]);
+        $game = Game::findOrFail($request->input('match.gameId'));
+        abort_if((bool) $game->is_expansion, 422, "Une partie doit être démarrée depuis un jeu de base, pas depuis une extension.");
         Log::info("Request");
         Log::debug($request);
         $match = $request->match;

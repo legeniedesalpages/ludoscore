@@ -68,3 +68,44 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+:host .result-list.extension-row {
+  padding-left: 24px;
+  box-sizing: border-box;
+}
+
+:host .extension-row .visual,
+:host .extension-row .visual img {
+  width: 48px;
+  height: 36px;
+}
+
+:host .extension-row .content {
+  min-height: 52px;
+  height: 52px;
+  justify-content: center;
+}
+
+:host .extension-row .heading {
+  padding-top: 0;
+  font-size: 14px;
+  text-overflow: ellipsis;
+}
+
+:host .extension-row .supporting {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 2px;
+}
+
+.extension-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  vertical-align: text-bottom;
+}
+
+.context-row {
+  opacity: 0.65;
+}

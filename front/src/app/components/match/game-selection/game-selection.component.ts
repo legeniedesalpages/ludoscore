@@ -23,6 +23,7 @@ import { MatchState } from 'src/app/core/state/match/match.state'
 import { formatTimeDifference } from 'src/app/core/services/misc/date.format'
 
 import { displayPlayerName } from 'src/app/core/pipes/player-name.pipe'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   templateUrl: './game-selection.component.html',
@@ -45,7 +46,7 @@ export class GameSelectionComponent implements OnInit {
   public lessThanThirtyMinutes: boolean = false
   public moreThanOneHourAndAHalfFilter: boolean = false
 
-  constructor(private gameService: GameService, private store: Store, private changeDetectorRef: ChangeDetectorRef, private route: ActivatedRoute, private router: Router) {
+  constructor(private gameService: GameService, private store: Store, private changeDetectorRef: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -74,6 +75,10 @@ export class GameSelectionComponent implements OnInit {
   }
 
   public gameSelection(game: Game) {
+    if (game.isExpansion) {
+      this.snackBar.open('Choisissez un jeu de base pour démarrer une partie.', 'Fermer', { duration: 5000 })
+      return
+    }
     this.loading = true
     this.store.dispatch(new CreateMatch(game)).subscribe(_ => {
       // TODO : ajouter ici le joueur correspondant à l'utilisateur connecté
@@ -135,6 +140,7 @@ export class GameSelectionComponent implements OnInit {
     const newGameThreshold = 24 * 60 * 60 * 1000
 
     const filteredGames = (games ?? []).filter(game =>
+      !game.isExpansion &&
       (!this.onlyInLibraryFilter || game.inLibrary) &&
       (!searchText || game.title.toLocaleLowerCase().includes(searchText)) &&
       (!this.onlyCooperativeFilter || game.isOnlyCooperative) &&

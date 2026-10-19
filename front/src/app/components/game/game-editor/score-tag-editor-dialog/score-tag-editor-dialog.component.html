@@ -39,7 +39,7 @@
                 <mat-form-field appearance="fill">
                     <mat-label [style.background]="newColor.code" [style.color]="newColor.invert">Couleur de la
                         categorie</mat-label>
-                    <mat-select [(value)]="newColor" formControlName="color">
+                    <mat-select [(value)]="newColor" formControlName="color" [compareWith]="compareColors">
                         <mat-option *ngFor="let color of colors" [value]="color">
                             <div [style.background]="color.code" [style.color]="color.invert" class="couleur">
                                 {{color.name}}
@@ -50,11 +50,17 @@
             </div>
         </div>
 
+        @if (inherited && changedProperties.length) {
+            <div class="inherited-changes">
+                <span>Modifié par l'extension : {{ changedProperties.join(', ') }}</span>
+                <button type="button" mat-button class="reset-values" (click)="resetProperties()">Réinitialiser</button>
+            </div>
+        }
+
     </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button (click)="cancelTagDialog()" mat-button [mat-dialog-close]="false">abandonner</button>
-    <button (click)="closeTagDialog()" mat-button [mat-dialog-close]="false"
-        [disabled]="!tagEditorForm.valid">Ok</button>
+    <button type="button" (click)="cancelTagDialog()" mat-button>abandonner</button>
+    <button type="button" (click)="closeTagDialog()" mat-button [disabled]="!tagEditorForm.valid">Ok</button>
 </mat-dialog-actions>

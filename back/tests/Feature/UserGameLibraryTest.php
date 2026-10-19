@@ -56,6 +56,10 @@ class UserGameLibraryTest extends TestCase
             }
             $table->timestamps();
         });
+        (require database_path('migrations/2026_10_19_000000_create_game_expansion_table.php'))->up();
+        (require database_path('migrations/2026_10_19_000001_add_additional_players_to_games.php'))->up();
+        (require database_path('migrations/2026_10_19_000002_add_expansion_tag_changes_to_games.php'))->up();
+        (require database_path('migrations/2026_10_19_000003_add_expansion_score_changes_to_games.php'))->up();
         Schema::create('matches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('game_id');
@@ -345,6 +349,449 @@ class UserGameLibraryTest extends TestCase
         ]))->assertCreated();
         $this->assertSame(1, $this->other->games()->wherePivot('in_library', true)->count());
         $this->assertSame(0, $this->owner->games()->count());
+    }
+
+    private function fakeExpansion(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*xmlapi2/thing?stats=1&id=50&versions=1' => Http::response(
+                '<items><item type="boardgameexpansion" id="50"><name type="primary" value="Expansion"/>'
+                . '<minplayers value="1"/><maxplayers value="4"/>'
+                . '<link type="boardgameexpansion" id="42" value="Base" inbound="true"/>'
+                . '<link type="boardgameexpansion" id="60" value="Other base" inbound="true"/>'
+                . '<link type="boardgameexpansion" id="60" value="Other base" inbound="true"/>'
+                . '<link type="boardgameexpansion" id="61" value="Other expansion" inbound="true"/>'
+                . '<link type="boardgameexpansion" id="62" value="Child expansion"/>'
+                . '</item></items>'
+            ),
+            '*xmlapi2/thing?stats=1&id=42,60,61&versions=1' => Http::response(
+                '<items><item type="boardgame" id="42"><name value="Base"/></item>'
+                . '<item type="boardgame" id="60"><name value="Other base"/></item>'
+                . '<item type="boardgameexpansion" id="61"><name value="Other expansion"/></item></items>'
+            ),
+        ]);
+    }
+
+    public function test_expansion_requires_one_catalogued_base_game_without_requiring_ownership(): void
+    {
+        $this->migration()->up();
+        Storage::fake('images');
+        $this->fakeExpansion();
+        $this->actingAs($this->owner);
+        $this->getJson('/api/game_search_detail?id=50')->assertOk()
+            ->assertJsonPath('isExpansion', true)
+            ->assertJsonPath('canAddExpansion', false)
+            ->assertJsonPath('baseGames.0.name', 'Base')
+            ->assertJsonPath('minplayers', '1')->assertJsonPath('maxplayers', '4');
+        $payload = $this->payload([
+            'bggId' => 50, 'name' => 'Expansion', 'isExpansion' => true,
+            'imageUrlFromBgg' => 'data://text/plain,image',
+            'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+        ]);
+        $this->postJson('/api/game', $payload)->assertUnprocessable()->assertJsonValidationErrors('isExpansion');
+        $this->assertDatabaseCount('games', 0);
+        $this->assertDatabaseCount('game_expansion', 0);
+        $this->assertDatabaseCount('game_user', 0);
+        Storage::disk('images')->assertDirectoryEmpty('/');
+        $base = new Game;
+        $base->forceFill(['title' => 'Base', 'bgg_id' => 42, 'is_expansion' => true])->save();
+        $this->postJson('/api/game', $payload)->assertUnprocessable()->assertJsonValidationErrors('isExpansion');
+        $base->is_expansion = false;
+        $base->save();
+        $this->getJson('/api/game_search_detail?id=50')->assertOk()
+            ->assertJsonPath('canAddExpansion', true)->assertJsonPath('baseGames.0.owned', false);
+        $response = $this->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'name' => 'Expansion', 'isExpansion' => true,
+            'imageUrlFromBgg' => 'data://text/plain,image',
+            'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+        ]))->assertCreated();
+        $extension = Game::findOrFail($response->json('id'));
+
+        $this->assertDatabaseCount('games', 2);
+        $this->assertDatabaseHas('games', ['id' => $extension->id, 'is_expansion' => true]);
+        $this->assertDatabaseCount('game_expansion', 2);
+        foreach ([42, 60] as $parentId) {
+            $this->assertDatabaseHas('game_expansion', ['extension_id' => $extension->id, 'base_game_bgg_id' => $parentId]);
+        }
+        $this->assertSame([$base->id], $extension->baseGames()->pluck('games.id')->all());
+        $this->assertSame(1, $this->owner->games()->wherePivot('in_library', true)->count());
+        $this->assertSame(0, $this->other->games()->count());
+        $this->getJson('/api/game/bgg/50')->assertOk()->assertJsonPath('isExpansion', 1);
+        $this->getJson('/api/game/'.$extension->id)->assertOk()->assertJsonPath('isExpansion', 1);
+        $this->getJson('/api/game')->assertOk()->assertJsonCount(2);
+        $catalogue = collect($this->getJson('/api/game')->assertOk()->json())->keyBy('id');
+        $this->assertSame([42, 60], $catalogue[$extension->id]['baseGameBggIds']);
+        $this->assertSame([], $catalogue[$base->id]['baseGameBggIds']);
+
+        $otherBase = new Game;
+        $otherBase->forceFill(['title' => 'Other base', 'bgg_id' => 60])->save();
+        $this->assertSame(2, $extension->baseGames()->count());
+        $this->assertSame([$extension->id], $base->expansions()->pluck('games.id')->all());
+        $this->assertSame(1, $this->owner->games()->count());
+        Http::assertSentCount(2);
+    }
+
+    public function test_editing_or_adding_an_existing_expansion_preserves_its_type_and_links(): void
+    {
+        $this->game();
+        $this->migration()->up();
+        $extension = new Game;
+        $extension->forceFill([
+            'title' => 'Expansion', 'bgg_id' => 50, 'is_expansion' => true,
+            'image_id' => 'image.jpg', 'thumbnail_id' => 'thumb.jpg',
+        ])->save();
+        $extension->baseGames()->sync([42, 60]);
+        $this->owner->games()->attach($extension->id, ['in_library' => true]);
+        Http::preventStrayRequests();
+        Http::fake();
+
+        $this->actingAs($this->other)->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'name' => 'Edited expansion', 'isExpansion' => false,
+        ]))->assertOk();
+        $this->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'name' => 'Edited again',
+        ]))->assertOk();
+
+        $this->assertDatabaseHas('games', ['id' => $extension->id, 'is_expansion' => true, 'title' => 'Edited again']);
+        $this->assertDatabaseCount('game_expansion', 2);
+        $this->assertDatabaseCount('games', 2);
+        $this->assertSame(2, $this->owner->games()->count());
+        $this->assertSame(1, $this->other->games()->count());
+        Http::assertNothingSent();
+
+        $extension->delete();
+        $this->assertDatabaseCount('game_expansion', 0);
+    }
+
+    public function test_expansions_store_only_additional_players_and_colors_without_changing_base_games(): void
+    {
+        $red = ['name' => 'Rouge', 'code' => 'red', 'invert' => 'white', 'fallback' => []];
+        $blue = ['name' => 'Bleu', 'code' => 'blue', 'invert' => 'white', 'fallback' => []];
+        $green = ['name' => 'Vert', 'code' => 'green', 'invert' => 'white', 'fallback' => []];
+        $base = $this->game(['player_colors' => json_encode([$red]), 'min_players' => 1, 'max_players' => 4,
+            'estimated_duration_in_minutes' => 90, 'quantifiable_score' => false, 'highest_score_win' => false]);
+        $otherBase = $this->game(['bgg_id' => 60, 'title' => 'Other base', 'player_colors' => json_encode([$blue])]);
+        $this->migration()->up();
+        $baseAttributes = $base->fresh()->getAttributes();
+        $otherAttributes = $otherBase->fresh()->getAttributes();
+        Storage::fake('images');
+        $this->fakeExpansion();
+        $this->actingAs($this->owner);
+        $this->getJson('/api/game_search_detail?id=50')->assertOk()
+            ->assertJsonCount(2, 'baseGameColors')
+            ->assertJsonFragment(['playerColors' => [$red]])
+            ->assertJsonFragment(['playerColors' => [$blue]]);
+
+        $payload = $this->payload([
+            'bggId' => 50, 'name' => 'Expansion', 'isExpansion' => true, 'additionalPlayers' => 2,
+            'playerColors' => json_encode([$green]),
+            'imageUrlFromBgg' => 'data://text/plain,image', 'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+        ]);
+        foreach (['minPlayers', 'maxPlayers', 'isOnlyCooperative', 'estimatedDurationInMinutes', 'quantifiableScore', 'highestScoreWin'] as $field) {
+            unset($payload[$field]);
+        }
+        $id = $this->postJson('/api/game', $payload)->assertCreated()->json('id');
+        $extension = Game::findOrFail($id);
+        $this->assertSame(2, $extension->additional_players);
+        $this->assertSame([$green], json_decode($extension->player_colors, true));
+        foreach (['/api/game/bgg/50', '/api/game/'.$id] as $url) {
+            $this->getJson($url)->assertOk()->assertJsonPath('additionalPlayers', 2)
+                ->assertJsonCount(2, 'baseGameColors')
+                ->assertJsonFragment(['playerColors' => [$red]])
+                ->assertJsonFragment(['playerColors' => [$blue]]);
+        }
+        $this->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'additionalPlayers' => 0, 'playerColors' => '[]',
+            'minPlayers' => 20, 'maxPlayers' => 30, 'estimatedDurationInMinutes' => 500,
+            'isOnlyCooperative' => true, 'quantifiableScore' => false, 'highestScoreWin' => false,
+        ]))->assertOk();
+        $this->assertDatabaseHas('games', ['id' => $id, 'additional_players' => 0, 'min_players' => 0,
+            'max_players' => 0, 'estimated_duration_in_minutes' => 0, 'is_only_cooperative' => false,
+            'quantifiable_score' => true, 'highest_score_win' => true]);
+        $this->assertSame($baseAttributes, $base->fresh()->getAttributes());
+        $this->assertSame($otherAttributes, $otherBase->fresh()->getAttributes());
+    }
+
+    public function test_invalid_extension_players_and_inherited_or_duplicate_colors_are_rejected(): void
+    {
+        $red = ['name' => 'Rouge', 'code' => 'red', 'invert' => 'white', 'fallback' => []];
+        $blue = ['name' => 'Bleu', 'code' => 'blue', 'invert' => 'white', 'fallback' => []];
+        $this->game(['player_colors' => json_encode([$red])]);
+        $extension = $this->game(['bgg_id' => 50, 'is_expansion' => true, 'additional_players' => 2, 'player_colors' => '[]']);
+        $extension->baseGames()->sync([42]);
+        $this->migration()->up();
+        $this->actingAs($this->owner);
+        foreach ([-1, 1.5, null, 'invalid', 65536] as $value) {
+            $this->postJson('/api/game', $this->payload(['bggId' => 50, 'additionalPlayers' => $value]))
+                ->assertUnprocessable()->assertJsonValidationErrors('additionalPlayers');
+        }
+        foreach (['invalid', 'null', '{}', json_encode([$red]), json_encode([array_merge($red, ['code' => 'RED'])]),
+            json_encode([$blue, $blue]), json_encode([['code' => 'blue']])] as $colors) {
+            $this->postJson('/api/game', $this->payload(['bggId' => 50, 'playerColors' => $colors]))
+                ->assertUnprocessable();
+        }
+        $this->assertDatabaseHas('games', ['id' => $extension->id, 'additional_players' => 2, 'player_colors' => '[]']);
+    }
+
+    public function test_legacy_extension_hidden_properties_are_preserved_and_regular_games_remain_editable(): void
+    {
+        $base = $this->game(['min_players' => 1, 'max_players' => 4, 'estimated_duration_in_minutes' => 90]);
+        $extension = $this->game(['bgg_id' => 50, 'is_expansion' => true, 'additional_players' => 2,
+            'min_players' => 1, 'max_players' => 6, 'estimated_duration_in_minutes' => 120,
+            'is_only_cooperative' => true, 'quantifiable_score' => false, 'highest_score_win' => false]);
+        $extension->baseGames()->sync([42]);
+        $this->migration()->up();
+        $this->actingAs($this->owner)->postJson('/api/game', $this->payload(['bggId' => 50]))->assertOk();
+        $this->assertDatabaseHas('games', ['id' => $extension->id, 'additional_players' => 2,
+            'min_players' => 1, 'max_players' => 6, 'estimated_duration_in_minutes' => 120,
+            'is_only_cooperative' => true, 'quantifiable_score' => false, 'highest_score_win' => false]);
+        $this->postJson('/api/game', $this->payload([
+            'minPlayers' => 2, 'maxPlayers' => 5, 'estimatedDurationInMinutes' => 60,
+            'isOnlyCooperative' => true, 'quantifiableScore' => false, 'highestScoreWin' => false,
+        ]))->assertOk();
+        $this->assertDatabaseHas('games', ['id' => $base->id, 'min_players' => 2, 'max_players' => 5,
+            'estimated_duration_in_minutes' => 60, 'is_only_cooperative' => true,
+            'quantifiable_score' => false, 'highest_score_win' => false]);
+    }
+
+    public function test_expansion_tag_value_changes_are_saved_separately_for_each_parent_and_scope(): void
+    {
+        $tag = ['category' => 'Faction', 'unique' => true, 'minOcurrences' => 1, 'maxOcurrences' => 1,
+            'revealedLater' => true, 'names' => ['A', 'B']];
+        $base = $this->game(['player_tags' => json_encode([$tag]), 'match_tags' => json_encode([$tag])]);
+        $other = $this->game(['bgg_id' => 60, 'title' => 'Other', 'player_tags' => json_encode([$tag])]);
+        $this->migration()->up();
+        $baseAttributes = $base->fresh()->getAttributes();
+        $otherAttributes = $other->fresh()->getAttributes();
+        $this->fakeExpansion();
+        Storage::fake('images');
+        $changes = [
+            ['baseGameBggId' => 42, 'scope' => 'player', 'category' => 'Faction', 'addedValues' => ['C'], 'removedValues' => ['A']],
+            ['baseGameBggId' => 42, 'scope' => 'match', 'category' => 'Faction', 'addedValues' => [], 'removedValues' => ['A', 'B']],
+            ['baseGameBggId' => 60, 'scope' => 'player', 'category' => 'Faction', 'addedValues' => ['D'], 'removedValues' => []],
+        ];
+        $this->actingAs($this->other)->getJson('/api/game_search_detail?id=50')->assertOk()
+            ->assertJsonCount(2, 'baseGameTags')
+            ->assertJsonPath('baseGameTags.0.playerTags.0.category', 'Faction');
+        $newTag = array_merge($tag, ['category' => 'New tag', 'names' => ['New value']]);
+        $id = $this->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'isExpansion' => true, 'expansionTagChanges' => $changes,
+            'playerTags' => json_encode([$newTag]), 'matchTags' => json_encode([$newTag]),
+            'imageUrlFromBgg' => 'data://text/plain,image', 'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+        ]))->assertCreated()->json('id');
+        $this->assertSame($changes, Game::findOrFail($id)->expansion_tag_changes);
+        foreach (['/api/game/bgg/50', '/api/game/'.$id] as $url) {
+            $this->getJson($url)->assertOk()->assertJsonPath('expansionTagChanges', $changes)
+                ->assertJsonCount(2, 'baseGameTags')->assertJsonPath('baseGameTags.0.playerTags.0.names', ['A', 'B']);
+        }
+        $this->postJson('/api/game', $this->payload(['bggId' => 50]))->assertOk();
+        $this->assertSame($changes, Game::findOrFail($id)->expansion_tag_changes);
+        $this->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'expansionTagChanges' => [], 'playerTags' => json_encode([$newTag]),
+            'matchTags' => json_encode([$newTag]),
+        ]))->assertOk();
+        $this->assertSame([], Game::findOrFail($id)->expansion_tag_changes);
+        $this->assertSame([$newTag], json_decode(Game::findOrFail($id)->player_tags, true));
+        $this->assertSame([$newTag], json_decode(Game::findOrFail($id)->match_tags, true));
+        $this->assertSame($baseAttributes, $base->fresh()->getAttributes());
+        $this->assertSame($otherAttributes, $other->fresh()->getAttributes());
+    }
+
+    public function test_invalid_or_stale_tag_value_changes_cannot_modify_any_game(): void
+    {
+        $tag = ['category' => 'Faction', 'unique' => true, 'minOcurrences' => 1, 'maxOcurrences' => 1, 'names' => ['A', 'B']];
+        $this->game(['player_tags' => json_encode([$tag])]);
+        $this->game(['bgg_id' => 60, 'player_tags' => json_encode([$tag])]);
+        $extension = $this->game(['bgg_id' => 50, 'is_expansion' => true]);
+        $extension->baseGames()->sync([42]);
+        $this->migration()->up();
+        $change = ['baseGameBggId' => 42, 'scope' => 'player', 'category' => 'Faction', 'addedValues' => ['C'], 'removedValues' => ['A']];
+        $this->actingAs($this->owner);
+        foreach ([
+            null, '[]', ['unexpected' => $change], [$change, $change],
+            [$change, array_merge($change, ['baseGameBggId' => '42'])],
+            [array_merge($change, ['baseGameBggId' => 60])],
+            [array_merge($change, ['category' => 'Missing'])],
+            [array_merge($change, ['scope' => 'score'])],
+            [array_merge($change, ['scope' => 'match'])],
+            [array_merge($change, ['addedValues' => ['A']])],
+            [array_merge($change, ['addedValues' => ['C', 'C']])],
+            [array_merge($change, ['removedValues' => ['A', 'A']])],
+            [array_merge($change, ['removedValues' => ['C']])],
+            [array_merge($change, ['addedValues' => [null]])],
+            [array_merge($change, ['unique' => false])],
+        ] as $invalid) {
+            $this->postJson('/api/game', $this->payload([
+                'bggId' => 50, 'name' => 'Must not change', 'expansionTagChanges' => $invalid,
+            ]))->assertUnprocessable();
+        }
+        $this->assertSame(null, $extension->fresh()->expansion_tag_changes);
+        $this->assertSame('Test', $extension->fresh()->title);
+        $this->postJson('/api/game', $this->payload(['expansionTagChanges' => [$change]]))
+            ->assertUnprocessable()->assertJsonValidationErrors('expansionTagChanges');
+        $this->postJson('/api/game', $this->payload(['bggId' => 50, 'expansionTagChanges' => [$change]]))->assertOk();
+        Game::where('bgg_id', 42)->update(['player_tags' => '[]']);
+        $this->postJson('/api/game', $this->payload(['bggId' => 50, 'expansionTagChanges' => [$change]]))->assertUnprocessable();
+        $this->assertSame([$change], $extension->fresh()->expansion_tag_changes);
+        $this->postJson('/api/game', $this->payload(['bggId' => 50, 'expansionTagChanges' => []]))->assertOk();
+        $this->assertSame([], $extension->fresh()->expansion_tag_changes);
+    }
+
+    public function test_expansion_score_category_changes_store_only_differing_properties(): void
+    {
+        $red = ['name' => 'Rouge', 'code' => 'red', 'invert' => 'white', 'fallback' => ['Pourpre']];
+        $score = ['category' => 'Animaux', 'min' => 0, 'max' => 10, 'negatif' => false, 'complex' => false,
+            'color' => ['name' => 'Aucune', 'code' => 'white', 'invert' => 'black', 'fallback' => []]];
+        $base = $this->game(['score_template' => json_encode([$score])]);
+        $this->game(['bgg_id' => 60, 'title' => 'Other', 'score_template' => json_encode([$score])]);
+        $this->migration()->up();
+        $baseAttributes = $base->fresh()->getAttributes();
+        $this->fakeExpansion();
+        Storage::fake('images');
+        $this->actingAs($this->other)->getJson('/api/game_search_detail?id=50')->assertOk()
+            ->assertJsonPath('baseGameTags.0.scoreTags.0.category', 'Animaux');
+        $id = $this->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'isExpansion' => true,
+            'imageUrlFromBgg' => 'data://text/plain,image', 'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+            'expansionScoreChanges' => [
+                ['baseGameBggId' => 42, 'category' => 'Animaux', 'properties' => [
+                    'min' => 0, 'max' => null, 'negatif' => true, 'complex' => false, 'color' => $red,
+                ]],
+                ['baseGameBggId' => 60, 'category' => 'Animaux', 'properties' => [
+                    'min' => '0', 'max' => 10, 'negatif' => false, 'complex' => false, 'color' => $score['color'],
+                ]],
+            ],
+        ]))->assertCreated()->json('id');
+        $expected = [['baseGameBggId' => 42, 'category' => 'Animaux', 'properties' => [
+            'max' => null, 'negatif' => true, 'color' => $red,
+        ]]];
+        $this->assertSame($expected, Game::findOrFail($id)->expansion_score_changes);
+        foreach (['/api/game/bgg/50', '/api/game/'.$id] as $url) {
+            $this->getJson($url)->assertOk()->assertJsonPath('expansionScoreChanges', $expected)
+                ->assertJsonPath('baseGameTags.0.scoreTags.0.max', 10);
+        }
+        $this->postJson('/api/game', $this->payload(['bggId' => 50]))->assertOk();
+        $this->assertSame($expected, Game::findOrFail($id)->expansion_score_changes);
+        $this->postJson('/api/game', $this->payload(['bggId' => 50, 'expansionScoreChanges' => []]))->assertOk();
+        $this->assertSame([], Game::findOrFail($id)->expansion_score_changes);
+        $this->assertSame($baseAttributes, $base->fresh()->getAttributes());
+    }
+
+    public function test_invalid_score_category_changes_are_rejected(): void
+    {
+        $score = ['category' => 'Animaux', 'min' => 0, 'max' => 10, 'negatif' => false, 'complex' => false,
+            'color' => ['name' => 'Aucune', 'code' => 'white', 'invert' => 'black', 'fallback' => []]];
+        $this->game(['score_template' => json_encode([$score])]);
+        $extension = $this->game(['bgg_id' => 50, 'is_expansion' => true]);
+        $extension->baseGames()->sync([42]);
+        $this->migration()->up();
+        $change = ['baseGameBggId' => 42, 'category' => 'Animaux', 'properties' => ['negatif' => true]];
+        $this->actingAs($this->owner);
+        foreach ([
+            null, '[]', ['unexpected' => $change], [$change, $change],
+            [array_merge($change, ['baseGameBggId' => 60])],
+            [array_merge($change, ['category' => 'Missing'])],
+            [array_merge($change, ['properties' => ['category' => 'Renamed']])],
+            [array_merge($change, ['properties' => ['min' => 'abc']])],
+            [array_merge($change, ['properties' => ['min' => 20]])],
+            [array_merge($change, ['properties' => ['color' => ['code' => 'red']]])],
+            [array_merge($change, ['extra' => true])],
+        ] as $invalid) {
+            $this->postJson('/api/game', $this->payload([
+                'bggId' => 50, 'name' => 'Must not change', 'expansionScoreChanges' => $invalid,
+            ]))->assertUnprocessable();
+        }
+        $this->assertNull($extension->fresh()->expansion_score_changes);
+        $this->assertSame('Test', $extension->fresh()->title);
+        $this->postJson('/api/game', $this->payload(['expansionScoreChanges' => [$change]]))
+            ->assertUnprocessable()->assertJsonValidationErrors('expansionScoreChanges');
+    }
+
+    public function test_empty_tag_deltas_are_not_stored_and_parent_tags_remain_live(): void
+    {
+        $tag = ['category' => 'Faction', 'unique' => true, 'minOcurrences' => 1, 'maxOcurrences' => 1, 'names' => ['A']];
+        $base = $this->game(['player_tags' => json_encode([$tag])]);
+        $extension = $this->game(['bgg_id' => 50, 'is_expansion' => true]);
+        $extension->baseGames()->sync([42]);
+        $this->migration()->up();
+        $this->actingAs($this->owner)->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'expansionTagChanges' => [
+                ['baseGameBggId' => 42, 'scope' => 'player', 'category' => 'Faction', 'addedValues' => [], 'removedValues' => []],
+            ],
+        ]))->assertOk();
+        $this->assertSame([], $extension->fresh()->expansion_tag_changes);
+        $tag['names'][] = 'B';
+        $base->player_tags = json_encode([$tag]);
+        $base->save();
+        $this->getJson('/api/game/bgg/50')->assertOk()->assertJsonPath('baseGameTags.0.playerTags.0.names', ['A', 'B']);
+    }
+
+    public function test_invalid_expansion_metadata_is_rejected_before_creating_anything(): void
+    {
+        $this->migration()->up();
+        Http::preventStrayRequests();
+        Http::fake([
+            '*xmlapi2/thing*' => Http::response('<items><item type="boardgame" id="42"><name value="Base"/></item></items>'),
+        ]);
+        $this->actingAs($this->owner)->postJson('/api/game', $this->payload(['isExpansion' => true]))
+            ->assertUnprocessable()->assertJsonValidationErrors('isExpansion');
+        $this->postJson('/api/game', $this->payload(['isExpansion' => 'invalid']))->assertUnprocessable();
+        $this->assertDatabaseCount('games', 0);
+        $this->assertDatabaseCount('game_expansion', 0);
+        $this->assertDatabaseCount('game_user', 0);
+    }
+
+    public function test_incomplete_bgg_parents_abort_expansion_creation_without_writing_links(): void
+    {
+        $this->migration()->up();
+        Http::preventStrayRequests();
+        Http::fake([
+            '*xmlapi2/thing?stats=1&id=50&versions=1' => Http::response(
+                '<items><item type="boardgameexpansion" id="50"><name value="Expansion"/>'
+                . '<link type="boardgameexpansion" id="42" value="Missing base" inbound="true"/></item></items>'
+            ),
+            '*xmlapi2/thing?stats=1&id=42&versions=1' => Http::response('<items/>'),
+        ]);
+        $this->actingAs($this->owner)->postJson('/api/game', $this->payload(['bggId' => 50, 'isExpansion' => true]))
+            ->assertStatus(502);
+        $this->assertDatabaseCount('games', 0);
+        $this->assertDatabaseCount('game_expansion', 0);
+        $this->assertDatabaseCount('game_user', 0);
+    }
+
+    public function test_expansion_and_its_links_are_rolled_back_if_library_membership_cannot_be_saved(): void
+    {
+        $base = $this->game();
+        $this->migration()->up();
+        Storage::fake('images');
+        $this->fakeExpansion();
+        DB::statement('CREATE TRIGGER reject_membership BEFORE INSERT ON "test$game_user" BEGIN SELECT RAISE(ABORT, \'Membership rejected\'); END');
+
+        $this->actingAs($this->owner)->postJson('/api/game', $this->payload([
+            'bggId' => 50, 'isExpansion' => true,
+            'imageUrlFromBgg' => 'data://text/plain,image',
+            'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+        ]))->assertStatus(500);
+
+        $this->assertDatabaseCount('games', 1);
+        $this->assertDatabaseHas('games', ['id' => $base->id]);
+        $this->assertDatabaseCount('game_expansion', 0);
+        $this->assertDatabaseCount('game_user', 1);
+    }
+
+    public function test_a_match_cannot_be_started_from_an_expansion(): void
+    {
+        Schema::table('players', function (Blueprint $table) {
+            $table->unsignedBigInteger('replaced_by_player_id')->nullable();
+        });
+        $extension = $this->game(['is_expansion' => true]);
+        DB::table('players')->insert(['id' => 101, 'pseudo' => 'Player']);
+        $this->actingAs($this->owner)->postJson('/api/game-match', [
+            'match' => ['gameId' => $extension->id, 'tags' => []],
+            'teams' => [['players' => [['playerId' => 101]]]],
+        ])->assertStatus(422);
+        $this->assertDatabaseCount('matches', 0);
     }
 
     public function test_invalid_library_fields_are_rejected_without_mutation(): void

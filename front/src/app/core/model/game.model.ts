@@ -1,5 +1,5 @@
-import { ScoreTag } from "./score.model"
-import { ColorTag, Tag } from "./tag.model"
+import { ScoreTag, ScoreTagChange } from "./score.model"
+import { BaseGameTags, ColorTag, Tag, TagValueChange } from "./tag.model"
 
 /**
     * @description      :
@@ -20,6 +20,7 @@ export interface Game extends GameDetail {
 }
 
 export interface SelectingGame extends Game {
+    baseGameBggIds?: number[]
     lastPlayed: Date
     lastWinner: string
     createdAt: string
@@ -36,6 +37,12 @@ export interface GameToSave extends GameDetail {
 
 export interface GameDetail {
     title: string
+    isExpansion?: boolean
+    additionalPlayers?: number
+    baseGameColors?: BaseGameColors[]
+    baseGameTags?: BaseGameTags[]
+    expansionTagChanges?: TagValueChange[]
+    expansionScoreChanges?: ScoreTagChange[]
     isOnlyCooperative: boolean
     minPlayers: number
     maxPlayers: number
@@ -51,6 +58,12 @@ export interface GameDetail {
     quantifiableScore: boolean
     highestScoreWin: boolean
     estimatedDurationInMinutes: number
+}
+
+export interface BaseGameColors {
+    bggId: number
+    title: string
+    playerColors: ColorTag[]
 }
 
 export interface DrawBreaker {

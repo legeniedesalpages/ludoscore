@@ -1,6 +1,8 @@
 <app-layout [withBackButton]="true" (backButtonAction)="returnToGameList()">
     <ng-container role="header">
-        <span class="title">{{ editingExistingGame ? 'Modifier le jeu' : 'Ajouter un jeu' }}</span>
+        <span class="title">{{ isExpansion
+            ? (editingExistingGame ? "Modifier l'extension" : 'Ajouter une extension')
+            : (editingExistingGame ? 'Modifier le jeu' : 'Ajouter un jeu') }}</span>
     </ng-container>
 
     <ng-container role="body">
@@ -17,16 +19,22 @@
                 *ngIf="backgroundImageUrl != null && !loading">
 
                 <fieldset [disabled]="saving">
+                    <div *ngIf="isExpansion && !canAddExpansion" role="alert">
+                        <p>Ajoutez d'abord au moins un jeu de base dans le catalogue pour enregistrer cette extension.</p>
+                        <button mat-button type="button" *ngFor="let baseGame of baseGames" (click)="addBaseGame(baseGame)">
+                            Ajouter {{ baseGame.name }}
+                        </button>
+                    </div>
 
                     <div class="row">
                         <div class="column">
                             <mat-form-field appearance="fill">
-                                <mat-label>Nom du jeu</mat-label>
+                                <mat-label>{{ isExpansion ? "Nom de l'extension" : 'Nom du jeu' }}</mat-label>
                                 <input matInput formControlName="name">
                             </mat-form-field>
                         </div>
 
-                        <div class="column duration">
+                        <div class="column duration" *ngIf="!isExpansion">
                             <mat-form-field appearance="fill">
                                 <mat-label>Temps de jeu estimé</mat-label>
                                 <mat-select formControlName="estimatedDurationInMinutes">
@@ -57,40 +65,75 @@
 
                     <div class="row">
 
-                        <div class="column number">
+                        <div class="column additional-players" *ngIf="isExpansion">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Joueurs supplémentaires</mat-label>
+                                <input matInput type="number" min="0" max="65535" step="1" formControlName="additionalPlayers">
+                                <mat-error>Saisissez un entier positif ou nul.</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="column number" *ngIf="!isExpansion">
                             <mat-form-field appearance="fill">
                                 <mat-label>Joueurs minimum</mat-label>
                                 <input matInput formControlName="minPlayer">
                             </mat-form-field>
                         </div>
 
-                        <div class="column number">
+                        <div class="column number" *ngIf="!isExpansion">
                             <mat-form-field appearance="fill">
                                 <mat-label>Joueurs maximum</mat-label>
                                 <input matInput formControlName="maxPlayer">
                             </mat-form-field>
                         </div>
 
-                        <div class="column boolean">
+                        <div class="column boolean" *ngIf="!isExpansion">
                             <mat-slide-toggle formControlName="cooperative">Uniquement coopérarif</mat-slide-toggle>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="column">
-                            <color-tag-editor [tags]="tagsColor" [title]="'Couleurs'"></color-tag-editor>
-                        </div>
-                    </div>
+                    @if (isExpansion) {
+                        @for (baseGame of baseGameColors; track baseGame.bggId) {
+                            <div class="row">
+                                <div class="column">
+                                    <color-tag-editor [tags]="baseGame.playerColors"
+                                        [title]="baseGameColors.length > 1 ? 'Couleurs de ' + baseGame.title : 'Couleurs du jeu de base'"
+                                        [readonly]="true" />
+                                </div>
+                            </div>
+                        }
+                    }
 
                     <div class="row">
                         <div class="column">
-                            <tag-editor [tags]="tagsPlayer" [title]="'Tags des joueurs'"></tag-editor>
+                            <color-tag-editor [tags]="tagsColor" [title]="isExpansion ? 'Couleurs supplémentaires' : 'Couleurs'"
+                                [excludedTags]="inheritedColors"></color-tag-editor>
+                        </div>
+                    </div>
+
+                    @if (isExpansion) {
+                        @for (baseGame of baseGameTags; track baseGame.bggId) {
+                            @if (baseGame.playerTags.length) {
+                                <div class="row">
+                                    <div class="column">
+                                        <tag-editor [tags]="baseGame.playerTags"
+                                            [title]="baseGameTags.length > 1 ? 'Tags joueurs hérités de ' + baseGame.title : 'Tags joueurs hérités du jeu de base'"
+                                            [baseGameBggId]="baseGame.bggId" tagScope="player" [tagChanges]="expansionTagChanges" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+
+                    <div class="row">
+                        <div class="column">
+                            <tag-editor [tags]="tagsPlayer" [title]="isExpansion ? 'Tags des joueurs de l\'extension' : 'Tags des joueurs'"></tag-editor>
                         </div>
                     </div>
 
                     <div class="divide">Gestion des scores</div>
 
-                    <div class="row">
+                    <div class="row" *ngIf="!isExpansion">
                         <div class="column boolean">
                             <mat-slide-toggle formControlName="quantifiableScore">Score chiffré</mat-slide-toggle>
                         </div>
@@ -101,9 +144,24 @@
                     </div>
 
 
-                    <div class="row" *ngIf="gameEditorForm.get('quantifiableScore')!.value">
+                    <div class="row" *ngIf="isExpansion || gameEditorForm.get('quantifiableScore')!.value">
                         <div class="column">
-                            <score-tag-editor [tags]="tagsScore" [title]="'Categorie de score'"></score-tag-editor>
+                            @if (isExpansion) {
+                                @for (baseGame of baseGameTags; track baseGame.bggId) {
+                                    @if (baseGame.scoreTags?.length) {
+                                        <score-tag-editor [tags]="baseGame.scoreTags!"
+                                            [title]="baseGameTags.length > 1 ? 'Catégories de score héritées de ' + baseGame.title : 'Catégories de score héritées du jeu de base'"
+                                            [baseGameBggId]="baseGame.bggId" [scoreChanges]="expansionScoreChanges" />
+                                    }
+                                }
+                                @for (change of unavailableScoreChanges(); track $index) {
+                                    <p role="alert">
+                                        La catégorie de score « {{ change.category }} » (jeu BGG {{ change.baseGameBggId }}) n'existe plus.
+                                        <button mat-button type="button" (click)="resetScoreChange(change)">Supprimer cette modification</button>
+                                    </p>
+                                }
+                            }
+                            <score-tag-editor [tags]="tagsScore" [title]="isExpansion ? 'Catégories de score spécifiques à l\'extension' : 'Categorie de score'"></score-tag-editor>
                         </div>
                     </div>
 
@@ -121,15 +179,37 @@
 
                     <div class="divide">Propriétés du jeu</div>
 
+                    @if (isExpansion) {
+                        @for (baseGame of baseGameTags; track baseGame.bggId) {
+                            @if (baseGame.matchTags.length) {
+                                <div class="row">
+                                    <div class="column">
+                                        <tag-editor [tags]="baseGame.matchTags"
+                                            [title]="baseGameTags.length > 1 ? 'Tags du jeu hérités de ' + baseGame.title : 'Tags hérités du jeu de base'"
+                                            [baseGameBggId]="baseGame.bggId" tagScope="match" [tagChanges]="expansionTagChanges" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (change of unavailableTagChanges(); track $index) {
+                            <p role="alert">
+                                Le tag « {{ change.category }} » (jeu BGG {{ change.baseGameBggId }}) n'existe plus.
+                                <button mat-button type="button" (click)="resetTagChange(change)">Supprimer cette modification</button>
+                            </p>
+                        }
+                    }
+
                     <div class="row">
                         <div class="column">
-                            <tag-editor [tags]="tagsGame" [title]="'Tags du jeu'"></tag-editor>
+                            <tag-editor [tags]="tagsGame" [title]="isExpansion ? 'Tags spécifiques à l\'extension' : 'Tags du jeu'"></tag-editor>
                         </div>
                     </div>
 
                     <div class="row button_row">
                         <div class="column">
-                            <button mat-flat-button [hidden]="saving" (click)="saveGame()">Enregistrer le jeu</button>
+                            <button mat-flat-button [hidden]="saving" [disabled]="isExpansion && !canAddExpansion" (click)="saveGame()">
+                                {{ isExpansion ? "Enregistrer l'extension" : 'Enregistrer le jeu' }}
+                            </button>
                             <div class="spinner searching" [hidden]="!saving">
                                 <mat-spinner [diameter]=36 [strokeWidth]="7"></mat-spinner>
                             </div>

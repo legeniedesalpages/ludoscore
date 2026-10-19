@@ -56,6 +56,10 @@ fieldset {
   max-width: 150px;
 }
 
+.additional-players {
+  max-width: 280px;
+}
+
 .boolean {
   max-width: 250px;
   padding-top: 5px;

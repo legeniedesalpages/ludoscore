@@ -119,4 +119,68 @@ describe('GameLibraryComponent filters', () => {
     expect(fixture.componentInstance.filteredGames()).toEqual([])
     expect(fixture.nativeElement.querySelector('.empty').textContent).toContain('Aucun jeu ne correspond')
   })
+
+  it('groups compact extensions below each base game and keeps counters unique', async () => {
+    const fixture = await setup()
+    const component = fixture.componentInstance
+    component.games.set([
+      game(1, 'Zebra', true, 0),
+      game(2, 'Base', true, 0),
+      { ...game(3, 'Alpha extension', true, 0), isExpansion: true, baseGameBggIds: [1, 2] },
+      { ...game(4, 'Beta extension', true, 0), isExpansion: true, baseGameBggIds: [2] },
+    ])
+    await fixture.whenStable()
+    expect(component.rows().map(row => row.game.id)).toEqual([2, 3, 4, 1, 3])
+    expect(component.countInLibrary()).toBe(4)
+    expect(component.filteredGames()).toHaveLength(4)
+    const rows: NodeListOf<HTMLElement> = fixture.nativeElement.querySelectorAll('.extension-row')
+    expect(rows).toHaveLength(3)
+    expect(rows[0].querySelector('mat-icon')?.textContent).toContain('extension')
+    expect(rows[0].querySelector('.play-count')).toBeNull()
+    expect(rows[0].querySelectorAll('.heading, .supporting')).toHaveLength(2)
+    rows[0].click()
+    expect(TestBed.inject(Store).dispatch).toHaveBeenCalled()
+  })
+
+  it('keeps a context parent when searching an extension or filtering out its base game', async () => {
+    const fixture = await setup()
+    const component = fixture.componentInstance
+    component.games.set([
+      game(1, 'Base', false, 0),
+      { ...game(2, 'Addon', true, 0), isExpansion: true, baseGameBggIds: [1] },
+      { ...game(3, 'Hidden addon', false, 0), isExpansion: true, baseGameBggIds: [1] },
+    ])
+    component.searchText.set('Addon')
+    await fixture.whenStable()
+    expect(component.filteredGames().map(game => game.id)).toEqual([2])
+    expect(component.rows().map(row => [row.game.id, row.context])).toEqual([[1, true], [2, false]])
+    expect(fixture.nativeElement.querySelector('.context-row').textContent).toContain('Jeu de base (hors filtre)')
+    component.searchText.set('Base')
+    await fixture.whenStable()
+    expect(component.rows().map(row => row.game.id)).toEqual([1, 2])
+    expect(component.filteredGames()).toHaveLength(1)
+  })
+
+  it('does not lose legacy extensions whose parent is unavailable', async () => {
+    const fixture = await setup()
+    fixture.componentInstance.games.set([
+      { ...game(3, 'Addon', true, 0), isExpansion: true, baseGameBggIds: [999] },
+    ])
+    await fixture.whenStable()
+    expect(fixture.componentInstance.rows().map(row => row.game.id)).toEqual([3])
+    expect(fixture.nativeElement.querySelector('.extension-row')).not.toBeNull()
+  })
+
+  it('shows additional players instead of the obsolete player range for extensions', async () => {
+    const fixture = await setup()
+    fixture.componentInstance.games.set([
+      { ...game(1, 'Addon', true, 0), isExpansion: true, additionalPlayers: 2, isOnlyCooperative: true },
+    ])
+    await fixture.whenStable()
+    const row = fixture.nativeElement.querySelector('.extension-row')
+    expect(row.textContent).toContain('+2 joueurs supplémentaires')
+    expect(row.textContent).not.toContain('1 à 4 joueurs')
+    expect(row.textContent).not.toContain('coopératif')
+    expect(fixture.componentInstance.playersLabel({ ...game(2, 'Addon', true, 0), isExpansion: true })).toBe('Aucun joueur supplémentaire')
+  })
 })

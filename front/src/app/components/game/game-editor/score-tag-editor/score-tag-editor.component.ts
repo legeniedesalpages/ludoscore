@@ -15,7 +15,7 @@ import { MatChipEditedEvent, MatChipInputEvent } from '@angular/material/chips'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { ScoreTag } from 'src/app/core/model/score.model'
+import { SCORE_TAG_PROPERTY_LABELS, ScoreTag, ScoreTagChange, scoreTagDifferences, scoreTagWithChanges } from 'src/app/core/model/score.model'
 import { COLORS, ColorTag, NO_COLOR } from 'src/app/core/model/tag.model'
 
 
@@ -36,6 +36,12 @@ export class ScoreTagEditorComponent implements OnInit {
   @Input()
   public title: string = ''
 
+  @Input()
+  public baseGameBggId?: number
+
+  @Input()
+  public scoreChanges: ScoreTagChange[] = []
+
   constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -43,17 +49,39 @@ export class ScoreTagEditorComponent implements OnInit {
   }
 
   public removeTag(tag: ScoreTag): void {
+    if (this.baseGameBggId !== undefined) return
     const index = this.tags.indexOf(tag)
     if (index >= 0) {
       this.tags.splice(index, 1)
     }
   }
 
+  public changeFor(tag: ScoreTag): ScoreTagChange | undefined {
+    return this.scoreChanges.find(change => change.baseGameBggId === this.baseGameBggId && change.category === tag.category)
+  }
+
   public editTag(tag: ScoreTag) {
+    if (this.baseGameBggId !== undefined) {
+      this.dialog.open(DialogScoreTagEditorComponent, {
+        disableClose: true,
+        data: { ...scoreTagWithChanges(tag, this.changeFor(tag)), original: tag },
+      }).afterClosed().subscribe((result: ScoreTag | null | undefined) => {
+        if (!result) return
+        const previous = this.changeFor(tag)
+        if (previous) this.scoreChanges.splice(this.scoreChanges.indexOf(previous), 1)
+        const properties = scoreTagDifferences(tag, result)
+        if (Object.keys(properties).length) {
+          this.scoreChanges.push({ baseGameBggId: this.baseGameBggId!, category: tag.category, properties })
+        }
+        this.changeDetectorRef.markForCheck()
+      })
+      return
+    }
     this.openDialog(tag, this.tags.indexOf(tag))
   }
 
   public addTag(): void {
+    if (this.baseGameBggId !== undefined) return
     var tag: ScoreTag = {
       category: "",
       min: undefined,
@@ -137,22 +165,42 @@ export class DialogScoreTagEditorComponent {
     this.dialogRef.close(null)
   }
 
+  get inherited(): boolean {
+    return !!this.data.original
+  }
+
+  public readonly compareColors = (a?: ColorTag, b?: ColorTag) =>
+    (a?.code ?? '').toLowerCase() === (b?.code ?? '').toLowerCase()
+
+  private formTag(): ScoreTag {
+    const value = this.tagEditorForm.getRawValue()
+    return { category: value.category, min: value.min, max: value.max, negatif: value.negatif, complex: value.complex, color: value.color }
+  }
+
+  get changedProperties(): string[] {
+    if (!this.data.original) return []
+    return Object.keys(scoreTagDifferences(this.data.original, this.formTag()))
+      .map(property => SCORE_TAG_PROPERTY_LABELS[property as keyof typeof SCORE_TAG_PROPERTY_LABELS])
+  }
+
+  resetProperties(): void {
+    const original = this.data.original!
+    this.tagEditorForm.patchValue({
+      min: original.min ?? null, max: original.max ?? null,
+      negatif: !!original.negatif, complex: !!original.complex, color: original.color,
+    })
+    this.newColor = original.color
+  }
+
   closeTagDialog() {
     if (!this.tagEditorForm.valid) {
       console.info("Form is invalid")
     }
 
-    this.dialogRef.close({
-      category: this.tagEditorForm.get('category')?.value,
-      min: this.tagEditorForm.get('min')?.value,
-      max: this.tagEditorForm.get('max')?.value,
-      negatif: this.tagEditorForm.get('negatif')?.value,
-      complex: this.tagEditorForm.get('complex')?.value,
-      color: this.tagEditorForm.get('color')?.value
-    })
+    this.dialogRef.close(this.formTag())
   }
 
-  constructor(public dialogRef: MatDialogRef<DialogScoreTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: ScoreTag) {
+  constructor(public dialogRef: MatDialogRef<DialogScoreTagEditorComponent>, @Inject(MAT_DIALOG_DATA) public data: ScoreTag & { original?: ScoreTag }) {
     this.tagEditorForm = new FormGroup({
       category: new FormControl(data.category, Validators.required),
       min: new FormControl(data.min, [Validators.pattern("^[0-9\-]*$")]),
@@ -162,5 +210,6 @@ export class DialogScoreTagEditorComponent {
       color: new FormControl(data.color, Validators.required)
     })
     this. newColor = data.color
+    if (data.original) this.tagEditorForm.get('category')!.disable()
   }
 }

@@ -1,3 +1,5 @@
+import type { ScoreTag } from './score.model'
+
 /**
     * @description      : 
     * @author           : renau
@@ -21,6 +23,34 @@ export interface Tag {
 }
 
 export type TagPhase = 'initial' | 'all'
+
+export type TagScope = 'player' | 'match'
+
+export interface TagValueChange {
+    baseGameBggId: number
+    scope: TagScope
+    category: string
+    addedValues: string[]
+    removedValues: string[]
+}
+
+export interface BaseGameTags {
+    bggId: number
+    title: string
+    playerTags: Tag[]
+    matchTags: Tag[]
+    scoreTags?: ScoreTag[]
+}
+
+export function tagWithValueChanges(tag: Tag, change?: TagValueChange): Tag {
+    return {
+        ...tag,
+        names: [...new Set([
+            ...tag.names.filter(value => !change?.removedValues.includes(value)),
+            ...(change?.addedValues ?? []),
+        ])],
+    }
+}
 
 export function tagsForPhase(tags: Tag[], phase: TagPhase): Tag[] {
     return phase === 'initial' ? tags.filter(tag => !tag.revealedLater) : tags
