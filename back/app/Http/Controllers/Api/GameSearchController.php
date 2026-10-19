@@ -13,11 +13,10 @@ class GameSearchController extends Controller
 
     public function searchById($id)
     {
-        $detailRequest = 'https://boardgamegeek.com/xmlapi2/thing?type=boardgame&stats=1&id=' . $id;
-        $jsonDetailData = $this->requester($detailRequest);
+        $items = $this->fetchThings([(int) $id]);
 
-        if (array_key_exists('item', $jsonDetailData)) {
-            return json_encode($this->extractDetail($jsonDetailData['item']));
+        if (isset($items[(int) $id])) {
+            return json_encode($this->extractDetail($items[(int) $id]));
         }
         else {
             Log::info("No detail results");
@@ -33,6 +32,7 @@ class GameSearchController extends Controller
     private const MAX_THING_IDS = 20;
     private const MAX_DISPLAYED_EXPANSIONS = 10;
     private const THING_CACHE_HOURS = 24;
+    private const THING_CACHE_PREFIX = 'bgg.thing.versions.v1.';
 
     public function searchByName($searchText, $type = self::TYPE_GAME)
     {
@@ -182,7 +182,7 @@ class GameSearchController extends Controller
         $items = [];
         $missingIds = [];
         foreach (array_unique($ids) as $id) {
-            $cached = Cache::get('bgg.thing.' . $id);
+            $cached = Cache::get(self::THING_CACHE_PREFIX . $id);
             if ($cached !== null) {
                 $items[$id] = $cached;
             } else {
@@ -191,11 +191,11 @@ class GameSearchController extends Controller
         }
 
         foreach (array_chunk($missingIds, self::MAX_THING_IDS) as $chunk) {
-            $data = $this->requester(self::BGG_URL . 'thing?stats=1&id=' . implode(',', $chunk));
+            $data = $this->requester(self::BGG_URL . 'thing?stats=1&id=' . implode(',', $chunk) . '&versions=1');
             foreach ($this->asList($data['item'] ?? []) as $item) {
                 $id = (int) $item['@attributes']['id'];
                 $items[$id] = $item;
-                Cache::put('bgg.thing.' . $id, $item, now()->addHours(self::THING_CACHE_HOURS));
+                Cache::put(self::THING_CACHE_PREFIX . $id, $item, now()->addHours(self::THING_CACHE_HOURS));
             }
         }
         return $items;
@@ -346,6 +346,11 @@ class GameSearchController extends Controller
 
     private function extractName($item)
     {
+        $frenchTitle = $this->extractFrenchTitle($item);
+        if ($frenchTitle !== null) {
+            return $frenchTitle;
+        }
+
         $names = $this->asList($item['name'] ?? []);
         foreach ($names as $name) {
             if (($name['@attributes']['type'] ?? null) === 'primary') {
@@ -353,6 +358,33 @@ class GameSearchController extends Controller
             }
         }
         return $names[0]['@attributes']['value'] ?? "";
+    }
+
+    private function extractFrenchTitle(array $item): ?string
+    {
+        $multilingualTitle = null;
+        foreach ($this->asList($item['versions']['item'] ?? []) as $version) {
+            $title = $version['canonicalname']['@attributes']['value'] ?? null;
+            if (!is_string($title) || trim($title) === '') {
+                continue;
+            }
+
+            $languages = array_filter(
+                $this->asList($version['link'] ?? []),
+                fn(array $link): bool => ($link['@attributes']['type'] ?? null) === 'language'
+            );
+            foreach ($languages as $language) {
+                if (($language['@attributes']['id'] ?? null) === '2187'
+                    || ($language['@attributes']['value'] ?? null) === 'French') {
+                    if (count($languages) === 1) {
+                        return trim($title);
+                    }
+                    $multilingualTitle ??= trim($title);
+                }
+            }
+        }
+
+        return $multilingualTitle;
     }
 
     private function requester($request)

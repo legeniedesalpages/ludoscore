@@ -12,6 +12,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -375,6 +376,101 @@ class UserGameLibraryTest extends TestCase
             ->assertJsonPath('0.owned', false)->assertJsonPath('0.registered', true);
     }
 
+    public function test_bgg_french_titles_are_consistent_across_search_modes_and_creation_details(): void
+    {
+        Http::preventStrayRequests();
+        $game = $this->game(['title' => 'My custom title']);
+        $this->migration()->up();
+        Cache::put('bgg.thing.42', [
+            '@attributes' => ['id' => '42'],
+            'name' => ['@attributes' => ['type' => 'primary', 'value' => 'Old cached English title']],
+        ], now()->addDay());
+        $gameXml = '<item type="boardgame" id="42"><name type="primary" value="Base game"/>'
+            . '<link type="boardgameexpansion" id="50" value="Expansion"/>'
+            . '<versions><item id="420"><name type="primary" value="French edition"/>'
+            . '<canonicalname value="Jeu en français"/><link type="language" id="2187" value="French"/></item></versions></item>';
+        $expansionXml = '<item type="boardgameexpansion" id="50"><name type="primary" value="Expansion"/>'
+            . '<link type="boardgameexpansion" id="42" value="Base game" inbound="true"/>'
+            . '<versions><item id="500"><name type="primary" value="French edition"/>'
+            . '<canonicalname value="Extension française"/><link type="language" id="2187" value="French"/></item></versions></item>';
+        Http::fake([
+            '*xmlapi2/search*type=boardgameexpansion*' => Http::response('<items total="1"><item id="50"/></items>'),
+            '*xmlapi2/search*' => Http::response('<items total="2"><item id="42"/><item id="50"/></items>'),
+            '*xmlapi2/thing?stats=1&id=42&versions=1' => Http::response('<items>' . $gameXml . '</items>'),
+            '*xmlapi2/thing?stats=1&id=50&versions=1' => Http::response('<items>' . $expansionXml . '</items>'),
+        ]);
+
+        $this->actingAs($this->owner);
+        $this->getJson('/api/game_search?q=test')->assertOk()->assertJsonPath('0.name', 'Jeu en français');
+        $this->getJson('/api/game_search?q=test&type=expansion')->assertOk()
+            ->assertJsonPath('0.name', 'Extension française')
+            ->assertJsonPath('0.baseGames.0.name', 'Jeu en français')
+            ->assertJsonPath('0.baseGames.0.owned', true);
+        $this->getJson('/api/game_search?q=test&type=all')->assertOk()
+            ->assertJsonPath('0.name', 'Jeu en français')
+            ->assertJsonPath('0.expansions.0.name', 'Extension française');
+        $this->getJson('/api/game_search_detail?id=42')->assertOk()->assertJsonPath('name', 'Jeu en français');
+        $this->getJson('/api/game_search_detail?id=50')->assertOk()->assertJsonPath('name', 'Extension française');
+
+        Http::assertSentCount(6);
+        Http::assertSent(fn($request) => str_contains($request->url(), 'versions=1'));
+        $this->assertSame('My custom title', $game->fresh()->title);
+    }
+
+    public function test_french_title_from_creation_details_is_saved_and_returned_in_the_library(): void
+    {
+        Http::preventStrayRequests();
+        Storage::fake('images');
+        $this->migration()->up();
+        Http::fake([
+            '*xmlapi2/thing?stats=1&id=42&versions=1' => Http::response(
+                '<items><item type="boardgame" id="42"><name type="primary" value="Ticket to Ride"/>'
+                . '<versions><item><canonicalname value="Les Aventuriers du Rail"/>'
+                . '<link type="language" id="2187" value="French"/></item></versions></item></items>'
+            ),
+        ]);
+        $this->actingAs($this->owner);
+        $title = $this->getJson('/api/game_search_detail?id=42')->assertOk()->json('name');
+        $this->postJson('/api/game', $this->payload([
+            'name' => $title,
+            'imageUrlFromBgg' => 'data://text/plain,image',
+            'thumbnailUrlFromBgg' => 'data://text/plain,thumb',
+        ]))->assertCreated();
+
+        $this->assertDatabaseHas('games', ['bgg_id' => 42, 'title' => 'Les Aventuriers du Rail']);
+        $this->getJson('/api/game/bgg/42')->assertOk()->assertJsonPath('title', 'Les Aventuriers du Rail');
+    }
+
+    public function test_bgg_title_selection_prefers_french_only_editions_and_has_safe_fallbacks(): void
+    {
+        Http::preventStrayRequests();
+        $frenchOnly = '<item><canonicalname value="Titre français"/><link type="language" id="2187" value="French"/></item>';
+        $multilingual = '<item><canonicalname value="Titre multilingue"/>'
+            . '<link type="language" id="2184" value="English"/><link type="language" id="2187" value="French"/></item>';
+        $cases = [
+            [$multilingual . $frenchOnly, 'Titre français'],
+            [$frenchOnly . '<item><canonicalname value="Autre titre français"/><link type="language" id="2187" value="French"/></item>', 'Titre français'],
+            [$multilingual, 'Titre multilingue'],
+            ['<item><canonicalname value="German title"/><link type="language" id="2188" value="German"/></item>', 'Primary title'],
+            ['<item><name value="French edition"/><link type="language" id="2187" value="French"/></item>', 'Primary title'],
+            ['<item><canonicalname value="   "/><link type="language" id="2187" value="French"/></item>', 'Primary title'],
+            ['', 'Primary title'],
+        ];
+        $responses = [];
+        foreach ($cases as $index => [$versions, $expected]) {
+            $id = 1000 + $index;
+            $responses['*xmlapi2/thing?stats=1&id=' . $id . '&versions=1'] = Http::response(
+                '<items><item type="boardgame" id="' . $id . '"><name type="alternate" value="Alternate title"/>'
+                . '<name type="primary" value="Primary title"/><versions>' . $versions . '</versions></item></items>'
+            );
+        }
+        Http::fake($responses);
+        $this->actingAs($this->owner);
+        foreach ($cases as $index => [$versions, $expected]) {
+            $this->getJson('/api/game_search_detail?id=' . (1000 + $index))->assertOk()->assertJsonPath('name', $expected);
+        }
+    }
+
     public function test_bgg_game_search_excludes_expansions_by_default(): void
     {
         Http::preventStrayRequests();
@@ -382,7 +478,7 @@ class UserGameLibraryTest extends TestCase
         Http::fake([
             '*xmlapi2/search*type=boardgameexpansion*' => Http::response('<items total="1"><item type="boardgameexpansion" id="50"/></items>'),
             '*xmlapi2/search*' => Http::response('<items total="2"><item type="boardgame" id="42"/><item type="boardgame" id="50"/></items>'),
-            '*xmlapi2/thing?stats=1&id=42' => Http::response('<items><item type="boardgame" id="42"><name type="primary" value="Base"/></item></items>'),
+            '*xmlapi2/thing?stats=1&id=42&versions=1' => Http::response('<items><item type="boardgame" id="42"><name type="primary" value="Base"/></item></items>'),
         ]);
 
         $response = $this->actingAs($this->owner)->getJson('/api/game_search?q=base')->assertOk()->json();
@@ -399,10 +495,10 @@ class UserGameLibraryTest extends TestCase
         $this->migration()->up();
         Http::fake([
             '*xmlapi2/search*' => Http::response('<items total="1"><item type="boardgameexpansion" id="50"/></items>'),
-            '*xmlapi2/thing?stats=1&id=50' => Http::response('<items><item type="boardgameexpansion" id="50"><thumbnail>thumb.jpg</thumbnail><name type="primary" value="Joker"/><yearpublished value="2017"/>'
+            '*xmlapi2/thing?stats=1&id=50&versions=1' => Http::response('<items><item type="boardgameexpansion" id="50"><thumbnail>thumb.jpg</thumbnail><name type="primary" value="Joker"/><yearpublished value="2017"/>'
                 . '<link type="boardgameexpansion" id="42" value="Base" inbound="true"/><link type="boardgameexpansion" id="60" value="Other base" inbound="true"/>'
                 . '<link type="boardgameexpansion" id="61" value="Parent expansion" inbound="true"/></item></items>'),
-            '*xmlapi2/thing?stats=1&id=42,60,61' => Http::response('<items><item type="boardgame" id="42"><name type="primary" value="Base"/></item>'
+            '*xmlapi2/thing?stats=1&id=42,60,61&versions=1' => Http::response('<items><item type="boardgame" id="42"><name type="primary" value="Base"/></item>'
                 . '<item type="boardgame" id="60"><name type="primary" value="Other base"/></item>'
                 . '<item type="boardgameexpansion" id="61"><name type="primary" value="Parent expansion"/></item></items>'),
         ]);
@@ -422,16 +518,16 @@ class UserGameLibraryTest extends TestCase
         $this->migration()->up();
         Http::fake([
             '*xmlapi2/search*' => Http::response('<items total="2"><item type="boardgame" id="42"/><item type="boardgame" id="51"/></items>'),
-            '*xmlapi2/thing?stats=1&id=42,51' => Http::response('<items>'
+            '*xmlapi2/thing?stats=1&id=42,51&versions=1' => Http::response('<items>'
                 . '<item type="boardgame" id="42"><name type="primary" value="Matched base"/><poll totalvotes="5"/>'
                 . '<link type="boardgameexpansion" id="50" value="Not matched expansion"/><link type="boardgameexpansion" id="51" value="Matched expansion"/></item>'
                 . '<item type="boardgameexpansion" id="51"><thumbnail>exp.jpg</thumbnail><name type="primary" value="Matched expansion"/><poll totalvotes="1"/>'
                 . '<link type="boardgameexpansion" id="42" value="Matched base" inbound="true"/><link type="boardgameexpansion" id="70" value="Other base" inbound="true"/>'
                 . '<link type="boardgameexpansion" id="80" value="Parent expansion" inbound="true"/></item>'
                 . '</items>'),
-            '*xmlapi2/thing?stats=1&id=70,80' => Http::response('<items><item type="boardgame" id="70"><thumbnail>other.jpg</thumbnail><name type="primary" value="Other base"/><poll totalvotes="2"/></item>'
+            '*xmlapi2/thing?stats=1&id=70,80&versions=1' => Http::response('<items><item type="boardgame" id="70"><thumbnail>other.jpg</thumbnail><name type="primary" value="Other base"/><poll totalvotes="2"/></item>'
                 . '<item type="boardgameexpansion" id="80"><name type="primary" value="Parent expansion"/><poll totalvotes="9"/></item></items>'),
-            '*xmlapi2/thing?stats=1&id=50' => Http::response('<items><item type="boardgameexpansion" id="50"><name type="primary" value="Not matched expansion"/><poll totalvotes="0"/></item></items>'),
+            '*xmlapi2/thing?stats=1&id=50&versions=1' => Http::response('<items><item type="boardgameexpansion" id="50"><name type="primary" value="Not matched expansion"/><poll totalvotes="0"/></item></items>'),
         ]);
 
         $response = $this->actingAs($this->owner)->getJson('/api/game_search?q=test&type=all')->assertOk()->json();
@@ -459,7 +555,7 @@ class UserGameLibraryTest extends TestCase
         ));
         Http::fake([
             '*xmlapi2/search*' => Http::response('<items total="2"><item type="boardgame" id="42"/><item type="boardgame" id="51"/></items>'),
-            '*xmlapi2/thing?stats=1&id=42,51' => Http::response('<items>'
+            '*xmlapi2/thing?stats=1&id=42,51&versions=1' => Http::response('<items>'
                 . '<item type="boardgame" id="42"><name type="primary" value="Base"/>' . $rated(5000) . $links . '<link type="boardgameexpansion" id="51" value="Matched"/></item>'
                 . '<item type="boardgameexpansion" id="51"><name type="primary" value="Matched"/>' . $rated(1)
                 . '<link type="boardgameexpansion" id="42" value="Base" inbound="true"/></item></items>'),

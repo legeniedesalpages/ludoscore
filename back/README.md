@@ -7,6 +7,24 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## BoardGameGeek titles
+
+BGG search and creation details request editions with `versions=1`. Game and
+expansion titles prefer the `canonicalname` of a French-language edition
+(BGG language ID `2187`). French-only editions take priority over multilingual
+editions including French; the first usable title in BGG order is selected.
+Without a French edition title, the primary BGG name is used, then the first
+available name. Alternate names alone have no language metadata and are not
+guessed to be French.
+
+The same selection applies to parent games in expansion results. Creation
+prefills this title, which remains editable and is saved as the game's title.
+Existing saved titles are never automatically renamed.
+
+Search and creation details share a 24-hour per-item cache under
+`bgg.thing.versions.v1.<id>`. This namespace bypasses older cached items that
+did not include editions, without clearing unrelated application caches.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
