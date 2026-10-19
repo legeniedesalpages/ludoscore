@@ -40,8 +40,11 @@ class GameStatistics
         $participants = DB::table('teams as t')
             ->leftJoin('team_players as tp', 'tp.team_id', '=', 't.id')
             ->leftJoin('players as p', 'p.id', '=', 'tp.player_id')
+            ->leftJoin('matches as age_matches', 'age_matches.id', '=', 't.match_id')
+            ->leftJoin('games as age_games', 'age_games.id', '=', 'age_matches.game_id')
             ->whereIn('t.match_id', $matches->pluck('id'))
-            ->select('t.match_id', 't.id as team_id', 't.name', 't.color', 't.position', 't.tags', 'tp.player_id', 'p.pseudo')
+            ->select('t.match_id', 't.id as team_id', 't.name', 't.color', 't.position', 't.tags', 'tp.player_id', 'p.pseudo',
+                'p.birth_date', 'p.birth_year', 'age_games.is_only_cooperative as is_cooperative')
             ->get();
         $participants = app(\App\Services\PlayerNames::class)->present($participants, 'player_id')->groupBy('match_id');
         $winners = [];
@@ -115,7 +118,8 @@ class GameStatistics
                 $chart('Nombre de joueurs', 'bar', 'Joueurs', $playerCounts),
                 $chart('Parties par mois', 'line', 'Mois', $months),
                 ['title' => 'Évolution des durées', 'type' => 'line', 'columns' => ['Début de partie', 'Minutes'], 'rows' => $durations],
-            ], (new ParticipationStatistics())->charts($matches, $participants->collapse(), $playerId)),
+            ], (new ParticipationStatistics())->charts($matches, $participants->collapse(), $playerId),
+                (new AgeStatistics())->charts($matches, $participants->collapse(), $playerId)),
         ];
     }
 

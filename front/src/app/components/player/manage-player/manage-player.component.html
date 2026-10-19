@@ -5,13 +5,38 @@
 
     <ng-container role="body">
         <loading-spinner [loading]="loading" caption="Chargement de la liste des joueurs"></loading-spinner>
+        @if (isAdmin) {
+            <mat-checkbox [checked]="hideReplaced" [disabled]="loading" (change)="setHideReplaced($event.checked)">
+                Masquer les joueurs remplacés
+            </mat-checkbox>
+        }
+        @if (loadError) {
+            <p role="alert">{{ loadError }}</p>
+            <button mat-button (click)="reloadPlayers()">Réessayer</button>
+        }
 
-        <div class="manage-player" *ngIf="!loading">
+        <div class="manage-player" *ngIf="!loading && !loadError">
+            @if (personalPlayer; as player) {
+                <button type="button" class="personal-player-card" (click)="editPlayer(player.id)">
+                    <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg" alt="">
+                    <span class="personal-player-content">
+                        <span class="personal-player-name">{{ player.pseudo }}</span>
+                        <span class="personal-player-caption">
+                            @if (player.createdAt) {
+                                C’est vous, vous êtes ici depuis le {{ player.createdAt | date: 'dd/MM/yyyy' }}
+                            } @else {
+                                C’est vous
+                            }
+                        </span>
+                    </span>
+                </button>
+            }
             <div class="actions">
                 <button mat-raised-button (click)="createPlayer()">Ajouter un joueur</button>
             </div>
 
-            <div *ngFor="let player of playerEntities" class="result-list" (click)="editPlayer(player.id)">
+            @for (player of playerEntities; track player.id) {
+            <div class="result-list" (click)="editPlayer(player.id)">
                 <div class="visual">
                     <img src="https://www.gravatar.com/avatar/{{player.gravatar}}?d=identicon&r=pg">
                 </div>
@@ -20,23 +45,37 @@
                     @if (player.status === 'replaced') {
                         <div class="supporting">Remplacé par le joueur n° {{ player.replacedByPlayerId }}</div>
                     }
+                    @if (player.permissions?.canPersonalize ?? player.permissions?.can_personalize) {
+                        <div class="supporting player-association">
+                            @if (player.creatorName) {
+                                Copié depuis le compte de {{ player.creatorName }}
+                            } @else {
+                                Joueur associé à votre compte (copié depuis un autre compte)
+                            }
+                        </div>
+                    }
                     <div class="supporting">
                         Nous a rejoint le: {{ player.createdAt | date: 'dd/MM/yyyy' }}
                         <br/>
                         <span class="compte" [hidden]="player?.user?.email == undefined || !isAdmin">
                             Associé au compte: <span class="email">{{ player?.user?.email}}</span>
                         </span>
-                        @if (isAdmin && !player.user && player.creator; as creator) {
+                        @if (!player.user && player.createdByUserId === currentUserId) {
+                            <span class="creator">Créé par vous</span>
+                        } @else if (isAdmin && !player.user && player.creator; as creator) {
                             <span class="creator">
-                                Créé par : {{ creator.email }}
+                                Créé par :
                                 @if (creator.player; as creatorPlayer) {
-                                    <span class="creator-player">Joueur du créateur : {{ creatorPlayer.pseudo }}</span>
+                                    {{ creatorPlayer.pseudo }} ({{ creator.email }})
+                                } @else {
+                                    {{ creator.email }}
                                 }
                             </span>
                         }
                     </div>
                 </div>
             </div>
+            }
         </div>
     </ng-container>
 </app-layout>

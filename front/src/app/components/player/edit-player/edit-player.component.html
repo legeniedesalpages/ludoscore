@@ -83,6 +83,35 @@
                             </mat-form-field>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="column">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Naissance (facultatif)</mat-label>
+                                <mat-select formControlName="birthPrecision">
+                                    <mat-option value="none">Non renseignée</mat-option>
+                                    <mat-option value="year">Année seulement</mat-option>
+                                    <mat-option value="date">Date complète</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            @if (playerEditorForm.get('birthPrecision')?.value === 'year') {
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Année de naissance</mat-label>
+                                    <input matInput type="number" formControlName="birthYear" min="1" [max]="currentYear" step="1">
+                                    <mat-hint>L’âge sera approximatif dans les statistiques.</mat-hint>
+                                </mat-form-field>
+                            }
+                            @if (playerEditorForm.get('birthPrecision')?.value === 'date') {
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Date de naissance</mat-label>
+                                    <input matInput type="date" formControlName="birthDate" min="0001-01-01" [max]="today">
+                                </mat-form-field>
+                            }
+                            @if (playerEditorForm.hasError('birth')) {
+                                <p role="alert">Renseignez une {{ playerEditorForm.get('birthPrecision')?.value === 'year' ? 'année' : 'date' }} de naissance valide, sans dépasser aujourd’hui.</p>
+                            }
+                            <p>Utilisée pour les statistiques d’âge. Visible uniquement avec le droit d’accès aux informations personnelles. Choisissez « Non renseignée » pour l’effacer.</p>
+                        </div>
+                    </div>
                     }
 
                     <div class="row">
@@ -122,6 +151,9 @@
                     </div>
                 </fieldset>
             </form>
+            @if (saveError) {
+                <p role="alert">{{ saveError }}</p>
+            }
 
             <mat-accordion class="player-actions" [multi]="true" displayMode="flat">
             @if (!creating && canPersonalize) {

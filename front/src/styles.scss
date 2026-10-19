@@ -50,6 +50,28 @@ body {
   overflow-wrap: anywhere;
 }
 
+.personal-player-card {
+  background-color: mat.get-theme-color($ludoscore-theme, surface-container-low);
+  color: mat.get-theme-color($ludoscore-theme, on-surface);
+  border-color: mat.get-theme-color($ludoscore-theme, outline-variant);
+
+  .personal-player-caption {
+    color: mat.get-theme-color($ludoscore-theme, on-surface-variant);
+  }
+
+  .personal-player-name {
+    color: mat.get-theme-color($ludoscore-theme, primary);
+  }
+
+  &:hover {
+    background-color: mat.get-theme-color($ludoscore-theme, surface-container);
+  }
+
+  &:focus-visible {
+    outline-color: mat.get-theme-color($ludoscore-theme, primary);
+  }
+}
+
 .row {
   display: flex;
   flex-direction: row;

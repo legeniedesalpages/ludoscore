@@ -91,7 +91,9 @@ class PlayerAccess
         $player->getAttribute('gravatar');
         $player->setAttribute('permissions', $permissions);
         if (! $permissions['can_view_personal_info']) {
-            $player->makeHidden(['first_name', 'last_name', 'user']);
+            $player->makeHidden(['first_name', 'last_name', 'user', 'birth_date', 'birth_year']);
+        } else {
+            $player->makeVisible(['birth_date', 'birth_year']);
         }
         if ($personalize) {
             app(PlayerNames::class)->present(collect([$player]), user: $user);

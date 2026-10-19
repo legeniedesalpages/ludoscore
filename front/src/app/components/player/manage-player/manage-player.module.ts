@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common'
 
 import { Routes, RouterModule } from '@angular/router'
 import { MatButtonModule } from '@angular/material/button'
+import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatCardModule } from '@angular/material/card'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
@@ -43,6 +44,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     MatButtonModule,
+    MatCheckboxModule,
     MatCardModule,
     FormsModule,
     ReactiveFormsModule,

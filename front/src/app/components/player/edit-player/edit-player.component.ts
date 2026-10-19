@@ -11,7 +11,7 @@
     * - Modification    : 
 **/
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 import { Navigate } from '@ngxs/router-plugin'
@@ -45,6 +45,9 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
   public loading: boolean = true
   public creating: boolean = false
   public saving: boolean = false
+  public saveError = ''
+  public readonly currentYear = new Date().getFullYear()
+  public readonly today = `${this.currentYear}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
   public colors = COLORS
   public currentPlayerId: number = 0
   public isEditable: boolean = false
@@ -93,17 +96,36 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
       pseudo: new FormControl('', Validators.required),
       prenom: new FormControl(''),
       nom: new FormControl(''),
+      birthPrecision: new FormControl('none', { nonNullable: true }),
+      birthYear: new FormControl<number | null>(null),
+      birthDate: new FormControl('', { nonNullable: true }),
       couleur: new FormControl(''),
       user: new FormControl({value: '', disabled: true})
-    })
+    }, { validators: (form: AbstractControl): ValidationErrors | null => {
+      if (form.get('birthPrecision')?.disabled) return null
+      const precision = form.get('birthPrecision')?.value
+      if (precision === 'year') {
+        const year = form.get('birthYear')?.value
+        return Number.isInteger(year) && year >= 1 && year <= this.currentYear ? null : { birth: true }
+      }
+      if (precision === 'date') {
+        const date: string = form.get('birthDate')?.value
+        const parsed = new Date(`${date}T00:00:00Z`)
+        return /^\d{4}-\d{2}-\d{2}$/.test(date) && date >= '0001-01-01' && date <= this.today
+          && !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date ? null : { birth: true }
+      }
+      return precision === 'none' ? null : { birth: true }
+    } })
   }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       this.loading = true
       this.loadError = ''
+      this.saveError = ''
       this.isEditable = false
       this.playerEditorForm.disable()
+      this.playerEditorForm.patchValue({ birthPrecision: 'none', birthYear: null, birthDate: '' })
       this.canManageAssociations = false
       this.canPersonalize = false
       this.personalPseudoInput.reset()
@@ -162,6 +184,9 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
               pseudo: this.canonicalPseudo,
               prenom: playerEntity.firstName ?? '',
               nom: playerEntity.lastName ?? '',
+              birthPrecision: playerEntity.birthDate ? 'date' : playerEntity.birthYear ? 'year' : 'none',
+              birthDate: playerEntity.birthDate ?? '',
+              birthYear: playerEntity.birthYear ?? null,
               couleur: playerEntity.preferedColor,
               user: userId
             })
@@ -204,6 +229,9 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
     if (this.canViewPersonalInfo) {
       this.playerEditorForm.get('prenom')?.enable()
       this.playerEditorForm.get('nom')?.enable()
+      for (const field of ['birthPrecision', 'birthYear', 'birthDate']) {
+        this.playerEditorForm.get(field)?.enable()
+      }
       if (this.isAdmin) this.playerEditorForm.get('user')?.enable()
     }
   }
@@ -413,6 +441,7 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
   public save() {
     if (!this.isEditable || this.playerEditorForm.invalid || this.saving || this.joining || this.mergeLoading || this.personalPseudoSaving) return
     this.saving = true
+    this.saveError = ''
     let playerEntity: PlayerEntity = {
       id: this.currentPlayerId,
       pseudo: this.playerEditorForm.get('pseudo')?.value,
@@ -426,9 +455,26 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
       gravatar: '',
       createdAt: undefined
     }
+    if (this.canViewPersonalInfo) {
+      const precision = this.playerEditorForm.get('birthPrecision')?.value
+      playerEntity.birthDate = precision === 'date' ? this.playerEditorForm.get('birthDate')?.value : null
+      playerEntity.birthYear = precision === 'year' ? this.playerEditorForm.get('birthYear')?.value : null
+    }
+
+    const onError = (error: HttpErrorResponse): void => {
+      const body: unknown = error.error
+      this.saveError = error.status === 422
+        ? 'Vérifiez les informations saisies, notamment la date ou l’année de naissance.'
+        : 'Impossible d’enregistrer ce joueur. Réessayez.'
+      if (body !== null && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+        this.saveError += ` ${body.message}`
+      }
+      this.saving = false
+      this.changeDetectorRef.markForCheck()
+    }
 
     if (this.creating) {
-      this.playerService.save(playerEntity).subscribe(() => {
+      this.playerService.save(playerEntity).subscribe({ next: () => {
         console.debug("Player created")
         this.playerListService.invalidateCache()
         this.saving = false
@@ -437,9 +483,9 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
           duration: 10000
         })
         this.store.dispatch(new Navigate(['/']))
-      })
+      }, error: onError })
     } else {
-      this.playerService.update(playerEntity.id, playerEntity).subscribe(() => {
+      this.playerService.update(playerEntity.id, playerEntity).subscribe({ next: () => {
         console.debug("Player updated")
         this.playerListService.invalidateCache()
         this.saving = false
@@ -448,7 +494,7 @@ export class EditPlayerComponent implements OnInit, OnDestroy {
           duration: 10000
         })
         this.store.dispatch(new Navigate(['/']))
-      })
+      }, error: onError })
     }
   }
 }

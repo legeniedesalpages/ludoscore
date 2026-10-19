@@ -22,34 +22,50 @@ GROUP BY p.id, p.pseudo
 ORDER BY nb_teams desc
 ```
 
-## Récit de fin de partie
+## Naissance des joueurs et statistiques d’âge
 
-Après validation des scores, l'application revient à l'accueil et ouvre une popup
-qui génère puis affiche un court récit en français avec Gemini. Le bouton **OK**
-ferme la popup et laisse l'utilisateur sur l'accueil. En cas d'échec de l'IA,
-la popup propose de réessayer ou de fermer ; les scores restent enregistrés.
-Le récit s'appuie sur les tags de la partie et des équipes,
-la durée, le vainqueur enregistré, les écarts de score et les catégories de points.
-Les équipes sont désignées par des codes lors de l'appel à l'IA ; leurs noms sont
-réinsérés localement avant sauvegarde. Le texte est une évocation imaginée, pas
-un relevé des actions réellement jouées.
-Le ton demandé est littéraire, drôle, épique et volontairement provocateur :
-Gemini peut inventer des scènes, dialogues et péripéties, avec des piques complices
-sur les stratégies et les personnages fictifs, jamais des attaques personnelles.
-Les résultats restent fidèles aux données enregistrées. La température de génération
-des récits est fixée à `1.0`, sans modifier celle de l'assistant statistiques.
-Ce style s'applique aux nouveaux récits ; les textes déjà sauvegardés sont conservés.
+La fiche joueur propose une naissance facultative : date complète, année seule
+ou « Non renseignée » (qui permet aussi d’effacer une valeur existante).
+Les valeurs futures, dates impossibles et saisies simultanées d’une date et
+d’une année sont refusées. Une mise à jour API qui omet ces deux champs conserve
+la valeur existante ; un `null` explicite la supprime.
 
-Le récit est conservé dans la partie et affiché dans son historique. Une ancienne
-partie sans récit propose **Générer le récit de la partie**. En cas d'indisponibilité
-de l'IA, les scores restent enregistrés et la génération peut être relancée.
-La correction des résultats ou des dates invalide le récit pour permettre sa
-régénération avec les nouvelles données.
+Les informations de naissance suivent le droit d’accès aux informations
+personnelles. Les statistiques détaillées des jeux et des joueurs affichent
+la répartition par tranches de dix ans, calculée à la date de chaque partie.
+Une année seule donne un âge approximatif ; les données absentes ou
+inaccessibles sont exclues et leur nombre est indiqué.
 
-Configuration : `GEMINI_API_KEY` et, facultativement, `GEMINI_MODEL` dans
-l'environnement du conteneur Laravel, comme pour l'assistant statistiques.
+Une comparaison locale « Plus jeunes / plus âgés » porte sur les âges extrêmes
+de chaque partie, avec au moins **10 ans d’écart garanti**. Avec une année seule,
+l’incertitude d’un an est prise en compte. Les âges intermédiaires, parties aux
+âges incomplets, groupes extrêmes dans une même équipe et jeux exclusivement
+coopératifs sont exclus de cette comparaison. Les effectifs et taux de victoire
+sont affichés ; en dessous de trois parties par groupe, il ne s’agit que d’une
+tendance, sans conclusion de causalité. Les naissances ne sont pas transmises
+au service d’IA.
+
 Appliquer la migration avant utilisation :
 
 ```sh
 docker compose exec laravel-app php artisan migrate
 ```
+
+## Joueurs remplacés
+
+Les joueurs remplacés sont masqués par défaut dans les listes, y compris pour
+l’administrateur. Dans la gestion des joueurs, seul l’administrateur peut
+décocher **Masquer les joueurs remplacés** pour consulter leurs fiches archivées.
+Cette option ne modifie ni les listes de sélection pour une partie ni les
+répertoires statistiques. L’API n’accepte `include_replaced=true` que pour un
+administrateur et hors sélection de participants (`purpose=match`).
+
+Les joueurs associés depuis un autre compte affichent « Copié depuis le compte
+de [pseudo du créateur] ». Seul le pseudo est communiqué aux autres utilisateurs,
+jamais l’email du créateur. Si celui-ci n’a pas d’identité joueur, une mention
+générique de copie est affichée.
+
+Le joueur personnel du compte connecté possède un encart dédié au-dessus de
+la liste, avec accès à sa fiche et la mention « C’est vous, vous êtes ici depuis
+le … ». Il n’est pas répété parmi les autres joueurs. Leur ordre relatif est
+conservé, y compris lorsque l’administrateur change le filtre des joueurs remplacés.

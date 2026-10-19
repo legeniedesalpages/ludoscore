@@ -352,13 +352,21 @@ class PlayerMergeTest extends TestCase
     {
         $this->merge()->assertOk();
         $this->actingAs($this->actor)->getJson('/api/player')->assertOk()->assertJsonCount(2);
+        $this->getJson('/api/player?include_replaced=true')->assertOk()->assertJsonCount(2)
+            ->assertJsonMissing(['id' => 10]);
         $this->getJson('/api/player/10')->assertOk()->assertJsonPath('status', 'replaced')
             ->assertJsonPath('replacedByPlayerId', 20)->assertJsonPath('permissions.canEdit', false);
         $this->getJson('/api/player?purpose=match')->assertOk()->assertJsonCount(1)->assertJsonPath('0.id', 30);
         $this->postJson('/api/player/associate-ludotag', ['ludotag' => $this->tag(10)])->assertUnprocessable();
         $this->actor->forceFill(['is_admin' => true])->save();
-        $this->getJson('/api/player')->assertOk()->assertJsonCount(3);
+        $this->getJson('/api/player')->assertOk()->assertJsonCount(2)
+            ->assertJsonMissing(['id' => 10]);
+        $this->getJson('/api/player?include_replaced=false')->assertOk()->assertJsonCount(2);
+        $this->getJson('/api/player?include_replaced=true')->assertOk()->assertJsonCount(3)
+            ->assertJsonFragment(['id' => 10, 'pseudo' => 'Player 10', 'status' => 'replaced']);
         $this->getJson('/api/player?purpose=match')->assertOk()->assertJsonCount(2);
+        $this->getJson('/api/player?purpose=match&include_replaced=true')->assertOk()->assertJsonCount(2)
+            ->assertJsonMissing(['id' => 10]);
         $this->putJson('/api/player/10', ['pseudo' => 'Overwrite'])->assertNotFound();
         $this->postJson('/api/game-match', ['teams' => [['players' => [['playerId' => 10]]]]])->assertForbidden();
         $this->assertDatabaseCount('matches', 0);

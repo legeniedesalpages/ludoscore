@@ -50,3 +50,48 @@
 .creator-player {
   display: block;
 }
+
+.personal-player-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: calc(100% - 32px);
+  margin: 16px;
+  padding: 20px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 20px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.personal-player-card:focus-visible {
+  outline-width: 3px;
+  outline-style: solid;
+  outline-offset: 3px;
+}
+
+.personal-player-card img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.personal-player-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.personal-player-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.personal-player-caption {
+  font-size: 0.875rem;
+}

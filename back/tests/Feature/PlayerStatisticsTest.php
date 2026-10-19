@@ -98,7 +98,8 @@ class PlayerStatisticsTest extends TestCase
             ->assertJsonPath('charts.0.rows', [['Victoires', 1], ['Défaites', 1], ['Sans vainqueur renseigné', 1]])
             ->assertJsonPath('charts.3.rows', [['1', 1], ['2', 2]])
             ->assertJsonPath('charts.7.rows', [['Rouge', 2, 1, 2, 50]])
-            ->assertJsonPath('charts.14.rows', [['Test', 3]]);
+            ->assertJsonPath('charts.14.rows', [])
+            ->assertJsonPath('charts.16.rows', [['Test', 3]]);
     }
 
     public function test_summary_deduplicates_matches_and_unknown_results_are_not_losses(): void

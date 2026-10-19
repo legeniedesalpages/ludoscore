@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router'
 import { Store } from '@ngxs/store'
-import { PlayerAssociation, PlayerMergePreview } from 'src/app/core/entity/player-entity.model'
+import { PlayerAssociation, PlayerEntity, PlayerMergePreview } from 'src/app/core/entity/player-entity.model'
 import { of, Subject, throwError } from 'rxjs'
 import { describe, expect, it, vi } from 'vitest'
 import { PlayerCrudService } from 'src/app/core/services/crud/player-crud.service'
@@ -15,7 +15,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { MatExpansionPanelHarness } from '@angular/material/expansion/testing'
 
 describe('EditPlayerComponent participation count', () => {
-  async function setup(count: number, id = 1, admin = true, personalInfo = true, denied = false, canMerge = false, archived = false, canManageAssociations = admin, personalizable = false, editable = admin) {
+  async function setup(count: number, id = 1, admin = true, personalInfo = true, denied = false, canMerge = false, archived = false, canManageAssociations = admin, personalizable = false, editable = admin, birth: Pick<PlayerEntity, 'birthDate' | 'birthYear'> = {}) {
     const associations: PlayerAssociation[] = [{
       userId: 3, email: 'shared@example.test', isCreator: false, isSelf: false,
       canViewPersonalInfo: false, canViewOtherMatches: false, canAddToMatch: false,
@@ -39,9 +39,12 @@ describe('EditPlayerComponent participation count', () => {
     const invalidateCache = vi.fn()
     const dispatch = vi.fn()
     const copy = vi.fn(() => true)
+    const save = vi.fn(() => of({ id, pseudo: 'Test' }))
+    const update = vi.fn(() => of({ id, pseudo: 'Test' }))
     const findOne = vi.fn(() => denied ? throwError(() => new Error('Denied')) : of({
       id, pseudo: 'Test', firstName: '', lastName: '', preferedColor: '',
       user: null, playedMatchCount: count,
+      ...birth,
       replacedByPlayerId: archived ? 9 : null, status: archived ? 'replaced' : 'active',
       permissions: { canViewPersonalInfo: personalInfo, canViewOtherMatches: admin, canEdit: editable && !archived, canMerge, canManageAssociations: canManageAssociations && !archived, canPersonalize: personalizable && !archived },
     }))
@@ -58,10 +61,10 @@ describe('EditPlayerComponent participation count', () => {
         } },
       ],
     })
-    TestBed.overrideProvider(PlayerCrudService, { useValue: { findOne, associations: loadAssociations, saveAssociation, ludotag, associateLudotag, previewMerge, merge, savePersonalPseudo } })
+    TestBed.overrideProvider(PlayerCrudService, { useValue: { findOne, associations: loadAssociations, saveAssociation, ludotag, associateLudotag, previewMerge, merge, savePersonalPseudo, save, update } })
     const fixture = TestBed.createComponent(EditPlayerComponent)
     await fixture.whenStable()
-    return { element: fixture.nativeElement as HTMLElement, findOne, saveAssociation, loadAssociations, fixture, ludotag, associateLudotag, invalidateCache, dispatch, copy, previewMerge, merge, preview, savePersonalPseudo }
+    return { element: fixture.nativeElement as HTMLElement, findOne, saveAssociation, loadAssociations, fixture, ludotag, associateLudotag, invalidateCache, dispatch, copy, previewMerge, merge, preview, savePersonalPseudo, save, update }
   }
 
   it('collapses every secondary action by default and allows independent expansion', async () => {
@@ -424,5 +427,82 @@ describe('EditPlayerComponent participation count', () => {
     fixture.componentInstance.mergeConfirmed.setValue(true)
     fixture.componentInstance.confirmMerge()
     expect(merge).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ birthDate: '2000-02-29' }, 'date'],
+    [{ birthYear: 1980 }, 'year'],
+    [{}, 'none'],
+  ] as const)('loads the precision of birth information %j', async (birth, precision) => {
+    const { fixture } = await setup(1, 1, true, true, false, false, false, true, false, true, birth)
+    expect(fixture.componentInstance.playerEditorForm.get('birthPrecision')?.value).toBe(precision)
+    expect(fixture.componentInstance.playerEditorForm.valid).toBe(true)
+  })
+
+  it('saves only the selected precision and can clear birth information', async () => {
+    const { fixture, update } = await setup(1)
+    const component = fixture.componentInstance
+    component.playerEditorForm.patchValue({ birthPrecision: 'year', birthYear: 1980, birthDate: '2000-02-29' })
+    component.save()
+    expect(update).toHaveBeenLastCalledWith(1, expect.objectContaining({ birthYear: 1980, birthDate: null }))
+    component.playerEditorForm.patchValue({ birthPrecision: 'date' })
+    component.save()
+    expect(update).toHaveBeenLastCalledWith(1, expect.objectContaining({ birthYear: null, birthDate: '2000-02-29' }))
+    component.playerEditorForm.patchValue({ birthPrecision: 'none' })
+    component.save()
+    expect(update).toHaveBeenLastCalledWith(1, expect.objectContaining({ birthYear: null, birthDate: null }))
+  })
+
+  it('creates a player with an optional year of birth', async () => {
+    const { fixture, save } = await setup(0, 0)
+    fixture.componentInstance.playerEditorForm.patchValue({ pseudo: 'New', birthPrecision: 'year', birthYear: 2000 })
+    fixture.componentInstance.save()
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ birthYear: 2000, birthDate: null }))
+  })
+
+  it('rejects invalid births and accepts leap days and an empty optional birth', async () => {
+    const { fixture, update } = await setup(1)
+    const component = fixture.componentInstance
+    for (const birth of [
+      { birthPrecision: 'year', birthYear: null },
+      { birthPrecision: 'year', birthYear: component.currentYear + 1 },
+      { birthPrecision: 'year', birthYear: 1980.5 },
+      { birthPrecision: 'year', birthYear: 0 },
+      { birthPrecision: 'date', birthDate: '' },
+      { birthPrecision: 'date', birthDate: '2001-02-29' },
+      { birthPrecision: 'date', birthDate: `${component.currentYear + 1}-01-01` },
+    ]) {
+      component.playerEditorForm.patchValue(birth)
+      expect(component.playerEditorForm.hasError('birth')).toBe(true)
+      component.save()
+    }
+    expect(update).not.toHaveBeenCalled()
+    component.playerEditorForm.patchValue({ birthPrecision: 'date', birthDate: '2000-02-29' })
+    expect(component.playerEditorForm.valid).toBe(true)
+    component.playerEditorForm.patchValue({ birthPrecision: 'none' })
+    expect(component.playerEditorForm.valid).toBe(true)
+  })
+
+  it('hides birth fields and does not submit them without personal information rights', async () => {
+    const { element, fixture, update } = await setup(1, 1, false, false, false, false, false, false, false, true)
+    expect(element.querySelector('[formControlName="birthPrecision"]')).toBeNull()
+    fixture.componentInstance.save()
+    expect(update).toHaveBeenCalledWith(1, expect.not.objectContaining({ birthYear: expect.anything() }))
+    expect(update).toHaveBeenCalledWith(1, expect.not.objectContaining({ birthDate: expect.anything() }))
+  })
+
+  it('reports a save failure and allows retrying without losing the draft', async () => {
+    const { element, fixture, update } = await setup(1)
+    update.mockReturnValueOnce(throwError(() => new HttpErrorResponse({ status: 422 })))
+    fixture.componentInstance.playerEditorForm.patchValue({ birthPrecision: 'year', birthYear: 1980 })
+    fixture.componentInstance.save()
+    await fixture.whenStable()
+    expect(element.textContent).toContain('Vérifiez les informations saisies')
+    expect(fixture.componentInstance.saveError).toContain('Vérifiez')
+    expect(fixture.componentInstance.saving).toBe(false)
+    expect(fixture.componentInstance.playerEditorForm.get('birthYear')?.value).toBe(1980)
+    fixture.componentInstance.save()
+    expect(update).toHaveBeenCalledTimes(2)
+    expect(fixture.componentInstance.saveError).toBe('')
   })
 })

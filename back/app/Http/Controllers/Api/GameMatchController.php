@@ -398,7 +398,7 @@ class GameMatchController extends Controller
                     unset($player->ludotag);
                     $permissions = app(PlayerAccess::class)->permissions(Player::findOrFail($player->player_id), request()->user());
                     if (!$permissions['can_view_personal_info']) {
-                        unset($player->first_name, $player->last_name);
+                        unset($player->first_name, $player->last_name, $player->birth_date, $player->birth_year);
                     }
                     return $player;
                 });

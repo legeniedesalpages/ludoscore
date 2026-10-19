@@ -113,6 +113,7 @@ class PlayerSharingTest extends TestCase
         (require database_path('migrations/2026_10_18_180000_add_ludotag_to_players.php'))->up();
         (require database_path('migrations/2026_10_18_190000_add_player_merges.php'))->up();
         (require database_path('migrations/2026_10_18_200000_add_personal_pseudo_to_player_user.php'))->up();
+        (require database_path('migrations/2026_10_19_100000_add_birth_information_to_players.php'))->up();
     }
 
     protected function tearDown(): void
@@ -644,5 +645,89 @@ class PlayerSharingTest extends TestCase
         $this->assertDatabaseCount('players', 2);
         $this->assertDatabaseCount('player_user', 3);
         $this->assertSame($this->self, $this->viewer->refresh()->player_id);
+    }
+
+    public function test_ludotag_recipient_sees_creator_nickname_but_not_their_email(): void
+    {
+        $this->actingAs($this->creator)->postJson('/api/player', [
+            'pseudo' => 'Reno', 'user' => ['id' => $this->creator->id],
+        ])->assertCreated();
+        $tag = DB::table('players')->where('id', $this->player)->value('ludotag');
+        $this->actingAs($this->viewer)->postJson('/api/player/associate-ludotag', ['ludotag' => $tag])->assertOk();
+        $response = $this->getJson('/api/player')->assertOk();
+        $guest = collect($response->json())->firstWhere('id', $this->player);
+        $this->assertSame('Reno', $guest['creatorName']);
+        $this->assertArrayNotHasKey('creator', $guest);
+        $this->assertStringNotContainsString($this->creator->email, $response->getContent());
+    }
+
+    public function test_birth_can_be_created_changed_between_precisions_preserved_and_cleared(): void
+    {
+        $response = $this->actingAs($this->creator)->postJson('/api/player', [
+            'pseudo' => 'Birthday', 'birthDate' => '2000-02-29',
+        ])->assertCreated()->assertJsonPath('birthDate', '2000-02-29')->assertJsonPath('birthYear', null);
+        $id = $response->json('id');
+        $this->putJson('/api/player/'.$id, ['pseudo' => 'Birthday', 'birthYear' => 2000])
+            ->assertOk()->assertJsonPath('birthYear', 2000)->assertJsonPath('birthDate', null);
+        $this->putJson('/api/player/'.$id, ['pseudo' => 'Renamed'])
+            ->assertOk()->assertJsonPath('birthYear', 2000);
+        $this->putJson('/api/player/'.$id, ['pseudo' => 'Renamed', 'birthDate' => '1999-12-31'])
+            ->assertOk()->assertJsonPath('birthDate', '1999-12-31')->assertJsonPath('birthYear', null);
+        $this->putJson('/api/player/'.$id, ['pseudo' => 'Renamed', 'birthYear' => null, 'birthDate' => null])
+            ->assertOk()->assertJsonPath('birthDate', null)->assertJsonPath('birthYear', null);
+        $this->assertDatabaseHas('players', ['id' => $id, 'birth_year' => null, 'birth_date' => null]);
+    }
+
+    public function test_birth_rejects_invalid_future_and_ambiguous_values_on_create_and_update(): void
+    {
+        $this->actingAs($this->creator);
+        foreach ([
+            ['birthDate' => '2001-02-29'], ['birthDate' => 'not a date'],
+            ['birthDate' => now()->addDay()->toDateString()],
+            ['birthYear' => now()->year + 1], ['birthYear' => 0], ['birthYear' => 2000.5],
+            ['birthDate' => '2000-01-01', 'birthYear' => 2000],
+        ] as $birth) {
+            $this->postJson('/api/player', ['pseudo' => 'Invalid'] + $birth)->assertUnprocessable();
+            $this->putJson('/api/player/'.$this->player, ['pseudo' => 'Invalid'] + $birth)->assertUnprocessable();
+        }
+        $this->assertDatabaseCount('players', 2);
+        $this->assertDatabaseHas('players', ['id' => $this->player, 'pseudo' => 'Guest']);
+    }
+
+    public function test_birth_is_private_on_profiles_matches_models_and_age_statistics(): void
+    {
+        DB::table('players')->where('id', $this->player)->update(['birth_year' => 1980]);
+        $match = $this->matchWith([$this->player, $this->self]);
+        $this->link();
+        $this->actingAs($this->viewer)->getJson('/api/player/'.$this->player)->assertOk()->assertJsonMissingPath('birthYear');
+        $this->getJson('/api/player')->assertOk()->assertJsonMissingPath('0.birthYear');
+        $this->getJson('/api/game-match/'.$match)->assertOk()->assertJsonMissingPath('teams.0.players.0.birthYear');
+        $this->assertArrayNotHasKey('birth_year', Player::findOrFail($this->player)->toArray());
+        $stats = $this->getJson('/api/statistics/players/'.$this->player)->assertOk();
+        $stats->assertJsonPath('charts.14.rows', [])->assertJsonPath('charts.15.rows', []);
+        $this->link(['can_view_personal_info' => true]);
+        $this->getJson('/api/player/'.$this->player)->assertOk()->assertJsonPath('birthYear', 1980);
+        $this->getJson('/api/statistics/players/'.$this->player)->assertOk()
+            ->assertJsonPath('charts.14.rows', [['40–49 ans', 1]]);
+    }
+
+    public function test_editor_without_personal_information_right_cannot_overwrite_birth(): void
+    {
+        DB::table('players')->where('id', $this->self)->update(['birth_year' => 1980]);
+        DB::table('player_user')->where('player_id', $this->self)->where('user_id', $this->viewer->id)
+            ->update(['can_view_personal_info' => false]);
+        $this->actingAs($this->viewer)->putJson('/api/player/'.$this->self, [
+            'pseudo' => 'Me', 'birthYear' => 2000, 'birthDate' => null,
+        ])->assertOk()->assertJsonMissingPath('birthYear');
+        $this->assertDatabaseHas('players', ['id' => $this->self, 'birth_year' => 1980]);
+    }
+
+    public function test_birth_migration_rolls_back_and_leaves_existing_players_intact(): void
+    {
+        $migration = require database_path('migrations/2026_10_19_100000_add_birth_information_to_players.php');
+        $migration->down();
+        $this->assertFalse(Schema::hasColumn('players', 'birth_date'));
+        $migration->up();
+        $this->assertDatabaseHas('players', ['id' => $this->player, 'birth_date' => null, 'birth_year' => null]);
     }
 }

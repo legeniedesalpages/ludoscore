@@ -14,12 +14,16 @@ export interface PlayerEntity {
     id: number
     pseudo: string
     creatorPseudo?: string | null
+    creatorName?: string | null
     personalPseudo?: string | null
     lastName?: string | null
     firstName?: string | null
+    birthDate?: string | null
+    birthYear?: number | null
     preferedColor: string
     gravatar: string
     createdAt: Date | undefined
+    createdByUserId?: number
     playedMatchCount?: number
     status?: 'active' | 'replaced'
     replacedByPlayerId?: number | null
@@ -35,6 +39,7 @@ export interface PlayerEntity {
         canMerge?: boolean
         canManageAssociations?: boolean
         canPersonalize?: boolean
+        can_personalize?: boolean
     }
     user?: {
         email: string

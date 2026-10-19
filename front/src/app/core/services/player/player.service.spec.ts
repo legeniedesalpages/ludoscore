@@ -7,6 +7,21 @@ import { PlayerService } from './player.service'
 import { PlayerCrudService } from '../crud/player-crud.service'
 
 describe('PlayerService selectable participants', () => {
+  it('requests archived players only through the explicit management option without affecting other lists', async () => {
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] })
+    const service = TestBed.inject(PlayerCrudService)
+    const http = TestBed.inject(HttpTestingController)
+    const archives = firstValueFrom(service.findAll(true))
+    http.expectOne(request => request.url.endsWith('/api/player') && request.params.get('include_replaced') === 'true').flush([])
+    await archives
+    for (const list of [() => service.findAll(), () => service.findAll(false), () => service.findForMatch()]) {
+      const result = firstValueFrom(list())
+      http.expectOne(request => request.url.endsWith('/api/player') && !request.params.has('include_replaced')).flush([])
+      await result
+    }
+    http.verify()
+  })
+
   it('maps match access separately from selection rights for both API permission casings', async () => {
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] })
     const http = TestBed.inject(HttpTestingController)

@@ -22,6 +22,11 @@ export class PlayerCrudService extends CrudService<PlayerEntity, number> {
         super(http, '/player')
     }
 
+    override findAll(includeReplaced = false) {
+        if (!includeReplaced) return super.findAll()
+        return this.http.get<PlayerEntity[]>(`${this.apiUrl}/player`, { params: { include_replaced: true } })
+    }
+
     findForMatch() {
         return this.http.get<PlayerEntity[]>(`${this.apiUrl}/player`, { params: { purpose: 'match' } })
     }

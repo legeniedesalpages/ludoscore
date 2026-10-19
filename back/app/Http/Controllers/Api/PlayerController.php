@@ -23,15 +23,18 @@ class PlayerController extends Controller
         Log::debug("Liste les joueurs");
         $access = app(PlayerAccess::class);
         $players = $access->scopePlayers(Player::with(['personalUsers:users.id,email', 'creators:users.id,email']), $request->user(),
-            includeReplaced: $request->user()->is_admin && $request->query('purpose') !== 'match');
+            includeReplaced: $request->user()->is_admin && $request->boolean('include_replaced') && $request->query('purpose') !== 'match');
         if ($request->query('purpose') === 'match') {
             $access->scopePlayers($players, $request->user(), 'players.id', 'can_add_to_match');
         }
 
         $players = $players->get();
+        $players->load('creators.selfPlayers:players.id,pseudo');
+        foreach ($players as $player) {
+            $player->setAttribute('creator_name', $player->creator->player?->pseudo);
+        }
         if ($request->user()->is_admin) {
             $unassociated = $players->filter(fn (Player $player) => $player->user === null);
-            $unassociated->load('creators.selfPlayers:players.id,pseudo');
             foreach ($unassociated as $player) {
                 $creator = $player->creator;
                 $creatorPlayer = $creator->player;
@@ -73,18 +76,19 @@ class PlayerController extends Controller
     public function update(Request $request, $id)
     {        
         Log::info("Mise à jour du joueur d'id : " . $id);
-        Log::debug($request);
         $access = app(PlayerAccess::class);
         $player = $access->scopePlayers(Player::query(), $request->user())->findOrFail($id);
         $permissions = $access->permissions($player, $request->user());
         abort_unless($permissions['can_edit'], 403, 'Modification de ce joueur refusee.');
-        return DB::transaction(function () use ($request, $player, $permissions, $access, $id) {
+        $birth = $permissions['can_view_personal_info'] ? $this->validateBirth($request) : [];
+        return DB::transaction(function () use ($request, $player, $permissions, $access, $birth) {
             $player = Player::whereKey($player->id)->lockForUpdate()->firstOrFail();
             abort_if($player->replaced_by_player_id !== null, 422, 'Ce joueur est remplace et ne peut plus etre modifie.');
             $player->pseudo = $request->pseudo;
             if ($permissions['can_view_personal_info']) {
                 $player->last_name = $request->last_name;
                 $player->first_name = $request->first_name;
+                $player->forceFill($birth);
             }
             $player->prefered_color = $request->prefered_color;
             $player->save();
@@ -101,9 +105,9 @@ class PlayerController extends Controller
     public function store(Request $request)
     {
         Log::info("Enregistrement du joueur");
-        Log::debug($request);
         
-        return DB::transaction(function () use ($request) {
+        $birth = $this->validateBirth($request);
+        return DB::transaction(function () use ($request, $birth) {
             $user = null;
             $userId = $request->input('user.id');
             if ($userId !== null) {
@@ -116,6 +120,7 @@ class PlayerController extends Controller
             $player->last_name = $request->last_name;
             $player->first_name = $request->first_name;
             $player->prefered_color = $request->prefered_color;
+            $player->forceFill($birth);
             $player->save();
             $player->users()->attach($request->user()->id, [
                 'is_creator' => true, 'can_view_personal_info' => true,
@@ -129,6 +134,29 @@ class PlayerController extends Controller
 
             return app(PlayerAccess::class)->present($player, $request->user());
         }, 3);
+    }
+
+    private function validateBirth(Request $request): array
+    {
+        $data = $request->validate([
+            'birth_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:0001-01-01', 'before_or_equal:today', 'prohibits:birth_year'],
+            'birth_year' => ['nullable', 'integer', 'min:1', 'max:'.now()->year, 'prohibits:birth_date'],
+        ], [
+            'birth_date.date_format' => 'La date de naissance doit être une date valide au format AAAA-MM-JJ.',
+            'birth_date.before_or_equal' => 'La date de naissance ne peut pas être dans le futur.',
+            'birth_date.prohibits' => 'Renseignez soit la date complète, soit uniquement l’année de naissance.',
+            'birth_year.prohibits' => 'Renseignez soit la date complète, soit uniquement l’année de naissance.',
+            'birth_year.integer' => 'L’année de naissance doit être un entier.',
+            'birth_year.min' => 'L’année de naissance doit être positive.',
+            'birth_year.max' => 'L’année de naissance ne peut pas être dans le futur.',
+        ]);
+
+        // Omitted fields preserve existing information; an explicit null clears it.
+        if ($request->exists('birth_date') || $request->exists('birth_year')) {
+            return ['birth_date' => $data['birth_date'] ?? null, 'birth_year' => $data['birth_year'] ?? null];
+        }
+
+        return [];
     }
 
     public function associations(Request $request, int $id)

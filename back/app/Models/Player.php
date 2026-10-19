@@ -12,7 +12,9 @@ class Player extends Model
     use HasFactory;
 
     protected $appends = ['gravatar', 'user', 'created_by_user_id', 'status'];
-    protected $hidden = ['creators', 'personalUsers', 'ludotag'];
+    protected $hidden = ['creators', 'personalUsers', 'ludotag', 'birth_date', 'birth_year'];
+
+    protected $casts = ['birth_year' => 'integer'];
 
     protected static function booted(): void
     {
