@@ -42,3 +42,81 @@
   display: flex;
   align-items: center;
 }
+
+.search-type {
+  display: flex;
+  width: calc(100% - 16px);
+  max-width: 800px;
+  margin: 16px auto 8px auto;
+}
+
+.search-type mat-button-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13px;
+  --mat-button-toggle-height: 36px;
+}
+
+.search-type ::ng-deep .mat-button-toggle-label-content {
+  display: block;
+  padding: 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-list .visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-list .visual mat-icon {
+  opacity: 0.5;
+}
+
+.expansion-row {
+  padding-left: 32px;
+  box-sizing: border-box;
+}
+
+.result-list.expansion-row.compact .visual {
+  width: 40px;
+  height: 36px;
+}
+
+.result-list.compact .content {
+  height: 40px;
+  justify-content: center;
+}
+
+.result-list.compact .heading {
+  padding-top: 0;
+  font-size: small;
+}
+
+.context {
+  opacity: 0.7;
+}
+
+.result-list.not-clickable {
+  cursor: default;
+}
+
+.type-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+.hidden-expansions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 8px 40px;
+  font-size: small;
+  font-style: italic;
+  opacity: 0.7;
+  border-bottom: 1px solid lightgrey;
+}

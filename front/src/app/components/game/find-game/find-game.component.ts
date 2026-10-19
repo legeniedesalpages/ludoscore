@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Navigate } from '@ngxs/router-plugin'
 import { Store } from '@ngxs/store'
-import { GameSearchResult } from 'src/app/core/model/game-search.model'
+import { BaseGameReference, GameSearchResult, GameSearchType } from 'src/app/core/model/game-search.model'
 import { FindGameService } from 'src/app/core/services/game/find-game.service'
 
 @Component({
@@ -33,6 +33,12 @@ export class FindGameComponent {
     this.searching = false
   }
 
+  public readonly searchTypes: { value: GameSearchType, label: string }[] = [
+    { value: 'game', label: 'Jeux' },
+    { value: 'expansion', label: 'Extensions' },
+    { value: 'all', label: 'Jeux + extensions' },
+  ]
+
   public search(event: any) {
 
     if (!event.value) {
@@ -40,13 +46,24 @@ export class FindGameComponent {
       return
     }
 
-    if (event.value === this.findGameService.searchString) {
+    if (event.value.toLowerCase() === this.findGameService.searchString) {
       console.debug('No new search, old search : ' + this.findGameService.searchString)
       return
     }
 
     this.findGameService.searchString = event.value.toLowerCase()
-    console.debug("Search value: ", this.findGameService.searchString)
+    this.runSearch()
+  }
+
+  public changeSearchType(searchType: GameSearchType) {
+    this.findGameService.searchType = searchType
+    if (this.findGameService.searchString) {
+      this.runSearch()
+    }
+  }
+
+  private runSearch() {
+    console.debug("Search value: ", this.findGameService.searchString, this.findGameService.searchType)
     this.searching = true
 
     this.findGameService.search().subscribe({
@@ -54,13 +71,15 @@ export class FindGameComponent {
         console.info("Number of found game: " + this.findGameService.searchResult.length)
         this.changeDetectorRef.markForCheck()
         if (this.findGameService.searchResult.length === 0) {
-          this.snackBar.open("Aucun jeu trouvé", 'Fermer', {
+          this.snackBar.open("Aucun résultat trouvé", 'Fermer', {
             duration: 5000
           })
         }
       },
       error: (error: any) => {
+        const searchType = this.findGameService.searchType
         this.findGameService.resetSearch()
+        this.findGameService.searchType = searchType
         this.searching = false
         this.changeDetectorRef.markForCheck()
         this.snackBar.open("Erreur:" + error, 'Fermer', {
@@ -74,7 +93,15 @@ export class FindGameComponent {
     })
   }
 
+  public baseGamesLabel(baseGames: BaseGameReference[]): string {
+    return baseGames.map(baseGame => baseGame.owned ? baseGame.name + ' ★' : baseGame.name).join(', ')
+  }
+
   public goToGameDetail(gameFound: GameSearchResult) {
+    if (gameFound.type === 'expansion') {
+      this.snackBar.open("La gestion des extensions arrive bientôt", 'Fermer', { duration: 3000 })
+      return
+    }
     console.info("Go to edition page for id :" + gameFound.id)
     if (!gameFound.registered) {
       this.store.dispatch(new Navigate(['/game-editor', 'bgg', gameFound.id]))

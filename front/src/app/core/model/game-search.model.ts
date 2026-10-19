@@ -10,15 +10,37 @@
     * - Author          : renau
     * - Modification    : 
 **/
+export type GameSearchType = 'game' | 'expansion' | 'all'
+
+export type BggItemType = 'game' | 'expansion'
+
 export interface GameSearchResult {
     id: number
-    thumbnailUrlFromBgg: string
+    type: BggItemType
+    thumbnailUrlFromBgg: string | null
     name: string
-    year: number
-    popularity: number
+    year: number | null
+    popularity: number | null
+    owned: boolean
+    registered: boolean
+    /** false quand l'élément n'a pas été trouvé par la recherche mais est affiché pour le contexte (jeu de base, extension d'un jeu trouvé) */
+    matched: boolean
+    expansions?: GameSearchResult[]
+    /** extensions du jeu non renvoyées car moins populaires */
+    hiddenExpansionCount?: number
+    baseGames?: BaseGameReference[]
+}
+
+export interface BaseGameReference {
+    id: number
+    name: string
     owned: boolean
     registered: boolean
 }
+
+export type GameSearchRow =
+    | { kind: 'item', result: GameSearchResult, level: 0 | 1 }
+    | { kind: 'hidden-expansions', count: number }
 
 export interface GameSearchDetail {
     id: number

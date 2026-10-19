@@ -358,10 +358,12 @@ class UserGameLibraryTest extends TestCase
 
     public function test_bgg_search_distinguishes_catalog_presence_from_personal_ownership(): void
     {
+        Http::preventStrayRequests();
         $this->game();
         $this->game(['bgg_id' => 43, 'in_library' => false]);
         $this->migration()->up();
         Http::fake([
+            '*xmlapi2/search*type=boardgameexpansion*' => Http::response('<items total="0"></items>'),
             '*xmlapi2/search*' => Http::response('<items total="3"><item id="42"/><item id="43"/><item id="44"/></items>'),
             '*xmlapi2/thing*' => Http::response('<items><item id="42"><name value="First"/><poll totalvotes="3"/></item><item id="43"><name value="Second"/><poll totalvotes="2"/></item><item id="44"><name value="New"/><poll totalvotes="1"/></item></items>'),
         ]);
@@ -371,6 +373,104 @@ class UserGameLibraryTest extends TestCase
             ->assertJsonPath('2.owned', false)->assertJsonPath('2.registered', false);
         $this->actingAs($this->other)->getJson('/api/game_search?q=test')->assertOk()
             ->assertJsonPath('0.owned', false)->assertJsonPath('0.registered', true);
+    }
+
+    public function test_bgg_game_search_excludes_expansions_by_default(): void
+    {
+        Http::preventStrayRequests();
+        $this->migration()->up();
+        Http::fake([
+            '*xmlapi2/search*type=boardgameexpansion*' => Http::response('<items total="1"><item type="boardgameexpansion" id="50"/></items>'),
+            '*xmlapi2/search*' => Http::response('<items total="2"><item type="boardgame" id="42"/><item type="boardgame" id="50"/></items>'),
+            '*xmlapi2/thing?stats=1&id=42' => Http::response('<items><item type="boardgame" id="42"><name type="primary" value="Base"/></item></items>'),
+        ]);
+
+        $response = $this->actingAs($this->owner)->getJson('/api/game_search?q=base')->assertOk()->json();
+
+        $this->assertSame([42], array_column($response, 'id'));
+        $this->assertSame('game', $response[0]['type']);
+        Http::assertNotSent(fn($request) => str_contains($request->url(), 'thing') && str_contains($request->url(), '50'));
+    }
+
+    public function test_bgg_expansion_search_returns_base_games_with_library_status(): void
+    {
+        Http::preventStrayRequests();
+        $this->game();
+        $this->migration()->up();
+        Http::fake([
+            '*xmlapi2/search*' => Http::response('<items total="1"><item type="boardgameexpansion" id="50"/></items>'),
+            '*xmlapi2/thing?stats=1&id=50' => Http::response('<items><item type="boardgameexpansion" id="50"><thumbnail>thumb.jpg</thumbnail><name type="primary" value="Joker"/><yearpublished value="2017"/>'
+                . '<link type="boardgameexpansion" id="42" value="Base" inbound="true"/><link type="boardgameexpansion" id="60" value="Other base" inbound="true"/>'
+                . '<link type="boardgameexpansion" id="61" value="Parent expansion" inbound="true"/></item></items>'),
+            '*xmlapi2/thing?stats=1&id=42,60,61' => Http::response('<items><item type="boardgame" id="42"><name type="primary" value="Base"/></item>'
+                . '<item type="boardgame" id="60"><name type="primary" value="Other base"/></item>'
+                . '<item type="boardgameexpansion" id="61"><name type="primary" value="Parent expansion"/></item></items>'),
+        ]);
+
+        $this->actingAs($this->owner)->getJson('/api/game_search?q=joker&type=expansion')->assertOk()
+            ->assertJsonPath('0.id', 50)->assertJsonPath('0.type', 'expansion')
+            ->assertJsonPath('0.thumbnailUrlFromBgg', 'thumb.jpg')->assertJsonPath('0.year', 2017)
+            ->assertJsonPath('0.baseGames.0.id', 42)->assertJsonPath('0.baseGames.0.name', 'Base')
+            ->assertJsonPath('0.baseGames.0.owned', true)
+            ->assertJsonPath('0.baseGames.1.id', 60)->assertJsonPath('0.baseGames.1.owned', false)
+            ->assertJsonCount(2, '0.baseGames');
+    }
+
+    public function test_bgg_combined_search_groups_expansions_under_their_base_games(): void
+    {
+        Http::preventStrayRequests();
+        $this->migration()->up();
+        Http::fake([
+            '*xmlapi2/search*' => Http::response('<items total="2"><item type="boardgame" id="42"/><item type="boardgame" id="51"/></items>'),
+            '*xmlapi2/thing?stats=1&id=42,51' => Http::response('<items>'
+                . '<item type="boardgame" id="42"><name type="primary" value="Matched base"/><poll totalvotes="5"/>'
+                . '<link type="boardgameexpansion" id="50" value="Not matched expansion"/><link type="boardgameexpansion" id="51" value="Matched expansion"/></item>'
+                . '<item type="boardgameexpansion" id="51"><thumbnail>exp.jpg</thumbnail><name type="primary" value="Matched expansion"/><poll totalvotes="1"/>'
+                . '<link type="boardgameexpansion" id="42" value="Matched base" inbound="true"/><link type="boardgameexpansion" id="70" value="Other base" inbound="true"/>'
+                . '<link type="boardgameexpansion" id="80" value="Parent expansion" inbound="true"/></item>'
+                . '</items>'),
+            '*xmlapi2/thing?stats=1&id=70,80' => Http::response('<items><item type="boardgame" id="70"><thumbnail>other.jpg</thumbnail><name type="primary" value="Other base"/><poll totalvotes="2"/></item>'
+                . '<item type="boardgameexpansion" id="80"><name type="primary" value="Parent expansion"/><poll totalvotes="9"/></item></items>'),
+            '*xmlapi2/thing?stats=1&id=50' => Http::response('<items><item type="boardgameexpansion" id="50"><name type="primary" value="Not matched expansion"/><poll totalvotes="0"/></item></items>'),
+        ]);
+
+        $response = $this->actingAs($this->owner)->getJson('/api/game_search?q=test&type=all')->assertOk()->json();
+
+        $this->assertSame([42, 70], array_column($response, 'id'));
+        $this->assertTrue($response[0]['matched']);
+        $this->assertSame([51, 50], array_column($response[0]['expansions'], 'id'));
+        $this->assertSame([true, false], array_column($response[0]['expansions'], 'matched'));
+        $this->assertSame('exp.jpg', $response[0]['expansions'][0]['thumbnailUrlFromBgg']);
+        $this->assertFalse($response[1]['matched']);
+        $this->assertSame('other.jpg', $response[1]['thumbnailUrlFromBgg']);
+        $this->assertSame([51], array_column($response[1]['expansions'], 'id'));
+        $this->assertSame(0, $response[1]['hiddenExpansionCount']);
+    }
+
+    public function test_bgg_combined_search_shows_the_most_popular_expansions_first_and_counts_hidden_ones(): void
+    {
+        Http::preventStrayRequests();
+        $this->migration()->up();
+        $rated = fn(int $count) => '<statistics><ratings><usersrated value="' . $count . '"/></ratings></statistics>';
+        $links = implode('', array_map(fn($id) => '<link type="boardgameexpansion" id="' . $id . '" value="Expansion ' . $id . '"/>', range(100, 111)));
+        $expansions = implode('', array_map(
+            fn($id) => '<item type="boardgameexpansion" id="' . $id . '"><name type="primary" value="Expansion ' . $id . '"/>' . $rated($id) . '</item>',
+            range(100, 111)
+        ));
+        Http::fake([
+            '*xmlapi2/search*' => Http::response('<items total="2"><item type="boardgame" id="42"/><item type="boardgame" id="51"/></items>'),
+            '*xmlapi2/thing?stats=1&id=42,51' => Http::response('<items>'
+                . '<item type="boardgame" id="42"><name type="primary" value="Base"/>' . $rated(5000) . $links . '<link type="boardgameexpansion" id="51" value="Matched"/></item>'
+                . '<item type="boardgameexpansion" id="51"><name type="primary" value="Matched"/>' . $rated(1)
+                . '<link type="boardgameexpansion" id="42" value="Base" inbound="true"/></item></items>'),
+            '*xmlapi2/thing?stats=1&id=100,*' => Http::response('<items>' . $expansions . '</items>'),
+        ]);
+
+        $response = $this->actingAs($this->owner)->getJson('/api/game_search?q=test&type=all')->assertOk()->json();
+
+        $this->assertSame([42], array_column($response, 'id'));
+        $this->assertSame([111, 110, 109, 108, 107, 106, 105, 104, 103, 102], array_column($response[0]['expansions'], 'id'));
+        $this->assertSame(3, $response[0]['hiddenExpansionCount']);
     }
 
     public function test_newsletter_prompt_and_suggestions_only_use_the_recipients_library(): void

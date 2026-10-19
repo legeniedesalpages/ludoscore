@@ -115,7 +115,7 @@ Route::middleware(['auth:sanctum', 'throttle:6,1'])->get('/admin/newsletter/prev
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->get('/game_search', ['as' => 'game_search', function () {
-    return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = ['searchText' => request()->q]);
+    return app()->make(GameSearchController::class)->callAction('searchByName', $parameters = ['searchText' => request()->q, 'type' => request()->type ?? GameSearchController::TYPE_GAME]);
 }]);
 
 Route::middleware('auth:sanctum')->get('/game_search_detail', ['as' => 'game_search_detail', function () {

@@ -16,6 +16,7 @@ import { NgModule } from '@angular/core'
 import { A11yModule } from '@angular/cdk/a11y'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
+import { MatButtonToggleModule } from '@angular/material/button-toggle'
 import { MatCardModule } from '@angular/material/card'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatGridListModule } from '@angular/material/grid-list'
@@ -42,6 +43,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     FormsModule,
     ReactiveFormsModule,

@@ -15,29 +15,57 @@
                 </mat-form-field>
             </form>
 
-            <div class="search-result">
-                <div *ngFor="let gameFound of findGameService.searchResult" class="result-list"
-                    (click)="goToGameDetail(gameFound)">
-                    <div class="visual">
-                        <img src={{gameFound.thumbnailUrlFromBgg}} />
-                    </div>
+            <mat-button-toggle-group class="search-type" [value]="findGameService.searchType"
+                (change)="changeSearchType($event.value)" [disabled]="searching" hideSingleSelectionIndicator
+                aria-label="Type de recherche">
+                <mat-button-toggle *ngFor="let searchType of searchTypes" [value]="searchType.value">
+                    {{searchType.label}}
+                </mat-button-toggle>
+            </mat-button-toggle-group>
 
-                    <div [class]="gameFound.owned ? 'owned content' : 'content'">
-                        <div class="heading">{{gameFound.name}}</div>
-                        <div class="supporting">
-                            <div class="detail" *ngIf="!gameFound.owned">
-                                Année: <span class="emphasis">{{gameFound.year}}</span>
+            <div class="search-result">
+                <ng-container *ngFor="let row of findGameService.searchRows">
+                    <div *ngIf="row.kind === 'hidden-expansions'" class="hidden-expansions">
+                        <mat-icon>more_horiz</mat-icon>
+                        Il reste {{row.count}} extension{{row.count > 1 ? 's' : ''}} non affichée{{row.count > 1 ? 's' : ''}},
+                        précisez votre recherche
+                    </div>
+                    <div *ngIf="row.kind === 'item'" class="result-list"
+                        [class.expansion-row]="row.level === 1" [class.compact]="!row.result.thumbnailUrlFromBgg"
+                        [class.not-clickable]="row.result.type === 'expansion'" (click)="goToGameDetail(row.result)">
+                        <div class="visual">
+                            <img *ngIf="row.result.thumbnailUrlFromBgg" [src]="row.result.thumbnailUrlFromBgg" />
+                            <mat-icon *ngIf="!row.result.thumbnailUrlFromBgg">
+                                {{row.result.type === 'expansion' ? 'extension' : 'casino'}}
+                            </mat-icon>
+                        </div>
+
+                        <div class="content" [class.owned]="row.result.owned" [class.context]="!row.result.matched && row.level === 0">
+                            <div class="heading">
+                                <mat-icon *ngIf="row.result.type === 'expansion' && row.result.thumbnailUrlFromBgg"
+                                    class="type-icon" title="Extension">extension</mat-icon>
+                                {{row.result.name}}
+                                <mat-icon *ngIf="!row.result.thumbnailUrlFromBgg && row.result.owned" class="type-icon"
+                                    title="Déjà dans ma ludothèque">star</mat-icon>
                             </div>
-                            <div class="detail" *ngIf="!gameFound.owned">
-                                Popularité: <span class="emphasis">{{gameFound.popularity}}</span>
-                            </div>
-                            <div class="detail" *ngIf="gameFound.owned">
-                                <div class="emphasis">Déjà dans ma ludothèque</div>
-                                <mat-icon>star</mat-icon>
+                            <div class="supporting" *ngIf="row.result.thumbnailUrlFromBgg">
+                                <div class="detail" *ngIf="row.result.baseGames?.length">
+                                    Extension de : <span class="emphasis">{{baseGamesLabel(row.result.baseGames!)}}</span>
+                                </div>
+                                <div class="detail" *ngIf="!row.result.owned && row.result.year">
+                                    Année: <span class="emphasis">{{row.result.year}}</span>
+                                </div>
+                                <div class="detail" *ngIf="!row.result.owned && row.result.popularity !== null && !row.result.baseGames?.length">
+                                    Popularité: <span class="emphasis">{{row.result.popularity}}</span>
+                                </div>
+                                <div class="detail" *ngIf="row.result.owned">
+                                    <div class="emphasis">Déjà dans ma ludothèque</div>
+                                    <mat-icon>star</mat-icon>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </ng-container>
             </div>
         </div>
     </ng-container>
